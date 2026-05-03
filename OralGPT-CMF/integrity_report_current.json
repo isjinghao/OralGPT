@@ -1,0 +1,4208 @@
+{
+  "reference": "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/JIANGJUCHENG",
+  "dataset_root": "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata",
+  "summary": {
+    "total": 387,
+    "ok": 132,
+    "fail": 255
+  },
+  "results": {
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/CHENFANG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/CHENFENGQI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/CHENGYAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF0.png",
+        "FP/FF1.png",
+        "FP/FF2.png",
+        "FP/FL1.png",
+        "FP/FR0.png",
+        "FP/FR1.png",
+        "FP_mosaic/FF0.png",
+        "FP_mosaic/FF1.png",
+        "FP_mosaic/FF2.png",
+        "FP_mosaic/FL1.png",
+        "FP_mosaic/FR0.png",
+        "FP_mosaic/FR1.png"
+      ],
+      "extra_files": [
+        "DP/FF0.png",
+        "DP/FF1.png",
+        "DP/FL1.png",
+        "DP/FR0.png",
+        "DP/FR1.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/CHENJINGYUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/CHENQIANG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/CHENSHUO": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/CHENSISI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/CHENYIHAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/CHENYIWEN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/CHENYUDONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XR/XLa.png"
+      ],
+      "extra_files": [
+        "XR/XLa1.png",
+        "XR/XLa2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/DIAOMENGCHEN": {
+      "ok": false,
+      "missing_dirs": [
+        "CT",
+        "DP",
+        "TMJ",
+        "XR"
+      ],
+      "extra_dirs": [
+        "CT.png",
+        "DP.png",
+        "TMJ.png",
+        "XR.png"
+      ],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "DP/DD.png",
+        "DP/DF.png",
+        "DP/DL.png",
+        "DP/DLa.png",
+        "DP/DR.png",
+        "DP/DU.png",
+        "TMJ/*.png",
+        "XLadata.png",
+        "XR/XF.png",
+        "XR/XLa.png",
+        "XR/XP.png"
+      ],
+      "extra_files": [
+        "CT.png/CTF.png",
+        "CT.png/CTL0.png",
+        "CT.png/CTL1.png",
+        "CT.png/CTR0.png",
+        "CT.png/CTR1.png",
+        "DP.png/DD.png",
+        "DP.png/DF.png",
+        "DP.png/DL.png",
+        "DP.png/DLa.png",
+        "DP.png/DR.png",
+        "DP.png/DU.png",
+        "TMJ.png/TMJL1.png",
+        "TMJ.png/TMJL2.png",
+        "TMJ.png/TMJR1.png",
+        "TMJ.png/TMJR2.png",
+        "TMJ.png/TMJR3.png",
+        "XLaData.png",
+        "XR.png/XF.png",
+        "XR.png/XLa.png",
+        "XR.png/XP.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/DONGANYANG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/DONGWENLONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png",
+        "XR/XF.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/GONGCHENGSHENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/GUOYIWEN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/HEZHENGHUI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "TMJ/*.png",
+        "XLadata.png",
+        "XR/XF.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/HUAYIXUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "FP/FF3.png",
+        "FP_mosaic/FF3.png",
+        "XLaData.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/HUZHIYUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/JIANGLINNA": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/KANGJIANWEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/KANGXIAOYA": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LAIJING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LIBIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "XR/XF.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LIHUI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LILELIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LILING": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LINYIXIAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "XLadata.png",
+        "XR/XLa.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XR/XLa1.png",
+        "XR/XLa2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LINZIHAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LISIXUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LIUCHENXI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LIUKEQIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LIUXIAOJIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XR/XF.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LIUXUXIAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XR/XF.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LIUYIMIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LIXIAOBEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LIXUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LIYINGLAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LIYIXUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/LUBAOZHU": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/MAXIAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/MAYUETENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "DP/DD.png",
+        "DP/DF.png",
+        "DP/DL.png",
+        "DP/DLa.png",
+        "DP/DR.png",
+        "DP/DU.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/NIZHENJUN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/PANGE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/PANMENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/PANZIYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/QIANMEIZHEN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/QIANYIHAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/QIUYUEJUE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/SHIXINPING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/SONGENBEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": [
+        "FP/CTF.png",
+        "FP/CTL0.png",
+        "FP/CTL1.png",
+        "FP/CTR0.png",
+        "FP/CTR1.png",
+        "FP_mosaic/CTF.png",
+        "FP_mosaic/CTL0.png",
+        "FP_mosaic/CTL1.png",
+        "FP_mosaic/CTR0.png",
+        "FP_mosaic/CTR1.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/SUNSHUOFAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/SUNSHUYAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/SUYINGHAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/SUYIQING": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/TIANRUN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WANCHUNYU": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "TMJ/*.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WANGCHENYANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WANGDONGSHENG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WANGLUWEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WANGXU": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WANGXUANYE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "DP/DLa.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WANGYIFAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WANGYILIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WANGYING": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WANGYOUCHENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WURUIHAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "DP/DD.png",
+        "DP/DF.png",
+        "DP/DL.png",
+        "DP/DLa.png",
+        "DP/DR.png",
+        "DP/DU.png"
+      ],
+      "extra_files": [
+        "DP/ .png",
+        "FP/FF3.png",
+        "FP_mosaic/FF3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/WUYUQI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/XIAOFENG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/XIECHUANHUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "XR/XF.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/XIEMINQI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": [
+        "CT/CTS1.png",
+        "FP/FF3.png",
+        "FP/FF4.png",
+        "FP/FF5.png",
+        "FP/FF6.png",
+        "FP/FF7.png",
+        "FP/FF8.png",
+        "FP/FF9.png",
+        "FP_mosaic/FF3.png",
+        "FP_mosaic/FF4.png",
+        "FP_mosaic/FF5.png",
+        "FP_mosaic/FF6.png",
+        "FP_mosaic/FF7.png",
+        "FP_mosaic/FF8.png",
+        "FP_mosaic/FF9.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/XUANMINGYANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/XUJIALING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/XUXUYAOTING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTL1.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "CT/CRL1.png",
+        "CT/CTF1.png",
+        "XLaData.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/XUYUPING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png",
+        "XR/XLa.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/YANGMANLI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/YANGZIQIN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/YECHENKAI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/YUANJIAYI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/YUZIXI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHANGHAIYUE": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHANGJUNXIANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHANGXIANGYU": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHANGYIWEN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHANGZHIHUI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHANGZIANG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHAOCHUANRU": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHAORUI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHENGYIJIE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHOUDONGQI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHOUJIANHONG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHOUMO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHOUZIYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "FP/FF3.png",
+        "FP_mosaic/FF3.png",
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHUHANJIA": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHUOXIAOWEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FR1.png",
+        "FP_mosaic/FR1.png"
+      ],
+      "extra_files": [
+        "FP/XR1.png",
+        "FP_mosaic/XR1.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZHUXINXIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTL1.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "CT/CRL1.png",
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group1/ZOUYUYING": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/BUFANGMEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/CAIYUXIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/CHENSIYUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/CHENYUNYING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/DINGYIDAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/FANYOUYU": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/FANZHIHAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/GEFANYUN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/GUOQINGHUA": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/HESICHENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/HUTIANCI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/HUYIQI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/HUZHONGYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/JIANGYIFAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": [
+        "CT/CTS1.png",
+        "CT/CTS2.png",
+        "CT/CTS3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/LILINGHUI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "DP/DLa.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/LIXIAOBING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/LIXUETING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/LUJIAYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/LUZHAOYANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/MAOJIADONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/MAYIBO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/MENGXIANGJIE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/PEIJUNJIE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/SHAOSHIWEI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/SHIZHUOXI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/SIHONGLIANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/WANGHUANPENG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/WANGLUOZIHANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/WANGYIFEI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/WUHAORAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/WUJIANAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/WULIWEN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/XIEHANYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "XLadata.png",
+        "XR/XF.png",
+        "XR/XLa.png",
+        "XR/XP.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/XUFENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/XUSHUAI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/XUXINYU": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/YANGJINGHAO": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/YANGLIUYIYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/YANYI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/YANYUZHEN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/YEJIAHONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "CT/CTS1.png",
+        "CT/CTS2.png",
+        "CT/CTS3.png",
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/YEKAIWEN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/YEYANGHAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "FP/FF3.png",
+        "FP_mosaic/FF3.png",
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/YINLUYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/YUJIANAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/ZHANGHUI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/ZHANGJIAJIA": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/ZHANGXUEWEI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/ZHANGYUE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/ZHOUQI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/ZHOUZIXUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "DP/DLa.png",
+        "FP/FF1.png",
+        "FP/FF2.png",
+        "FP_mosaic/FF1.png",
+        "FP_mosaic/FF2.png",
+        "TMJ/*.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/ZHUFANGFANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/ZHUOLINYING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group2/ZHUXINGRONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/BAIYULONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/CAIKANGZHENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/CAIKAYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/CAIYULU": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/CHENBINGXU": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/CHENBOJUN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": [
+        "CT/CTS1.jpg"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/CHENHAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/CHENJIAXIE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/CHENYAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/CHENZIHAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/CHUJUNYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/DENGQIUQIONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/DINGMUCHEN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/DONGGEGE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/FUXINGRUI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/GAODEZHUANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/GEJIALIN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/GUOLEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/GUSIYUN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/HUANGYIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/LIJIAYI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/LIJUNCHEN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/LILI1": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/LILI2": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/LINXUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png",
+        "XR/XLa.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/LINYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FR0.png",
+        "FP_mosaic/FR0.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/LIYUETONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/LULUYUHAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/LVLINXUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/NIELIAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/QIANPANPAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/QIHAOCUN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/QINZHENGYU": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/SHENCHONG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/SHENGWEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/SHENYAODONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/SONGLIJUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/SUSHUANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/TAOYIYI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/WANGSEN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/WANGXIANYU": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/WANGXIAOPAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/WANGYINGXIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "DP/DL.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/WANGZENGCHENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/WANGZHEN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/WENGXINYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/WUAOBO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/WUZHUOREN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/XIERUONAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/XUBO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XR/XLa.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/XUDI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/XUJIAMIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/XUQIJIAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/YAOYUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "DP/DD.png",
+        "DP/DL.png",
+        "DP/DLa.png",
+        "DP/DR.png",
+        "DP/DU.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/YUANJIAZHE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/YUYINUO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "DP/DU.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/ZHANGHANLIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/ZHANGJIANXIN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/ZHANGLINGRUI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/ZHANGSHUYAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/ZHANGWANJUN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/ZHANGYINGTIAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/ZHENGXIAOYING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/ZHOULUXI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": [
+        "FP/FF3.png",
+        "FP_mosaic/FF3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/ZHOURONGGANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group3/ZHOUZHENG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/CHENMINGZHE": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/DONGSHICHENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/DUANMUYUCHENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "TMJ/*.png"
+      ],
+      "extra_files": [
+        "TMJ/TMJL1.jpg",
+        "TMJ/TMJL2.jpg",
+        "TMJ/TMJL3.jpg",
+        "TMJ/TMJR1.jpg",
+        "TMJ/TMJR2.jpg",
+        "TMJ/TMJR3.jpg"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/GAOYIXUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/HEHAOJIE": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/HUAJIE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/HUOMINYA": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/LINJIANUO": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/LIUQIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/LUJIANI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/QIULINGYI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/QIYU": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/SHENXIAOXIAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/SHIYATONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "~$textrecord_SHIYATONG.xlsx"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/TANSIYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/WANGJIALEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/XUXIANGHUI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/YAOQILONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/YINJIAYI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/ZHANGWENJUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "DP/DLa.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/ZHAOCHENKAI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/ZHAOJIANGE": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/ZHAOYIFAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "DP/DD.png",
+        "DP/DF.png",
+        "DP/DL.png",
+        "DP/DLa.png",
+        "DP/DR.png",
+        "DP/DU.png"
+      ],
+      "extra_files": [
+        "DP/DD.jpg",
+        "DP/DF.jpg",
+        "DP/DL1.jpg",
+        "DP/DL2.jpg",
+        "DP/DLa.jpg",
+        "DP/DU.jpg"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group4/ZHUGEJUNHAO": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/BAIZIYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "TMJ/*.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/CAIJINGJING": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/CHAQINCHEN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/CHENQI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XR/XF.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/CHENYUCHONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/FENGXIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/JIANGLI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/JIANGWEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/JIASUNQI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": [
+        "CT/CTS1.jpg"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/LILANCHENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/LIURUNQI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/LIUYANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "TMJ/*.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/LIYUTONG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/PANCAIYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/TANGDONGYAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/TANGYIHAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/TIANWEI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/WANGYING": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/XURONGQIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/XUYITING": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/YANGXINCHANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/YINGYUE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/YUFANGYUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/YUSUHUI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/ZHANGXUEYAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/ZHAOSHUAIHANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "TMJ/*.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/ZHAOXINDIE": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/ZHOUMENGYA": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": [
+        "CT/CTF2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group5/ZHOUMIN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/CAIJIAYIN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/CHENGJUNHAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": [
+        "CT/CTS1.jpg",
+        "CT/CTS2.jpg"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/CHENGZHAOJIA": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/CHENRUOXUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XR/XF.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/DINGDANQI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/GAOJIE": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/GAOZIYANG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/GUMUYANG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/GUOQINGHUA": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/GUYUFAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/HANPANWU": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/HOUXINYING": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/HUANGYIMAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/HUANGZIYE": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/LIUQIAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/WANGMUGE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "TMJ/*.png"
+      ],
+      "extra_files": [
+        "CT/CTS1.jpg"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/WANGWENHAO": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/WANGYAO": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/YANGSIJIA": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/YINGBO": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/YINHAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/ZHANGXILAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/ZHAOXUEFENG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group6/ZUOLINGHAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/CHENSIYU": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/DAIYANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/DONGXIAOCEN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/DUXINKAI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/GUHAOLIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/GUYANG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/HAOZEFENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/HOUCHANGHAO": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/HUANGYIJIA": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/JINXINGXING": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/JIWEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "XLadata.png",
+        "XR/XF.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/LIUYUHAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png",
+        "XR/XF.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/PENGJINGYU": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/QUYIJIAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/WANGHAOHAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "DP/DD.png",
+        "DP/DF.png",
+        "DP/DL.png",
+        "DP/DLa.png",
+        "DP/DR.png",
+        "DP/DU.png",
+        "FP/FF0.png",
+        "FP/FF1.png",
+        "FP/FF2.png",
+        "FP/FL0.png",
+        "FP/FL1.png",
+        "FP/FR0.png",
+        "FP/FR1.png",
+        "FP_mosaic/FF0.png",
+        "FP_mosaic/FF1.png",
+        "FP_mosaic/FF2.png",
+        "FP_mosaic/FL0.png",
+        "FP_mosaic/FL1.png",
+        "FP_mosaic/FR0.png",
+        "FP_mosaic/FR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/WANGHUI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/WUCHENXUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/XIANGFEIJIAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/XIEJINGTIAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/XUWANLEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/YANGRUNZI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/YANGXIAODAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/ZHANGKUI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/ZHANGYIZHONG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group7/ZHAOZHEYU": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/BANTINGYUE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/CAIZHUOYE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png",
+        "XLadata.png",
+        "XR/XF.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/CHENTONG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/CHENXIYING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/DINGJIARUI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/DINGYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/FANGJINGYING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/FANGYUE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/FANKEPENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/FENGYUTONG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/GENGYANYAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/HANKE": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/JINYE": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/JIQI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/LIAOXINGPING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png",
+        "XR/XF.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/LIAOYIFAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/LIHAIYAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/LIWENSHUO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/LIYIQING": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/LIYUNYUN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/LIYUXING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/LUOJIAQI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "DP/DLa.png",
+        "FP/FF2.png",
+        "FP/FL0.png",
+        "FP/FL1.png",
+        "FP/FR1.png",
+        "FP_mosaic/FF2.png",
+        "FP_mosaic/FL0.png",
+        "FP_mosaic/FL1.png",
+        "FP_mosaic/FR1.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/LUSIYUAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/MASIHAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/SHAOZIYOU": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/SHENDIANFENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/WANGCHENG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/WANGCHUQI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/WANGGUOPING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/WANGTIANHAO": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/WEILI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/WUXIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/XUFANGJUN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/XUHUIMIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/XUJIAHE": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/XULEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png",
+        "XLadata3.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/YANGJIARUI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/YANGZHIMING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png",
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/YANGZIHAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/YEZIWEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/ZENGFUYI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/ZHANGJINGJING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/ZHANGNINGHUI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/ZHENGJIALIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group8/ZHUZHENWEI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png"
+      ],
+      "extra_files": [
+        "XLadata1.png",
+        "XLadata2.png"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/CHANGZIHAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/CHENROU": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/HUQUBIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XR/XF.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/JIANGJUCHENG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/LIHANXUE": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/LIJUANJUAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/LIYIWEI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/LUOZIEN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "TMJ/*.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/MAHANGRUI": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XLadata.png",
+        "XR/XLa.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/MAJINGRONG": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTR0.png",
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/MOHUANLIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "XR/XF.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/PEIFENGMING": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "textrecord_*.xlsx"
+      ],
+      "extra_files": [
+        "PEIFENGMING.xlsx"
+      ]
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/TAOHONG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/WANGWEI": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/WANGXIANG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/WANGYULIN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "FP/FF2.png",
+        "FP_mosaic/FF2.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/WUWENJIN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/YUANMENGYAO": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/YUSHENHANG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/YUSHUHAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/YUSIHAN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/ZHANGQIXUN": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/ZHANGYAN": {
+      "ok": false,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [
+        "CT/CTF{1,2}.png",
+        "CT/CTL0.png",
+        "CT/CTL1.png",
+        "CT/CTR0.png",
+        "CT/CTR1.png"
+      ],
+      "extra_files": []
+    },
+    "/data/OralGPT/OralGPT-CMF/dataset/SH9HCMFdata/group9/ZHUYUNENG": {
+      "ok": true,
+      "missing_dirs": [],
+      "extra_dirs": [],
+      "missing_files": [],
+      "extra_files": []
+    }
+  }
+}
