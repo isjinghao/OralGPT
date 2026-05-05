@@ -40,6 +40,9 @@ QUESTION_ECT = (
 )
 DOB_KEYWORDS = ["dob", "date of birth", "birth date", "birthday"]
 AGE_REFERENCE_YEAR = 2026
+IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff"}
+FACIAL_IMAGE_ORDER = ["FF0", "FF1", "FF2", "FL0", "FL1", "FR0", "FR1"]
+DENTAL_IMAGE_ORDER = ["DF", "DU", "DD", "DL", "DLa", "DR"]
 
 
 def parse_args() -> argparse.Namespace:
@@ -161,17 +164,35 @@ def json_record_template(uid: str, group: str, patient_name: str, patient_dir: P
     }
 
 
+def collect_images(patient_dir: Path, subdir_name: str, preferred_order: List[str]) -> List[Path]:
+    image_dir = patient_dir / subdir_name
+    if not image_dir.is_dir():
+        return []
+
+    order_index = {name.lower(): index for index, name in enumerate(preferred_order)}
+
+    def sort_key(path: Path) -> Tuple[int, str]:
+        stem = path.stem.lower()
+        return order_index.get(stem, len(order_index)), path.name.lower()
+
+    return sorted(
+        [path for path in image_dir.iterdir() if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES],
+        key=sort_key,
+    )
+
+
 def add_task_result(
     record: Dict[str, Any],
     task_type: str,
     question: str,
     textrecord_path: Path,
     answer: str,
+    input_images: Optional[List[Path]] = None,
 ) -> None:
     record["Modalities"][task_type] = {
         "question": question,
         "status": "success",
-        "input_images": [],
+        "input_images": [str(path) for path in input_images] if input_images else [],
         "input_textrecord": str(textrecord_path),
         "answer": answer,
         "error": "",
@@ -521,6 +542,7 @@ def process_one_patient(
     facial_sheet = get_sheet(wb, "facial photo")
     if facial_sheet is not None:
         facial_pairs = sheet_to_pairs(facial_sheet)
+        facial_images = collect_images(item["patient_dir"], "FP_mosaic", FACIAL_IMAGE_ORDER)
         ans = safe_generate_answer(
             client=client,
             model=model,
@@ -530,11 +552,12 @@ def process_one_patient(
             fallback=build_facial_answer(facial_sheet),
         )
         if ans:
-            add_task_result(record, "facial_image", QUESTION_FACIAL, textrecord_path, ans)
+            add_task_result(record, "facial_image", QUESTION_FACIAL, textrecord_path, ans, facial_images)
 
     dental_sheet = get_sheet(wb, "dental photo")
     if dental_sheet is not None:
         dental_pairs = sheet_to_pairs(dental_sheet)
+        dental_images = collect_images(item["patient_dir"], "DP", DENTAL_IMAGE_ORDER)
         ans = safe_generate_answer(
             client=client,
             model=model,
@@ -544,7 +567,7 @@ def process_one_patient(
             fallback=build_dental_answer(dental_sheet),
         )
         if ans:
-            add_task_result(record, "intraoral_image", QUESTION_DENTAL, textrecord_path, ans)
+            add_task_result(record, "intraoral_image", QUESTION_DENTAL, textrecord_path, ans, dental_images)
 
     tmj_sheet = get_sheet(wb, "TMJ")
     if tmj_sheet is not None:
