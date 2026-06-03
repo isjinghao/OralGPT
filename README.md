@@ -179,11 +179,11 @@ This streamlined process allows you to easily benchmark any VLM against our MMOr
 If you find our work helpful, please cite us:  
 
 ```bibtex
-@article{hao2025mmoral,
-  title={Towards Better Dental AI: A Multimodal Benchmark and Instruction Dataset for Panoramic X-ray Analysis},
-  author={Hao, Jing and Fan, Yuxuan and Sun, Yanpeng and Guo, Kaixin and Lin, Lizhuo and Yang, Jinrong and Ai, Qi Yong H and Wong, Lun M and Tang, Hao and Hung, Kuo Feng},
-  journal={NeurIPS 2025},
-  year={2025}
+@article{hao2026oralagent,
+  title={OralAgent: Integrating Reasoning, Tools, and Knowledge for Interactive Dental Image Analysis},
+  author={Hao, Jing and Dai, Siyuan and Zhang, Yongxin and Liang, Yuci and Wu, Jiamin and Bao, Jiahao and Fan, Yuxuan and Ye, Zanting and Sun, Yanpeng and Zhang, Xinyu and others},
+  journal={arXiv preprint arXiv:2605.27378},
+  year={2026}
 }
 @article{hao2025oralgpt-omni,
   title={OralGPT-Omni: A Versatile Dental Multimodal Large Language Model},
@@ -196,6 +196,12 @@ If you find our work helpful, please cite us:
   author={Fan, Yuxuan and Hao, Jing and Chen, Hong and Bao, Jiahao and Shao, Yihua and Liang, Yuci and Hung, Kuo Feng and Tang, Hao},
   journal={CVPR 2026},
   year={2026}
+}
+@article{hao2025mmoral,
+  title={Towards Better Dental AI: A Multimodal Benchmark and Instruction Dataset for Panoramic X-ray Analysis},
+  author={Hao, Jing and Fan, Yuxuan and Sun, Yanpeng and Guo, Kaixin and Lin, Lizhuo and Yang, Jinrong and Ai, Qi Yong H and Wong, Lun M and Tang, Hao and Hung, Kuo Feng},
+  journal={NeurIPS 2025},
+  year={2025}
 }
 @article{hao2025oraldataset,
   title={Characteristics, licensing, and ethical considerations of openly accessible oral-maxillofacial imaging datasets: a systematic review},
