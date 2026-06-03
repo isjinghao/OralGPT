@@ -36,16 +36,3 @@ Reward computation can call an external judge model. The API key is read from th
 ```bash
 export API_KEY="your_judge_api_key"
 ```
-
-## Attribution
-
-This code derives from Mini-o3 and VeRL. Please refer to and respect their original
-licenses. If you use this training code, please cite OralGPT-Plus.
-
-```bibtex
-@article{fan2026oralgpt-plus,
-  title={OralGPT-Plus: Learning to Use Visual Tools via Reinforcement Learning for Panoramic X-ray Analysis},
-  author={Fan and others},
-  year={2026}
-}
-```
