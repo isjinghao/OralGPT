@@ -8,6 +8,7 @@
   <a href="https://arxiv.org/pdf/2509.09254" target="_blank">📄 <b>[NeurIPS'25] OralGPT</b></a> &nbsp;|&nbsp;
   <a href="https://arxiv.org/abs/2511.22055" target="_blank">📄 <b>[CVPR'26] OralGPT-Omni</b></a> &nbsp;|&nbsp;
   <a href="https://arxiv.org/abs/2603.06366" target="_blank">📄 <b>[CVPR'26] OralGPT-Plus</b></a> &nbsp;|&nbsp;
+  
   <a href="https://arxiv.org/abs/2605.27378" target="_blank">📄 <b>[Arxiv'26] OralAgent</b></a> 
 
     
