@@ -7,8 +7,7 @@ Training code and data-curation tools for **OralGPT-Plus: Learning to Use Visual
 ```
 OralGPT-Plus/
 ├── training/
-│   ├── mini-o3-rl.tar.gz        # Packaged RL training source tree
-│   └── README.md                 # Original training README
+│   └── mini-o3-rl.tar.gz        # Packaged RL training source tree
 └── tools/
     ├── data_process_for_*.py     # Raw dataset processors (4 sources)
     ├── step_0_data*_proposal.py  # DentalProbe Step 0 -- region proposal generation
