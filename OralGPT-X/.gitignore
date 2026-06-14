@@ -1,0 +1,29 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Logs and temporary outputs
+*.log
+nohup.out
+tmp/
+temp/
+
+# Local environment files
+.env
+.env.*
+
+# Large/generated dataset artifacts
+dataset_Low-Dose_to_Standard_CBCT/
+preprocessed_png/
+cbct_png_output/
+
+# OS/editor metadata
+.DS_Store
+.idea/
+.vscode/
