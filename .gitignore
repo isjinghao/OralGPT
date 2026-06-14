@@ -1,0 +1,57 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Local environment and secrets
+.env
+.env.*
+*.key
+*.pem
+credentials.json
+
+# Logs and temporary files
+*.log
+nohup.out
+tmp/
+temp/
+*.tmp
+
+# IDE / OS metadata
+.DS_Store
+.idea/
+.vscode/
+
+# Model training / inference outputs
+output/
+outputs/
+saves/
+checkpoints/
+wandb/
+runs/
+
+# Common large local files
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+*.onnx
+*.parquet
+*.npy
+*.npz
