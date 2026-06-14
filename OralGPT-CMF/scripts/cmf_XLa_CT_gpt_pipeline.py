@@ -83,6 +83,11 @@ CT_PROMPT = (
     """
 )
 
+CT_SAVED_QUESTION = (
+    "Please analyze the dentofacial deformity based on the provided 3D CT craniofacial reconstruction.\n\n"
+    "You may internally utilize prior sagittal information (e.g., from cephalometric analysis) as a reference to guide your understanding of maxillomandibular relationships."
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -180,10 +185,22 @@ def discover_patients(dataset_root: Path) -> List[Dict[str, Any]]:
         for patient_dir in sorted(p for p in group_dir.iterdir() if p.is_dir()):
             xr_dir = patient_dir / "XR"
             ct_dir = patient_dir / "CT"
-            xla_candidates = sorted(patient_dir.glob("XLadata*.png"))
+            xla_candidates = sorted(
+                (
+                    path
+                    for path in patient_dir.iterdir()
+                    if path.is_file()
+                    and path.suffix.lower() == ".png"
+                    and path.stem.lower().startswith("xladata")
+                ),
+                key=lambda path: path.name.lower(),
+            )
             xla_data = xla_candidates[0] if xla_candidates else (patient_dir / "XLadata.png")
-            xr_xf = xr_dir / "XF.png"
             xr_xla = xr_dir / "XLa.png"
+            xr_xf = xr_dir / "XF.png"
+            xray_images = [xla_data, xr_xla]
+            if xr_xf.exists():
+                xray_images.append(xr_xf)
             ct_images = sorted(ct_dir.glob("*.png")) if ct_dir.exists() else []
 
             patients.append(
@@ -191,9 +208,9 @@ def discover_patients(dataset_root: Path) -> List[Dict[str, Any]]:
                     "group": group_dir.name,
                     "patient_name": patient_dir.name,
                     "patient_dir": patient_dir,
-                    "xray_images": [xla_data, xr_xf, xr_xla],
+                    "xray_images": xray_images,
                     "ct_images": ct_images,
-                    "xray_ready": all(p.exists() for p in [xla_data, xr_xf, xr_xla]),
+                    "xray_ready": all(p.exists() for p in [xla_data, xr_xla]),
                     "ct_ready": len(ct_images) > 0,
                 }
             )
@@ -340,7 +357,7 @@ def process_one_patient(
             add_task_result(
                 patient_record=record,
                 task_type="CT",
-                question=CT_PROMPT,
+                question=CT_SAVED_QUESTION,
                 input_images=ct_images,
                 status="dry_run",
             )
@@ -355,7 +372,7 @@ def process_one_patient(
                 add_task_result(
                     patient_record=record,
                     task_type="CT",
-                    question=CT_PROMPT,
+                    question=CT_SAVED_QUESTION,
                     input_images=ct_images,
                     status="success",
                     answer=res["answer"],
@@ -364,7 +381,7 @@ def process_one_patient(
                 add_task_result(
                     patient_record=record,
                     task_type="CT",
-                    question=CT_PROMPT,
+                    question=CT_SAVED_QUESTION,
                     input_images=ct_images,
                     status="failed",
                     error=str(e),
@@ -373,7 +390,7 @@ def process_one_patient(
         add_task_result(
             patient_record=record,
             task_type="CT",
-            question=CT_PROMPT,
+            question=CT_SAVED_QUESTION,
             input_images=ct_images,
             status="missing_input",
             error="No CT images found under CT/ folder.",
