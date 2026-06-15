@@ -1,0 +1,30 @@
+{
+    "model": {
+        "OralGPT-Omni_qwen2_5vl-7b_baseline": {
+            "class": "GPT4V",
+            "model": "OralGPT-Omni_qwen2_5vl-7b_baseline",
+            "temperature": 1.0,
+            "img_detail": "high",
+            "api_base": "http://147.8.222.102:8000/v1/chat/completions",
+            "retry": 10,
+            "verbose": true
+        }
+    },
+    "data": {
+        "MMOral": {
+            "class": "MMOral",
+            "dataset": "MMOral"
+        }
+    },
+    "judger": {
+        "gpt-5-mini": {
+            "class": "GPT4V",
+            "model": "gpt-5-mini",
+            "img_detail": "high",
+            "api_base": "https://www.dmxapi.cn/v1/chat/completions",
+            "temperature": 1.0,
+            "retry": 10,
+            "verbose": true
+        }
+    }
+}

@@ -32,7 +32,7 @@
 
 - **Papers**: [OralGPT](https://arxiv.org/abs/2509.09254) · [OralGPT-Omni](https://arxiv.org/abs/2511.22055) · [OralGPT-Plus](https://arxiv.org/abs/2603.06366) · [OralAgent](https://arxiv.org/abs/2605.27378) 
 - **Datasets/Models**: [MMOral-OPG-Bench](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench) · [Hugging Face Org](https://huggingface.co/OralGPT)
-- **Evaluation**: [MMOral-Omni-Bench-Eval](./MMOral-Omni-Bench-Eval/) for MMOral-OPG-Bench and MMOral-Omni-Bench
+- **Evaluation**: [MMOral-Bench-EvalKit](./MMOral-Bench-EvalKit/) for MMOral-OPG-Bench and MMOral-Omni-Bench
 
 ## 📖 Table of Contents
 
@@ -87,7 +87,7 @@ This is the fastest way to run an evaluation with the provided toolkit.
 
 ### 1) Prepare API credentials
 
-Create a `.env` file under `MMOral-Omni-Bench-Eval/` and fill in your credentials:
+Create a `.env` file under `MMOral-Bench-EvalKit/` and fill in your credentials:
 
 ```bash
 OPENAI_API_KEY=
@@ -104,11 +104,11 @@ Edit the evaluation config (example file name used by the toolkit: `config_mmora
 - benchmark split (e.g., `MMOral_OPG_CLOSED`, `MMOral_OPG_OPEN`)
 - judge model (e.g., `gpt-4-turbo` or `gpt-5-mini`)
 
-See: `MMOral-Omni-Bench-Eval/README.md` for full examples.
+See: `MMOral-Bench-EvalKit/README.md` for full examples.
 
 ### 3) Run evaluation
 
-From `MMOral-Omni-Bench-Eval/`, run:
+From `MMOral-Bench-EvalKit/`, run:
 
 ```bash
 python run.py --config config_mmoral_opg.json \
@@ -125,7 +125,7 @@ Add `--reuse` to resume existing results.
 
 ## 🧭 Repository Structure
 
-- **`MMOral-Omni-Bench-Eval/`**: unified evaluation toolkit for MMOral-OPG-Bench, MMOral-Omni-Bench, and newer benchmark variants.
+- **`MMOral-Bench-EvalKit/`**: unified evaluation toolkit for MMOral-OPG-Bench, MMOral-Omni-Bench, and newer benchmark variants.
 - **`MMOral-Omni/`**: OralGPT-Omni related materials (in progress).
 - **`LLaMA-Factory/`**: training framework (upstream project included for convenience).
 
@@ -143,12 +143,12 @@ All benchmark data are **reviewed and validated by professional clinical dentist
 
 Our benchmark consists of both Open-Ended and Closed-Ended evaluation formats, with corresponding TSV files available at 🤗 [Hugging Face](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench).
 
-For benchmark evaluation, please use the unified [**MMOral-Omni-Bench-Eval**](./MMOral-Omni-Bench-Eval/) toolkit. It supports both MMOral-OPG-Bench splits:
+For benchmark evaluation, please use the unified [**MMOral-Bench-EvalKit**](./MMOral-Bench-EvalKit/) toolkit. It supports both MMOral-OPG-Bench splits:
 
 - `MMOral_OPG_CLOSED` for closed-ended multiple-choice evaluation.
 - `MMOral_OPG_OPEN` for open-ended evaluation with an LLM judge.
 
-The same evaluation folder also supports MMOral-Omni-Bench and newer benchmark variants. To evaluate a model, edit the `data` field in `MMOral-Omni-Bench-Eval/config_mmoral_opg.json` or create a config with either `MMOral_OPG_CLOSED` or `MMOral_OPG_OPEN`, then run `python run.py --config <config>.json --mode all`.
+The same evaluation folder also supports MMOral-Omni-Bench and newer benchmark variants. To evaluate a model, edit the `data` field in `MMOral-Bench-EvalKit/config_mmoral_opg.json` or create a config with either `MMOral_OPG_CLOSED` or `MMOral_OPG_OPEN`, then run `python run.py --config <config>.json --mode all`.
 
 ## 📌 Citation  
 

@@ -1,0 +1,32 @@
+{
+    "model": {
+        "Qwen2.5-VL-7B-v2-omin-tiles-v-0.9": {
+            "class": "GPT4V",
+            "model": "Qwen2.5-VL-7B-v2-omin-tiles-v-0.9",
+            "temperature": 0.0,
+            "img_detail": "high",
+            "api_base": "http://147.8.222.102:8001/v1/chat/completions",
+            "retry": 10,
+            "timeout": 600,
+            "max_tokens": 8192,
+            "verbose": true
+        }
+    },
+    "data": {
+        "MMOral_OMNI": {
+            "class": "MMOral_OMNI",
+            "dataset": "MMOral_OMNI"
+        }
+    },
+    "judger": {
+        "gpt-5-mini": {
+            "class": "GPT4V",
+            "model": "gpt-5-mini",
+            "img_detail": "high",
+            "api_base": "https://www.dmxapi.cn/v1/chat/completions",
+            "temperature": 0.0,
+            "retry": 10,
+            "verbose": true
+        }
+    }
+}

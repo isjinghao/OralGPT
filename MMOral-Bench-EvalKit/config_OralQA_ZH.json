@@ -1,0 +1,26 @@
+{
+    "model": {
+        "OralQA-ZH_qwen3.5-27b_wRAG": {
+            "class": "GPT4V",
+            "model": "qwen3.5-27b",
+            "temperature": 0.0,
+            "img_detail": "high",
+            "api_base":"http://0.0.0.0:8124/v1/chat/completions",
+            "retry": 10,
+            "timeout": 600,
+            "max_tokens": 32768,
+            "verbose": true
+        }
+    },
+    "data": {
+        "OralQA-ZH": {
+            "class": "OralQA_ZH",
+            "dataset": "OralQA-ZH"
+        }
+    },
+    "judger": {
+        "exact_matching": {
+            "model": "exact_matching"
+        }
+    }
+}
