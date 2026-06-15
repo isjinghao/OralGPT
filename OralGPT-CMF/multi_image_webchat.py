@@ -7,8 +7,8 @@ import gradio as gr
 from llamafactory.chat import ChatModel
 
 
-MODEL_PATH = "/root/autodl-tmp/models/Qwen3-VL-4B-Instruct"
-ADAPTER_PATH = "/root/autodl-tmp/saves/qwen3vl-4b-oralgpt-cmf-lora"
+MODEL_PATH = os.getenv("MODEL_PATH", "OralGPT/OralGPT-CMF-v1")
+ADAPTER_PATH = os.getenv("ADAPTER_PATH", "").strip() or None
 TEMPLATE = "qwen3_vl_nothink"
 IMAGE_MAX_PIXELS = 131072
 
@@ -19,16 +19,16 @@ chat_model: ChatModel | None = None
 def get_chat_model() -> ChatModel:
     global chat_model
     if chat_model is None:
-        chat_model = ChatModel(
-            dict(
-                model_name_or_path=MODEL_PATH,
-                adapter_name_or_path=ADAPTER_PATH,
-                template=TEMPLATE,
-                trust_remote_code=True,
-                infer_backend="huggingface",
-                image_max_pixels=IMAGE_MAX_PIXELS,
-            )
+        args = dict(
+            model_name_or_path=MODEL_PATH,
+            template=TEMPLATE,
+            trust_remote_code=True,
+            infer_backend="huggingface",
+            image_max_pixels=IMAGE_MAX_PIXELS,
         )
+        if ADAPTER_PATH:
+            args["adapter_name_or_path"] = ADAPTER_PATH
+        chat_model = ChatModel(args)
     return chat_model
 
 
