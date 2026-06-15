@@ -32,7 +32,7 @@
 
 - **Papers**: [OralGPT](https://arxiv.org/abs/2509.09254) · [OralGPT-Omni](https://arxiv.org/abs/2511.22055) · [OralGPT-Plus](https://arxiv.org/abs/2603.06366) · [OralAgent](https://arxiv.org/abs/2605.27378) 
 - **Datasets/Models**: [MMOral-OPG-Bench](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench) · [Hugging Face Org](https://huggingface.co/OralGPT)
-- **Evaluation**: [MMOral-OPG-Bench-EvalKit](./MMOral-Bench-EvalKit/) · [MMOral-Uni-Bench-Eval](./MMOral-Omni-Bench-Eval/)
+- **Evaluation**: [MMOral-Omni-Bench-Eval](./MMOral-Omni-Bench-Eval/) for MMOral-OPG-Bench and MMOral-Omni-Bench
 
 ## 📖 Table of Contents
 
@@ -87,7 +87,7 @@ This is the fastest way to run an evaluation with the provided toolkit.
 
 ### 1) Prepare API credentials
 
-Create a `.env` file under `MMOral-Bench-EvalKit/` and fill in your credentials:
+Create a `.env` file under `MMOral-Omni-Bench-Eval/` and fill in your credentials:
 
 ```bash
 OPENAI_API_KEY=
@@ -104,11 +104,11 @@ Edit the evaluation config (example file name used by the toolkit: `config_mmora
 - benchmark split (e.g., `MMOral_OPG_CLOSED`, `MMOral_OPG_OPEN`)
 - judge model (e.g., `gpt-4-turbo` or `gpt-5-mini`)
 
-See: `MMOral-Bench-EvalKit/README.md` for full examples.
+See: `MMOral-Omni-Bench-Eval/README.md` for full examples.
 
 ### 3) Run evaluation
 
-From `MMOral-Bench-EvalKit/`, run:
+From `MMOral-Omni-Bench-Eval/`, run:
 
 ```bash
 python run.py --config config_mmoral_opg.json \
@@ -125,7 +125,7 @@ Add `--reuse` to resume existing results.
 
 ## 🧭 Repository Structure
 
-- **`MMOral-Bench-EvalKit/`**: evaluation toolkit (recommended entry for benchmarking).
+- **`MMOral-Omni-Bench-Eval/`**: unified evaluation toolkit for MMOral-OPG-Bench, MMOral-Omni-Bench, and newer benchmark variants.
 - **`MMOral-Omni/`**: OralGPT-Omni related materials (in progress).
 - **`LLaMA-Factory/`**: training framework (upstream project included for convenience).
 
@@ -143,40 +143,12 @@ All benchmark data are **reviewed and validated by professional clinical dentist
 
 Our benchmark consists of both Open-Ended and Closed-Ended evaluation formats, with corresponding TSV files available at 🤗 [Hugging Face](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench).
 
-For benchmark evaluation, we provide two approaches:
+For benchmark evaluation, please use the unified [**MMOral-Omni-Bench-Eval**](./MMOral-Omni-Bench-Eval/) toolkit. It supports both MMOral-OPG-Bench splits:
 
-1. Using [**VLMEvalkit**](https://github.com/isbrycee/OralGPT/tree/main/MMOral-Bench-EvalKit) (supporting multiple pre-configured VLMs)
-2. For VLMs not available in VLMEvalkit or new VLMs, we provide generic evaluation scripts: `eval_MMOral_VQA_Closed.py` and `eval_MMOral_VQA_Open.py`
+- `MMOral_OPG_CLOSED` for closed-ended multiple-choice evaluation.
+- `MMOral_OPG_OPEN` for open-ended evaluation with an LLM judge.
 
-#### Using VLMEvalkit
-
-Please refer to [**Evaluation Suite**](./MMOral-Bench-EvalKit/) or [**official VLMEvalKit**](https://github.com/open-compass/VLMEvalKit/tree/main).
-
-#### Using Generic Evaluation Scripts
-
-For models not supported by VLMEvalkit, you can use our generic evaluation templates. Simply add your model's inference method to either `eval_MMOral_VQA_Closed.py` or `eval_MMOral_VQA_Open.py` to conduct the evaluation. These scripts provide a flexible framework that can accommodate any VLM implementation.
-
-```python
-#For Open-Ended Evaluation
-python MMOral-Bench-EvalKit/eval_MMOral_VQA_Open.py \
-  --benchmark_path '/path/to/your/MM-Oral-VQA-Open-Ended_processed.tsv' \
-  --output_dir '/path/to/save/evaluation_results_open-4o' \
-  --gpt_api_key 'your_api_key_here' \
-  --gpt_api_base 'https://your-gpt-api-endpoint.com/v1/chat/completions' \
-  --dataset_name 'MM-Oral-VQA-Open-Ended' \
-  --model_name 'gpt4o'
-
-#For Closed-Ended Evaluation
-python MMOral-Bench-EvalKit/eval_MMOral_VQA_Closed.py \
-  --benchmark_path '/path/to/your/MM-Oral-VQA-Closed-Ended.tsv' \
-  --output_dir '/path/to/save/evaluation_results' \
-  --api_url 'https://your-gpt-api-endpoint.com/v1/chat/completions' \
-  --api_key 'your_api_key_here' \
-  --dataset_name 'MM-Oral-VQA-Closed-Ended' \
-  --model_name 'gpt4o'
-```
-
-This streamlined process allows you to easily benchmark any VLM against our MMOral-OPG-Bench.
+The same evaluation folder also supports MMOral-Omni-Bench and newer benchmark variants. To evaluate a model, edit the `data` field in `MMOral-Omni-Bench-Eval/config_mmoral_opg.json` or create a config with either `MMOral_OPG_CLOSED` or `MMOral_OPG_OPEN`, then run `python run.py --config <config>.json --mode all`.
 
 ## 📌 Citation  
 

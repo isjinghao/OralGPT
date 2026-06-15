@@ -104,14 +104,20 @@ class MMOral_OPG_OPEN(MMOralBase):
 # Class for closed-ended questions
 class MMOral_OPG_CLOSED(MMOralBase):
     TYPE = 'MCQ'
+    OPTION_COLUMNS = ['option1', 'option2', 'option3', 'option4']
     
     DATASET_URL = {
         'MMOral_OPG_CLOSED': 'https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench/resolve/main/MMOral-OPG-Bench-Closed-Ended.tsv'
     }
     
     DATASET_MD5 = {
-        'MMOral_OPG_CLOSED': 'b13cff13ffce25225d5de0efed8e53fa'
+        'MMOral_OPG_CLOSED': 'd70060e427f7d68a7cad1edb513b3a5f'
     }
+
+    def post_build(self, dataset):
+        for col in self.OPTION_COLUMNS:
+            if col in self.data:
+                self.data[col] = self.data[col].fillna('None')
     
     def build_prompt(self, line):
         tgt_path = self.dump_image(line)

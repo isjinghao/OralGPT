@@ -3,7 +3,12 @@
 ## ☀️ 0. Benchmarks supported:
 
 1. 🦷 MMOral-OPG-Bench <a href="https://arxiv.org/pdf/2509.09254" target="_blank"><b>[Paper]</b></a>
-2. ⚕️ MMOral-Omni-Bench <a href="" target="_blank"><b>[Coming soom]</b></a>
+2. ⚕️ MMOral-Omni-Bench <a href="" target="_blank"><b>[Coming soon]</b></a>
+
+This is the unified evaluation toolkit for the current MMOral benchmarks. It supports both MMOral-OPG-Bench splits:
+
+- `MMOral_OPG_CLOSED`: closed-ended multiple-choice evaluation.
+- `MMOral_OPG_OPEN`: open-ended evaluation with an LLM judge.
 
 > You will need access to the gpt-4-turbo or gpt-5-mini as the judge model in the evaluation process.
 
@@ -14,7 +19,7 @@
 
 ### 🧩 Create a `.env` file
 
-Inside your `$VLMEvalKit` directory, create a `.env` file and fill in your OpenAI API credentials:
+Inside the `MMOral-Omni-Bench-Eval/` directory, create a `.env` file and fill in your OpenAI API credentials:
 
 ```bash
 OPENAI_API_KEY=
@@ -71,7 +76,7 @@ Create or edit the file `config_mmoral_opg.json`. This file defines:
 - The benchmark name (e.g., '**MMOral_OPG_CLOSED**', '**MMOral_OPG_OPEN**', '**MMOral_OMNI**', etc.)
 - The Judge model (e.g., 'gpt-5-mini' or 'gpt-4-turbo')
 
-Config Example:
+Use `MMOral_OPG_CLOSED` for closed-ended evaluation:
 
 ```json
 {
@@ -105,6 +110,45 @@ Config Example:
 }
 
 ```
+
+Use `MMOral_OPG_OPEN` for open-ended evaluation:
+
+```json
+{
+    "model": {
+        "OralGPT-Omni": {
+            "class": "GPT4V",
+            "model": "OralAgent",
+            "temperature": 0.0,
+            "img_detail": "high",
+            "api_base": "http://0.0.0.0:8124/v1/chat/completions",
+            "retry": 10,
+            "timeout": 600,
+            "max_tokens": 8192,
+            "verbose": true
+        }
+    },
+    "data": {
+        "MMOral_OPG_OPEN": {
+            "class": "MMOral_OPG_OPEN",
+            "dataset": "MMOral_OPG_OPEN"
+        }
+    },
+    "judger": {
+        "gpt-5-mini": {
+            "class": "GPT4V",
+            "model": "gpt-5-mini",
+            "img_detail": "high",
+            "api_base": "https://www.dmxapi.cn/v1/chat/completions",
+            "temperature": 0.0,
+            "retry": 10,
+            "verbose": true
+        }
+    }
+}
+```
+
+Use `MMOral_OMNI` or `MMOral_OMNI_Mini` for Omni-Bench evaluation:
 
 ```json
 {
@@ -140,6 +184,7 @@ Config Example:
         }
     }
 }
+```
 
 
 ---
@@ -159,7 +204,7 @@ python run.py --config config_mmoral_opg.json \
 
 #### 🧹 Optional: Post-processing Model Outputs
 
-If you wish to clean model responses (e.g., remove “thinking” reasoning parts and keep only final answers), edit the post-processing logic in: `$VLMEvalKit/vlmeval/inference.py` at Line 244.
+If you wish to clean model responses (e.g., remove “thinking” reasoning parts and keep only final answers), edit the post-processing logic in: `MMOral-Omni-Bench-Eval/vlmeval/inference.py`.
 
 ---
 
