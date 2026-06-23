@@ -1,0 +1,79 @@
+{
+  "benchmark": "t2i",
+  "version": "v1.0-examples",
+  "split": "test",
+  "num_samples": 5,
+  "note": "Five public T2I smoke prompts. Full benchmark: expand metadata.test.jsonl on eval machine.",
+  "samples": [
+    {
+      "id": "intraoral_caries_001",
+      "benchmark": "t2i",
+      "task_family": "text_to_image",
+      "category": "pathology_caries",
+      "split": "test",
+      "prompt": "Please generate an intraoral image showing dental caries.",
+      "instruction": "Please generate an intraoral image showing dental caries.",
+      "metadata": {
+        "modality": "intraoral_photo",
+        "finding": "caries",
+        "language": "en"
+      }
+    },
+    {
+      "id": "intraoral_healthy_001",
+      "benchmark": "t2i",
+      "task_family": "text_to_image",
+      "category": "healthy",
+      "split": "test",
+      "prompt": "Please generate an intraoral image of healthy teeth and gingiva with no obvious pathology.",
+      "instruction": "Please generate an intraoral image of healthy teeth and gingiva with no obvious pathology.",
+      "metadata": {
+        "modality": "intraoral_photo",
+        "finding": "none",
+        "language": "en"
+      }
+    },
+    {
+      "id": "intraoral_gingivitis_001",
+      "benchmark": "t2i",
+      "task_family": "text_to_image",
+      "category": "pathology_periodontal",
+      "split": "test",
+      "prompt": "Please generate an intraoral image showing gingivitis with red, swollen gingival margins and plaque accumulation.",
+      "instruction": "Please generate an intraoral image showing gingivitis with red, swollen gingival margins and plaque accumulation.",
+      "metadata": {
+        "modality": "intraoral_photo",
+        "finding": "gingivitis",
+        "language": "en"
+      }
+    },
+    {
+      "id": "intraoral_missing_tooth_001",
+      "benchmark": "t2i",
+      "task_family": "text_to_image",
+      "category": "anatomy_edentulous",
+      "split": "test",
+      "prompt": "Please generate an intraoral image showing a missing mandibular molar with an empty extraction socket.",
+      "instruction": "Please generate an intraoral image showing a missing mandibular molar with an empty extraction socket.",
+      "metadata": {
+        "modality": "intraoral_photo",
+        "finding": "missing_tooth",
+        "language": "en"
+      }
+    },
+    {
+      "id": "intraoral_crown_001",
+      "benchmark": "t2i",
+      "task_family": "text_to_image",
+      "category": "restoration_crown",
+      "split": "test",
+      "prompt": "Please generate an intraoral image showing a ceramic crown on a maxillary premolar.",
+      "instruction": "Please generate an intraoral image showing a ceramic crown on a maxillary premolar.",
+      "metadata": {
+        "modality": "intraoral_photo",
+        "finding": "crown",
+        "language": "en"
+      }
+    }
+  ]
+}

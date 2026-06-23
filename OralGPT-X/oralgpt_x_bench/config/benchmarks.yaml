@@ -1,0 +1,49 @@
+# Top-level benchmarks (peer): cbct, ortho, mri
+
+benchmarks:
+  cbct:
+    display_name: Oral-Edit-CBCT
+    task_family: edit_restoration
+    description: Low-dose to standard-dose CBCT enhancement
+    metadata: benchmark/cbct/metadata.test.json
+    infer_script: infer/gen_edit_mp.py
+    metrics:
+      - pixel
+    pixel_metrics: [ssim, psnr, nmi, mae]
+    optional_metrics: [lpips]
+    groups: [task_type, volume_id]
+    shell: scripts/run_cbct.sh
+
+  ortho:
+    display_name: Oral-Edit-Ortho
+    task_family: edit_simulation
+    description: Pre-to-post orthognathic X-ray simulation
+    metadata: benchmark/ortho/metadata.test.json
+    infer_script: infer/gen_edit_mp.py
+    metrics:
+      - pixel
+      - judge_edit
+    groups: [modality, batch]
+    shell: scripts/run_ortho.sh
+
+  mri:
+    display_name: Oral-Edit-MRI
+    task_family: edit_translation
+    description: T1/T2 MRI modality conversion
+    metadata: benchmark/mri/metadata.test.json
+    infer_script: infer/gen_edit_mp.py
+    metrics:
+      - pixel
+    groups: [task_type, cohort]
+    shell: scripts/run_mri.sh
+
+  t2i:
+    display_name: Oral-T2I
+    task_family: text_to_image
+    description: Caption to oral radiograph generation
+    metadata: benchmark/t2i/metadata.test.jsonl
+    infer_script: infer/gen_t2i_mp.py
+    metrics:
+      - judge_t2i
+    groups: [category]
+    shell: scripts/run_t2i.sh

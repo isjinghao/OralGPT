@@ -1,0 +1,127 @@
+#!/usr/bin/env python3
+"""Export CBCT test parquet shards into OralGPT-X-Bench metadata + PNG files."""
+
+from __future__ import annotations
+
+import argparse
+import io
+import json
+from pathlib import Path
+
+import pyarrow.parquet as pq
+from PIL import Image
+from tqdm import tqdm
+
+from path_utils import bench_root, resolve_path
+
+TASK_NAMES = {
+    "cbct_78_to_333": "78_to_333",
+    "cbct_123_to_333": "123_to_333",
+    "cbct_131_to_333": "131_to_333",
+}
+
+
+def png_bytes_to_file(png_bytes: bytes, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with Image.open(io.BytesIO(png_bytes)) as image:
+        image.save(path, format="PNG")
+
+
+def export_task(
+    parquet_path: Path,
+    task_type: str,
+    bench_data_root: Path,
+    samples: list[dict],
+) -> None:
+    table = pq.read_table(parquet_path)
+    rows = table.to_pylist()
+    if args.max_per_task is not None:
+        rows = rows[: args.max_per_task]
+    for row in tqdm(rows, desc=task_type):
+        pair_id = row["pair_id"]
+        instruction = row["instruction_list"][0][0]
+        sample_id = pair_id.replace("/", "_")
+
+        source_rel = Path("source") / task_type / f"{sample_id}.png"
+        target_rel = Path("target") / task_type / f"{sample_id}.png"
+        png_bytes_to_file(row["image_list"][0], bench_data_root / source_rel)
+        png_bytes_to_file(row["image_list"][1], bench_data_root / target_rel)
+
+        samples.append(
+            {
+                "id": sample_id,
+                "benchmark": "cbct",
+                "task_family": "edit_restoration",
+                "task_type": task_type,
+                "split": "test",
+                "source": {"image_path": source_rel.as_posix()},
+                "target": {"image_path": target_rel.as_posix(), "role": "pixel_gt"},
+                "instruction": instruction,
+                "metadata": {
+                    "pair_id": pair_id,
+                    "volume_id": row.get("volume_id"),
+                    "source_dose": row.get("source_dose"),
+                    "target_dose": row.get("target_dose"),
+                    "source_slice_index": row.get("source_slice_index"),
+                    "target_slice_index": row.get("target_slice_index"),
+                },
+            }
+        )
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--parquet-root",
+        type=Path,
+        default=Path("/data/OralGPT/OralGPT-X/dataset_CBCT_Low-Dose_to_Standard/test"),
+        help="Root containing cbct_*_to_333/part-*.parquet",
+    )
+    parser.add_argument(
+        "--bench-data-root",
+        type=Path,
+        default=bench_root() / "benchmark_data" / "cbct",
+        help="Directory for exported source/target PNG files",
+    )
+    parser.add_argument(
+        "--output-metadata",
+        type=Path,
+        default=bench_root() / "benchmark" / "cbct" / "metadata.test.json",
+    )
+    parser.add_argument("--tasks", nargs="*", default=list(TASK_NAMES.keys()))
+    parser.add_argument(
+        "--max-per-task",
+        type=int,
+        default=None,
+        help="If set, export at most N samples per task (for smoke tests).",
+    )
+    args = parser.parse_args()
+
+    parquet_root = resolve_path(args.parquet_root)
+    bench_data_root = resolve_path(args.bench_data_root)
+    output_metadata = resolve_path(args.output_metadata, bench_root())
+
+    samples: list[dict] = []
+    for task_dir_name in args.tasks:
+        parquet_path = parquet_root / task_dir_name / "part-00000.parquet"
+        if not parquet_path.is_file():
+            raise FileNotFoundError(parquet_path)
+        export_task(parquet_path, task_dir_name, bench_data_root, samples)
+
+    payload = {
+        "benchmark": "cbct",
+        "version": "v1.0",
+        "split": "test",
+        "num_samples": len(samples),
+        "bench_data_root_hint": str(bench_data_root),
+        "samples": samples,
+    }
+    output_metadata.parent.mkdir(parents=True, exist_ok=True)
+    output_metadata.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"Exported {len(samples)} samples")
+    print(f"Images: {bench_data_root}")
+    print(f"Metadata: {output_metadata}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,125 @@
+{
+  "benchmark": "ortho",
+  "version": "v1.0-examples",
+  "split": "test",
+  "num_samples": 5,
+  "note": "Five public examples (2 pan, 2 la, 1 xf). Full test: tools/export_ortho_benchmark.py.",
+  "bench_data_root_hint": "benchmark/ortho/examples",
+  "samples": [
+    {
+      "id": "0526配对三片__刘姿汝__pan__pre_to_post",
+      "benchmark": "ortho",
+      "task_family": "edit_simulation",
+      "task_type": "orthosurgery_pan_pre_to_post",
+      "split": "test",
+      "source": {
+        "image_path": "source/orthosurgery_pan_pre_to_post/0526配对三片__刘姿汝__pan__pre_to_post.png"
+      },
+      "target": {
+        "image_path": "target/orthosurgery_pan_pre_to_post/0526配对三片__刘姿汝__pan__pre_to_post.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Please help me generate a postoperative simulation image for this dentofacial deformity patient after orthognathic surgery based on this panoramic radiograph.",
+      "metadata": {
+        "pair_id": "0526配对三片__刘姿汝__pan__pre_to_post",
+        "case_id": "0526配对三片__刘姿汝",
+        "patient_id": "刘姿汝",
+        "modality": "pan",
+        "batch": "0526配对三片",
+        "qc_status": "pass"
+      }
+    },
+    {
+      "id": "0526配对三片__吴宇馨__pan__pre_to_post",
+      "benchmark": "ortho",
+      "task_family": "edit_simulation",
+      "task_type": "orthosurgery_pan_pre_to_post",
+      "split": "test",
+      "source": {
+        "image_path": "source/orthosurgery_pan_pre_to_post/0526配对三片__吴宇馨__pan__pre_to_post.png"
+      },
+      "target": {
+        "image_path": "target/orthosurgery_pan_pre_to_post/0526配对三片__吴宇馨__pan__pre_to_post.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Please help me generate a postoperative simulation image for this dentofacial deformity patient after orthognathic surgery based on this panoramic radiograph.",
+      "metadata": {
+        "pair_id": "0526配对三片__吴宇馨__pan__pre_to_post",
+        "case_id": "0526配对三片__吴宇馨",
+        "patient_id": "吴宇馨",
+        "modality": "pan",
+        "batch": "0526配对三片",
+        "qc_status": "pass"
+      }
+    },
+    {
+      "id": "0526配对三片__刘姿汝__la__pre_to_post",
+      "benchmark": "ortho",
+      "task_family": "edit_simulation",
+      "task_type": "orthosurgery_la_pre_to_post",
+      "split": "test",
+      "source": {
+        "image_path": "source/orthosurgery_la_pre_to_post/0526配对三片__刘姿汝__la__pre_to_post.png"
+      },
+      "target": {
+        "image_path": "target/orthosurgery_la_pre_to_post/0526配对三片__刘姿汝__la__pre_to_post.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Please help me generate a postoperative simulation image for this dentofacial deformity patient after orthognathic surgery based on this lateral cephalogram.",
+      "metadata": {
+        "pair_id": "0526配对三片__刘姿汝__la__pre_to_post",
+        "case_id": "0526配对三片__刘姿汝",
+        "patient_id": "刘姿汝",
+        "modality": "la",
+        "batch": "0526配对三片",
+        "qc_status": "pass"
+      }
+    },
+    {
+      "id": "0526配对三片__吴宇馨__la__pre_to_post",
+      "benchmark": "ortho",
+      "task_family": "edit_simulation",
+      "task_type": "orthosurgery_la_pre_to_post",
+      "split": "test",
+      "source": {
+        "image_path": "source/orthosurgery_la_pre_to_post/0526配对三片__吴宇馨__la__pre_to_post.png"
+      },
+      "target": {
+        "image_path": "target/orthosurgery_la_pre_to_post/0526配对三片__吴宇馨__la__pre_to_post.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Please help me generate a postoperative simulation image for this dentofacial deformity patient after orthognathic surgery based on this lateral cephalogram.",
+      "metadata": {
+        "pair_id": "0526配对三片__吴宇馨__la__pre_to_post",
+        "case_id": "0526配对三片__吴宇馨",
+        "patient_id": "吴宇馨",
+        "modality": "la",
+        "batch": "0526配对三片",
+        "qc_status": "pass"
+      }
+    },
+    {
+      "id": "0526配对三片__刘姿汝__xf__pre_to_post",
+      "benchmark": "ortho",
+      "task_family": "edit_simulation",
+      "task_type": "orthosurgery_xf_pre_to_post",
+      "split": "test",
+      "source": {
+        "image_path": "source/orthosurgery_xf_pre_to_post/0526配对三片__刘姿汝__xf__pre_to_post.png"
+      },
+      "target": {
+        "image_path": "target/orthosurgery_xf_pre_to_post/0526配对三片__刘姿汝__xf__pre_to_post.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Please help me generate a postoperative simulation image for this dentofacial deformity patient after orthognathic surgery based on this posteroanterior cephalogram.",
+      "metadata": {
+        "pair_id": "0526配对三片__刘姿汝__xf__pre_to_post",
+        "case_id": "0526配对三片__刘姿汝",
+        "patient_id": "刘姿汝",
+        "modality": "xf",
+        "batch": "0526配对三片",
+        "qc_status": "pass"
+      }
+    }
+  ]
+}

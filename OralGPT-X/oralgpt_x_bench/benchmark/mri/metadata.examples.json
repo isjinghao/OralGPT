@@ -1,0 +1,135 @@
+{
+  "benchmark": "mri",
+  "version": "v1.0-examples",
+  "split": "test",
+  "num_samples": 5,
+  "note": "Five public examples for repo smoke tests. Full test split: run tools/export_mri_benchmark.py on eval machine.",
+  "bench_data_root_hint": "benchmark/mri/examples",
+  "samples": [
+    {
+      "id": "Guizhou_Guizhou_04_T1WI_000_to_T2FS_000",
+      "benchmark": "mri",
+      "task_family": "edit_translation",
+      "task_type": "mri_t1_to_t2",
+      "split": "test",
+      "source": {
+        "image_path": "source/mri_t1_to_t2/Guizhou_Guizhou_04_T1WI_000_to_T2FS_000.png"
+      },
+      "target": {
+        "image_path": "target/mri_t1_to_t2/Guizhou_Guizhou_04_T1WI_000_to_T2FS_000.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Task: MRI modality translation (T1-weighted to T2 fat-suppressed). Input: axial T1-weighted (T1WI) salivary-gland MRI slice. Target: T2 fat-suppressed (T2FS) slice at the same anatomical level. Instruction: Convert T1 contrast to T2FS appearance—emphasize fluid and soft-tissue signal expected on fat-suppressed T2, preserve lesion location, gland margins, and spatial anatomy without adding or removing pathology.",
+      "metadata": {
+        "pair_id": "Guizhou::Guizhou_04_T1WI_000_to_T2FS_000",
+        "cohort": "Guizhou",
+        "volume_id": "04",
+        "source_modality": "T1WI",
+        "target_modality": "T2FS",
+        "direction": "t1_to_t2",
+        "source_slice_index": 0,
+        "target_slice_index": 0
+      }
+    },
+    {
+      "id": "Guizhou_Guizhou_04_T1WI_001_to_T2FS_001",
+      "benchmark": "mri",
+      "task_family": "edit_translation",
+      "task_type": "mri_t1_to_t2",
+      "split": "test",
+      "source": {
+        "image_path": "source/mri_t1_to_t2/Guizhou_Guizhou_04_T1WI_001_to_T2FS_001.png"
+      },
+      "target": {
+        "image_path": "target/mri_t1_to_t2/Guizhou_Guizhou_04_T1WI_001_to_T2FS_001.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Task: MRI modality translation (T1-weighted to T2 fat-suppressed). Input: axial T1-weighted (T1WI) salivary-gland MRI slice. Target: T2 fat-suppressed (T2FS) slice at the same anatomical level. Instruction: Convert T1 contrast to T2FS appearance—emphasize fluid and soft-tissue signal expected on fat-suppressed T2, preserve lesion location, gland margins, and spatial anatomy without adding or removing pathology.",
+      "metadata": {
+        "pair_id": "Guizhou::Guizhou_04_T1WI_001_to_T2FS_001",
+        "cohort": "Guizhou",
+        "volume_id": "04",
+        "source_modality": "T1WI",
+        "target_modality": "T2FS",
+        "direction": "t1_to_t2",
+        "source_slice_index": 1,
+        "target_slice_index": 1
+      }
+    },
+    {
+      "id": "Guizhou_Guizhou_04_T1WI_002_to_T2FS_002",
+      "benchmark": "mri",
+      "task_family": "edit_translation",
+      "task_type": "mri_t1_to_t2",
+      "split": "test",
+      "source": {
+        "image_path": "source/mri_t1_to_t2/Guizhou_Guizhou_04_T1WI_002_to_T2FS_002.png"
+      },
+      "target": {
+        "image_path": "target/mri_t1_to_t2/Guizhou_Guizhou_04_T1WI_002_to_T2FS_002.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Task: MRI modality translation (T1-weighted to T2 fat-suppressed). Input: axial T1-weighted (T1WI) salivary-gland MRI slice. Target: T2 fat-suppressed (T2FS) slice at the same anatomical level. Instruction: Convert T1 contrast to T2FS appearance—emphasize fluid and soft-tissue signal expected on fat-suppressed T2, preserve lesion location, gland margins, and spatial anatomy without adding or removing pathology.",
+      "metadata": {
+        "pair_id": "Guizhou::Guizhou_04_T1WI_002_to_T2FS_002",
+        "cohort": "Guizhou",
+        "volume_id": "04",
+        "source_modality": "T1WI",
+        "target_modality": "T2FS",
+        "direction": "t1_to_t2",
+        "source_slice_index": 2,
+        "target_slice_index": 2
+      }
+    },
+    {
+      "id": "Guizhou_Guizhou_04_T2FS_000_to_T1WI_000",
+      "benchmark": "mri",
+      "task_family": "edit_translation",
+      "task_type": "mri_t2_to_t1",
+      "split": "test",
+      "source": {
+        "image_path": "source/mri_t2_to_t1/Guizhou_Guizhou_04_T2FS_000_to_T1WI_000.png"
+      },
+      "target": {
+        "image_path": "target/mri_t2_to_t1/Guizhou_Guizhou_04_T2FS_000_to_T1WI_000.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Task: MRI modality translation (T2 fat-suppressed to T1-weighted). Input: axial T2 fat-suppressed (T2FS) salivary-gland MRI slice. Target: T1-weighted (T1WI) slice at the same anatomical level. Instruction: Convert T2FS contrast to T1 appearance—recover T1 soft-tissue and anatomical contrast, preserve lesion location, gland margins, and spatial anatomy without adding or removing pathology.",
+      "metadata": {
+        "pair_id": "Guizhou::Guizhou_04_T2FS_000_to_T1WI_000",
+        "cohort": "Guizhou",
+        "volume_id": "04",
+        "source_modality": "T2FS",
+        "target_modality": "T1WI",
+        "direction": "t2_to_t1",
+        "source_slice_index": 0,
+        "target_slice_index": 0
+      }
+    },
+    {
+      "id": "Guizhou_Guizhou_04_T2FS_001_to_T1WI_001",
+      "benchmark": "mri",
+      "task_family": "edit_translation",
+      "task_type": "mri_t2_to_t1",
+      "split": "test",
+      "source": {
+        "image_path": "source/mri_t2_to_t1/Guizhou_Guizhou_04_T2FS_001_to_T1WI_001.png"
+      },
+      "target": {
+        "image_path": "target/mri_t2_to_t1/Guizhou_Guizhou_04_T2FS_001_to_T1WI_001.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Task: MRI modality translation (T2 fat-suppressed to T1-weighted). Input: axial T2 fat-suppressed (T2FS) salivary-gland MRI slice. Target: T1-weighted (T1WI) slice at the same anatomical level. Instruction: Convert T2FS contrast to T1 appearance—recover T1 soft-tissue and anatomical contrast, preserve lesion location, gland margins, and spatial anatomy without adding or removing pathology.",
+      "metadata": {
+        "pair_id": "Guizhou::Guizhou_04_T2FS_001_to_T1WI_001",
+        "cohort": "Guizhou",
+        "volume_id": "04",
+        "source_modality": "T2FS",
+        "target_modality": "T1WI",
+        "direction": "t2_to_t1",
+        "source_slice_index": 1,
+        "target_slice_index": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "benchmark": "cbct",
+  "version": "v1.0-examples",
+  "split": "test",
+  "num_samples": 5,
+  "note": "Five public examples for repo smoke tests. Full test split: run tools/export_cbct_benchmark.py on eval machine.",
+  "bench_data_root_hint": "benchmark/cbct/examples",
+  "samples": [
+    {
+      "id": "127_350257_78_001_to_333_001_orig_050_to_050",
+      "benchmark": "cbct",
+      "task_family": "edit_restoration",
+      "task_type": "cbct_78_to_333",
+      "split": "test",
+      "source": {
+        "image_path": "source/cbct_78_to_333/127_350257_78_001_to_333_001_orig_050_to_050.png"
+      },
+      "target": {
+        "image_path": "target/cbct_78_to_333/127_350257_78_001_to_333_001_orig_050_to_050.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Task: Standard-dose CBCT image enhancement through noise suppression. Input: Low-dose dental CBCT slice acquired at 78 mGy.cm^2 using reduced mAs and a voxel size of 0.2 mm. Target: Standard-dose-equivalent CBCT image corresponding to 333 mGy.cm^2 with the same voxel size of 0.2 mm. Instruction: Enhance the low-dose CBCT image by suppressing noise caused by reduced mAs while improving contrast, edge definition, and visibility of the boundaries of hard tissue and soft tissue space, including teeth, alveolar bony structures, periodontal ligament spaces, and mandibular canals. Preserve the exact patient-specific anatomy, pathology, and tooth-canal spatial relationships. Do not introduce, remove, or alter anatomical structures or pathology. The enhanced image should approximate the appearance and diagnostic quality of a standard-dose CBCT image while avoiding hallucinated details.",
+      "metadata": {
+        "pair_id": "127_350257_78_001_to_333_001_orig_050_to_050",
+        "volume_id": "127_350257",
+        "source_dose": "78",
+        "target_dose": "333",
+        "source_slice_index": 1,
+        "target_slice_index": 1
+      }
+    },
+    {
+      "id": "107_346579_123_019_to_333_002_orig_068_to_051",
+      "benchmark": "cbct",
+      "task_family": "edit_restoration",
+      "task_type": "cbct_123_to_333",
+      "split": "test",
+      "source": {
+        "image_path": "source/cbct_123_to_333/107_346579_123_019_to_333_002_orig_068_to_051.png"
+      },
+      "target": {
+        "image_path": "target/cbct_123_to_333/107_346579_123_019_to_333_002_orig_068_to_051.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Task: Standard-dose CBCT image enhancement through noise suppression. Input: Low-dose dental CBCT slice acquired at 123 mGy.cm^2 using reduced mAs with a voxel size of 0.15 mm. Target: Standard-dose-equivalent CBCT image corresponding to 333 mGy.cm^2 with a larger voxel size of 0.2 mm. Instruction: Enhance the low-dose CBCT image by suppressing noise caused by reduced mAs while improving contrast, edge definition, and visibility of the boundaries of hard tissue and soft tissue space, including teeth, alveolar bony structures, periodontal ligament spaces, and mandibular canals. Preserve the exact patient-specific anatomy, pathology, and tooth-canal spatial relationships. Do not introduce, remove, or alter anatomical structures or pathology. The enhanced image should approximate the appearance and diagnostic quality of a standard-dose CBCT image while avoiding hallucinated details.",
+      "metadata": {
+        "pair_id": "107_346579_123_019_to_333_002_orig_068_to_051",
+        "volume_id": "107_346579",
+        "source_dose": "123",
+        "target_dose": "333",
+        "source_slice_index": 19,
+        "target_slice_index": 2
+      }
+    },
+    {
+      "id": "119_350455_131_001_to_333_050_orig_050_to_099",
+      "benchmark": "cbct",
+      "task_family": "edit_restoration",
+      "task_type": "cbct_131_to_333",
+      "split": "test",
+      "source": {
+        "image_path": "source/cbct_131_to_333/119_350455_131_001_to_333_050_orig_050_to_099.png"
+      },
+      "target": {
+        "image_path": "target/cbct_131_to_333/119_350455_131_001_to_333_050_orig_050_to_099.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Task: Standard-dose CBCT image enhancement through noise suppression and spatial-resolution improvement. Input: Low-dose dental CBCT slice acquired at 131 mGy.cm^2 using reduced mAs with a voxel size of 0.4 mm. Target: Standard-dose-equivalent CBCT image corresponding to 333 mGy.cm^2 with a smaller voxel size of 0.2 mm. Instruction: Enhance the low-dose CBCT image by suppressing noise caused by reduced mAs and improving spatial resolution while improving contrast, edge definition, and visibility of the boundaries of hard tissue and soft tissue space, including teeth, alveolar bony structures, periodontal ligament spaces, and mandibular canals. Preserve the exact patient-specific anatomy, pathology, and tooth-canal spatial relationships. Do not introduce, remove, or alter anatomical structures or pathology. The enhanced image should approximate the appearance and diagnostic quality of a standard-dose CBCT image while avoiding hallucinated details.",
+      "metadata": {
+        "pair_id": "119_350455_131_001_to_333_050_orig_050_to_099",
+        "volume_id": "119_350455",
+        "source_dose": "131",
+        "target_dose": "333",
+        "source_slice_index": 1,
+        "target_slice_index": 50
+      }
+    },
+    {
+      "id": "127_350257_78_002_to_333_002_orig_051_to_051",
+      "benchmark": "cbct",
+      "task_family": "edit_restoration",
+      "task_type": "cbct_78_to_333",
+      "split": "test",
+      "source": {
+        "image_path": "source/cbct_78_to_333/127_350257_78_002_to_333_002_orig_051_to_051.png"
+      },
+      "target": {
+        "image_path": "target/cbct_78_to_333/127_350257_78_002_to_333_002_orig_051_to_051.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Task: Standard-dose CBCT image enhancement through noise suppression. Input: Low-dose dental CBCT slice acquired at 78 mGy.cm^2 using reduced mAs and a voxel size of 0.2 mm. Target: Standard-dose-equivalent CBCT image corresponding to 333 mGy.cm^2 with the same voxel size of 0.2 mm. Instruction: Enhance the low-dose CBCT image by suppressing noise caused by reduced mAs while improving contrast, edge definition, and visibility of the boundaries of hard tissue and soft tissue space, including teeth, alveolar bony structures, periodontal ligament spaces, and mandibular canals. Preserve the exact patient-specific anatomy, pathology, and tooth-canal spatial relationships. Do not introduce, remove, or alter anatomical structures or pathology. The enhanced image should approximate the appearance and diagnostic quality of a standard-dose CBCT image while avoiding hallucinated details.",
+      "metadata": {
+        "pair_id": "127_350257_78_002_to_333_002_orig_051_to_051",
+        "volume_id": "127_350257",
+        "source_dose": "78",
+        "target_dose": "333",
+        "source_slice_index": 2,
+        "target_slice_index": 2
+      }
+    },
+    {
+      "id": "127_350257_78_003_to_333_003_orig_052_to_052",
+      "benchmark": "cbct",
+      "task_family": "edit_restoration",
+      "task_type": "cbct_78_to_333",
+      "split": "test",
+      "source": {
+        "image_path": "source/cbct_78_to_333/127_350257_78_003_to_333_003_orig_052_to_052.png"
+      },
+      "target": {
+        "image_path": "target/cbct_78_to_333/127_350257_78_003_to_333_003_orig_052_to_052.png",
+        "role": "pixel_gt"
+      },
+      "instruction": "Task: Standard-dose CBCT image enhancement through noise suppression. Input: Low-dose dental CBCT slice acquired at 78 mGy.cm^2 using reduced mAs and a voxel size of 0.2 mm. Target: Standard-dose-equivalent CBCT image corresponding to 333 mGy.cm^2 with the same voxel size of 0.2 mm. Instruction: Enhance the low-dose CBCT image by suppressing noise caused by reduced mAs while improving contrast, edge definition, and visibility of the boundaries of hard tissue and soft tissue space, including teeth, alveolar bony structures, periodontal ligament spaces, and mandibular canals. Preserve the exact patient-specific anatomy, pathology, and tooth-canal spatial relationships. Do not introduce, remove, or alter anatomical structures or pathology. The enhanced image should approximate the appearance and diagnostic quality of a standard-dose CBCT image while avoiding hallucinated details.",
+      "metadata": {
+        "pair_id": "127_350257_78_003_to_333_003_orig_052_to_052",
+        "volume_id": "127_350257",
+        "source_dose": "78",
+        "target_dose": "333",
+        "source_slice_index": 3,
+        "target_slice_index": 3
+      }
+    }
+  ]
+}

@@ -23,6 +23,13 @@ dataset_Low-Dose_to_Standard_CBCT/
 preprocessed_png/
 cbct_png_output/
 
+# OralGPT-X-Bench generated full exports and local demo artifacts
+oralgpt_x_bench/benchmark_data/
+oralgpt_x_bench/benchmark/*/metadata.test.json
+oralgpt_x_bench/benchmark/*/examples/
+oralgpt_x_bench/_visual_review_*/
+oralgpt_x_bench/_smoke_test_output/
+
 # OS/editor metadata
 .DS_Store
 .idea/

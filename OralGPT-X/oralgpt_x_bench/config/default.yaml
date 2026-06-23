@@ -1,0 +1,20 @@
+# Default paths — override via environment variables in scripts/env.sh
+
+bagel_root: null  # set BAGEL_ROOT env var
+
+inference:
+  num_timesteps: 50
+  timestep_shift: 3.0
+  cfg_text_scale: 4.0
+  cfg_img_scale: 1.5
+  cfg_renorm_min: 0.0
+  max_latent_size: 64
+  max_image_size: 1024
+  min_image_size: 512
+  seed: 42
+
+cbct:
+  doses:
+    - cbct_78_to_333
+    - cbct_123_to_333
+    - cbct_131_to_333
