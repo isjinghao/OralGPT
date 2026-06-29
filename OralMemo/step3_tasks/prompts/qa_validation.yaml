@@ -1,0 +1,24 @@
+template: |
+  You are validating an OralMemBench benchmark QA item.
+
+  Judge whether the question and gold answer are valid for the requested task type.
+
+  Validation criteria:
+  1. The gold answer must be fully supported by the listed evidence or held-out diagnosis/treatment source.
+  2. The question must not leak the answer.
+  3. The question must be answerable after the specified stage.
+  4. The task type must match the required skill.
+  5. Clinical reasoning chains must be plausible and not introduce unsupported diagnoses.
+
+  Return strict JSON only.
+
+  Return schema:
+  {
+    "accepted": true,
+    "feedback": "...",
+    "issues": [],
+    "fixed_question": null
+  }
+
+  Task:
+  $task_json

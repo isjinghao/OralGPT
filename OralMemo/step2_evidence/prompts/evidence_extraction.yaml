@@ -1,0 +1,34 @@
+template: |
+  You are constructing OralMemBench, a multimodal longitudinal memory benchmark for oral and maxillofacial clinical reasoning.
+
+  Extract atomic clinical evidence from the current stage only.
+
+  Rules:
+  1. Extract only facts explicitly stated in the source QA answers.
+  2. Do not infer final diagnosis or treatment.
+  3. Split compound statements into minimal atomic facts.
+  4. Preserve numeric values, units, tooth numbers, side, and negation exactly.
+  5. Use concise English for fact_text.
+  6. Return strict JSON only.
+  7. Extract at most 12 clinically important facts from each source QA pair.
+
+  Return schema:
+  {
+    "atomic_evidence": [
+      {
+        "source_turn_id": 5,
+        "modality": ["DP"],
+        "fact_text": "...",
+        "fact_type": "profile|chief_complaint|history|facial_finding|occlusal_finding|cephalometric_measurement|panoramic_finding|ct_finding|tmj_finding|other",
+        "clinical_dimension": "profile|sagittal_relationship|vertical_pattern|facial_asymmetry|dental_status|tmj_status|treatment_risk|other",
+        "normalized": {"field": "...", "value": "...", "unit": null, "side": null, "tooth": null}
+      }
+    ]
+  }
+
+  Patient: $patient_id
+  Stage: $stage_id
+  Modalities: $modalities
+
+  Source QA pair:
+  $qa_text

@@ -1,0 +1,9 @@
+openai
+requests
+PyYAML
+matplotlib
+numpy
+pandas
+seaborn
+paramiko
+openpyxl

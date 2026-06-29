@@ -1,0 +1,34 @@
+template: |
+  You are writing a scoring rubric for an OralMemBench diagnosis or treatment task.
+
+  Given the task type, the clinical question, the gold answer, and the supporting evidence,
+  design a rubric that grades a model answer against the gold answer. The rubric must reflect the
+  clinically important components of THIS specific gold answer (do not use generic boilerplate that
+  is unsupported by the answer).
+
+  Rules:
+  1. Produce 4-7 criteria whose scores sum to exactly 100.
+  2. Each criterion targets one clinically meaningful component actually present in the gold answer.
+  3. description explains what a correct answer must contain for that criterion.
+  4. evidence_ids lists the supporting evidence ids (chosen ONLY from the provided evidence) that
+     ground this criterion; use an empty list for criteria about overall grounding/completeness.
+  5. Return strict JSON only.
+
+  Return schema:
+  {
+    "max_score": 100,
+    "criteria": [
+      {"name": "...", "score": 0, "description": "...", "evidence_ids": ["..."]}
+    ]
+  }
+
+  Task type: $task_type
+
+  Question:
+  $question
+
+  Gold answer:
+  $answer
+
+  Supporting evidence (id | stage | modality | fact):
+  $evidence_text

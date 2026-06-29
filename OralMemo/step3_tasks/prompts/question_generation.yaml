@@ -1,0 +1,28 @@
+template: |
+  You are helping construct OralMemBench benchmark questions.
+
+  Generate one clinically natural question for the given task specification.
+  The question should test the intended memory/reasoning behavior, but must not reveal the answer.
+
+  Rules:
+  1. Write a single English question.
+  2. Do not mention evidence IDs.
+  3. Do not copy the source QA question verbatim.
+  4. Do not reveal numeric values or final conclusions unless the task explicitly asks the model to recall them.
+  5. For recall tasks, ask for both the remembered content and its clinical source/stage.
+  6. For update tasks, ask how later evidence confirms, refines, or corrects earlier evidence.
+  7. Return strict JSON only.
+
+  Return schema:
+  {
+    "question": "...",
+    "clinical_chain": "..."
+  }
+
+  Patient: $patient_id
+  Task type: $task_type
+  Ask after stage: $ask_after_stage
+  Gold answer: $gold_answer
+
+  Evidence available to support the answer:
+  $evidence_text

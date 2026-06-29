@@ -1,0 +1,41 @@
+template: |
+  You are designing OralMemBench benchmark tasks for one orthognathic / craniomaxillofacial patient.
+
+  You are given the clinical stages (released in clinical order), the full catalog of atomic
+  evidence extracted from the visible source turns, and the evidence graph. Design exactly
+  $task_count task(s) of type "$task_type" for this patient. All tasks must be medically sound and
+  fully grounded in the provided evidence only.
+
+  Definition of this task type:
+  $type_instruction
+
+  Hard rules:
+  1. required_evidence_ids must be chosen ONLY from the evidence catalog below (use exact ids).
+  2. ask_after_stage must be a stage id from the stage list, and ALL required evidence must be released at or before that stage (use stage order).
+  3. gold_answer must be fully supported by the chosen evidence. Do NOT invent diagnoses, numbers, or findings that are not in the evidence.
+  4. natural_answer is a concise (<= 4 sentences), clinically natural answer.
+  5. The $task_count tasks must be clinically distinct (different findings/evidence focus).
+  6. Return strict JSON only.
+
+  Return schema:
+  {
+    "tasks": [
+      {
+        "task_type": "$task_type",
+        "ask_after_stage": "S#_...",
+        "required_evidence_ids": ["..."],
+        "gold_answer": {"natural_answer": "..."}
+      }
+    ]
+  }
+
+  Patient: $patient_id
+
+  Clinical stages (release order):
+  $stages_text
+
+  Evidence catalog (id | stage | modality | fact):
+  $evidence_text
+
+  Evidence graph edges (source -> target | type | reason):
+  $edges_text

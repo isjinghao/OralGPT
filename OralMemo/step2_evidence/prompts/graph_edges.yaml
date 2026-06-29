@@ -1,0 +1,31 @@
+template: |
+  You are constructing OralMemBench, a multimodal longitudinal memory benchmark for oral and maxillofacial clinical reasoning.
+
+  You are given atomic clinical evidence nodes extracted from one patient's staged diagnostic workup. Stages are released in clinical order: a smaller stage_order means the evidence appeared earlier in the trajectory. Each node has an id, stage, stage_order, clinical_dimension, a normalized field, and a fact_text.
+
+  Task: propose CROSS-STAGE clinical dependency edges that capture how a LATER piece of evidence clinically depends on, supports, refines, confirms, quantifies, explains, or updates an EARLIER piece of evidence. Focus especially on dependencies that span DIFFERENT clinical dimensions or modalities, because those encode the multimodal longitudinal reasoning this benchmark evaluates.
+
+  Rules:
+  1. Every edge goes from an earlier node (source) to a later node (target): the source stage_order MUST be strictly smaller than the target stage_order.
+  2. Connect two nodes only when there is a genuine, defensible clinical relationship. Never connect unrelated findings to inflate the graph.
+  3. Prefer cross-dimension / cross-modality dependencies, for example: a chief complaint supported by an occlusal measurement; a clinical facial finding confirmed by a cephalometric or CT measurement; a dental finding cross-checked by a radiographic finding.
+  4. Use ONLY the node ids provided below. Never invent ids, facts, or values.
+  5. relation MUST be exactly one of: supports, refines, confirms, quantifies, explains, updates.
+  6. Give each edge a concise English clinical reason (one short clause, at most 15 words).
+  7. Be selective: propose at most $max_edges high-quality edges. Quality and clinical validity matter more than quantity.
+  8. Return strict JSON only, no commentary, no markdown, no reasoning text outside the JSON.
+
+  Return schema:
+  {
+    "edges": [
+      {"source": "<node_id>", "target": "<node_id>", "relation": "supports", "reason": "..."}
+    ]
+  }
+
+  Patient: $patient_id
+
+  Stage release order (earlier -> later):
+  $stage_order
+
+  Evidence nodes:
+  $nodes

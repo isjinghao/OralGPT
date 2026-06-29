@@ -1,0 +1,37 @@
+# 普通任务的类型、数量与设计说明
+# 每项:
+#   task_type   任务类型
+#   count       该类型生成数量
+#   instruction 该类型定义说明(注入规划 prompt)
+
+task_types:
+  # 单阶段/单模态可直接观察到的发现
+  - task_type: modality_perception
+    count: 3
+    instruction: >-
+      Read findings that are directly visible within a single stage/modality;
+      required evidence should come from one stage.
+
+  # 在后续阶段推理时回忆更早阶段引入的证据(答案需点明更早的来源/阶段)
+  - task_type: longitudinal_evidence_recall
+    count: 2
+    instruction: >-
+      Recall evidence introduced in an earlier stage while reasoning at a later
+      stage; the answer must name the earlier clinical source/stage; required
+      evidence should span at least two different stages.
+
+  # 整合多阶段/多模态证据推断骨性、不对称或功能模式
+  - task_type: cross_modal_reasoning
+    count: 2
+    instruction: >-
+      Integrate evidence from multiple stages/modalities to infer a skeletal,
+      asymmetry, or functional pattern; required evidence should span at least
+      two different stages.
+
+  # 解释后续阶段证据如何确认、细化或纠正更早阶段的印象
+  - task_type: memory_update_conflict_correction
+    count: 2
+    instruction: >-
+      Explain how later-stage evidence confirms, refines, or corrects an
+      earlier-stage impression; required evidence should span at least two
+      different stages.

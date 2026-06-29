@@ -1,0 +1,31 @@
+template: |
+  You are attributing supporting evidence for an OralMemBench held-out QA item.
+
+  You are given a clinical question and its gold answer (both taken verbatim from the original
+  dataset), together with the full catalog of atomic evidence extracted from the visible source
+  turns, and the evidence graph. Select the evidence items that the gold answer actually relies on.
+
+  Rules:
+  1. Choose evidence_id values ONLY from the catalog below (use exact ids).
+  2. Include every evidence item that the answer's findings, measurements, diagnoses, or treatment
+     decisions are grounded in; exclude unrelated items.
+  3. Use the evidence graph edges as a hint to include clinically linked evidence, but do not add
+     items that are irrelevant to this specific answer.
+  4. Do not invent ids. Return strict JSON only.
+
+  Return schema:
+  {
+    "required_evidence_ids": ["..."]
+  }
+
+  Question:
+  $question
+
+  Gold answer:
+  $answer
+
+  Evidence catalog (id | stage | modality | fact):
+  $evidence_text
+
+  Evidence graph edges (source -> target | type | reason):
+  $edges_text

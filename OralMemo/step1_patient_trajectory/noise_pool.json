@@ -1,0 +1,142 @@
+[
+  {
+    "id": "noise_logistics_001",
+    "category": "logistics",
+    "modality": null,
+    "human": "Doctor, could we move my next appointment to a later week? Something came up at work.",
+    "assistant": "Sure, that's no problem at all. Let me check the calendar and find a slot for you a week or two out, then I'll send you the new confirmation."
+  },
+  {
+    "id": "noise_logistics_002",
+    "category": "logistics",
+    "modality": null,
+    "human": "Roughly how much is the whole treatment going to cost me?",
+    "assistant": "Good question. I'll have the front desk put together a detailed estimate for you, and we can also go over the payment options before we start anything."
+  },
+  {
+    "id": "noise_logistics_003",
+    "category": "logistics",
+    "modality": null,
+    "human": "Is this procedure covered by my medical insurance?",
+    "assistant": "Coverage varies by plan, so let's have our billing team verify your policy. They'll let you know exactly what's covered and what your out-of-pocket portion would be."
+  },
+  {
+    "id": "noise_logistics_004",
+    "category": "logistics",
+    "modality": null,
+    "human": "What are your clinic hours, and is there somewhere I can park nearby?",
+    "assistant": "We're open from 8 to 5 on weekdays. There's a parking garage right next door, and we can validate your ticket at reception when you come in."
+  },
+  {
+    "id": "noise_lifestyle_001",
+    "category": "lifestyle",
+    "modality": null,
+    "human": "I brush twice a day. Is that enough, or should I be doing more?",
+    "assistant": "Twice a day is a solid routine. Just keep it up and add flossing once daily if you can; that combination covers most people's needs well."
+  },
+  {
+    "id": "noise_lifestyle_002",
+    "category": "lifestyle",
+    "modality": null,
+    "human": "I smoke socially once in a while. Does that matter for today's visit?",
+    "assistant": "It won't affect what we're looking at today. In general, cutting back helps your gums and healing, but there's nothing you need to worry about for this appointment."
+  },
+  {
+    "id": "noise_lifestyle_003",
+    "category": "lifestyle",
+    "modality": null,
+    "human": "I drink a lot of coffee. Is that why my teeth look a bit stained?",
+    "assistant": "Coffee can cause surface staining over time, yes. It's purely cosmetic, and a routine cleaning or whitening can usually take care of it whenever you'd like."
+  },
+  {
+    "id": "noise_lifestyle_004",
+    "category": "lifestyle",
+    "modality": null,
+    "human": "Should I be using mouthwash every day?",
+    "assistant": "An alcohol-free fluoride rinse once a day is fine if you enjoy it, but it's optional. Brushing and flossing are still the most important parts."
+  },
+  {
+    "id": "noise_benign_repeat_001",
+    "category": "benign_repeat",
+    "modality": null,
+    "human": "Just to be clear, I don't have any other major health conditions.",
+    "assistant": "Thanks for confirming. I've already got that noted from earlier, so we're all set on that front."
+  },
+  {
+    "id": "noise_benign_repeat_002",
+    "category": "benign_repeat",
+    "modality": null,
+    "human": "And I'm not allergic to any medications, as far as I know.",
+    "assistant": "Noted, that matches what you told me before. It's always good to double-check, so thank you."
+  },
+  {
+    "id": "noise_benign_repeat_003",
+    "category": "benign_repeat",
+    "modality": null,
+    "human": "No one in my family has had anything like this either, I think.",
+    "assistant": "Understood, that's consistent with what we discussed. I've kept your family history on file as non-contributory."
+  },
+  {
+    "id": "noise_benign_repeat_004",
+    "category": "benign_repeat",
+    "modality": null,
+    "human": "My last cleaning went totally fine, by the way, nothing unusual.",
+    "assistant": "Good to hear. That lines up with your records, so there's nothing extra we need to follow up on from that visit."
+  },
+  {
+    "id": "noise_postop_concern_001",
+    "category": "postop_concern",
+    "modality": null,
+    "human": "I'm a little worried about my face swelling up after the surgery.",
+    "assistant": "That's a very common concern. Some swelling is normal and usually peaks in the first few days; ice and keeping your head elevated help a lot, and we'll give you clear aftercare instructions."
+  },
+  {
+    "id": "noise_postop_concern_002",
+    "category": "postop_concern",
+    "modality": null,
+    "human": "How many days off work should I plan for after the treatment?",
+    "assistant": "Most patients take about a week, but it depends on how you feel and how physical your job is. We'll firm up that timeline once we finalize the plan."
+  },
+  {
+    "id": "noise_postop_concern_003",
+    "category": "postop_concern",
+    "modality": null,
+    "human": "Is it normal to feel some mild discomfort after a procedure like this?",
+    "assistant": "Yes, a bit of soreness afterward is completely normal and manageable with the medication we'll prescribe. If anything feels worse than expected, you can always call us."
+  },
+  {
+    "id": "noise_soft_modal_fp_001",
+    "category": "soft_modal",
+    "modality": "FP",
+    "human": "Did the lighting in my facial photos turn out okay?",
+    "assistant": "The lighting looked good, the photos came out clear. If we ever need a sharper shot we can simply retake it, so no need to worry about that."
+  },
+  {
+    "id": "noise_soft_modal_dp_001",
+    "category": "soft_modal",
+    "modality": "DP",
+    "human": "Did the photos of the inside of my mouth come out clear?",
+    "assistant": "Yes, the intraoral photos are nice and clear. We've got everything we need from them, so you're good."
+  },
+  {
+    "id": "noise_soft_modal_xr_001",
+    "category": "soft_modal",
+    "modality": "XR",
+    "human": "Does the X-ray expose me to a lot of radiation?",
+    "assistant": "The dose is very low, comparable to a few days of normal background radiation, so it's quite safe. We only take what we genuinely need."
+  },
+  {
+    "id": "noise_soft_modal_ct_001",
+    "category": "soft_modal",
+    "modality": "CT",
+    "human": "How long does the CT scan take, and will it be uncomfortable?",
+    "assistant": "It's quick, usually under a minute, and it's painless. You just need to hold still while the scanner rotates around you, that's all."
+  },
+  {
+    "id": "noise_soft_modal_tmj_001",
+    "category": "soft_modal",
+    "modality": "TMJ",
+    "human": "Will the jaw joint exam be uncomfortable?",
+    "assistant": "It's gentle, I'll just feel and listen around the joint while you open and close. Let me know if anything feels tender and I'll ease off."
+  }
+]
