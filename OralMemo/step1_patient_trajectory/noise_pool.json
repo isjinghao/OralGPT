@@ -28,6 +28,48 @@
     "assistant": "We're open from 8 to 5 on weekdays. There's a parking garage right next door, and we can validate your ticket at reception when you come in."
   },
   {
+    "id": "noise_logistics_005",
+    "category": "logistics",
+    "modality": null,
+    "human": "Can I get a copy of my scans and records to share with my family dentist?",
+    "assistant": "Absolutely. I'll have reception prepare a copy for you; you can pick it up or we can send it securely by email, whichever is easier for you."
+  },
+  {
+    "id": "noise_logistics_006",
+    "category": "logistics",
+    "modality": null,
+    "human": "Do you have any evening or weekend slots? Weekdays are tough with my schedule.",
+    "assistant": "We do keep a few later slots midweek and the occasional Saturday morning. I'll have the desk show you what's open so we can find something that fits."
+  },
+  {
+    "id": "noise_logistics_007",
+    "category": "logistics",
+    "modality": null,
+    "human": "Okay, sounds good.",
+    "assistant": "Before you leave, I'll ask the front desk to book your follow-up and send you a reminder the day before, so it doesn't slip your mind."
+  },
+  {
+    "id": "noise_logistics_008",
+    "category": "logistics",
+    "modality": null,
+    "human": "Alright.",
+    "assistant": "Just a heads-up: the clinic will be closed next Monday for a public holiday, so we'll schedule around that when we set your next visit."
+  },
+  {
+    "id": "noise_logistics_009",
+    "category": "logistics",
+    "modality": null,
+    "human": "Got it, thanks.",
+    "assistant": "I'll email you the pre-visit forms in advance so you can fill them out at home and skip the wait at reception next time."
+  },
+  {
+    "id": "noise_logistics_010",
+    "category": "logistics",
+    "modality": null,
+    "human": "Understood.",
+    "assistant": "Our billing team will call you in a day or two once the insurance pre-authorization comes back, so keep an eye on your phone."
+  },
+  {
     "id": "noise_lifestyle_001",
     "category": "lifestyle",
     "modality": null,
@@ -54,6 +96,48 @@
     "modality": null,
     "human": "Should I be using mouthwash every day?",
     "assistant": "An alcohol-free fluoride rinse once a day is fine if you enjoy it, but it's optional. Brushing and flossing are still the most important parts."
+  },
+  {
+    "id": "noise_lifestyle_005",
+    "category": "lifestyle",
+    "modality": null,
+    "human": "I grind my teeth at night sometimes. Should I be concerned?",
+    "assistant": "It's worth keeping an eye on. If it becomes frequent, a simple night guard helps protect your teeth, but it's not something we need to act on today."
+  },
+  {
+    "id": "noise_lifestyle_006",
+    "category": "lifestyle",
+    "modality": null,
+    "human": "Is it bad that I snack quite late at night?",
+    "assistant": "Late snacking isn't ideal for your teeth if you skip brushing afterward, but an occasional snack is fine. Just rinse or brush before bed when you can."
+  },
+  {
+    "id": "noise_lifestyle_007",
+    "category": "lifestyle",
+    "modality": null,
+    "human": "Okay.",
+    "assistant": "While it's on my mind, cutting back on very sugary drinks between meals would do your enamel a favor over the long run; just a general tip, nothing to worry about."
+  },
+  {
+    "id": "noise_lifestyle_008",
+    "category": "lifestyle",
+    "modality": null,
+    "human": "Sure.",
+    "assistant": "One small thing I mention to most patients: try not to brush too hard. A soft brush and gentle pressure protect your gums better over time."
+  },
+  {
+    "id": "noise_lifestyle_009",
+    "category": "lifestyle",
+    "modality": null,
+    "human": "Alright, thanks.",
+    "assistant": "Staying well hydrated through the day also helps with dry mouth, so keep a water bottle handy when you can; it's a simple habit that pays off."
+  },
+  {
+    "id": "noise_lifestyle_010",
+    "category": "lifestyle",
+    "modality": null,
+    "human": "Good to know.",
+    "assistant": "If you play any contact sports, a mouthguard is a cheap way to avoid dental injuries. Nothing urgent, just something worth keeping in mind."
   },
   {
     "id": "noise_benign_repeat_001",
@@ -84,6 +168,48 @@
     "assistant": "Good to hear. That lines up with your records, so there's nothing extra we need to follow up on from that visit."
   },
   {
+    "id": "noise_benign_repeat_005",
+    "category": "benign_repeat",
+    "modality": null,
+    "human": "Again, I haven't had any surgeries in the past, just to confirm.",
+    "assistant": "Thanks for reconfirming. That's consistent with your record, so nothing changes on our end."
+  },
+  {
+    "id": "noise_benign_repeat_006",
+    "category": "benign_repeat",
+    "modality": null,
+    "human": "I think I mentioned I don't smoke, right?",
+    "assistant": "Yes, you did, and I've got that recorded as a non-smoker. Thanks for confirming it again."
+  },
+  {
+    "id": "noise_benign_repeat_007",
+    "category": "benign_repeat",
+    "modality": null,
+    "human": "Okay.",
+    "assistant": "Just to double-check what I have on file: no daily medications and no known drug allergies, correct? Great, that's exactly what I'll keep noted."
+  },
+  {
+    "id": "noise_benign_repeat_008",
+    "category": "benign_repeat",
+    "modality": null,
+    "human": "Right.",
+    "assistant": "I'll restate this for the record: your general health is stable and there are no red flags in your history, which matches what you told me earlier."
+  },
+  {
+    "id": "noise_benign_repeat_009",
+    "category": "benign_repeat",
+    "modality": null,
+    "human": "Yes.",
+    "assistant": "For completeness, I'm confirming again that your family history is non-contributory, so we won't be flagging anything hereditary."
+  },
+  {
+    "id": "noise_benign_repeat_010",
+    "category": "benign_repeat",
+    "modality": null,
+    "human": "Correct.",
+    "assistant": "I'll note once more that your previous dental visits were routine with no complications, just so the record stays fully consistent."
+  },
+  {
     "id": "noise_postop_concern_001",
     "category": "postop_concern",
     "modality": null,
@@ -105,11 +231,67 @@
     "assistant": "Yes, a bit of soreness afterward is completely normal and manageable with the medication we'll prescribe. If anything feels worse than expected, you can always call us."
   },
   {
+    "id": "noise_postop_concern_004",
+    "category": "postop_concern",
+    "modality": null,
+    "human": "Will I be able to eat normally right after the procedure?",
+    "assistant": "You'll want to stick to soft foods for the first few days and avoid anything too hot or hard. We'll give you a simple diet list to follow while you heal."
+  },
+  {
+    "id": "noise_postop_concern_005",
+    "category": "postop_concern",
+    "modality": null,
+    "human": "Should I be worried about scarring afterward?",
+    "assistant": "For this type of treatment, visible scarring is usually minimal or well hidden. We take care to keep everything as discreet as possible, so it's not something to lose sleep over."
+  },
+  {
+    "id": "noise_postop_concern_006",
+    "category": "postop_concern",
+    "modality": null,
+    "human": "How long until I can exercise again?",
+    "assistant": "Take it easy for about a week and avoid strenuous workouts, since they can increase swelling. We'll confirm when you're clear to resume based on how you heal."
+  },
+  {
+    "id": "noise_postop_concern_007",
+    "category": "postop_concern",
+    "modality": null,
+    "human": "Okay.",
+    "assistant": "Ahead of time, let me reassure you: some bruising and swelling in the first few days is expected and settles on its own. I'll write down what's normal versus what warrants a call."
+  },
+  {
+    "id": "noise_postop_concern_008",
+    "category": "postop_concern",
+    "modality": null,
+    "human": "Alright.",
+    "assistant": "I'll go over aftercare with you before you leave: cold compresses the first day, gentle rinses afterward, and the pain-medicine schedule, so you're not guessing at home."
+  },
+  {
+    "id": "noise_postop_concern_009",
+    "category": "postop_concern",
+    "modality": null,
+    "human": "Got it.",
+    "assistant": "One thing I always mention: if you notice fever or worsening pain after day three, call us right away; otherwise a steady day-by-day improvement is what we expect."
+  },
+  {
+    "id": "noise_postop_concern_010",
+    "category": "postop_concern",
+    "modality": null,
+    "human": "Thanks.",
+    "assistant": "I'll also arrange a quick check-in call a few days after the procedure, just to make sure your recovery is on track and answer anything that comes up."
+  },
+  {
     "id": "noise_soft_modal_fp_001",
     "category": "soft_modal",
     "modality": "FP",
     "human": "Did the lighting in my facial photos turn out okay?",
     "assistant": "The lighting looked good, the photos came out clear. If we ever need a sharper shot we can simply retake it, so no need to worry about that."
+  },
+  {
+    "id": "noise_soft_modal_fp_002",
+    "category": "soft_modal",
+    "modality": "FP",
+    "human": "Okay.",
+    "assistant": "By the way, your facial photos came out well and I've already saved them to your file, so we won't need to redo them."
   },
   {
     "id": "noise_soft_modal_dp_001",
@@ -119,11 +301,25 @@
     "assistant": "Yes, the intraoral photos are nice and clear. We've got everything we need from them, so you're good."
   },
   {
+    "id": "noise_soft_modal_dp_002",
+    "category": "soft_modal",
+    "modality": "DP",
+    "human": "Alright.",
+    "assistant": "Just so you know, the intraoral photos are clear and properly labeled in your chart; nothing more is needed from you on those."
+  },
+  {
     "id": "noise_soft_modal_xr_001",
     "category": "soft_modal",
     "modality": "XR",
     "human": "Does the X-ray expose me to a lot of radiation?",
     "assistant": "The dose is very low, comparable to a few days of normal background radiation, so it's quite safe. We only take what we genuinely need."
+  },
+  {
+    "id": "noise_soft_modal_xr_002",
+    "category": "soft_modal",
+    "modality": "XR",
+    "human": "Okay.",
+    "assistant": "For your reassurance, the X-ray settings we used are the lowest that still give a clear image, and it's already stored in your record."
   },
   {
     "id": "noise_soft_modal_ct_001",
@@ -133,10 +329,24 @@
     "assistant": "It's quick, usually under a minute, and it's painless. You just need to hold still while the scanner rotates around you, that's all."
   },
   {
+    "id": "noise_soft_modal_ct_002",
+    "category": "soft_modal",
+    "modality": "CT",
+    "human": "Got it.",
+    "assistant": "The CT images uploaded fine and the quality is good; I've confirmed the scan covers everything we need, so no repeat is necessary."
+  },
+  {
     "id": "noise_soft_modal_tmj_001",
     "category": "soft_modal",
     "modality": "TMJ",
     "human": "Will the jaw joint exam be uncomfortable?",
     "assistant": "It's gentle, I'll just feel and listen around the joint while you open and close. Let me know if anything feels tender and I'll ease off."
+  },
+  {
+    "id": "noise_soft_modal_tmj_002",
+    "category": "soft_modal",
+    "modality": "TMJ",
+    "human": "Alright.",
+    "assistant": "Just noting for you, the joint exam findings are recorded and the readings we took are all clearly documented in your file, so we're set on that."
   }
 ]

@@ -4,6 +4,7 @@ import copy
 import hashlib
 import json
 import random
+from itertools import combinations
 from pathlib import Path
 
 
@@ -42,15 +43,26 @@ def build_standard_trajectory(patient_stages: dict) -> dict:
 
 
 def build_missing_modality_variants(standard: dict) -> list[dict]:
-    # 分别删除 FP/DP/XR/CT/TMJ 各一个阶段, 并重排 order, 得到5个变体
-    variants = []
-    drops = {
-        "no_fp": {"S1_FP"},
-        "no_dp": {"S2_DP"},
-        "no_xr": {"S3_XR_XLA"},
-        "no_ct": {"S4_CT"},
-        "no_tmj": {"S5_TMJ"},
+    """构造缺失模态变体轨迹 (单模态缺失 + 双模态缺失)
+       先分别删除单个阶段(4 个单缺失变体), 再两两组合删除(6 个双缺失变体)
+    """
+    # FP 为必备模态
+    removable = {
+        "dp": "S2_DP",
+        "xr": "S3_XR_XLA",
+        "ct": "S4_CT",
+        "tmj": "S5_TMJ",
     }
+
+    drops: dict[str, set[str]] = {}
+    # 单模态缺失
+    for name, stage_id in removable.items():
+        drops[f"no_{name}"] = {stage_id}
+    # 双模态缺失(可删模态两两组合)
+    for (a_name, a_stage), (b_name, b_stage) in combinations(removable.items(), 2):
+        drops[f"no_{a_name}_{b_name}"] = {a_stage, b_stage}
+
+    variants = []
     for name, removed in drops.items():
         stages = [copy.deepcopy(s) for s in standard["stages"] if s["stage_id"] not in removed]
         for new_order, stage in enumerate(stages):
