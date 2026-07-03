@@ -1,0 +1,22 @@
+template: |
+  You are grading whether a model's ANSWER correctly recalls the key clinical facts of the
+  GOLD ANSWER for the QUESTION.
+
+  Grade "correct" = true ONLY if the answer captures the essential factual content of the
+  gold answer (the key findings / values it asks about). Rules:
+  - Paraphrase and minor wording differences are fine.
+  - Numerical values must match the gold (small rounding tolerance allowed).
+  - Missing a key fact, or contradicting one, => correct = false.
+  - Extra unrelated but non-contradicting content does not by itself make it wrong.
+
+  QUESTION:
+  $question
+
+  GOLD ANSWER:
+  $gold
+
+  MODEL ANSWER:
+  $answer
+
+  Return strict JSON only, no markdown, no commentary:
+  {"correct": true, "reason": "<one short clause>"}

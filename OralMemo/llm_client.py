@@ -13,18 +13,26 @@ class ChatClient:
         self.client = OpenAI(api_key=api_key, base_url=base_url.rstrip("/") + "/")
         self.model = model
 
-    def complete_json(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000) -> dict:
+    def complete_json(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
+                      images: list[str] | None = None) -> dict:
         """发起对话补全并解析为 JSON。
 
         功能: 调用 chat.completions(timeout=90s), 将返回文本解析为 JSON; 遇限流最多重试 4 次。注: 推理模型的思维链 token 计入 max_tokens, 故各调用点需为正文 JSON 之外预留充足预算。
-        输入: prompt 提示词; temperature 采样温度; max_tokens 最大生成长度。
+        输入: prompt 提示词; temperature 采样温度; max_tokens 最大生成长度;
+              images 可选的图片 URL 列表(http(s) 或 data:base64), 传入时以多模态 content 分块发送。
         输出: dict - 解析后的 JSON 对象
         """
+        if images:
+            content: list[dict] = [{"type": "text", "text": prompt}]
+            content.extend({"type": "image_url", "image_url": {"url": url}} for url in images)
+            message: dict = {"role": "user", "content": content}
+        else:
+            message = {"role": "user", "content": prompt}
         for attempt in range(4):
             try:
                 response = self.client.chat.completions.create(
                     model=self.model,
-                    messages=[{"role": "user", "content": prompt}],
+                    messages=[message],
                     temperature=temperature,
                     max_tokens=max_tokens,
                     timeout=90,

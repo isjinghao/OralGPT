@@ -1,0 +1,22 @@
+template: |
+  You are scoring a model's ANSWER to a clinical treatment/diagnosis question against a
+  scoring RUBRIC checklist.
+
+  For EACH criterion, award points between 0 and its "max_score", based on how fully and
+  correctly the model answer satisfies the criterion "description". Partial credit is allowed.
+  Never exceed a criterion's max_score. Judge only against the rubric and the reference answer.
+
+  QUESTION:
+  $question
+
+  REFERENCE (gold) ANSWER:
+  $gold
+
+  MODEL ANSWER:
+  $answer
+
+  RUBRIC CRITERIA (JSON list, each has name / max_score / description):
+  $criteria
+
+  Return strict JSON only, no markdown, no commentary:
+  {"criteria": [{"name": "<criterion name>", "awarded": 0, "reason": "<short>"}], "total_awarded": 0}
