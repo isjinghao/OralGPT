@@ -1,6 +1,4 @@
-"""单阶段基线: 每个阶段清空记忆, 只保留当前阶段信息。
-
-用于证明"仅凭当前阶段输入无法完成需要跨阶段信息的任务"。
+"""单阶段基线: 每个阶段清空记忆, 只保留当前阶段信息
 """
 from __future__ import annotations
 
@@ -22,8 +20,8 @@ class SingleStageMemory(MemoryMethod):
         self._images = []
 
     def observe(self, stage: dict) -> None:
-        # 关键: 直接替换(而非追加), 等价于每阶段 memory.clear()
-        self._buffer = format_stage_input(stage, multimodal=self.multimodal)
+        # 直接替换, 等价于每阶段 memory.clear()
+        self._buffer = format_stage_input(stage)
         self._images = collect_stage_images(stage)
 
     def context(self, query: str | None = None) -> str:

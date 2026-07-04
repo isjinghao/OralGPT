@@ -1,10 +1,4 @@
 """记忆基线: 增量把每阶段信息由大模型融入一份紧凑的结构化记忆。
-
-observe 观察当前阶段, update 调用 LLM 将其增量合并进运行中的记忆(文本),
-回答问题时读取该记忆(context)。
-
-多模态说明: 文本记忆经 LLM 巩固后会丢失图片路径, 因此图片路径单独累积保存
-(images()), 由上层在回答时转成 image_url 分块附加给大模型。
 """
 from __future__ import annotations
 
@@ -29,7 +23,7 @@ class SummaryMemory(MemoryMethod):
         self._images = []
 
     def observe(self, stage: dict) -> None:
-        self._pending = format_stage_input(stage, multimodal=self.multimodal)
+        self._pending = format_stage_input(stage)
         # 图片路径独立累积, 不经 LLM 文本巩固而丢失
         for path in collect_stage_images(stage):
             if path not in self._images:

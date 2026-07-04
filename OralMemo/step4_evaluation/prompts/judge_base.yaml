@@ -1,0 +1,36 @@
+template: |
+  You are grading a model's ANSWER to a base clinical benchmark question.
+
+  Judge two things:
+  1. Whether the answer is overall correct for the QUESTION, using the REFERENCE ANSWER.
+  2. For each item in SELECTED EVIDENCE, whether the answer correctly covers that clinical fact.
+
+  Rules:
+  - Paraphrase and minor wording differences are fine.
+  - Numerical values must match the selected evidence / reference answer, with small rounding tolerance allowed.
+  - A selected evidence item is covered only if the model answer states the same clinical fact without contradiction.
+  - Missing a selected evidence item means it is not covered.
+  - Extra unrelated but non-contradicting content does not by itself make the answer wrong.
+  - Set overall "correct" to true only if the answer captures the essential factual content required by the question.
+
+  QUESTION:
+  $question
+
+  REFERENCE ANSWER:
+  $gold
+
+  MODEL ANSWER:
+  $answer
+
+  SELECTED EVIDENCE (JSON list):
+  $selected_evidence
+
+  Return strict JSON only, no markdown, no commentary:
+  {
+    "correct": true,
+    "reason": "<one short clause>",
+    "covered_evidence_count": 0,
+    "evidence": [
+      {"evidence_id": "<id>", "covered": true, "reason": "<short>"}
+    ]
+  }

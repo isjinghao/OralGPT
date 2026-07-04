@@ -1,7 +1,6 @@
 """基于 mem0 的检索式记忆方法。
 
-mem0(https://github.com/mem0ai/mem0) 是面向 LLM 应用的记忆层: 从输入中抽取原子化事实,
-经 ADD/UPDATE/DELETE 决策写入向量库, 回答时按问题做语义检索取回相关记忆。
+mem0(https://github.com/mem0ai/mem0) 是面向 LLM 应用的记忆层: 从输入中抽取原子化事实, 经 ADD/UPDATE/DELETE 决策写入向量库, 回答时按问题做语义检索取回相关记忆。
 
 与本框架其它方法的映射:
   observe(stage)      -> 暂存当前阶段文本(并累积图片路径, 供多模态使用)
@@ -39,7 +38,7 @@ class Mem0Memory(MemoryMethod):
         self._config_override = config
         self._pending = ""
         self._images: list[str] = []
-        self._memory = None  # 懒加载的 mem0.Memory 实例
+        self._memory = None
 
     def setup(self, workdir) -> None:
         # 未显式指定 storage_dir 时, 用上层分配的专属工作目录做向量库持久化(按方法/轨迹隔离)
@@ -87,7 +86,7 @@ class Mem0Memory(MemoryMethod):
             }
         return config
 
-    # ------------------------------------------------------------------ 接口实现
+
     def reset(self) -> None:
         self._pending = ""
         self._images = []
@@ -95,7 +94,7 @@ class Mem0Memory(MemoryMethod):
 
 
     def observe(self, stage: dict) -> None:
-        self._pending = format_stage_input(stage, multimodal=self.multimodal)
+        self._pending = format_stage_input(stage)
         for path in collect_stage_images(stage):
             if path not in self._images:
                 self._images.append(path)

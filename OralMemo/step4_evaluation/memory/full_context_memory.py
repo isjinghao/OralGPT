@@ -1,4 +1,4 @@
-"""全上下文基线: 把所有历史阶段原样拼接进上下文(长上下文, 非记忆方法)。"""
+"""全上下文基线: 把所有历史阶段原样拼接进上下文，非记忆方法"""
 from __future__ import annotations
 
 from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
@@ -19,7 +19,7 @@ class FullContextMemory(MemoryMethod):
         self._images = []
 
     def observe(self, stage: dict) -> None:
-        self._chunks.append(format_stage_input(stage, multimodal=self.multimodal))
+        self._chunks.append(format_stage_input(stage))
         for path in collect_stage_images(stage):
             if path not in self._images:
                 self._images.append(path)

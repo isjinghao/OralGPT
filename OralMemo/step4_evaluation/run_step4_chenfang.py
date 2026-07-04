@@ -1,5 +1,5 @@
-"""Step4 + Step5 端到端评测入口(以 CHENFANG 为例): 按阶段流式提问作答并打分, 汇总对比报告。
-    python step4_evaluation/run_step4_chenfang.py --help
+"""Step4 + Step5 评测: 按阶段流式提问作答并打分, 汇总对比报告
+    python step4_evaluation/run_step4_chenfang.py
 """
 from __future__ import annotations
 
@@ -8,7 +8,6 @@ import json
 import sys
 from pathlib import Path
 
-# 将 OralMemo 根目录加入 sys.path, 使 config / llm_client / step4_evaluation 可作为顶层包导入
 BENCH_ROOT = Path(__file__).resolve().parent.parent
 if str(BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(BENCH_ROOT))
@@ -47,7 +46,7 @@ def load_rubric_index(out: Path) -> dict[str, dict]:
 
 
 def resolve_trajectory_path(out: Path, name: str) -> Path:
-    """把轨迹名解析为文件路径。standard -> 标准轨迹; 其余 -> variants/<name>.json。"""
+    # 把轨迹名解析为文件路径
     if name in ("standard", "standard_full", "standard_trajectory"):
         return out / "trajectories" / "standard_trajectory.json"
     return out / "variants" / f"{name}.json"
@@ -63,7 +62,8 @@ def evaluate_trajectory(
     multimodal: bool = False,
     image_root: Path | None = None,
 ) -> dict:
-    """对单条轨迹跑选定记忆方法并打分, 返回报告。缓存/输出按 trajectory_type(及模态)隔离。"""
+    # 对单条轨迹跑选定记忆方法并打分, 返回报告
+    # 缓存/输出按 trajectory_type(及模态)隔离
     ttype = trajectory["trajectory_type"]
     mode = "multimodal" if multimodal else "text"
     suffix = "_mm" if multimodal else ""
@@ -82,7 +82,6 @@ def evaluate_trajectory(
     for method in build_methods(names=methods, multimodal=multimodal):
         print(f"\n=== [{ttype}/{mode}] method: {method.name} ===", flush=True)
         method_dir = cache_root / method.name
-        # 给每个方法分配专属工作目录; 需要落盘的方法(如 mem0 向量库)据此自配置
         method.setup(method_dir)
         llm = CachedLLM(client, method_dir)
         llm_by_method[method.name] = llm
@@ -108,7 +107,7 @@ def evaluate_trajectory(
 
 
 def main() -> None:
-    # (0) 显式加载 OralMemo/.env, 再取配置(get_settings 内部 setdefault 不会覆盖)
+    # 加载 OralMemo/.env
     load_env(BENCH_ROOT / ".env")
     settings = get_settings()
     out = settings.output_root
@@ -123,10 +122,11 @@ def main() -> None:
     multimodal = args.multimodal
     methods = args.methods
     names = args.trajectories or ["standard"]
-    # 轨迹里的图片路径形如 "SH9HCMFdata/group1/...", 相对 OralMemo 根目录
+    
+    # 轨迹里的图片路径
     image_root = BENCH_ROOT if multimodal else None
 
-    # 任务与 rubric 与轨迹无关, 只加载一次
+    # 任务与 rubric 与轨迹无关
     tasks = read_json(out / "tasks" / "all_tasks.json")["tasks"]
     tasks_by_stage = group_tasks_by_stage(tasks)
     rubric_by_task = load_rubric_index(out)
@@ -155,17 +155,18 @@ def main() -> None:
     # 跨轨迹总览
     if len(reports) > 1:
         print("\n\n########## Cross-trajectory summary (summary_memory baseline) ##########")
-        header = f"{'Trajectory':<20}{'ERS(mem)':>14}{'Diag(mem)':>14}{'TPS(mem)':>14}"
+        header = f"{'Trajectory':<20}{'ACC(mem)':>14}{'ERS(mem)':>14}{'Diag(mem)':>14}{'TPS(mem)':>14}"
         print(header)
         print("-" * len(header))
         for rep in reports:
             mem = next((m for m in rep["methods"] if m["method"] == "summary_memory"), None)
             if not mem:
                 continue
+            acc = f"{mem['acc']['overall']['score']:.1f}%"
             ers = f"{mem['ers']['overall']['score']:.1f}%"
             diag = f"{mem['diagnosis']['percent']:.1f}%" if mem.get("diagnosis") else "n/a"
             tps = f"{mem['tps']['overall_percent']:.1f}%" if mem['tps']['overall_percent'] is not None else "n/a"
-            print(f"{rep['trajectory_type']:<20}{ers:>14}{diag:>14}{tps:>14}")
+            print(f"{rep['trajectory_type']:<20}{acc:>14}{ers:>14}{diag:>14}{tps:>14}")
 
 
 if __name__ == "__main__":

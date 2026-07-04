@@ -52,8 +52,8 @@ bench/
 └── step4_evaluation/                 # Step4 + Step5：记忆方法评测与打分
     ├── run_step4_chenfang.py         #   入口④：按阶段流式提问作答并打分，汇总对比报告
     ├── evaluator.py                  #   流式评测引擎（缓存 LLM、逐阶段读取轨迹、多模态图片编码）
-    ├── report.py                     #   汇总 ERS / 诊断分 / TPS，多方法对比表
-    ├── scoring.py                    #   ERS 二元判定与 rubric 打分（调用 LLM 裁判）
+    ├── report.py                     #   汇总 ACC / ERS / 诊断分 / TPS，多方法对比表
+    ├── scoring.py                    #   base 任务 ACC 判定与 rubric 打分（调用 LLM 裁判）
     ├── templating.py                 #   prompt 模板渲染
     ├── memory/                       #   记忆方法（一种方法一个文件）
     │   ├── base.py                   #     基类 MemoryMethod + 共享工具 format_stage_input / collect_stage_images
@@ -64,7 +64,7 @@ bench/
     └── prompts/
         ├── answer.yaml               #   基于记忆回答问题 prompt 模板
         ├── memory_update.yaml        #   summary_memory 增量巩固 prompt 模板
-        ├── judge_recall.yaml         #   召回类任务 ERS 二元判定 prompt 模板
+        ├── judge_base.yaml           #   base 任务 ACC 判定与证据覆盖统计 prompt 模板
         └── judge_rubric.yaml         #   诊断/治疗 rubric 打分 prompt 模板
 ```
 
@@ -214,7 +214,8 @@ python step4_evaluation/run_step4_chenfang.py --methods single_stage_memory,summ
 
 | 指标 | 适用任务 | 说明 |
 | --- | --- | --- |
-| **ERS** | 召回类（感知/回忆/跨模态/记忆更新） | LLM 裁判二元判定正确率；另按任务类型、模态细分 |
+| **ACC** | base 任务（感知/纵向证据/跨模态/记忆更新） | LLM 裁判二元判定准确率；另按任务类型、模态细分 |
+| **ERS** | base 任务（感知/纵向证据/跨模态/记忆更新） | `selected_evidence` 中被模型答案正确覆盖的证据数 / 证据总数；另按任务类型、模态细分 |
 | **Diagnosis** | `heldout_diagnosis` | 按诊断 rubric 打分（百分比） |
 | **TPS** | `heldout_treatment` | 各治疗任务 rubric 得分的均值（百分比） |
 

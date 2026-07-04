@@ -1,4 +1,4 @@
-"""Step4 流式评测引擎: 缓存 LLM 封装、按阶段流式读取轨迹并在问题释放时刻提问。"""
+"""Step4 流式评测引擎: 缓存 LLM 封装、按阶段流式读取轨迹并在问题释放时刻提问"""
 from __future__ import annotations
 
 import base64
@@ -8,9 +8,6 @@ from pathlib import Path
 
 from step4_evaluation.memory import MemoryMethod
 from step4_evaluation.templating import render
-
-# 多模态回答时单次最多附带的图片数(防止 payload 过大)
-MAX_IMAGES_PER_QUESTION = 24
 
 
 class CachedLLM:
@@ -36,7 +33,7 @@ class CachedLLM:
 
 
 def encode_image(path: Path) -> str | None:
-    """把本地图片读为 data URL(base64); 文件不存在时返回 None。"""
+    # 把本地图片读为 data URL(base64); 文件不存在时返回 None
     if not path.exists() or not path.is_file():
         return None
     mime = mimetypes.guess_type(path.name)[0] or "image/png"
@@ -44,10 +41,10 @@ def encode_image(path: Path) -> str | None:
     return f"data:{mime};base64,{encoded}"
 
 
-def gather_image_urls(method: MemoryMethod, image_root: Path, limit: int = MAX_IMAGES_PER_QUESTION) -> list[str]:
-    """把记忆中的图片路径(相对 image_root)转成可传给大模型的 data URL 列表。"""
+def gather_image_urls(method: MemoryMethod, image_root: Path) -> list[str]:
+    # 把记忆中的图片路径转成可传给大模型的 data URL 列表
     urls: list[str] = []
-    for rel in method.images()[:limit]:
+    for rel in method.images():
         url = encode_image(image_root / rel)
         if url:
             urls.append(url)
@@ -108,7 +105,6 @@ def run_streaming(
     for stage in stages:
         stage_id = stage["stage_id"]
         method.observe(stage)
-        # 仅 SummaryMemory 会真正调用 LLM 巩固记忆
         method.update(llm, cache_key=f"memupdate_{stage_id}")
         for task in tasks_by_stage.get(stage_id, []):
             print(f"  [{method.name}] answer {task['task_id']} @ {stage_id}", flush=True)
