@@ -32,7 +32,7 @@ def judge_base(llm: CachedLLM, record: dict) -> dict:
         answer=record["model_answer"],
         selected_evidence=json.dumps(selected_evidence, ensure_ascii=False),
     )
-    data = llm.complete(prompt, cache_key=f"judge_base_{record['task_id']}", max_tokens=3000)
+    data = llm.complete(prompt, cache_key=f"judge_base_{record['task_id']}", max_tokens=8000)
 
     evidence_items = data.get("evidence", []) or []
     total_evidence = len(selected_evidence)
@@ -72,7 +72,7 @@ def judge_rubric(llm: CachedLLM, record: dict, rubric: dict) -> dict:
         answer=record["model_answer"],
         criteria=json.dumps(payload, ensure_ascii=False),
     )
-    data = llm.complete(prompt, cache_key=f"rubric_{record['task_id']}", max_tokens=6000)
+    data = llm.complete(prompt, cache_key=f"rubric_{record['task_id']}", max_tokens=8000)
 
     # 先按名字收集模型给分
     awarded_by_name: dict[str, float] = {}

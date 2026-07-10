@@ -87,7 +87,7 @@ def generate_question(client: ChatClient, spec: dict, cache_dir: Path) -> dict:
             for item in spec["selected_evidence"]
         ]),
     )
-    return cached_completion(client, prompt, cache_path, max_tokens=4000)
+    return cached_completion(client, prompt, cache_path, max_tokens=8000)
 
 
 def validate_task(client: ChatClient, task: dict, cache_dir: Path) -> dict:
@@ -104,7 +104,7 @@ def validate_task(client: ChatClient, task: dict, cache_dir: Path) -> dict:
         "selected_evidence": task["selected_evidence"],
     }
     prompt = template.substitute(task_json=json.dumps(task_for_prompt, ensure_ascii=False, indent=2))
-    return cached_completion(client, prompt, cache_path, max_tokens=4000)
+    return cached_completion(client, prompt, cache_path, max_tokens=8000)
 
 
 def finalize_task(client: ChatClient, spec: dict, cache_dir: Path) -> dict:

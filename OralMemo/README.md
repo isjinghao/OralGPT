@@ -225,3 +225,97 @@ python step4_evaluation/run_step4_chenfang.py --methods single_stage_memory,summ
 - `report.json` / `report.txt`：多方法对比报告（结构化 + 控制台表格）
 
 > mem0 的向量库持久化在 `cache/step4/<轨迹>[_mm]/mem0_memory/vector_store/`，由方法自身经 `setup()` 配置；嵌入模型由 `.env` 的 `EMBEDDING_MODEL`（默认 `text-embedding-3-small`）指定，复用 `OPENAI_API_KEY` / `OPENAI_BASE_URL`。
+
+---
+
+## 六、Report 长程病例流水线（`report_pipeline/`）
+
+在原有「单次就诊、按**模态**切分 S0–S5」数据之外，本流水线从 `reports/` 下的**文献长程病例报告 PDF** 自动构造与 `oralgpt_cmf_llamafactory_sft_dataset.json` **同构**的数据，但阶段轴改为**时间**（就诊/随访时间点，跨月至跨年），用于扩充数据来源并新增「跨时间点记忆 / 趋势追踪 / 治疗-结局」这一评测维度。
+
+### 与原数据的关系
+
+| | 原数据（group1 病人） | 本流水线（report） |
+| --- | --- | --- |
+| 阶段轴 | 模态（S0_PROFILE … S5_TMJ） | **时间**（`T0_… / T1_… / …`，含 `timepoint.t_months`） |
+| 来源 | SH9H 真实病例 | 开放获取文献病例报告 PDF |
+| `group` | `group1` 等 | `report`（物理隔离，独立 `report_dataset.json`） |
+| 产物格式 | `conversations` / `stages` / `heldout` | **完全同构**（下游 step2/3/4 可复用） |
+
+### 全自动流程（LLM 抽取 ↔ 校验模型反馈循环）
+
+```
+step0 摄取(确定性)          抽取 <-> 校验 反馈循环                 step1(确定性)
+PDF ──► 全文/表格/图片   ──►  抽取模型 extract_timeline ──►         ──► SFT 条目
+        图注解析+对齐          ▲                     │                  时间点阶段
+                              └── 反馈(问题) ◄── 校验模型 verify ──┘      标准轨迹
+                                   (对照原文+表格+图注核验)
+```
+
+- **step0 摄取**（不经 LLM，确定性、通用）：`pymupdf` 抽全文与内嵌图片（按面积+md5 去重过滤矢量碎片），`pdfplumber` 抽表格；`captions.py` 用通用正则解析图注并与图片启发式对齐（纯文本模型无法视觉核验，已标注）。
+- **抽取模型**：从（通用头/尾裁剪后的）病例正文+表格+图注中抽出结构化时间线（每个时间点的原子 findings、决策、依据 + held-out 诊断/治疗/预后），强约束「只用原文事实、数值/牙位/日期原样保留、表格与叙述冲突以表格为准」。
+- **校验模型（critic）**：对照原文+表格+图注逐条核验事实支持性、数值保真、跨时间点逻辑一致与时序；若存在 high 级问题，则把问题清单作为**反馈**回灌给抽取模型自我修正，最多 `--max-iters` 轮。
+- **step1**（确定性、通用）：把已校验的 findings 用通用模板渲染成问答（数值逐字），组装成 SFT 条目、按时间点切分阶段、复用 step1 的 `build_standard_trajectory` 生成标准轨迹，并追加进 `report_dataset.json`。
+
+> 全流程**无任何针对单篇 report 的写死内容**，换 PDF 即可复用。
+
+### 目录结构
+
+```
+report_pipeline/
+├── config_reports.py                 # 复用 Settings + name 路径(产物统一在 outputs/report/<name>/)
+├── step0_ingest/
+│   ├── pdf_extract.py                 # 确定性: 全文/表格/图片(过滤去重, 相对路径)
+│   ├── captions.py                    # 通用图注解析 + 图注↔图片启发式对齐
+│   ├── timeline_llm.py                # 抽取模型(反馈感知 + 头/尾裁剪)
+│   ├── verify_llm.py                  # 校验模型(critic, 对照原文核验)
+│   └── prompts/
+│       ├── timeline_extraction.yaml   # 时间线抽取 prompt(通用)
+│       └── timeline_verification.yaml # 校验 prompt(critic)
+├── step1_report_trajectory/
+│   ├── qa_render.py                   # 确定性: findings -> 有序问答轮次(通用模板)
+│   ├── report_dataset.py              # -> 与原数据同构的 SFT 条目
+│   ├── report_stages.py              # 按时间点切分阶段(替代按模态的 classify_turn)
+│   └── report_trajectories.py         # 复用 step1 标准轨迹 + 回填 timepoint
+└── run_report_pipeline.py             # 主编排(step0 + 反馈循环 + step1)
+```
+
+### 运行
+
+```bash
+conda activate cmfbench
+
+# 处理一篇报告(PDF 路径 + name)
+python report_pipeline/run_report_pipeline.py --pdf reports/s12903-026-09034-7_reference.pdf --name pls_8y --max-iters 3
+```
+
+| 参数 | 缺省 | 说明 |
+| --- | --- | --- |
+| `--pdf` | 必填 | 报告 PDF 路径（相对工作区根或绝对） |
+| `--name` | 必填 | 报告标识，用于输出目录与病人 id（`report__<name>`） |
+| `--max-iters` | 3 | 抽取↔校验反馈循环最大轮数 |
+| `--model` | `.env` 的 `OPENAI_MODEL` | 覆盖使用的模型 |
+
+### 产物（`outputs/report/<name>/`）
+
+| 文件 | 说明 |
+| --- | --- |
+| `raw/{fulltext.json,tables.json,captions.json}` | step0 确定性抽取的中间产物（`captions.json` 仅存图注↔图片对齐表） |
+| `images/*.jpeg` | 过滤去重后的内嵌图片 |
+| `timeline.extracted.json` | LLM 抽取并经校验的结构化时间线（timepoints + held_out） |
+| `verification_report.json` | 每轮校验记录（passed / issues / 反馈） |
+| `stages/patient_stages.json` | 按时间点切分的阶段（含 `timepoint`） |
+| `trajectories/standard_trajectory.json` | 标准轨迹 |
+| `dataset_entry.json` | 该报告的 SFT 条目；并汇总进根目录 `report_dataset.json` |
+
+### 已验证样本（通用性）
+
+同一套代码/prompt 已跑通三篇结构迥异的纵向报告，均通过校验：
+
+| name | 报告 | 时间点 | 说明 |
+| --- | --- | --- | --- |
+| `pls_8y` | Papillon–Lefèvre 8 年牙周维护 | 4 | 有 CARE 时间线表；BOP 跨 4 点可追踪 |
+| `ph1_14m` | PH1 种植修复 14 个月 | 8 | 用 ISQ 而非 BOP；术前→植入→6 月→14 月 |
+| `pax7_dup` | PAX7 颅面重复畸形分期手术 | 4 | 无表格；以 11 月龄首诊为基线 |
+
+> **依赖**：`requirement.txt` 已含 `pymupdf`、`pdfplumber`。
+> **注意**：若所配置模型为推理型（思维链计入 `max_tokens`），本流水线已把抽取/校验的 `max_tokens` 提到 16000、`llm_client` 超时提到 300s；生产建议使用稳定支持 JSON 输出的模型。图注↔图片为文本模型下的启发式对齐，未做视觉核验。

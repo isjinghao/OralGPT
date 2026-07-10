@@ -54,12 +54,13 @@ def extract_stage_evidence(client: ChatClient, patient_id: str, stage: dict) -> 
             modalities=", ".join(stage["modality"]),
             qa_text=_turn_text(turn),
         )
-        result = client.complete_json(prompt, max_tokens=2200)
+        result = client.complete_json(prompt, max_tokens=8000)
         raw_evidence = result.get("atomic_evidence", [])
 
         for item in raw_evidence:
             source_turn_id = item.get("source_turn_id") or turn["source_turn_id"]
-            field = item.get("normalized", {}).get("field") or item.get("fact_type", "fact")
+            normalized = item.get("normalized") or {}
+            field = normalized.get("field") or item.get("fact_type", "fact")
             key = f"{stage['stage_id']}_{source_turn_id}_{field}".lower()
             used_counts[key] += 1
             evidence_id = f"{patient_id}_{key}_{used_counts[key]:02d}".replace("__", "_")
@@ -73,7 +74,7 @@ def extract_stage_evidence(client: ChatClient, patient_id: str, stage: dict) -> 
                         "fact_text": item.get("fact_text", ""),
                         "fact_type": item.get("fact_type", "other"),
                         "clinical_dimension": item.get("clinical_dimension", "other"),
-                        "normalized": item.get("normalized", {}),
+                        "normalized": normalized,
                     }
                 )
             )

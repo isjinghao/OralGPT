@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 from string import Template
@@ -23,8 +24,11 @@ ALLOWED_RELATIONS = {
 }
 
 def stage_order(stage: str) -> int:
-    if stage[:1] == "S" and stage[1:2].isdigit():
-        return int(stage[1:2])
+    # 通用取阶段序号: 兼容按模态的 S#_...(如 S0_PROFILE) 与按时间的 T#_...(如 T0_June-2017);
+    # 取阶段 id 中的首个整数作为顺序, 解析不到则返回 0。
+    m = re.search(r"\d+", stage or "")
+    return int(m.group()) if m else 0
+
 
 
 def build_evidence_graph(

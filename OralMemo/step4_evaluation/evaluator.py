@@ -20,7 +20,7 @@ class CachedLLM:
         self.calls = 0
         self.hits = 0
 
-    def complete(self, prompt: str, cache_key: str, max_tokens: int = 4000,
+    def complete(self, prompt: str, cache_key: str, max_tokens: int = 8000,
                  temperature: float = 0.0, images: list[str] | None = None) -> dict:
         path = self.cache_dir / f"{cache_key}.json"
         if path.exists():
@@ -65,7 +65,7 @@ def answer_question(method: MemoryMethod, task: dict, llm: CachedLLM, image_root
     if method.multimodal and image_root is not None:
         images = gather_image_urls(method, image_root) or None
 
-    data = llm.complete(prompt, cache_key=f"answer_{task['task_id']}", max_tokens=4000, images=images)
+    data = llm.complete(prompt, cache_key=f"answer_{task['task_id']}", max_tokens=8000, images=images)
     answer = (data.get("answer") or "").strip()
     return {
         "task_id": task["task_id"],
