@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from step4_evaluation.evaluator import CachedLLM
-from step4_evaluation.scoring import judge_base, judge_rubric
+from step4_evaluation.scoring import judge_base, judge_evidence, judge_rubric
 
 # base 任务(走 ACC 二元判定，并统计 selected_evidence 覆盖数)
 BASE_TYPES = {
@@ -79,8 +79,18 @@ def score_method(
                 for item in verdict.get("evidence", []) or []
                 if item.get("covered")
             }
+            # 问题范围外(in_scope=false)的证据不计入分模态 ERS 分母
+            verdict_evidence = verdict.get("evidence", []) or []
+            out_of_scope_ids = {
+                str(item.get("evidence_id", "")).strip()
+                for item in verdict_evidence
+                if item.get("in_scope", True) is False
+            }
             for ev in rec.get("selected_evidence", []) or []:
-                ev_covered = 1 if str(ev.get("evidence_id", "")).strip() in covered_ids else 0
+                eid = str(ev.get("evidence_id", "")).strip()
+                if eid in out_of_scope_ids:
+                    continue
+                ev_covered = 1 if eid in covered_ids else 0
                 for mod in ev.get("modality", []) or []:
                     ers_bm = ers_by_modality.setdefault(mod, {"covered": 0, "total": 0})
                     ers_bm["covered"] += ev_covered
@@ -114,6 +124,37 @@ def score_method(
                 treatment.append(entry)
                 metric = "TPS"
 
+            # 证据召回(ERS): 诊断/治疗任务同样有 selected_evidence, 用精简的证据召回判定
+            verdict = judge_evidence(llm, rec)
+            covered_evidence = int(verdict.get("covered_evidence_count", 0) or 0)
+            total_evidence = int(verdict.get("total_evidence_count", 0) or 0)
+
+            ers_overall["covered"] += covered_evidence
+            ers_overall["total"] += total_evidence
+            ers_bt = ers_by_type.setdefault(ttype, {"covered": 0, "total": 0})
+            ers_bt["covered"] += covered_evidence
+            ers_bt["total"] += total_evidence
+
+            covered_ids = {
+                str(item.get("evidence_id", "")).strip()
+                for item in verdict.get("evidence", []) or []
+                if item.get("covered")
+            }
+            out_of_scope_ids = {
+                str(item.get("evidence_id", "")).strip()
+                for item in verdict.get("evidence", []) or []
+                if item.get("in_scope", True) is False
+            }
+            for ev in rec.get("selected_evidence", []) or []:
+                eid = str(ev.get("evidence_id", "")).strip()
+                if eid in out_of_scope_ids:
+                    continue
+                ev_covered = 1 if eid in covered_ids else 0
+                for mod in ev.get("modality", []) or []:
+                    ers_bm = ers_by_modality.setdefault(mod, {"covered": 0, "total": 0})
+                    ers_bm["covered"] += ev_covered
+                    ers_bm["total"] += 1
+
             per_task.append({
                 "task_id": rec["task_id"],
                 "task_type": ttype,
@@ -121,6 +162,10 @@ def score_method(
                 "awarded": scored["awarded"],
                 "max_total": scored["max_total"],
                 "percent": scored["percent"],
+                "covered_evidence_count": covered_evidence,
+                "total_evidence_count": total_evidence,
+                "ers_score": ratio(covered_evidence, total_evidence),
+                "evidence": verdict.get("evidence", []),
             })
 
     # 计算治疗类任务的平均分

@@ -35,8 +35,8 @@ def resolve_image(figure_ref, images_map: dict) -> list[str]:
     if not figure_ref:
         return []
     entry = images_map.get(figure_ref)
-    if isinstance(entry, dict) and entry.get("image"):
-        return [entry["image"]]
+    if isinstance(entry, dict) and entry.get("images"):
+        return list(entry["images"])
     return []
 
 

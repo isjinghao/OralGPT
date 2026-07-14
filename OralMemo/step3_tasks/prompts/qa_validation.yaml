@@ -4,11 +4,34 @@ template: |
   Judge whether the question and gold answer are valid for the requested task type.
 
   Validation criteria:
-  1. The gold answer must be fully supported by the listed evidence or held-out diagnosis/treatment source.
-  2. The question must not leak the answer.
-  3. The question must be answerable after the specified stage.
-  4. The task type must match the required skill.
-  5. Clinical reasoning chains must be plausible and not introduce unsupported diagnoses.
+  1. The question must NOT leak or restate the answer.
+  2. The question must be answerable after the specified stage (all needed evidence released by then).
+  3. The task type must match the required skill.
+  4. Clinical reasoning must be plausible and must not introduce unsupported diagnoses.
+  5. The gold answer must be grounded in the listed evidence. Its core clinical claims
+     (diagnoses, numeric values, key findings) must be supported by the evidence.
+  6. Modality accuracy: any exam/imaging modality named in the question MUST match the actual modality
+     of the evidence it refers to (see glossary). If the question names a wrong modality (e.g. calls
+     intraoral dental photographs a "panoramic radiograph" or an "X-ray"), it is invalid — return a
+     "fixed_question" that uses the correct modality (or refers to the finding by its stage).
+
+  Modality glossary (evidence modality code -> actual exam type):
+  - FP = facial photographs; DP = intraoral dental photographs (NOT a radiograph/X-ray);
+    XR = cephalometric and panoramic radiographs; XLData = cephalometric measurements;
+    CT = three-dimensional CT; TMJ = temporomandibular joint clinical examination;
+    TEXT_QA = patient profile / history.
+
+  Repair-first policy (IMPORTANT — prefer repairing over rejecting):
+  - If the ONLY problem is that the gold answer contains extra details that are not supported by
+    the listed evidence (for example numbers, measurements, or findings with no matching evidence),
+    do NOT reject. Instead set "accepted": true and return "fixed_answer": a rewritten gold answer
+    that keeps ONLY the evidence-supported content, stays clinically natural and concise
+    (<= 4 sentences), and still answers the question. Do not add anything new.
+  - If the question leaks the answer, or names a wrong modality, but is otherwise fine, set
+    "accepted": true and return "fixed_question": a corrected question.
+  - Only set "accepted": false when the item cannot be repaired this way: the question is
+    unanswerable at the stage, the task type is wrong, or the answer's CORE is unsupported by or
+    contradicts the evidence.
 
   Return strict JSON only.
 
@@ -17,7 +40,8 @@ template: |
     "accepted": true,
     "feedback": "...",
     "issues": [],
-    "fixed_question": null
+    "fixed_question": null,
+    "fixed_answer": null
   }
 
   Task:

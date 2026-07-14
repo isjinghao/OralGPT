@@ -37,7 +37,7 @@ class SummaryMemory(MemoryMethod):
             existing_memory=self._summary or "(empty)",
             new_stage=self._pending,
         )
-        data = llm.complete(prompt, cache_key=cache_key, max_tokens=4000)
+        data = llm.complete(prompt, cache_key=cache_key, max_tokens=16000)
         self._summary = (data.get("memory") or self._summary).strip()
         self._pending = ""
 

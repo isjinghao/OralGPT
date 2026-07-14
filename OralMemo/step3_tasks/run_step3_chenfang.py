@@ -24,19 +24,26 @@ def write_json(path: Path, data: dict | list) -> None:
 
 
 def build_normal_tasks(client: ChatClient, patient_stages: dict, index: EvidenceIndex, cache_dir: Path) -> list[dict]:
-    # 构建普通任务
+    # 构建普通任务; 仅保留通过校验的问题, 未通过校验的直接丢弃
     planned = plan_normal_tasks(client, patient_stages, index, cache_dir)
     patient_id = patient_stages["patient_id"]
     counters: dict[str, int] = {}
     tasks = []
+    dropped = 0
     for item in planned:
         task_type = item["task_type"]
         counters[task_type] = counters.get(task_type, 0) + 1
         spec = assemble_normal_task(patient_id, f"{task_type}_{counters[task_type]:03d}", item, index)
         print(f"[Step3 normal] {spec['task_id']} ({spec['task_type']})", flush=True)
         task = finalize_task(client, spec, cache_dir)
+        if not task["validation"].get("accepted"):
+            dropped += 1
+            print(f"  dropped (validation failed after retries): {spec['task_id']}", flush=True)
+            continue
         print(f"  accepted={task['validation'].get('accepted')}", flush=True)
         tasks.append(task)
+    if dropped:
+        print(f"[Step3 normal] dropped {dropped} task(s) that failed validation", flush=True)
     return tasks
 
 

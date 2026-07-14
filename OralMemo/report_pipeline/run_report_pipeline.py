@@ -14,8 +14,7 @@ if str(BENCH_ROOT) not in sys.path:
 from config import get_settings, load_env
 from llm_client import ChatClient
 from report_pipeline.config_reports import get_report_settings, name_paths
-from report_pipeline.step0_ingest.captions import build_images_map, parse_figure_captions
-from report_pipeline.step0_ingest.pdf_extract import extract_pdf, read_fulltext
+from report_pipeline.step0_ingest.pdf_extract import extract_pdf
 from report_pipeline.step1_report_trajectory.qa_render import normalize_timepoints, render_turns
 from report_pipeline.step0_ingest.timeline_llm import extract_timeline
 from report_pipeline.step0_ingest.verify_llm import high_severity_issues, verify_timeline
@@ -82,16 +81,14 @@ def main() -> None:
     out_dir, raw_dir, images_dir = paths["out_dir"], paths["raw_dir"], paths["images_dir"]
     pdf_path = Path(args.pdf) if Path(args.pdf).is_absolute() else (BENCH_ROOT / args.pdf)
 
-    # Step0: PDF 抽取
+    # Step0: PDF 抽取(MinerU)
     print(f"[step0] 抽取 PDF: {pdf_path}")
     summary = extract_pdf(pdf_path, raw_dir, images_dir, rel_base=BENCH_ROOT)
-    print(f"[step0] 页数={summary['n_pages']} 有效图片={summary['n_images_kept']} 表格={summary['n_tables']}")
-
-    fulltext = read_fulltext(raw_dir)
-    captions = parse_figure_captions(fulltext)
-    images_map = build_images_map(summary["kept_images"], captions)
+    images_map = summary["images_map"]
+    captions = summary["captions"]
     write_json(raw_dir / "captions.json", images_map)
-    print(f"[step0] 解析图注 {len(captions)} 条")
+    print(f"[step0] 页数={summary['n_pages']} 有效图片={summary['n_images_kept']} "
+          f"表格={summary['n_tables']} 图注={len(captions)}")
 
     source_pdf = (
         pdf_path.relative_to(BENCH_ROOT).as_posix() if str(pdf_path).startswith(str(BENCH_ROOT)) else str(pdf_path)

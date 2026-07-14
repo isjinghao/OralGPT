@@ -8,5 +8,4 @@ seaborn
 paramiko
 openpyxl
 mem0ai
-pymupdf
-pdfplumber
+mineru[core]

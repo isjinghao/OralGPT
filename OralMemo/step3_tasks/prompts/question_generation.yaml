@@ -11,7 +11,23 @@ template: |
   4. Do not reveal numeric values or final conclusions unless the task explicitly asks the model to recall them.
   5. For recall tasks, ask for both the remembered content and its clinical source/stage.
   6. For update tasks, ask how later evidence confirms, refines, or corrects earlier evidence.
-  7. Return strict JSON only.
+  7. Keep the question scoped to ONE clear modality/stage object. If the question names a modality or
+     stage (e.g. the CT findings), it must ask only about what that modality/stage provides, and must not
+     require content from a different modality/stage in the same question.
+  8. Any exam/imaging modality or stage named in the question MUST match the actual modality of the
+     evidence it is about (see the glossary below). NEVER rename or invent a modality — e.g. do not call
+     intraoral dental photographs a "panoramic radiograph" or an "X-ray". If unsure, refer to the
+     finding by its stage without inventing an imaging type.
+  9. Return strict JSON only.
+
+  Modality glossary (evidence modality code -> actual exam type):
+  - FP  = facial photographs
+  - DP  = intraoral dental photographs (this is NOT a radiograph / not an X-ray)
+  - XR  = cephalometric and panoramic radiographs (X-ray)
+  - XLData = cephalometric measurement data
+  - CT  = three-dimensional CT
+  - TMJ = temporomandibular joint clinical examination
+  - TEXT_QA = patient profile / history (text interview)
 
   Return schema:
   {
@@ -26,3 +42,5 @@ template: |
 
   Evidence available to support the answer:
   $evidence_text
+
+  $feedback_block

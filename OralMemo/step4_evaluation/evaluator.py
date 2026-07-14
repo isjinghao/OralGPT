@@ -31,6 +31,17 @@ class CachedLLM:
         self.calls += 1
         return data
 
+    def complete_text(self, prompt: str, cache_key: str, max_tokens: int = 8000,
+                      temperature: float = 0.0, images: list[str] | None = None) -> str:
+        # 纯文本作答的缓存封装; 缓存沿用 {"answer": ...} 格式以兼容既有缓存
+        path = self.cache_dir / f"{cache_key}.json"
+        if path.exists():
+            return json.loads(path.read_text(encoding="utf-8")).get("answer", "")
+        text = self.client.complete_text(prompt, temperature=temperature, max_tokens=max_tokens, images=images)
+        path.write_text(json.dumps({"answer": text}, ensure_ascii=False, indent=2), encoding="utf-8")
+        self.calls += 1
+        return text
+
 
 def encode_image(path: Path) -> str | None:
     # 把本地图片读为 data URL(base64); 文件不存在时返回 None
@@ -65,8 +76,7 @@ def answer_question(method: MemoryMethod, task: dict, llm: CachedLLM, image_root
     if method.multimodal and image_root is not None:
         images = gather_image_urls(method, image_root) or None
 
-    data = llm.complete(prompt, cache_key=f"answer_{task['task_id']}", max_tokens=8000, images=images)
-    answer = (data.get("answer") or "").strip()
+    answer = llm.complete_text(prompt, cache_key=f"answer_{task['task_id']}", max_tokens=16000, images=images).strip()
     return {
         "task_id": task["task_id"],
         "task_type": task["task_type"],

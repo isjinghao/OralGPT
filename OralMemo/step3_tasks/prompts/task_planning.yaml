@@ -15,7 +15,17 @@ template: |
   3. gold_answer must be fully supported by the chosen evidence. Do NOT invent diagnoses, numbers, or findings that are not in the evidence.
   4. natural_answer is a concise (<= 4 sentences), clinically natural answer.
   5. The $task_count tasks must be clinically distinct (different findings/evidence focus).
-  6. Return strict JSON only.
+  6. Evidence must be consistent with the modality/stage the task is about. Pick required_evidence_ids
+     that belong to the modality/stage the question focuses on; do not mix in unrelated modalities
+     (e.g. do not attach the chief complaint or a photo finding to a task that asks about CT imaging).
+     For update/correction tasks that span stages, only include the earlier impression being updated and
+     the later evidence that updates it.
+  7. Modality feasibility: only use findings that can actually be obtained from the modality that
+     introduced them. Do NOT attribute clinical-exam findings that require a dedicated specialist exam
+     (e.g. mouth opening, opening path, TMJ clicks) to photographic or imaging modalities.
+  8. When the clinical question has a definite answer, gold_answer must commit to a clear conclusion
+     rather than staying vague.
+  9. Return strict JSON only.
 
   Return schema:
   {

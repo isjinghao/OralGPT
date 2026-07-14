@@ -5,13 +5,41 @@ template: |
   1. Whether the answer is overall correct for the QUESTION, using the REFERENCE ANSWER.
   2. For each item in SELECTED EVIDENCE, whether the answer correctly covers that clinical fact.
 
-  Rules:
-  - Paraphrase and minor wording differences are fine.
-  - Numerical values must match the selected evidence / reference answer, with small rounding tolerance allowed.
-  - A selected evidence item is covered only if the model answer states the same clinical fact without contradiction.
-  - Missing a selected evidence item means it is not covered.
+  Scope of judging (IMPORTANT):
+  - Judge ONLY the aspects the QUESTION actually asks about (its stated modality / stage / topic).
+    If the question asks about one modality or stage (e.g. "the CT imaging findings"), do NOT mark
+    the answer incorrect for omitting facts that belong to a different modality/stage (e.g. the chief
+    complaint, or the cephalometric X-ray analysis).
+  - For each SELECTED EVIDENCE item, set "in_scope": false when that fact lies outside what the
+    question asks about. Out-of-scope items must NOT lower the score and are excluded from evidence
+    recall; set "in_scope": true otherwise.
+
+  Clinical semantic equivalence:
+  - Accept clinically equivalent or synonymous phrasing as covering the same fact; do not require
+    identical terminology. Examples of equivalent expressions:
+      * "mandibular excess" / "protruded chin" / "mandibular prognathism" ≈ "mandibular protrusion"
+      * "skeletal Class III" ≈ "bilateral Class III molar relationship" (when describing the same relationship)
+      * "concave facial profile" ≈ "prognathic mandibular profile"
+  - Judge on clinical meaning, not surface wording.
+
+  Numeric tolerance (apply per fact type):
+  - Quantitative LINEAR measurements (mm, e.g. chin/menton deviation, overjet, overbite, midline shift):
+    the DIRECTION / sign / laterality (left vs right, positive vs negative/reverse) MUST match; the
+    magnitude is acceptable if it is within ±2 mm OR ±20% of the reference value, whichever is larger.
+    Do NOT fail an item solely for a small magnitude difference within this tolerance.
+  - ANGULAR measurements (degrees, e.g. SNA/SNB/ANB, nasolabial angle): acceptable within ±10°, and any
+    qualitative descriptor (acute/obtuse/normal, high-angle/low-angle) MUST match.
+  - CATEGORICAL / CLASSIFICATION findings (Angle or skeletal Class I/II/III, presence vs absence of a
+    sign, left vs right laterality, crossbite yes/no): must match EXACTLY. A wrong class or wrong
+    direction is incorrect / not covered — no tolerance here.
+
+  Other rules:
+  - A selected evidence item is covered only if the model answer states the same clinical fact (per the
+    equivalence and tolerance rules above) without contradiction.
+  - Missing an in-scope selected evidence item means it is not covered.
   - Extra unrelated but non-contradicting content does not by itself make the answer wrong.
-  - Set overall "correct" to true only if the answer captures the essential factual content required by the question.
+  - Set overall "correct" to true only if the answer captures the essential in-scope factual content
+    required by the question.
 
   QUESTION:
   $question
@@ -31,6 +59,6 @@ template: |
     "reason": "<one short clause>",
     "covered_evidence_count": 0,
     "evidence": [
-      {"evidence_id": "<id>", "covered": true, "reason": "<short>"}
+      {"evidence_id": "<id>", "in_scope": true, "covered": true, "reason": "<short>"}
     ]
   }

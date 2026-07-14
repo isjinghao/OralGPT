@@ -68,15 +68,37 @@ def plan_normal_tasks(client: ChatClient, patient_stages: dict, index: EvidenceI
     return planned
 
 
-def generate_question(client: ChatClient, spec: dict, cache_dir: Path) -> dict:
+def question_feedback_block(validation: dict | None) -> str:
+    # 把上一轮校验的问题作为反馈, 指导模型重新生成一道合规的问题
+    if not validation:
+        return ""
+    lines = ["===== REVIEWER FEEDBACK ON YOUR PREVIOUS QUESTION (fix ALL of these) ====="]
+    if validation.get("feedback"):
+        lines.append(f"- overall: {validation['feedback']}")
+    for issue in validation.get("issues", []) or []:
+        if isinstance(issue, dict):
+            lines.append(
+                f"- [{issue.get('severity', '?')}] {issue.get('problem', issue)}"
+                f" | fix: {issue.get('suggested_fix', '')}"
+            )
+        else:
+            lines.append(f"- {issue}")
+    lines.append("Generate a NEW question that resolves every issue above.")
+    return "\n".join(lines)
+
+
+def generate_question(client: ChatClient, spec: dict, cache_dir: Path,
+                      feedback: dict | None = None, attempt: int = 1,
+                      gold_answer: str | None = None) -> dict:
     # 依据任务规格让 LLM 生成自然临床问题与临床链, 结果缓存到 question_generation/
-    cache_path = cache_dir / "question_generation" / f"{spec['task_id']}.json"
+    # feedback 为上一轮校验结果, attempt 用于区分多轮生成的缓存, gold_answer 允许使用修复后的金标准
+    cache_path = cache_dir / "question_generation" / f"{spec['task_id']}_a{attempt}.json"
     template = load_template("question_generation.yaml")
     prompt = template.substitute(
         patient_id=spec["patient_id"],
         task_type=spec["task_type"],
         ask_after_stage=spec["ask_after_stage"],
-        gold_answer=spec["gold_answer"],
+        gold_answer=gold_answer if gold_answer is not None else spec["gold_answer"],
         evidence_text=compact_evidence_text([
             {
                 "evidence_id": item["evidence_id"],
@@ -86,13 +108,14 @@ def generate_question(client: ChatClient, spec: dict, cache_dir: Path) -> dict:
             }
             for item in spec["selected_evidence"]
         ]),
+        feedback_block=question_feedback_block(feedback),
     )
     return cached_completion(client, prompt, cache_path, max_tokens=8000)
 
 
-def validate_task(client: ChatClient, task: dict, cache_dir: Path) -> dict:
+def validate_task(client: ChatClient, task: dict, cache_dir: Path, attempt: int = 1) -> dict:
     # 让 LLM 判断问题/金标准是否合规(是否泄题、能否在指定阶段后回答等), 结果缓存到 qa_validation/
-    cache_path = cache_dir / "qa_validation" / f"{task['task_id']}.json"
+    cache_path = cache_dir / "qa_validation" / f"{task['task_id']}_a{attempt}.json"
     template = load_template("qa_validation.yaml")
     task_for_prompt = {
         "task_id": task["task_id"],
@@ -107,20 +130,43 @@ def validate_task(client: ChatClient, task: dict, cache_dir: Path) -> dict:
     return cached_completion(client, prompt, cache_path, max_tokens=8000)
 
 
-def finalize_task(client: ChatClient, spec: dict, cache_dir: Path) -> dict:
-    # 先生成问题再校验; 若未通过且给出修正问题则采用修正问题, 返回带 validation 的最终任务
-    
-    # (1) 生成问题
-    candidate = generate_question(client, spec, cache_dir)
+def finalize_task(client: ChatClient, spec: dict, cache_dir: Path, max_iters: int = 3) -> dict:
+    # 生成<->校验反馈循环: 若未通过校验, 把反馈交回模型重生成问题, 并应用校验给出的修正问题/修正金标准, 直到通过或达到最大轮数
     task = dict(spec)
-    task["question"] = candidate["question"]
-    task["clinical_chain"] = candidate.get("clinical_chain", "")
-    
-    # (2) 问题验证
-    validation = validate_task(client, task, cache_dir)
-    if not validation.get("accepted") and validation.get("fixed_question"):
-        task["question"] = validation["fixed_question"]
+    feedback: dict | None = None
+    validation: dict = {}
+    history: list[dict] = []
+    current_gold = spec["gold_answer"]
+    for it in range(1, max_iters + 1):
+        # (1) 生成问题(可带上一轮反馈, 使用当前(可能已修复的)金标准)
+        candidate = generate_question(client, spec, cache_dir, feedback=feedback,
+                                      attempt=it, gold_answer=current_gold)
+        task["question"] = candidate["question"]
+        task["clinical_chain"] = candidate.get("clinical_chain", "")
+        task["gold_answer"] = current_gold
+
+        # (2) 问题+金标准验证
+        validation = validate_task(client, task, cache_dir, attempt=it)
+        history.append({"iteration": it, "accepted": validation.get("accepted")})
+        print(f"  [loop {it}/{max_iters}] accepted={validation.get('accepted')}", flush=True)
+        if validation.get("accepted"):
+            # 校验通过时也应用其给出的修正(如修剪后的金标准/问题)
+            if validation.get("fixed_answer"):
+                current_gold = validation["fixed_answer"]
+            if validation.get("fixed_question"):
+                task["question"] = validation["fixed_question"]
+            break
+
+        # (3) 未通过: 应用可用的修正并把反馈交回下一轮重新生成/复验
+        if validation.get("fixed_answer"):
+            current_gold = validation["fixed_answer"]
+        if validation.get("fixed_question"):
+            task["question"] = validation["fixed_question"]
+        feedback = validation
+
+    task["gold_answer"] = current_gold
     task["validation"] = validation
+    task["validation_history"] = history
     return task
 
 
@@ -157,9 +203,18 @@ def generate_rubric(client: ChatClient, task: dict, cache_dir: Path) -> dict:
         ]),
     )
     result = cached_completion(client, prompt, cache_path, max_tokens=12000)
+    # rubric 只保留评分标准(name/score/description); 证据在任务里已有, 不在 rubric 中冗余存储
+    criteria = [
+        {
+            "name": c["name"],
+            "score": c["score"],
+            "description": c.get("description", ""),
+        }
+        for c in result["criteria"]
+    ]
     return {
         "rubric_id": f"{task['task_type']}_{task['task_id']}",
         "task_id": task["task_id"],
         "max_score": result.get("max_score", 100),
-        "criteria": result["criteria"],
+        "criteria": criteria,
     }

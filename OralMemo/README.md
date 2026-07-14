@@ -245,13 +245,13 @@ python step4_evaluation/run_step4_chenfang.py --methods single_stage_memory,summ
 
 ```
 step0 摄取(确定性)          抽取 <-> 校验 反馈循环                 step1(确定性)
-PDF ──► 全文/表格/图片   ──►  抽取模型 extract_timeline ──►         ──► SFT 条目
-        图注解析+对齐          ▲                     │                  时间点阶段
+PDF ─MinerU─► 全文/表格/图片 ─►  抽取模型 extract_timeline ──►         ──► SFT 条目
+        图注↔图片语义配对       ▲                     │                  时间点阶段
                               └── 反馈(问题) ◄── 校验模型 verify ──┘      标准轨迹
                                    (对照原文+表格+图注核验)
 ```
 
-- **step0 摄取**（不经 LLM，确定性、通用）：`pymupdf` 抽全文与内嵌图片（按面积+md5 去重过滤矢量碎片），`pdfplumber` 抽表格；`captions.py` 用通用正则解析图注并与图片启发式对齐（纯文本模型无法视觉核验，已标注）。
+- **step0 摄取**（不经 LLM，确定性、通用）：用 **MinerU（pipeline 后端）** 解析 PDF，产出逐页全文（`fulltext.json`）、**结构化表格 HTML**（`tables.json`，表格即图片也能识别为表）、图片，并用 MinerU 的**图注↔图片语义配对**（以 `Figure N` 为权威身份）生成 `captions.json`。
 - **抽取模型**：从（通用头/尾裁剪后的）病例正文+表格+图注中抽出结构化时间线（每个时间点的原子 findings、决策、依据 + held-out 诊断/治疗/预后），强约束「只用原文事实、数值/牙位/日期原样保留、表格与叙述冲突以表格为准」。
 - **校验模型（critic）**：对照原文+表格+图注逐条核验事实支持性、数值保真、跨时间点逻辑一致与时序；若存在 high 级问题，则把问题清单作为**反馈**回灌给抽取模型自我修正，最多 `--max-iters` 轮。
 - **step1**（确定性、通用）：把已校验的 findings 用通用模板渲染成问答（数值逐字），组装成 SFT 条目、按时间点切分阶段、复用 step1 的 `build_standard_trajectory` 生成标准轨迹，并追加进 `report_dataset.json`。
@@ -264,8 +264,7 @@ PDF ──► 全文/表格/图片   ──►  抽取模型 extract_timeline �
 report_pipeline/
 ├── config_reports.py                 # 复用 Settings + name 路径(产物统一在 outputs/report/<name>/)
 ├── step0_ingest/
-│   ├── pdf_extract.py                 # 确定性: 全文/表格/图片(过滤去重, 相对路径)
-│   ├── captions.py                    # 通用图注解析 + 图注↔图片启发式对齐
+│   ├── pdf_extract.py                 # MinerU 解析: 全文/表格(HTML)/图片 + 图注↔图片映射
 │   ├── timeline_llm.py                # 抽取模型(反馈感知 + 头/尾裁剪)
 │   ├── verify_llm.py                  # 校验模型(critic, 对照原文核验)
 │   └── prompts/
@@ -311,11 +310,13 @@ python report_pipeline/run_report_pipeline.py --pdf reports/s12903-026-09034-7_r
 
 同一套代码/prompt 已跑通三篇结构迥异的纵向报告，均通过校验：
 
-| name | 报告 | 时间点 | 说明 |
+| name | 报告 | 时间点* | 说明 |
 | --- | --- | --- | --- |
-| `pls_8y` | Papillon–Lefèvre 8 年牙周维护 | 4 | 有 CARE 时间线表；BOP 跨 4 点可追踪 |
-| `ph1_14m` | PH1 种植修复 14 个月 | 8 | 用 ISQ 而非 BOP；术前→植入→6 月→14 月 |
-| `pax7_dup` | PAX7 颅面重复畸形分期手术 | 4 | 无表格；以 11 月龄首诊为基线 |
+| `pls_8y` | Papillon–Lefèvre 8 年牙周维护 | ~6 | 有 CARE 时间线表(MinerU 解析为 HTML)；BOP 跨时间点可追踪 |
+| `ph1_14m` | PH1 种植修复 14 个月 | ~5 | 用 ISQ 而非 BOP；术前→植入→6 月→14 月 |
+| `pax7_dup` | PAX7 颅面重复畸形分期手术 | ~4 | 含产前/新生儿节点；ACMG 表(图片形式)被 MinerU 识别为表 |
 
-> **依赖**：`requirement.txt` 已含 `pymupdf`、`pdfplumber`。
-> **注意**：若所配置模型为推理型（思维链计入 `max_tokens`），本流水线已把抽取/校验的 `max_tokens` 提到 16000、`llm_client` 超时提到 300s；生产建议使用稳定支持 JSON 输出的模型。图注↔图片为文本模型下的启发式对齐，未做视觉核验。
+> *时间点数量会因 LLM 抽取略有浮动，由 critic 每轮把关。
+
+> **依赖**：`requirement.txt` 含 `mineru[core]`（含 torch + 版面/表格/OCR 模型；CPU 可跑，建议 GPU）。首次运行会联网下模型（默认 ModelScope 源）。
+> **注意**：若所配置模型为推理型（思维链计入 `max_tokens`），本流水线已把抽取/校验的 `max_tokens` 提到 16000、`llm_client` 超时提到 300s；生产建议使用稳定支持 JSON 输出的模型。图注↔图片由 MinerU 按版面语义配对（以 `Figure N` 为身份），多面板密集图仍可能不完美。

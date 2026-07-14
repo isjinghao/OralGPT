@@ -42,13 +42,13 @@ def trim_head(fulltext: str) -> str:
     return fulltext
 
 
-def load_source_text(raw_dir: Path, max_chars: int = 16000, max_table_chars: int = 3000,
-                     n_tables: int = 1) -> tuple[str, str]:
-    # 读取抽取的全文与表格, 拼成给 LLM 的源文本
+def load_source_text(raw_dir: Path, max_chars: int = 16000, max_table_chars: int = 6000,
+                     n_tables: int = 2) -> tuple[str, str]:
+    # 读取抽取的全文与表格(MinerU 表格为 HTML), 拼成给 LLM 的源文本
     fulltext = read_fulltext(raw_dir)
     fulltext = trim_tail(trim_head(fulltext))[:max_chars]
     tables = json.loads((raw_dir / "tables.json").read_text(encoding="utf-8"))
-    tables_sorted = sorted(tables, key=lambda t: -sum(len(r or []) for r in t["rows"]))
+    tables_sorted = sorted(tables, key=lambda t: -len(t.get("html", "")))
     tables_text = json.dumps(tables_sorted[:n_tables], ensure_ascii=False)[:max_table_chars]
     return fulltext, tables_text
 

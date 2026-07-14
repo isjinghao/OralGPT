@@ -35,7 +35,32 @@ class ChatClient:
                 return parse_json_object(content)
             except RateLimitError as exc:
                 wait_seconds = reset_wait_seconds(str(exc))
-                print(f"LLM rate limited; waiting {wait_seconds}s before retry {attempt + 1}/3.")
+                print(f"LLM rate limited; waiting {wait_seconds}s before retry {attempt + 1}/4.")
+                time.sleep(wait_seconds)
+        raise RuntimeError("LLM request failed after 4 rate-limit retries.")
+
+    def complete_text(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
+                      images: list[str] | None = None, timeout: int = 300) -> str:
+        # 返回纯文本(不做 JSON 解析), 适合自由文本作答, 避免长文本被包成 JSON 时的解析问题
+        if images:
+            content: list[dict] = [{"type": "text", "text": prompt}]
+            content.extend({"type": "image_url", "image_url": {"url": url}} for url in images)
+            message: dict = {"role": "user", "content": content}
+        else:
+            message = {"role": "user", "content": prompt}
+        for attempt in range(4):
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[message],
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    timeout=timeout,
+                )
+                return (response.choices[0].message.content or "").strip()
+            except RateLimitError as exc:
+                wait_seconds = reset_wait_seconds(str(exc))
+                print(f"LLM rate limited; waiting {wait_seconds}s before retry {attempt + 1}/4.")
                 time.sleep(wait_seconds)
         raise RuntimeError("LLM request failed after 4 rate-limit retries.")
 

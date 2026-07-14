@@ -35,14 +35,22 @@ def judge_base(llm: CachedLLM, record: dict) -> dict:
     data = llm.complete(prompt, cache_key=f"judge_base_{record['task_id']}", max_tokens=8000)
 
     evidence_items = data.get("evidence", []) or []
-    total_evidence = len(selected_evidence)
-    raw_covered = data.get("covered_evidence_count", None)
-    if raw_covered is None:
-        raw_covered = sum(1 for item in evidence_items if item.get("covered"))
-    try:
-        covered_evidence = int(raw_covered or 0)
-    except (TypeError, ValueError):
-        covered_evidence = 0
+    # in_scope 缺省视为 True(向后兼容); 仅统计问题范围内(in-scope)的证据用于 ERS
+    def _in_scope(item: dict) -> bool:
+        return item.get("in_scope", True) is not False
+
+    if evidence_items:
+        in_scope_items = [item for item in evidence_items if _in_scope(item)]
+        total_evidence = len(in_scope_items)
+        covered_evidence = sum(1 for item in in_scope_items if item.get("covered"))
+    else:
+        # 模型未返回逐项判定时, 回退到旧逻辑
+        total_evidence = len(selected_evidence)
+        raw_covered = data.get("covered_evidence_count", 0)
+        try:
+            covered_evidence = int(raw_covered or 0)
+        except (TypeError, ValueError):
+            covered_evidence = 0
     covered_evidence = max(0, min(total_evidence, covered_evidence))
 
     return {
@@ -51,6 +59,48 @@ def judge_base(llm: CachedLLM, record: dict) -> dict:
         "covered_evidence_count": covered_evidence,
         "total_evidence_count": total_evidence,
         "evidence": evidence_items,
+    }
+
+
+def judge_evidence(llm: CachedLLM, record: dict) -> dict:
+    # 仅测量证据召回(ERS): 让模型返回"已覆盖/超范围的证据 id 列表", 输出精简、健壮, 适合证据很多的诊断/治疗任务
+    selected_evidence = _selected_evidence_payload(record)
+    # 精简载荷: 只发 id / fact / modality, 缩短超长诊断任务输入, 降低空/坏输出概率
+    compact = [
+        {
+            "evidence_id": ev.get("evidence_id", ""),
+            "fact_text": ev.get("fact_text", ""),
+            "modality": ev.get("modality", []),
+        }
+        for ev in selected_evidence
+    ]
+    prompt = render(
+        "judge_evidence",
+        question=record["question"],
+        gold=record["gold_answer"],
+        answer=record["model_answer"],
+        selected_evidence=json.dumps(compact, ensure_ascii=False),
+    )
+    data = llm.complete(prompt, cache_key=f"judge_evidence_{record['task_id']}", max_tokens=16000)
+
+    covered_ids = {str(x).strip() for x in (data.get("covered_evidence_ids", []) or [])}
+
+    # heldout 任务的 selected_evidence 都是为该题归因的相关证据, 全部计入分母(不做范围排除)
+    evidence: list[dict] = []
+    total_evidence = 0
+    covered_evidence = 0
+    for ev in selected_evidence:
+        eid = str(ev.get("evidence_id", "")).strip()
+        is_covered = eid in covered_ids
+        evidence.append({"evidence_id": eid, "in_scope": True, "covered": is_covered})
+        total_evidence += 1
+        if is_covered:
+            covered_evidence += 1
+
+    return {
+        "covered_evidence_count": covered_evidence,
+        "total_evidence_count": total_evidence,
+        "evidence": evidence,
     }
 
 
@@ -72,12 +122,15 @@ def judge_rubric(llm: CachedLLM, record: dict, rubric: dict) -> dict:
         answer=record["model_answer"],
         criteria=json.dumps(payload, ensure_ascii=False),
     )
-    data = llm.complete(prompt, cache_key=f"rubric_{record['task_id']}", max_tokens=8000)
+    data = llm.complete(prompt, cache_key=f"rubric_{record['task_id']}", max_tokens=16000)
 
-    # 先按名字收集模型给分
+    # 先按名字收集模型给分与理由
     awarded_by_name: dict[str, float] = {}
+    reason_by_name: dict[str, str] = {}
     for item in data.get("criteria", []) or []:
-        awarded_by_name[str(item.get("name", "")).strip()] = float(item.get("awarded", 0) or 0)
+        nm = str(item.get("name", "")).strip()
+        awarded_by_name[nm] = float(item.get("awarded", 0) or 0)
+        reason_by_name[nm] = str(item.get("reason", "") or "")
 
     detailed = []
     total_awarded = 0.0
@@ -90,18 +143,21 @@ def judge_rubric(llm: CachedLLM, record: dict, rubric: dict) -> dict:
         # 优先按 name 对齐
         if name.strip() in awarded_by_name:
             raw = awarded_by_name[name.strip()]
+            reason = reason_by_name.get(name.strip(), "")
         # 如果名字没对上，就按顺序兜底
         elif idx < len(graded):
             try:
                 raw = float(graded[idx].get("awarded", 0) or 0)
             except (TypeError, ValueError):
                 raw = 0.0
+            reason = str(graded[idx].get("reason", "") or "")
         else:
             raw = 0.0
+            reason = ""
         # 封顶
         awarded = max(0.0, min(max_score, raw))
         total_awarded += awarded
-        detailed.append({"name": name, "max": max_score, "awarded": awarded})
+        detailed.append({"name": name, "max": max_score, "awarded": awarded, "reason": reason})
 
     max_total = float(sum(c["score"] for c in criteria_defs)) or float(rubric.get("max_score", 0)) or 1.0
     return {

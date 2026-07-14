@@ -6,19 +6,33 @@ template: |
   clinically important components of THIS specific gold answer (do not use generic boilerplate that
   is unsupported by the answer).
 
+  Clinical axes to organise the criteria around (orthognathic / craniomaxillofacial):
+  - Occlusal relationship / function.
+  - Facial aesthetics (may combine frontal symmetry and lateral profile into one criterion; no need to
+    over-subdivide).
+  - Dental disease diagnosis / treatment (caries, impacted / wisdom teeth, periodontitis, endodontic and
+    restorative status, etc.).
+  - For DIAGNOSIS tasks: the rubric MUST cover BOTH (a) the deformity / skeletal specialty diagnosis
+    (skeletal & dental malocclusion, asymmetry, vertical/transverse pattern) AND (b) the dental disease
+    diagnosis, as separate criteria, so a gap in either is scored distinctly.
+  - For TREATMENT tasks: include a criterion for the OVERALL treatment pathway and its sequencing/reasoning
+    (presurgical orthodontics -> orthognathic surgery -> postsurgical orthodontics -> dental disease
+    management), not only the surgical technique.
+
   Rules:
   1. Produce 4-7 criteria whose scores sum to exactly 100.
   2. Each criterion targets one clinically meaningful component actually present in the gold answer.
-  3. description explains what a correct answer must contain for that criterion.
-  4. evidence_ids lists the supporting evidence ids (chosen ONLY from the provided evidence) that
-     ground this criterion; use an empty list for criteria about overall grounding/completeness.
+  3. Do NOT give a minor single procedure its own high-weight criterion (e.g. do not make
+     "extraction of impacted teeth" a standalone criterion); fold it into the broader dental-disease
+     treatment criterion.
+  4. description explains what a correct answer must contain for that criterion.
   5. Return strict JSON only.
 
   Return schema:
   {
     "max_score": 100,
     "criteria": [
-      {"name": "...", "score": 0, "description": "...", "evidence_ids": ["..."]}
+      {"name": "...", "score": 0, "description": "..."}
     ]
   }
 

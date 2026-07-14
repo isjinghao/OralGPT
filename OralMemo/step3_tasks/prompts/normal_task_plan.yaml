@@ -34,4 +34,7 @@ task_types:
     instruction: >-
       Explain how later-stage evidence confirms, refines, or corrects an
       earlier-stage impression; required evidence should span at least two
-      different stages.
+      different stages. Keep the update scoped to a single modality relationship:
+      include only the earlier impression being updated and the later evidence
+      (of the asked modality/stage) that updates it, so the answer is judged only
+      on that update relationship and not on unrelated findings.

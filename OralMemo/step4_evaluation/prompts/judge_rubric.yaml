@@ -6,6 +6,18 @@ template: |
   correctly the model answer satisfies the criterion "description". Partial credit is allowed.
   Never exceed a criterion's max_score. Judge only against the rubric and the reference answer.
 
+  Scoring guidance:
+  - Primary / preferred plan: if the model correctly identifies the patient's MAIN or preferred
+    diagnosis/treatment pathway, award high credit on the criteria that cover it, even if it omits
+    alternative or edge-case options that may not apply to this patient. Only the criteria that
+    explicitly target those alternatives should be reduced for their absence.
+  - Reasoning over restatement: reward answers that show clinical REASONING — a causal/inference chain,
+    the sequencing/workflow of the plan (e.g. presurgical orthodontics -> orthognathic surgery ->
+    postsurgical orthodontics -> dental disease management), or why a diagnosis/plan follows from the
+    findings. Do not give full credit to a mere restatement/summary of raw findings when the criterion
+    calls for reasoning or an integrated plan.
+  - Clinical equivalence: accept synonymous clinical phrasing; do not require identical terminology.
+
   QUESTION:
   $question
 

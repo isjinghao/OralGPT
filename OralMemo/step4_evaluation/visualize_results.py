@@ -228,6 +228,9 @@ function scorePills(r){
     out.push(pill(`证据召回分数（ERS）${s.covered_evidence_count ?? 0}/${s.total_evidence_count ?? 0}`, 'blue'));
   } else if(d.percent !== undefined || s.percent !== undefined){
     out.push(pill(`Rubric得分 ${pct(d.percent ?? s.percent)}`, 'blue'));
+    if(s.total_evidence_count !== undefined){
+      out.push(pill(`证据召回分数（ERS）${s.covered_evidence_count ?? 0}/${s.total_evidence_count ?? 0}`, 'blue'));
+    }
   }
   if(r.validation_accepted === false) out.push(pill('校验未通过','red'));
   if(r.n_images) out.push(pill(`图片 ${r.n_images}`,'blue'));
@@ -251,10 +254,14 @@ function scoreSummaryHtml(r){
   const percent = d.percent ?? s.percent;
   const awarded = d.awarded ?? s.awarded;
   const maxTotal = d.max_total ?? s.max_total;
+  const ersBox = (s.total_evidence_count !== undefined)
+    ? `<div class="score-box"><div class="label">证据召回分数（ERS）</div><div class="value">${pct(s.ers_score)}</div><div class="desc">正确召回证据数 / selected_evidence 总数：${esc(s.covered_evidence_count ?? 0)} / ${esc(s.total_evidence_count ?? 0)}</div></div>`
+    : '';
   return `<div class="block"><h4>单题评分</h4>
     <div class="score-grid">
       <div class="score-box"><div class="label">Rubric 总分</div><div class="value">${pct(percent)}</div><div class="desc">得分 / 满分：${esc(awarded ?? 'n/a')} / ${esc(maxTotal ?? 'n/a')}</div></div>
       <div class="score-box"><div class="label">评分类型</div><div class="value">${esc(s.metric || taskTypeLabel(r.task_type) || 'rubric')}</div><div class="desc">诊断或治疗任务按 rubric 逐项计分</div></div>
+      ${ersBox}
     </div>
   </div>`;
 }
@@ -264,7 +271,7 @@ function evidenceHtml(r){
   const covered = evs.filter(e => e.covered === true).length;
   const judged = evs.some(e => Object.prototype.hasOwnProperty.call(e, 'covered'));
   return `<div class="small" style="margin-bottom:8px;">${judged ? `本题证据召回：${covered}/${evs.length}` : `本题 selected_evidence：${evs.length} 条`}</div>
-  <table class="criteria"><thead><tr><th style="width:84px;">召回情况</th><th style="width:220px;">证据ID</th><th>证据事实</th><th style="width:110px;">阶段 / 模态</th><th>判定理由</th></tr></thead><tbody>${evs.map(e => {
+  <table class="criteria"><thead><tr><th style="width:84px;">召回情况</th><th style="width:220px;">证据ID</th><th>证据事实</th><th style="width:110px;">阶段 / 模态</th></tr></thead><tbody>${evs.map(e => {
     const hasJudge = Object.prototype.hasOwnProperty.call(e, 'covered');
     const status = hasJudge ? (e.covered ? pill('已召回','green') : pill('未召回','red')) : pill('未判定');
     return `<tr>
@@ -272,7 +279,6 @@ function evidenceHtml(r){
       <td><div class="ev-id">${esc(e.evidence_id)}</div></td>
       <td>${esc(e.fact_text)}${e.value !== undefined && e.value !== null ? `<div class="small">取值: ${esc(e.value)} ${esc(e.unit || '')}</div>` : ''}</td>
       <td>${pill(stageLabel(e.stage || ''))}<br/>${pill((e.modality||[]).join(','))}</td>
-      <td>${esc(e.coverage_reason || '')}</td>
     </tr>`;
   }).join('')}</tbody></table>`;
 }
@@ -282,9 +288,9 @@ function criteriaHtml(r){
   if(!criteria.length) return '';
   return `<div class="block"><h4>Rubric 细项评分</h4>
     <div class="small" style="margin-bottom:8px;">总分：${esc(detail.awarded ?? 'n/a')} / ${esc(detail.max_total ?? 'n/a')}，百分比：${pct(detail.percent)}</div>
-    <table class="criteria"><thead><tr><th>评分项</th><th style="width:110px;">得分</th><th style="width:90px;">满分</th><th style="width:100px;">百分比</th></tr></thead><tbody>${criteria.map(c=>{
+    <table class="criteria"><thead><tr><th>评分项</th><th style="width:90px;">得分</th><th style="width:70px;">满分</th><th style="width:80px;">百分比</th><th>判定理由</th></tr></thead><tbody>${criteria.map(c=>{
       const p = (typeof c.awarded === 'number' && typeof c.max === 'number' && c.max) ? c.awarded / c.max * 100 : undefined;
-      return `<tr><td>${esc(c.name)}</td><td>${esc(c.awarded)}</td><td>${esc(c.max)}</td><td>${pct(p)}</td></tr>`;
+      return `<tr><td>${esc(c.name)}</td><td>${esc(c.awarded)}</td><td>${esc(c.max)}</td><td>${pct(p)}</td><td>${esc(c.reason || '')}</td></tr>`;
     }).join('')}</tbody></table></div>`;
 }
 function rawScoreHtml(r){

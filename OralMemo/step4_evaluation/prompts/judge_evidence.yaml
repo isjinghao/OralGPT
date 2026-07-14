@@ -1,0 +1,36 @@
+template: |
+  You are measuring EVIDENCE RECALL for a model's ANSWER to a clinical question.
+
+  For EACH item in SELECTED EVIDENCE, decide whether the MODEL ANSWER covers that clinical fact
+  (states the same fact; synonymous clinical phrasing is fine), using the REFERENCE ANSWER as ground
+  truth. Every listed evidence item is relevant to this task and MUST be judged for coverage — do not
+  exclude any item. Return ONLY the ids of the covered items, no explanations.
+
+  Clinical semantic equivalence:
+  - Accept clinically equivalent or synonymous phrasing as covering the same fact; do not require
+    identical terminology. Examples of equivalent expressions:
+      * "mandibular excess" / "protruded chin" / "mandibular prognathism" ≈ "mandibular protrusion"
+      * "skeletal Class III" ≈ "bilateral Class III molar relationship" (when describing the same relationship)
+      * "concave facial profile" ≈ "prognathic mandibular profile"
+  - Judge on clinical meaning, not surface wording.
+
+  Numeric tolerance:
+  - Linear measurements (mm): direction/sign/laterality must match; magnitude acceptable within ±2 mm
+    OR ±20% of the reference (whichever is larger).
+  - Angles (degrees): within ±10° and matching qualitative descriptor (acute/obtuse/normal, high/low-angle).
+  - Categorical / classification (Class I/II/III, left/right, presence/absence): must match EXACTLY.
+
+  QUESTION:
+  $question
+
+  REFERENCE ANSWER:
+  $gold
+
+  MODEL ANSWER:
+  $answer
+
+  SELECTED EVIDENCE (JSON list):
+  $selected_evidence
+
+  Return strict JSON only, no markdown, no commentary:
+  {"covered_evidence_ids": ["<id>"]}
