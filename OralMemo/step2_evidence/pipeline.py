@@ -49,8 +49,9 @@ def process_patient(item: dict, settings: Settings, client: ChatClient):
 
 
 def build_client(settings: Settings) -> ChatClient:
+    cfg = settings.llm_for("benchmark")
     return ChatClient(
-        api_key=settings.openai_api_key,
-        base_url=settings.openai_base_url,
-        model=settings.openai_model,
+        api_key=cfg.api_key,
+        base_url=cfg.base_url,
+        model=cfg.model,
     )

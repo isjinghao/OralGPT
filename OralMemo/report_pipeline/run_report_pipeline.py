@@ -28,7 +28,7 @@ def write_json(path: Path, data) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def extract_with_feedback(client, raw_dir: Path, figures, max_iters: int) -> tuple[dict, list[dict]]:
+def extract_with_feedback(extract_client, verifier_client, raw_dir: Path, figures, max_iters: int) -> tuple[dict, list[dict]]:
     """抽取<->校验反馈循环。返回(最终时间线, 每轮校验记录)。"""
     history: list[dict] = []
     feedback: list[dict] | None = None
@@ -36,11 +36,11 @@ def extract_with_feedback(client, raw_dir: Path, figures, max_iters: int) -> tup
     for it in range(1, max_iters + 1):
         # 抽取时间线
         print(f"[loop {it}/{max_iters}] 抽取模型生成时间线 ...", flush=True)
-        timeline = extract_timeline(client, raw_dir, figures, feedback_issues=feedback)
+        timeline = extract_timeline(extract_client, raw_dir, figures, feedback_issues=feedback)
         
         # 校验时间线
         print(f"[loop {it}/{max_iters}] 校验模型核验 ...", flush=True)
-        verification = verify_timeline(client, raw_dir, timeline, captions=figures)
+        verification = verify_timeline(verifier_client, raw_dir, timeline, captions=figures)
         highs = high_severity_issues(verification)
         history.append({"iteration": it, "passed": verification.get("passed"),
                         "n_issues": len(verification.get("issues", [])),
@@ -70,10 +70,17 @@ def main() -> None:
     settings = get_report_settings()
     load_env(BENCH_ROOT / ".env")
     s = get_settings()
+    benchmark_cfg = s.llm_for("benchmark")
+    verifier_cfg = s.llm_for("verifier")
     client = ChatClient(
-        api_key=s.openai_api_key,
-        base_url=s.openai_base_url,
-        model=args.model or s.openai_model,
+        api_key=benchmark_cfg.api_key,
+        base_url=benchmark_cfg.base_url,
+        model=args.model or benchmark_cfg.model,
+    )
+    verifier_client = ChatClient(
+        api_key=verifier_cfg.api_key,
+        base_url=verifier_cfg.base_url,
+        model=verifier_cfg.model,
     )
 
     name = args.name
@@ -95,7 +102,7 @@ def main() -> None:
     )
 
     # 抽取 <-> 校验 反馈循环
-    timeline, verif_history = extract_with_feedback(client, raw_dir, captions, args.max_iters)
+    timeline, verif_history = extract_with_feedback(client, verifier_client, raw_dir, captions, args.max_iters)
     write_json(out_dir / "timeline.extracted.json", timeline)
     write_json(out_dir / "verification_report.json", verif_history)
     final_passed = bool(verif_history and verif_history[-1]["passed"] and verif_history[-1]["n_high"] == 0)

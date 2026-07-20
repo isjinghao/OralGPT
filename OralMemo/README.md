@@ -88,18 +88,41 @@ pip install -r requirement.txt
 
 | 环境变量 | 必填 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `OPENAI_API_KEY` | 是 | 无（缺失会报 `KeyError`） | OpenAI 兼容接口的 API Key |
-| `OPENAI_BASE_URL` | 否 | `https://api.openai.com/v1` | 接口基址（末尾 `/` 会被去除） |
-| `OPENAI_MODEL` | 否 | `qwen3.6-chat` | 使用的模型名 |
-| `EMBEDDING_MODEL` | 否 | `text-embedding-3-small` | 仅 Step4 `mem0_memory` 用；向量化模型，复用 `OPENAI_API_KEY` / `OPENAI_BASE_URL` |
+| `OPENAI_API_KEY` | 条件必填 | 无 | 通用 OpenAI 兼容接口 API Key；各角色未单独配置时回退到它（若三类角色 key 都单独配置，则可不填） |
+| `OPENAI_BASE_URL` | 否 | `https://api.openai.com/v1` | 通用接口基址（末尾 `/` 会被去除） |
+| `OPENAI_MODEL` | 否 | `qwen3.6-chat` | 通用模型名 |
+| `BENCHMARK_OPENAI_API_KEY` / `BENCHMARK_OPENAI_BASE_URL` / `BENCHMARK_OPENAI_MODEL` | 否 | 回退到 `OPENAI_*` | 生成 benchmark 用：时间线抽取、证据抽取、任务/问题/rubric 生成 |
+| `ANSWER_OPENAI_API_KEY` / `ANSWER_OPENAI_BASE_URL` / `ANSWER_OPENAI_MODEL` | 否 | 回退到 `OPENAI_*` | 被测模型作答用：Step4 记忆更新与回答问题 |
+| `VERIFIER_OPENAI_API_KEY` / `VERIFIER_OPENAI_BASE_URL` / `VERIFIER_OPENAI_MODEL` | 否 | 回退到 `OPENAI_*` | 校验/评分用：时间线校验、QA 校验、judge/rubric/evidence 评分 |
+| `EMBEDDING_OPENAI_API_KEY` / `EMBEDDING_OPENAI_BASE_URL` / `EMBEDDING_MODEL` | 否 | key/url 回退到 `OPENAI_*`；模型默认 `text-embedding-3-small` | 仅 Step4 `mem0_memory` 用；向量化模型可单独配置 key 和 URL |
 
 在项目根目录创建 `.env`：
 
 ```bash
 cat > .env << 'EOF'
-OPENAI_API_KEY=你的key
+# 通用默认配置（角色未单独配置时使用）
+OPENAI_API_KEY=你的默认key
 OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=qwen3.6-chat
+
+# 生成 benchmark 的模型
+BENCHMARK_OPENAI_API_KEY=你的生成模型key
+BENCHMARK_OPENAI_BASE_URL=https://api.openai.com/v1
+BENCHMARK_OPENAI_MODEL=qwen3.6-chat
+
+# 回答问题 / 被测模型
+ANSWER_OPENAI_API_KEY=你的回答模型key
+ANSWER_OPENAI_BASE_URL=https://api.openai.com/v1
+ANSWER_OPENAI_MODEL=gpt-4o-mini
+
+# verifier / judge / critic 模型
+VERIFIER_OPENAI_API_KEY=你的校验模型key
+VERIFIER_OPENAI_BASE_URL=https://api.openai.com/v1
+VERIFIER_OPENAI_MODEL=gpt-4o
+
+# mem0 embedding
+EMBEDDING_OPENAI_API_KEY=你的embedding模型key
+EMBEDDING_OPENAI_BASE_URL=https://api.openai.com/v1
 EMBEDDING_MODEL=text-embedding-3-small
 EOF
 ```

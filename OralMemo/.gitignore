@@ -6,3 +6,16 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .ipynb_checkpoints/
+
+# Local credentials / environment
+.env
+
+# Downloaded papers and PubMed/PMC intermediate artifacts (do not upload/sync)
+reports/full_text/
+reports/cache/
+reports/reports/
+reports/*.pdf
+reports/*_targets*.csv
+reports/pmcid_targets*.csv
+reports/pmc_aws_*.csv
+reports/pmc_aws_*.json

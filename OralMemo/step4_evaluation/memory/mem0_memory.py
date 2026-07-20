@@ -53,17 +53,22 @@ class Mem0Memory(MemoryMethod):
         return self._memory
 
     def _default_config(self) -> dict:
-        api_key = os.environ.get("OPENAI_API_KEY", "")
-        base_url = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
-        llm_model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+        # mem0 内部 LLM 默认跟随 ANSWER_*（回答阶段）配置，未配置时回退到 OPENAI_*。
+        llm_api_key = os.environ.get("ANSWER_OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY", "")
+        llm_base_url = os.environ.get("ANSWER_OPENAI_BASE_URL") or os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        llm_model = os.environ.get("ANSWER_OPENAI_MODEL") or os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+
+        # embedding 可单独配置，未配置时回退到通用 OPENAI_*。
+        embedding_api_key = os.environ.get("EMBEDDING_OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY", "")
+        embedding_base_url = os.environ.get("EMBEDDING_OPENAI_BASE_URL") or os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
 
         config: dict = {
             "llm": {
                 "provider": "openai",
                 "config": {
                     "model": llm_model,
-                    "api_key": api_key,
-                    "openai_base_url": base_url,
+                    "api_key": llm_api_key,
+                    "openai_base_url": llm_base_url,
                     "temperature": 0.0,
                 },
             },
@@ -71,8 +76,8 @@ class Mem0Memory(MemoryMethod):
                 "provider": "openai",
                 "config": {
                     "model": self.embedding_model,
-                    "api_key": api_key,
-                    "openai_base_url": base_url,
+                    "api_key": embedding_api_key,
+                    "openai_base_url": embedding_base_url,
                 },
             },
         }

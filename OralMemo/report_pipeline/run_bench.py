@@ -44,8 +44,9 @@ def write_json(path: Path, data) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def build_client(settings) -> ChatClient:
-    return ChatClient(api_key=settings.openai_api_key, base_url=settings.openai_base_url, model=settings.openai_model)
+def build_client(settings, role: str = "benchmark") -> ChatClient:
+    cfg = settings.llm_for(role)
+    return ChatClient(api_key=cfg.api_key, base_url=cfg.base_url, model=cfg.model)
 
 
 # ------------------------------ step2 ------------------------------
@@ -89,14 +90,14 @@ def build_heldout_tasks(client, patient_stages, index, cache_dir):
     return tasks
 
 
-def run_step3(out: Path, client: ChatClient) -> None:
+def run_step3(out: Path, client: ChatClient, verifier_client: ChatClient) -> None:
     patient_stages = read_json(out / "stages" / "patient_stages.json")
     evidence_data = read_json(out / "evidence" / "evidence.json")
     evidence_graph = read_json(out / "graph" / "evidence_graph.json")
     index = EvidenceIndex(evidence=evidence_data["evidence"], graph=evidence_graph)
     cache_dir = out / "cache" / "step3"
 
-    tasks = build_normal_tasks(client, patient_stages, index, cache_dir)
+    tasks = build_normal_tasks(client, patient_stages, index, cache_dir, verifier_client=verifier_client)
     tasks.extend(build_heldout_tasks(client, patient_stages, index, cache_dir))
 
     rubrics = {"diagnosis_rubrics": [], "treatment_rubrics": []}
@@ -137,7 +138,13 @@ def load_rubric_index(out: Path) -> dict[str, dict]:
     return index
 
 
-def run_step4(out: Path, client: ChatClient, methods: list[str] | None, multimodal: bool) -> None:
+def run_step4(
+    out: Path,
+    answer_client: ChatClient,
+    verifier_client: ChatClient,
+    methods: list[str] | None,
+    multimodal: bool,
+) -> None:
     trajectory = read_json(out / "trajectories" / "standard_trajectory.json")
     tasks = read_json(out / "tasks" / "all_tasks.json")["tasks"]
     tasks_by_stage = group_tasks_by_stage(tasks)
@@ -154,9 +161,10 @@ def run_step4(out: Path, client: ChatClient, methods: list[str] | None, multimod
     for method in build_methods(names=methods, multimodal=multimodal):
         method_dir = cache_root / method.name
         method.setup(method_dir)
-        llm = CachedLLM(client, method_dir)
-        llm_by_method[method.name] = llm
-        records = run_streaming(method, trajectory, tasks_by_stage, llm, image_root)
+        answer_llm = CachedLLM(answer_client, method_dir / "answer")
+        verifier_llm = CachedLLM(verifier_client, method_dir / "verifier")
+        llm_by_method[method.name] = verifier_llm
+        records = run_streaming(method, trajectory, tasks_by_stage, answer_llm, image_root)
         records_by_method[method.name] = records
         write_json(eval_dir / f"answers_{method.name}.json", records)
         print(f"[step4] method={method.name} 作答={len(records)}", flush=True)
@@ -180,15 +188,17 @@ def main() -> None:
 
     load_env(BENCH_ROOT / ".env")
     settings = get_settings()
-    client = build_client(settings)
+    benchmark_client = build_client(settings, "benchmark")
+    answer_client = build_client(settings, "answer")
+    verifier_client = build_client(settings, "verifier")
     out = BENCH_ROOT / "outputs" / "report" / args.name
 
     if "2" in args.steps:
-        run_step2(out, client, settings)
+        run_step2(out, benchmark_client, settings)
     if "3" in args.steps:
-        run_step3(out, client)
+        run_step3(out, benchmark_client, verifier_client)
     if "4" in args.steps:
-        run_step4(out, client, args.methods, args.multimodal)
+        run_step4(out, answer_client, verifier_client, args.methods, args.multimodal)
 
 
 if __name__ == "__main__":

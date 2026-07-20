@@ -130,8 +130,16 @@ def validate_task(client: ChatClient, task: dict, cache_dir: Path, attempt: int 
     return cached_completion(client, prompt, cache_path, max_tokens=8000)
 
 
-def finalize_task(client: ChatClient, spec: dict, cache_dir: Path, max_iters: int = 3) -> dict:
+def finalize_task(
+    client: ChatClient,
+    spec: dict,
+    cache_dir: Path,
+    max_iters: int = 3,
+    verifier_client: ChatClient | None = None,
+) -> dict:
     # 生成<->校验反馈循环: 若未通过校验, 把反馈交回模型重生成问题, 并应用校验给出的修正问题/修正金标准, 直到通过或达到最大轮数
+    # client 用于生成 benchmark；verifier_client 用于校验，缺省回退到 client 以兼容旧逻辑。
+    verifier = verifier_client or client
     task = dict(spec)
     feedback: dict | None = None
     validation: dict = {}
@@ -146,7 +154,7 @@ def finalize_task(client: ChatClient, spec: dict, cache_dir: Path, max_iters: in
         task["gold_answer"] = current_gold
 
         # (2) 问题+金标准验证
-        validation = validate_task(client, task, cache_dir, attempt=it)
+        validation = validate_task(verifier, task, cache_dir, attempt=it)
         history.append({"iteration": it, "accepted": validation.get("accepted")})
         print(f"  [loop {it}/{max_iters}] accepted={validation.get('accepted')}", flush=True)
         if validation.get("accepted"):

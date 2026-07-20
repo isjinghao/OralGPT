@@ -23,7 +23,13 @@ def write_json(path: Path, data: dict | list) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def build_normal_tasks(client: ChatClient, patient_stages: dict, index: EvidenceIndex, cache_dir: Path) -> list[dict]:
+def build_normal_tasks(
+    client: ChatClient,
+    patient_stages: dict,
+    index: EvidenceIndex,
+    cache_dir: Path,
+    verifier_client: ChatClient | None = None,
+) -> list[dict]:
     # 构建普通任务; 仅保留通过校验的问题, 未通过校验的直接丢弃
     planned = plan_normal_tasks(client, patient_stages, index, cache_dir)
     patient_id = patient_stages["patient_id"]
@@ -35,7 +41,7 @@ def build_normal_tasks(client: ChatClient, patient_stages: dict, index: Evidence
         counters[task_type] = counters.get(task_type, 0) + 1
         spec = assemble_normal_task(patient_id, f"{task_type}_{counters[task_type]:03d}", item, index)
         print(f"[Step3 normal] {spec['task_id']} ({spec['task_type']})", flush=True)
-        task = finalize_task(client, spec, cache_dir)
+        task = finalize_task(client, spec, cache_dir, verifier_client=verifier_client)
         if not task["validation"].get("accepted"):
             dropped += 1
             print(f"  dropped (validation failed after retries): {spec['task_id']}", flush=True)
@@ -84,16 +90,23 @@ def main() -> None:
     evidence_data = read_json(out / "evidence" / "evidence.json")
     evidence_graph = read_json(out / "graph" / "evidence_graph.json")
 
+    benchmark_cfg = settings.llm_for("benchmark")
+    verifier_cfg = settings.llm_for("verifier")
     client = ChatClient(
-        api_key=settings.openai_api_key,
-        base_url=settings.openai_base_url,
-        model=settings.openai_model,
+        api_key=benchmark_cfg.api_key,
+        base_url=benchmark_cfg.base_url,
+        model=benchmark_cfg.model,
+    )
+    verifier_client = ChatClient(
+        api_key=verifier_cfg.api_key,
+        base_url=verifier_cfg.base_url,
+        model=verifier_cfg.model,
     )
     index = EvidenceIndex(evidence=evidence_data["evidence"], graph=evidence_graph)
     cache_dir = out / "cache" / "step3"
 
     # (2) LLM 规划并生成普通任务
-    tasks = build_normal_tasks(client, patient_stages, index, cache_dir)
+    tasks = build_normal_tasks(client, patient_stages, index, cache_dir, verifier_client=verifier_client)
 
     # (3) 拆分 held-out 诊断/治疗任务并由 LLM 归因证据
     tasks.extend(build_heldout_tasks(client, patient_stages, index, cache_dir))

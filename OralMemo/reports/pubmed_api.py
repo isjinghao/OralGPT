@@ -25,8 +25,41 @@ from requests.exceptions import JSONDecodeError as RequestsJSONDecodeError
 
 EUTILS_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 DB = "pubmed"
-NCBI_FETCH_MAX_RETRIES = 5
-NCBI_FETCH_RETRY_BASE_DELAY = 1.0
+NCBI_FETCH_MAX_RETRIES = 8
+NCBI_FETCH_RETRY_BASE_DELAY = 1.5
+NCBI_DEFAULT_TOOL = "OralMemo"
+NCBI_RETRY_STATUS_CODES = (408, 429, 500, 502, 503, 504)
+NCBI_TRANSIENT_EXCEPTIONS = (
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout,
+    requests.exceptions.ChunkedEncodingError,
+    requests.exceptions.ContentDecodingError,
+    requests.exceptions.SSLError,
+)
+
+
+def _ncbi_identity_params() -> Dict[str, str]:
+    params: Dict[str, str] = {"tool": (os.getenv("NCBI_TOOL") or NCBI_DEFAULT_TOOL).strip() or NCBI_DEFAULT_TOOL}
+    email = (os.getenv("NCBI_EMAIL") or "").strip()
+    if email:
+        params["email"] = email
+    api_key = (os.getenv("NCBI_API_KEY") or "").strip()
+    if api_key:
+        params["api_key"] = api_key
+    return params
+
+
+def _with_ncbi_identity(params: Dict[str, Any]) -> Dict[str, Any]:
+    merged = dict(params)
+    for key, value in _ncbi_identity_params().items():
+        merged.setdefault(key, value)
+    return merged
+
+
+def _ncbi_user_agent() -> str:
+    tool = _ncbi_identity_params().get("tool", NCBI_DEFAULT_TOOL)
+    email = _ncbi_identity_params().get("email")
+    return f"{tool}/1.0" + (f" ({email})" if email else "")
 
 
 def _ncbi_requests_extra(*, timeout: float | int) -> Dict[str, Any]:
@@ -34,7 +67,10 @@ def _ncbi_requests_extra(*, timeout: float | int) -> Dict[str, Any]:
     Match ``metadata_retrieval.ncbi_fetch`` / ``NCBI_USE_SYSTEM_PROXY``:
     when set to 0/false/no/off, bypass HTTP(S)_PROXY for E-utilities (broken corporate proxies are common).
     """
-    extra: Dict[str, Any] = {"timeout": timeout}
+    extra: Dict[str, Any] = {
+        "timeout": timeout,
+        "headers": {"User-Agent": _ncbi_user_agent()},
+    }
     raw = (os.getenv("NCBI_USE_SYSTEM_PROXY") or "").strip().lower()
     if raw in ("0", "false", "no", "off"):
         extra["proxies"] = {"http": None, "https": None}
@@ -62,11 +98,12 @@ def _throttle_ncbi() -> None:
 
 def _ncbi_get_with_retry(url: str, *, params: Dict[str, Any], timeout: float | int) -> requests.Response:
     last_err: Exception | None = None
+    request_params = _with_ncbi_identity(params)
     for attempt in range(1, NCBI_FETCH_MAX_RETRIES + 1):
         try:
             _throttle_ncbi()
-            resp = requests.get(url, params=params, **_ncbi_requests_extra(timeout=timeout))
-            if resp.status_code in (429, 500, 502, 503, 504):
+            resp = requests.get(url, params=request_params, **_ncbi_requests_extra(timeout=timeout))
+            if resp.status_code in NCBI_RETRY_STATUS_CODES:
                 if attempt >= NCBI_FETCH_MAX_RETRIES:
                     resp.raise_for_status()
                 sleep_s = NCBI_FETCH_RETRY_BASE_DELAY * (2 ** (attempt - 1))
@@ -74,11 +111,12 @@ def _ncbi_get_with_retry(url: str, *, params: Dict[str, Any], timeout: float | i
                 continue
             resp.raise_for_status()
             return resp
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+        except NCBI_TRANSIENT_EXCEPTIONS as e:
             last_err = e
             if attempt >= NCBI_FETCH_MAX_RETRIES:
                 break
             sleep_s = NCBI_FETCH_RETRY_BASE_DELAY * (2 ** (attempt - 1))
+            print(f"NCBI GET retry {attempt}/{NCBI_FETCH_MAX_RETRIES} after transient error: {e}", file=sys.stderr)
             time.sleep(sleep_s)
     if last_err is not None:
         raise last_err
@@ -87,11 +125,12 @@ def _ncbi_get_with_retry(url: str, *, params: Dict[str, Any], timeout: float | i
 
 def _ncbi_post_with_retry(url: str, *, data: Dict[str, Any], timeout: float | int) -> requests.Response:
     last_err: Exception | None = None
+    request_data = _with_ncbi_identity(data)
     for attempt in range(1, NCBI_FETCH_MAX_RETRIES + 1):
         try:
             _throttle_ncbi()
-            resp = requests.post(url, data=data, **_ncbi_requests_extra(timeout=timeout))
-            if resp.status_code in (429, 500, 502, 503, 504):
+            resp = requests.post(url, data=request_data, **_ncbi_requests_extra(timeout=timeout))
+            if resp.status_code in NCBI_RETRY_STATUS_CODES:
                 if attempt >= NCBI_FETCH_MAX_RETRIES:
                     resp.raise_for_status()
                 sleep_s = NCBI_FETCH_RETRY_BASE_DELAY * (2 ** (attempt - 1))
@@ -99,11 +138,12 @@ def _ncbi_post_with_retry(url: str, *, data: Dict[str, Any], timeout: float | in
                 continue
             resp.raise_for_status()
             return resp
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+        except NCBI_TRANSIENT_EXCEPTIONS as e:
             last_err = e
             if attempt >= NCBI_FETCH_MAX_RETRIES:
                 break
             sleep_s = NCBI_FETCH_RETRY_BASE_DELAY * (2 ** (attempt - 1))
+            print(f"NCBI POST retry {attempt}/{NCBI_FETCH_MAX_RETRIES} after transient error: {e}", file=sys.stderr)
             time.sleep(sleep_s)
     if last_err is not None:
         raise last_err
@@ -361,22 +401,47 @@ def _esearch_all_pmids_split_by_pdat(
     return collect_range(start, end, max_records)
 
 
-def esummary(pmids: List[str], api_key: str | None = None) -> Dict[str, Any]:
+def esummary(
+    pmids: List[str],
+    api_key: str | None = None,
+    batch_size: int = 100,
+    show_progress: bool = False,
+) -> Dict[str, Any]:
     if not pmids:
         return {}
 
     url = f"{EUTILS_BASE}/esummary.fcgi"
-    params = {
-        "db": DB,
-        "id": ",".join(pmids),
-        "retmode": "json",
-    }
-    if api_key:
-        params["api_key"] = api_key
+    merged_result: Dict[str, Any] = {"uids": []}
+    header: Dict[str, Any] = {}
+    batch_size = max(1, batch_size)
+    total_batches = (len(pmids) + batch_size - 1) // batch_size
 
-    resp = _ncbi_get_with_retry(url, params=params, timeout=30)
-    resp.raise_for_status()
-    return _safe_json_from_response(resp)
+    for i in range(0, len(pmids), batch_size):
+        chunk = pmids[i : i + batch_size]
+        if show_progress:
+            batch_no = i // batch_size + 1
+            print(f"Fetching esummary batch {batch_no}/{total_batches} ({len(chunk)} PMIDs)", file=sys.stderr, flush=True)
+
+        params = {
+            "db": DB,
+            "id": ",".join(chunk),
+            "retmode": "json",
+        }
+        if api_key:
+            params["api_key"] = api_key
+
+        resp = _ncbi_post_with_retry(url, data=params, timeout=60)
+        resp.raise_for_status()
+        data = _safe_json_from_response(resp)
+        header = data.get("header", header)
+        result = data.get("result", {})
+        uids = result.get("uids", [])
+        merged_result["uids"].extend(uids)
+        for uid in uids:
+            if uid in result:
+                merged_result[uid] = result[uid]
+
+    return {"header": header, "result": merged_result}
 
 
 def _first_sentence(text: str) -> str:
@@ -407,7 +472,7 @@ def efetch_abstract_first_sentences(
         params = {"db": DB, "id": ",".join(chunk), "retmode": "xml"}
         if api_key:
             params["api_key"] = api_key
-        resp = _ncbi_get_with_retry(url, params=params, timeout=60)
+        resp = _ncbi_post_with_retry(url, data=params, timeout=60)
         resp.raise_for_status()
 
         root = ET.fromstring(resp.text)
@@ -432,6 +497,7 @@ def efetch_full_articles(
     *,
     api_key: str | None = None,
     batch_size: int = 10,
+    show_progress: bool = False,
 ) -> Dict[str, Dict[str, Any]]:
     """
     Return full per-article data parsed from efetch XML:
@@ -442,12 +508,16 @@ def efetch_full_articles(
         return out
 
     url = f"{EUTILS_BASE}/efetch.fcgi"
+    total_batches = (len(pmids) + batch_size - 1) // batch_size
     for i in range(0, len(pmids), batch_size):
         chunk = pmids[i : i + batch_size]
+        if show_progress:
+            batch_no = i // batch_size + 1
+            print(f"Fetching efetch batch {batch_no}/{total_batches} ({len(chunk)} PMIDs)", file=sys.stderr, flush=True)
         params = {"db": DB, "id": ",".join(chunk), "retmode": "xml"}
         if api_key:
             params["api_key"] = api_key
-        resp = _ncbi_get_with_retry(url, params=params, timeout=60)
+        resp = _ncbi_post_with_retry(url, data=params, timeout=60)
         resp.raise_for_status()
 
         root = ET.fromstring(resp.text)
@@ -547,24 +617,34 @@ def main() -> None:
     parser.add_argument("term", nargs="?", help='Search term, e.g. "cancer immunotherapy"')
     parser.add_argument("--all", action="store_true", help="Fetch as many PMIDs as possible (paged via History).")
     parser.add_argument("--max-records", type=int, default=None, help="Cap total records when using --all.")
-    parser.add_argument("--page-size", type=int, default=10, help="PMID page size for esearch paging.")
-    parser.add_argument("--abstract-batch-size", type=int, default=10, help="Batch size for efetch abstract retrieval.")
+    parser.add_argument("--page-size", type=int, default=100, help="PMID page size for esearch paging.")
+    parser.add_argument("--abstract-batch-size", type=int, default=100, help="Batch size for efetch abstract retrieval.")
     parser.add_argument("--probe-rate-no-key", action="store_true", help="Probe best-effort max RPS without API key.")
+    parser.add_argument("--api-key", default=None, help="NCBI API key. Prefer NCBI_API_KEY env var for repeated use.")
+    parser.add_argument("--email", default=None, help="Email passed to NCBI E-utilities. Or set NCBI_EMAIL.")
+    parser.add_argument("--count-only", action="store_true", help="Only print the PubMed hit count for the built-in query.")
+    parser.add_argument("--quiet", action="store_true", help="Write JSON without printing every article to stdout.")
     parser.add_argument("--output", default="pubmed_api.json", help="Output JSON file path.")
     args = parser.parse_args()
 
     load_dotenv(".env")
-    api_key = os.getenv("NCBI_API_KEY")
+    if args.api_key:
+        os.environ["NCBI_API_KEY"] = args.api_key.strip()
+    if args.email:
+        os.environ["NCBI_EMAIL"] = args.email.strip()
+    api_key = (os.getenv("NCBI_API_KEY") or "").strip() or None
+    print(f"NCBI API key: {'enabled' if api_key else 'not set'}", file=sys.stderr)
 
     if args.probe_rate_no_key:
         best = probe_max_rate_no_key()
         print(f"Best-effort max RPS without api_key (probe): {best:.1f}")
         return
 
-    # Dental / maxillofacial disease case reports.
-    # Restrict the "disease" part to the oral & maxillofacial domain (MeSH + tiab)
-    # and use the "Case Reports" publication type instead of a free-text match,
-    # which removes off-topic hits (e.g. orthopedic "sickle cell disease" case reports).
+    # Expanded dental / maxillofacial disease case-report search.
+    # Scope: oral/dental/maxillofacial case reports, English, humans, with abstracts,
+    # since 2010. The journal whitelist intentionally mixes high-impact dental journals,
+    # specialty case-report-friendly journals, and open-access/PMC-friendly journals to
+    # increase downloadable full texts while keeping the topic clinically relevant.
     term = '''
         (
     "Stomatognathic Diseases"[Mesh]
@@ -579,12 +659,102 @@ def main() -> None:
     OR maxillofacial[tiab]
     OR oromaxillofacial[tiab]
     OR stomatognathic[tiab]
+    OR periodontal[tiab]
+    OR endodontic[tiab]
+    OR prosthodontic[tiab]
+    OR orthodontic[tiab]
+    OR peri-implant[tiab]
+    OR periimplant[tiab]
+    OR mandibular[tiab]
+    OR maxillary[tiab]
+    OR oral[tiab]
     )
     AND "Case Reports"[Publication Type]
     AND English[Language]
     AND Humans[Mesh]
+    AND hasabstract
+    AND ("2010/01/01"[Date - Publication] : "3000"[Date - Publication])
+    AND (
+    "Periodontology 2000"[Journal]
+    OR "Journal of Dental Research"[Journal]
+    OR "Journal of Clinical Periodontology"[Journal]
+    OR "Clinical Oral Implants Research"[Journal]
+    OR "Dental Materials"[Journal]
+    OR "Journal of Endodontics"[Journal]
+    OR "International Endodontic Journal"[Journal]
+    OR "Oral Oncology"[Journal]
+    OR "International Journal of Oral Science"[Journal]
+    OR "Journal of Dentistry"[Journal]
+    OR "Clinical Implant Dentistry and Related Research"[Journal]
+    OR "Journal of Prosthodontic Research"[Journal]
+    OR "Clinical Oral Investigations"[Journal]
+    OR "BMC Oral Health"[Journal]
+    OR "Head & Face Medicine"[Journal]
+    OR "Journal of Oral and Maxillofacial Surgery"[Journal]
+    OR "International Journal of Oral and Maxillofacial Surgery"[Journal]
+    OR "British Journal of Oral and Maxillofacial Surgery"[Journal]
+    OR "Journal of Cranio-Maxillo-Facial Surgery"[Journal]
+    OR "Maxillofacial Plastic and Reconstructive Surgery"[Journal]
+    OR "Journal of the Korean Association of Oral and Maxillofacial Surgeons"[Journal]
+    OR "Oral Diseases"[Journal]
+    OR "Oral Surgery, Oral Medicine, Oral Pathology and Oral Radiology"[Journal]
+    OR "Journal of Oral Pathology & Medicine"[Journal]
+    OR "Journal of Oral and Maxillofacial Pathology"[Journal]
+    OR "Head and Neck Pathology"[Journal]
+    OR "Medicina Oral, Patologia Oral y Cirugia Bucal"[Journal]
+    OR "European Journal of Dentistry"[Journal]
+    OR "Journal of Applied Oral Science"[Journal]
+    OR "Australian Dental Journal"[Journal]
+    OR "Special Care in Dentistry"[Journal]
+    OR "Dental Traumatology"[Journal]
+    OR "International Journal of Paediatric Dentistry"[Journal]
+    OR "European Archives of Paediatric Dentistry"[Journal]
+    OR "Pediatric Dentistry"[Journal]
+    OR "The Angle Orthodontist"[Journal]
+    OR "American Journal of Orthodontics and Dentofacial Orthopedics"[Journal]
+    OR "European Journal of Orthodontics"[Journal]
+    OR "Orthodontics & Craniofacial Research"[Journal]
+    OR "Journal of Periodontology"[Journal]
+    OR "Clinical Advances in Periodontics"[Journal]
+    OR "The International Journal of Periodontics & Restorative Dentistry"[Journal]
+    OR "The International Journal of Oral & Maxillofacial Implants"[Journal]
+    OR "Journal of Prosthetic Dentistry"[Journal]
+    OR "The International Journal of Prosthodontics"[Journal]
+    OR "Journal of Esthetic and Restorative Dentistry"[Journal]
+    OR "Operative Dentistry"[Journal]
+    OR "Quintessence International"[Journal]
+    OR "Gerodontology"[Journal]
+    OR "Odontology"[Journal]
+    OR "Case Reports in Dentistry"[Journal]
+    OR "International Journal of Dentistry"[Journal]
+    OR "Journal of Dental Sciences"[Journal]
+    OR "BDJ Open"[Journal]
+    OR "Frontiers in Oral Health"[Journal]
+    OR "Dentistry Journal"[Journal]
+    OR "Clinical, Cosmetic and Investigational Dentistry"[Journal]
+    OR "Journal of Clinical and Experimental Dentistry"[Journal]
+    OR "Contemporary Clinical Dentistry"[Journal]
+    OR "Journal of Conservative Dentistry"[Journal]
+    OR "Restorative Dentistry & Endodontics"[Journal]
+    OR "European Endodontic Journal"[Journal]
+    OR "Saudi Dental Journal"[Journal]
+    OR "Dental Research Journal"[Journal]
+    OR "Imaging Science in Dentistry"[Journal]
+    OR "Journal of Oral Biology and Craniofacial Research"[Journal]
+    OR "Clinical Case Reports"[Journal]
+    OR "BMJ Case Reports"[Journal]
+    OR "Medicine"[Journal]
+    OR "Cureus"[Journal]
+    OR "Heliyon"[Journal]
+    OR "Case Reports in Otolaryngology"[Journal]
+    )
     '''
     try:
+        if args.count_only:
+            count = _esearch_count(term, api_key=api_key)
+            print(f"PubMed count: {count}")
+            return
+
         if args.all:
             pmids = esearch_all_pmids(
                 term=term,
@@ -595,6 +765,8 @@ def main() -> None:
         else:
             pmids = list(esearch(term=term, retstart=0, retmax=min(args.page_size, 10), api_key=api_key).get("idlist", []))
 
+        print(f"Fetched PMID count: {len(pmids)}", file=sys.stderr, flush=True)
+
         # avoid requesting too fast (and keep a gap between different endpoints)
         _sleep_for_rate(api_key)
 
@@ -602,11 +774,18 @@ def main() -> None:
             pmids,
             api_key=api_key,
             batch_size=max(1, args.abstract_batch_size),
+            show_progress=not args.quiet,
         )
 
         _sleep_for_rate(api_key)
+        print("Fetching PubMed summaries...", file=sys.stderr, flush=True)
 
-        summary = esummary(pmids, api_key=api_key)
+        summary = esummary(
+            pmids,
+            api_key=api_key,
+            batch_size=max(1, args.abstract_batch_size),
+            show_progress=not args.quiet,
+        )
         result = summary.get("result", {})
         uids = result.get("uids", [])
 
@@ -654,15 +833,16 @@ def main() -> None:
                 }
             )
 
-            print(f"[{i}] PMID: {uid}")
-            print(f"Title   : {title}")
-            print(f"Authors : {authors}")
-            print(f"Journal : {source}")
-            print(f"PubDate : {pubdate}")
-            print(f"DOI     : {doi}")
-            print(f"Abstract: {abs_first if abs_first else 'N/A'}")
-            print(f"URL     : {pubmed_url}")
-            print("-" * 80)
+            if not args.quiet:
+                print(f"[{i}] PMID: {uid}")
+                print(f"Title   : {title}")
+                print(f"Authors : {authors}")
+                print(f"Journal : {source}")
+                print(f"PubDate : {pubdate}")
+                print(f"DOI     : {doi}")
+                print(f"Abstract: {abs_first if abs_first else 'N/A'}")
+                print(f"URL     : {pubmed_url}")
+                print("-" * 80)
 
         payload = {
             "query": {

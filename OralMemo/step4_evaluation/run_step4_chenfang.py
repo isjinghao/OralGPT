@@ -56,7 +56,8 @@ def evaluate_trajectory(
     trajectory: dict,
     tasks_by_stage: dict[str, list[dict]],
     rubric_by_task: dict[str, dict],
-    client: ChatClient,
+    answer_client: ChatClient,
+    verifier_client: ChatClient,
     out: Path,
     methods: list[str] | None = None,
     multimodal: bool = False,
@@ -83,9 +84,10 @@ def evaluate_trajectory(
         print(f"\n=== [{ttype}/{mode}] method: {method.name} ===", flush=True)
         method_dir = cache_root / method.name
         method.setup(method_dir)
-        llm = CachedLLM(client, method_dir)
-        llm_by_method[method.name] = llm
-        records = run_streaming(method, trajectory, tasks_by_stage, llm, image_root)
+        answer_llm = CachedLLM(answer_client, method_dir / "answer")
+        verifier_llm = CachedLLM(verifier_client, method_dir / "verifier")
+        llm_by_method[method.name] = verifier_llm
+        records = run_streaming(method, trajectory, tasks_by_stage, answer_llm, image_root)
         records_by_method[method.name] = records
         write_json(eval_dir / f"answers_{method.name}.json", records)
 
@@ -131,10 +133,17 @@ def main() -> None:
     tasks_by_stage = group_tasks_by_stage(tasks)
     rubric_by_task = load_rubric_index(out)
 
-    client = ChatClient(
-        api_key=settings.openai_api_key,
-        base_url=settings.openai_base_url,
-        model=settings.openai_model,
+    answer_cfg = settings.llm_for("answer")
+    verifier_cfg = settings.llm_for("verifier")
+    answer_client = ChatClient(
+        api_key=answer_cfg.api_key,
+        base_url=answer_cfg.base_url,
+        model=answer_cfg.model,
+    )
+    verifier_client = ChatClient(
+        api_key=verifier_cfg.api_key,
+        base_url=verifier_cfg.base_url,
+        model=verifier_cfg.model,
     )
 
     method_label = ", ".join(methods) if methods else "default(single_stage_memory)"
@@ -148,7 +157,7 @@ def main() -> None:
             print(f"[skip] trajectory file not found: {path}", flush=True)
             continue
         reports.append(evaluate_trajectory(
-            read_json(path), tasks_by_stage, rubric_by_task, client, out,
+            read_json(path), tasks_by_stage, rubric_by_task, answer_client, verifier_client, out,
             methods, multimodal, image_root,
         ))
 
