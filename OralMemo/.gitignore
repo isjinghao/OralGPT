@@ -15,7 +15,15 @@ reports/full_text/
 reports/cache/
 reports/reports/
 reports/*.pdf
+reports/*.log
+reports/dental_test*.json
+reports/dental_test*.csv
 reports/*_targets*.csv
 reports/pmcid_targets*.csv
 reports/pmc_aws_*.csv
 reports/pmc_aws_*.json
+reports/filtered_pmcid_target_chunks/
+reports/free_pdf_chunk_logs/
+reports/free_pdf_chunk_reports/
+reports/free_pdf_reports/
+reports/free_pdfs/
