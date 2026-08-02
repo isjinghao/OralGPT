@@ -4,13 +4,12 @@ template: |
   Extract atomic clinical evidence from the current stage only.
 
   Rules:
-  1. Extract only facts explicitly stated in the source QA answers.
-  2. Do not infer final diagnosis or treatment.
-  3. Split compound statements into minimal atomic facts.
-  4. Preserve numeric values, units, tooth numbers, side, and negation exactly.
-  5. Use concise English for fact_text.
-  6. Return strict JSON only.
-  7. Extract at most 12 clinically important facts from each source QA pair.
+  1. Extract only facts explicitly stated in this source QA pair; do not infer diagnosis or treatment.
+  2. Split compound statements into minimal atomic facts and preserve numbers, units, tooth numbers,
+     laterality, and negation.
+  3. Set modality from the source stage. For profile/history stages use TEXT_QA; never use DP for
+     patient history or chief complaints. Use only modalities listed for the stage.
+  4. Use concise English and return strict JSON only. Extract at most 12 important facts.
 
   Return schema:
   {

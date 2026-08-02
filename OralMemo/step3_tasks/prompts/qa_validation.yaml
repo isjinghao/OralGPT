@@ -4,16 +4,17 @@ template: |
   Judge whether the question and gold answer are valid for the requested task type.
 
   Validation criteria:
-  1. The question must NOT leak or restate the answer.
-  2. The question must be answerable after the specified stage (all needed evidence released by then).
-  3. The task type must match the required skill.
-  4. Clinical reasoning must be plausible and must not introduce unsupported diagnoses.
-  5. The gold answer must be grounded in the listed evidence. Its core clinical claims
-     (diagnoses, numeric values, key findings) must be supported by the evidence.
-  6. Modality accuracy: any exam/imaging modality named in the question MUST match the actual modality
-     of the evidence it refers to (see glossary). If the question names a wrong modality (e.g. calls
-     intraoral dental photographs a "panoramic radiograph" or an "X-ray"), it is invalid — return a
-     "fixed_question" that uses the correct modality (or refers to the finding by its stage).
+  1. The question must be natural, non-leaking, answerable at the requested point, and matched to its task type.
+  2. Every claim in the gold answer must be supported by the selected evidence; remove unsupported details.
+  3. Use all available evidence to check historical consistency. Later evidence is not new, refining,
+     updating, or corrective if the same clinical content was already available earlier.
+  4. Preserve certainty and scope. Equivalent conservative wording is allowed. Comparative or causal conclusions require evidence for that relationship.
+  5. An update or correction must explicitly compare an earlier finding with a later fact not previously available.
+     Confirmation alone or a measurement difference alone is not an update.
+  6. Every selected modality must be necessary, and source wording must not name a different source.
+  7. Temporal wording is valid only when the question genuinely compares evidence from different times.
+  8. The question must name the actual examination or imaging modality, not an internal stage ID.
+     Reject or repair any S0, S1_FP, S2_DP, S3_XR_XLA, S4_CT, or S5_TMJ token in the question or gold answer.
 
   Modality glossary (evidence modality code -> actual exam type):
   - FP = facial photographs; DP = intraoral dental photographs (NOT a radiograph/X-ray);

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -7,7 +8,7 @@ from string import Template
 
 import yaml
 
-from bench.llm_client import ChatClient
+from llm_client import ChatClient
 
 
 PROMPT_PATH = Path(__file__).resolve().parent / "prompts" / "evidence_extraction.yaml"
@@ -26,6 +27,13 @@ def _turn_text(turn: dict) -> str:
         f"Question: {turn['human'].replace('<image>', '').strip()}\n"
         f"Answer: {turn['assistant'].strip()}"
     )
+
+
+def canonical_modalities(stage: dict, item: dict) -> list[str]:
+    # 只保留当前源阶段允许的模态；错误输出回退到阶段模态
+    allowed = list(stage.get("modality", []))
+    reported = [modality for modality in item.get("modality", []) or [] if modality in allowed]
+    return reported or allowed
 
 
 def slim_evidence(record: dict) -> dict:
@@ -70,7 +78,7 @@ def extract_stage_evidence(client: ChatClient, patient_id: str, stage: dict) -> 
                         "evidence_id": evidence_id,
                         "source_turn_id": source_turn_id,
                         "introduced_stage": stage["stage_id"],
-                        "modality": item.get("modality") or stage["modality"],
+                        "modality": canonical_modalities(stage, item),
                         "fact_text": item.get("fact_text", ""),
                         "fact_type": item.get("fact_type", "other"),
                         "clinical_dimension": item.get("clinical_dimension", "other"),
@@ -85,11 +93,25 @@ def extract_all_evidence(client: ChatClient, patient_stages: dict, cache_dir: Pa
     # 抽取全部阶段的证据并汇总
     all_evidence = []
     for stage in patient_stages["stages"]:
-        cache_path = cache_dir / f"evidence_{stage['stage_id']}.json"
+        evidence_stage = {
+            **stage,
+            "qa_pairs": [
+                turn for turn in stage["qa_pairs"]
+                if turn["role"] == "observation"
+            ],
+        }
+        stage_digest = hashlib.sha256(
+            json.dumps(evidence_stage, ensure_ascii=False, sort_keys=True).encode("utf-8")
+        ).hexdigest()[:12]
+        cache_path = (
+            cache_dir / f"evidence_{stage['stage_id']}_{stage_digest}.json"
+            if cache_dir is not None
+            else None
+        )
         if cache_path and cache_path.exists():
             stage_evidence = json.loads(cache_path.read_text(encoding="utf-8"))
         else:
-            stage_evidence = extract_stage_evidence(client, patient_stages["patient_id"], stage)
+            stage_evidence = extract_stage_evidence(client, patient_stages["patient_id"], evidence_stage)
             if cache_path:
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
                 cache_path.write_text(json.dumps(stage_evidence, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -159,7 +159,8 @@ python step4_evaluation/run_step4_chenfang.py
 
 | 步骤 | 产物 |
 | --- | --- |
-| Step1 | `stages/patient_stages.json`、`trajectories/standard_trajectory.json`、`variants/*.json` |
+| Step1 | `trajectories/standard_trajectory.json`、`variants/*.json` |
+
 | Step2 | `evidence/evidence.json`、`cache/evidence_*.json` |
 | Step2 可视化 | `graph/evidence_graph.json`、`graph/evidence_graph.html` |
 | Step3 | `tasks/all_tasks.json` 及按类型分组的 6 个 json、`rubrics/{diagnosis,treatment}_rubrics.json`、`cache/step3/...` |
@@ -238,7 +239,7 @@ python step4_evaluation/run_step4_chenfang.py --methods single_stage_memory,summ
 | 指标 | 适用任务 | 说明 |
 | --- | --- | --- |
 | **ACC** | base 任务（感知/纵向证据/跨模态/记忆更新） | LLM 裁判二元判定准确率；另按任务类型、模态细分 |
-| **ERS** | base 任务（感知/纵向证据/跨模态/记忆更新） | `selected_evidence` 中被模型答案正确覆盖的证据数 / 证据总数；另按任务类型、模态细分 |
+| **ERS** | 全部任务（感知/纵向证据/跨模态/记忆更新/诊断/治疗） | benchmark 生成阶段预先筛选的 `selected_evidence` 中，被模型答案正确覆盖的证据数 / 证据总数；所有任务统一口径，另按任务类型、模态细分 |
 | **Diagnosis** | `heldout_diagnosis` | 按诊断 rubric 打分（百分比） |
 | **TPS** | `heldout_treatment` | 各治疗任务 rubric 得分的均值（百分比） |
 
@@ -259,10 +260,10 @@ python step4_evaluation/run_step4_chenfang.py --methods single_stage_memory,summ
 
 | | 原数据（group1 病人） | 本流水线（report） |
 | --- | --- | --- |
-| 阶段轴 | 模态（S0_PROFILE … S5_TMJ） | **时间**（`T0_… / T1_… / …`，含 `timepoint.t_months`） |
+| 阶段轴 | 模态（S0_PROFILE … S5_TMJ） | **时间**（如 `T0_perception_00`、`T1_treatment_00`，含 `timepoint.t_months`） |
 | 来源 | SH9H 真实病例 | 开放获取文献病例报告 PDF |
-| `group` | `group1` 等 | `report`（物理隔离，独立 `report_dataset.json`） |
-| 产物格式 | `conversations` / `stages` / `heldout` | **完全同构**（下游 step2/3/4 可复用） |
+| `group` | `group1` 等 | `report`（产物隔离在 `outputs/report/<name>/`） |
+| 产物格式 | `conversations` / 标准轨迹 | `dataset_entry.json` / 标准轨迹（下游 step2/3/4 可复用） |
 
 ### 全自动流程（LLM 抽取 ↔ 校验模型反馈循环）
 
@@ -275,9 +276,9 @@ PDF ─MinerU─► 全文/表格/图片 ─►  抽取模型 extract_timeline �
 ```
 
 - **step0 摄取**（不经 LLM，确定性、通用）：用 **MinerU（pipeline 后端）** 解析 PDF，产出逐页全文（`fulltext.json`）、**结构化表格 HTML**（`tables.json`，表格即图片也能识别为表）、图片，并用 MinerU 的**图注↔图片语义配对**（以 `Figure N` 为权威身份）生成 `captions.json`。
-- **抽取模型**：从（通用头/尾裁剪后的）病例正文+表格+图注中抽出结构化时间线（每个时间点的原子 findings、决策、依据 + held-out 诊断/治疗/预后），强约束「只用原文事实、数值/牙位/日期原样保留、表格与叙述冲突以表格为准」。
-- **校验模型（critic）**：对照原文+表格+图注逐条核验事实支持性、数值保真、跨时间点逻辑一致与时序；若存在 high 级问题，则把问题清单作为**反馈**回灌给抽取模型自我修正，最多 `--max-iters` 轮。
-- **step1**（确定性、通用）：把已校验的 findings 用通用模板渲染成问答（数值逐字），组装成 SFT 条目、按时间点切分阶段、复用 step1 的 `build_standard_trajectory` 生成标准轨迹，并追加进 `report_dataset.json`。
+- **抽取模型**：从（通用头/尾裁剪后的）病例正文+表格+图注中直接抽取按时间点组织的 `qa_pairs`；以 `stage_type=perception|treatment|followup` 和 `role=observation|evaluation` 区分可见事实与隐藏评测答案，数量由论文内容决定。
+- **校验模型（critic）**：对照原文+表格+图注核验事实、问题、角色、阶段、图片 QA、最早事件覆盖、数值与时序；high/medium 问题会作为**反馈**回灌给抽取模型，最多 `--max-iters` 轮。
+- **step1**（确定性、通用）：校验 schema 和时序、解析图片、按时间点切分阶段，生成 `dataset_entry.json` 和唯一阶段数据源 `standard_trajectory.json`。
 
 > 全流程**无任何针对单篇 report 的写死内容**，换 PDF 即可复用。
 
@@ -285,7 +286,6 @@ PDF ─MinerU─► 全文/表格/图片 ─►  抽取模型 extract_timeline �
 
 ```
 report_pipeline/
-├── config_reports.py                 # 复用 Settings + name 路径(产物统一在 outputs/report/<name>/)
 ├── step0_ingest/
 │   ├── pdf_extract.py                 # MinerU 解析: 全文/表格(HTML)/图片 + 图注↔图片映射
 │   ├── timeline_llm.py                # 抽取模型(反馈感知 + 头/尾裁剪)
@@ -294,10 +294,9 @@ report_pipeline/
 │       ├── timeline_extraction.yaml   # 时间线抽取 prompt(通用)
 │       └── timeline_verification.yaml # 校验 prompt(critic)
 ├── step1_report_trajectory/
-│   ├── qa_render.py                   # 确定性: findings -> 有序问答轮次(通用模板)
-│   ├── report_dataset.py              # -> 与原数据同构的 SFT 条目
-│   ├── report_stages.py              # 按时间点切分阶段(替代按模态的 classify_turn)
-│   └── report_trajectories.py         # 复用 step1 标准轨迹 + 回填 timepoint
+│   ├── qa_render.py                   # 校验时间点/角色并解析图片问答
+│   ├── report_dataset.py              # -> 单篇报告的 SFT 条目
+│   └── report_stages.py               # 按时间点切分阶段并设置评测释放时序
 └── run_report_pipeline.py             # 主编排(step0 + 反馈循环 + step1)
 ```
 
@@ -315,7 +314,8 @@ python report_pipeline/run_report_pipeline.py --pdf reports/s12903-026-09034-7_r
 | `--pdf` | 必填 | 报告 PDF 路径（相对工作区根或绝对） |
 | `--name` | 必填 | 报告标识，用于输出目录与病人 id（`report__<name>`） |
 | `--max-iters` | 3 | 抽取↔校验反馈循环最大轮数 |
-| `--model` | `.env` 的 `OPENAI_MODEL` | 覆盖使用的模型 |
+| `--model` | `.env` 的 benchmark 模型 | 覆盖时间线抽取模型 |
+| `--reuse-ingest` | false | 复用现有 `raw` 与 `images`，只重新执行时间线 QA 抽取、校验和轨迹生成 |
 
 ### 产物（`outputs/report/<name>/`）
 
@@ -323,11 +323,10 @@ python report_pipeline/run_report_pipeline.py --pdf reports/s12903-026-09034-7_r
 | --- | --- |
 | `raw/{fulltext.json,tables.json,captions.json}` | step0 确定性抽取的中间产物（`captions.json` 仅存图注↔图片对齐表） |
 | `images/*.jpeg` | 过滤去重后的内嵌图片 |
-| `timeline.extracted.json` | LLM 抽取并经校验的结构化时间线（timepoints + held_out） |
+| `timeline.extracted.json` | LLM 抽取并经校验的结构化时间线（timepoints） |
 | `verification_report.json` | 每轮校验记录（passed / issues / 反馈） |
-| `stages/patient_stages.json` | 按时间点切分的阶段（含 `timepoint`） |
-| `trajectories/standard_trajectory.json` | 标准轨迹 |
-| `dataset_entry.json` | 该报告的 SFT 条目；并汇总进根目录 `report_dataset.json` |
+| `trajectories/standard_trajectory.json` | 唯一阶段数据源，包含完整 observation/evaluation QA 与 `timepoint` |
+| `dataset_entry.json` | 该报告的独立 SFT 条目 |
 
 ### 已验证样本（通用性）
 
@@ -336,7 +335,7 @@ python report_pipeline/run_report_pipeline.py --pdf reports/s12903-026-09034-7_r
 | name | 报告 | 时间点* | 说明 |
 | --- | --- | --- | --- |
 | `pls_8y` | Papillon–Lefèvre 8 年牙周维护 | ~6 | 有 CARE 时间线表(MinerU 解析为 HTML)；BOP 跨时间点可追踪 |
-| `ph1_14m` | PH1 种植修复 14 个月 | ~5 | 用 ISQ 而非 BOP；术前→植入→6 月→14 月 |
+| `ph1_14m` | PH1 种植修复 14 个月 | ~12 | 用 ISQ 而非 BOP；童年病史→术前→植入→6 月→14 月 |
 | `pax7_dup` | PAX7 颅面重复畸形分期手术 | ~4 | 含产前/新生儿节点；ACMG 表(图片形式)被 MinerU 识别为表 |
 
 > *时间点数量会因 LLM 抽取略有浮动，由 critic 每轮把关。

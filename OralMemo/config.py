@@ -33,30 +33,13 @@ ModelRole = Literal["benchmark", "answer", "verifier"]
 
 @dataclass(frozen=True)
 class Settings:
-    root: Path
     bench_root: Path
     dataset_json: Path
-    data_root: Path
     output_root: Path
     benchmark_llm: ModelConfig
     answer_llm: ModelConfig
     verifier_llm: ModelConfig
     graph_max_edges: int
-
-    @property
-    def openai_api_key(self) -> str:
-        """Backward-compatible default: benchmark-generation model key."""
-        return self.benchmark_llm.api_key
-
-    @property
-    def openai_base_url(self) -> str:
-        """Backward-compatible default: benchmark-generation model URL."""
-        return self.benchmark_llm.base_url
-
-    @property
-    def openai_model(self) -> str:
-        """Backward-compatible default: benchmark-generation model name."""
-        return self.benchmark_llm.model
 
     def llm_for(self, role: ModelRole) -> ModelConfig:
         if role == "benchmark":
@@ -102,10 +85,8 @@ def get_settings() -> Settings:
     load_env(ROOT / ".env")
     load_env(BENCH_ROOT / ".env")
     return Settings(
-        root=ROOT,
         bench_root=BENCH_ROOT,
         dataset_json=BENCH_ROOT / "oralgpt_cmf_llamafactory_sft_dataset.json",
-        data_root=BENCH_ROOT / "SH9HCMFdata",
         output_root=BENCH_ROOT / "outputs" / "group1" / "CHENFANG",
         benchmark_llm=_model_config("BENCHMARK"),
         answer_llm=_model_config("ANSWER"),

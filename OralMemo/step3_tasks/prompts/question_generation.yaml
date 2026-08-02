@@ -7,18 +7,14 @@ template: |
   Rules:
   1. Write a single English question.
   2. Do not mention evidence IDs.
-  3. Do not copy the source QA question verbatim.
-  4. Do not reveal numeric values or final conclusions unless the task explicitly asks the model to recall them.
-  5. For recall tasks, ask for both the remembered content and its clinical source/stage.
-  6. For update tasks, ask how later evidence confirms, refines, or corrects earlier evidence.
-  7. Keep the question scoped to ONE clear modality/stage object. If the question names a modality or
-     stage (e.g. the CT findings), it must ask only about what that modality/stage provides, and must not
-     require content from a different modality/stage in the same question.
-  8. Any exam/imaging modality or stage named in the question MUST match the actual modality of the
-     evidence it is about (see the glossary below). NEVER rename or invent a modality — e.g. do not call
-     intraoral dental photographs a "panoramic radiograph" or an "X-ray". If unsure, refer to the
-     finding by its stage without inventing an imaging type.
-  9. Return strict JSON only.
+  3. Do not copy the source QA question verbatim or reveal the answer.
+  4. Never expose internal stage IDs (S0, S1_FP, S2_DP, S3_XR_XLA, S4_CT, S5_TMJ).
+  5. Use temporal wording such as "earlier" or "later" only when the question genuinely compares
+     evidence from different times; otherwise name the examination directly.
+  6. Name only the actual source represented by the evidence; do not broaden a source group or call
+     intraoral photographs a panoramic radiograph or X-ray.
+  7. For an update or correction task, explicitly compare the earlier finding with what later evidence adds or changes.
+  8. Keep the question focused on the requested finding or reasoning and return strict JSON only.
 
   Modality glossary (evidence modality code -> actual exam type):
   - FP  = facial photographs
@@ -37,7 +33,7 @@ template: |
 
   Patient: $patient_id
   Task type: $task_type
-  Ask after stage: $ask_after_stage
+  The question will be asked after: $ask_after_stage
   Gold answer: $gold_answer
 
   Evidence available to support the answer:

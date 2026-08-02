@@ -90,13 +90,53 @@ def answer_question(method: MemoryMethod, task: dict, llm: CachedLLM, image_root
     }
 
 
+def _release_task_answers(
+    method: MemoryMethod,
+    records: list[dict],
+    llm: CachedLLM,
+    stage_id: str,
+    release_treatment_ground_truth: bool,
+) -> None:
+    if not records:
+        return
+    qa_pairs = []
+    for record in records:
+        use_gold = (
+            record.get("release_group") == "treatment"
+            and release_treatment_ground_truth
+        )
+        qa_pairs.append(
+            {
+                "source_turn_id": record["task_id"],
+                "human": record["question"],
+                "assistant": record["gold_answer"] if use_gold else record["model_answer"],
+                "image_paths": [],
+                "role": "observation",
+
+            }
+        )
+    release_stage = {
+        "stage_id": f"{stage_id}__evaluation_release",
+        "order": 0,
+        "stage_type": "treatment" if records[0].get("release_group") == "treatment" else "followup",
+        "modality": ["TEXT_QA"],
+        "image_paths": [],
+        "qa_pairs": qa_pairs,
+    }
+    method.observe(release_stage)
+    method.update(llm, cache_key=f"memupdate_{release_stage['stage_id']}")
+
+
 def run_streaming(
     method: MemoryMethod,
     trajectory: dict,
     tasks_by_stage: dict[str, list[dict]],
     llm: CachedLLM,
     image_root: Path | None = None,
+    *,
+    release_treatment_ground_truth: bool = True,
 ) -> list[dict]:
+
     """按阶段顺序流式读取轨迹, 在每个阶段结束后释放并回答该阶段的问题。
 
     输入:
@@ -109,6 +149,7 @@ def run_streaming(
     """
     method.reset()
     records: list[dict] = []
+    pending_releases: dict[str, list[dict]] = {}
     stages = sorted(trajectory["stages"], key=lambda s: s["order"])
     present = {s["stage_id"] for s in stages}
 
@@ -116,12 +157,47 @@ def run_streaming(
         stage_id = stage["stage_id"]
         method.observe(stage)
         method.update(llm, cache_key=f"memupdate_{stage_id}")
+        # 早期已完成的治疗批次在其 release stage 开始时进入 memory，
+        # 使同阶段的后续 benchmark 任务能够使用真实/模型治疗历史。
+        _release_task_answers(
+            method,
+            pending_releases.pop(stage_id, []),
+            llm,
+            stage_id,
+            release_treatment_ground_truth,
+        )
+        stage_records: list[dict] = []
         for task in tasks_by_stage.get(stage_id, []):
+
             print(f"  [{method.name}] answer {task['task_id']} @ {stage_id}", flush=True)
-            records.append(answer_question(method, task, llm, image_root))
+            record = answer_question(method, task, llm, image_root)
+            record.update(
+                {
+                    "release_to_memory": bool(task.get("release_to_memory")),
+                    "release_after_stage": task.get("release_after_stage"),
+                    "release_group": task.get("release_group"),
+                }
+            )
+            records.append(record)
+            stage_records.append(record)
+        for record in stage_records:
+            if record["release_to_memory"]:
+                pending_releases.setdefault(record["release_after_stage"], []).append(record)
+        _release_task_answers(
+            method,
+            pending_releases.pop(stage_id, []),
+            llm,
+            stage_id,
+            release_treatment_ground_truth,
+        )
+
+
+    if pending_releases:
+        raise ValueError(f"Unreached evaluation release stages: {sorted(pending_releases)}")
 
     # 轨迹缺失某阶段(变体轨迹)时, 其任务在最后一个阶段后释放
     for stage_id, tasks in tasks_by_stage.items():
+
         if stage_id in present:
             continue
         for task in tasks:

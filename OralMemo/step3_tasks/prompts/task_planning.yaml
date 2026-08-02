@@ -12,20 +12,33 @@ template: |
   Hard rules:
   1. required_evidence_ids must be chosen ONLY from the evidence catalog below (use exact ids).
   2. ask_after_stage must be a stage id from the stage list, and ALL required evidence must be released at or before that stage (use stage order).
-  3. gold_answer must be fully supported by the chosen evidence. Do NOT invent diagnoses, numbers, or findings that are not in the evidence.
+  3. gold_answer must be fully supported by the chosen evidence, concise, clinically natural, and must not contain internal stage IDs such as S1_FP or S4_CT.
   4. natural_answer is a concise (<= 4 sentences), clinically natural answer.
   5. The $task_count tasks must be clinically distinct (different findings/evidence focus).
-  6. Evidence must be consistent with the modality/stage the task is about. Pick required_evidence_ids
+  6. required_evidence_ids must form a clinically sufficient reasoning set. Include every fact that
+     materially supports the answer or its reasoning chain; do not remove needed corroboration merely
+     to reduce the count. Exclude only facts that are unrelated to the task.
+  7. Evidence must be consistent with the modality/stage the task is about. Pick required_evidence_ids
      that belong to the modality/stage the question focuses on; do not mix in unrelated modalities
      (e.g. do not attach the chief complaint or a photo finding to a task that asks about CT imaging).
      For update/correction tasks that span stages, only include the earlier impression being updated and
      the later evidence that updates it.
-  7. Modality feasibility: only use findings that can actually be obtained from the modality that
+  8. Modality feasibility: only use findings that can actually be obtained from the modality that
      introduced them. Do NOT attribute clinical-exam findings that require a dedicated specialist exam
      (e.g. mouth opening, opening path, TMJ clicks) to photographic or imaging modalities.
-  8. When the clinical question has a definite answer, gold_answer must commit to a clear conclusion
-     rather than staying vague.
-  9. Return strict JSON only.
+  9. Preserve the evidence's certainty and scope. Do not turn qualified, approximate, or limited findings
+     into absolute claims.
+  10. Comparative or causal conclusions require evidence that supports the comparison or attribution,
+      not merely separate evidence that the involved findings coexist.
+  11. Before claiming that later evidence adds, refines, updates, or corrects information, compare it with
+      all earlier available evidence, not only the selected subset. Do not create novelty by omitting prior facts.
+  12. For updates or corrections, the answer must state a later fact not previously available. Confirmation
+      alone or a measurement difference alone is not an update.
+  13. Every selected modality must be necessary, and source wording must not name a different source.
+  14. When the clinical question has a definite answer, gold_answer must commit to a clear conclusion
+      without exceeding the evidence.
+  15. Return strict JSON only.
+
 
   Return schema:
   {

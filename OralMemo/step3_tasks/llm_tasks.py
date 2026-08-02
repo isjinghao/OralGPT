@@ -1,17 +1,19 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from string import Template
 
 import yaml
 
-from bench.llm_client import ChatClient
-from bench.step3_tasks.selectors import (
+from llm_client import ChatClient
+from step3_tasks.selectors import (
     EvidenceIndex,
-    compact_evidence_text,
     edges_text,
     evidence_catalog,
+    human_stage_label,
+    question_evidence_text,
     stages_summary,
 )
 
@@ -32,12 +34,16 @@ def load_normal_task_plan() -> list[dict]:
 
 
 def cached_completion(client: ChatClient, prompt: str, cache_path: Path, max_tokens: int) -> dict:
-    # 带缓存的 LLM JSON 调用
+    # 仅复用与当前提示词及模型完全匹配的缓存。
+    cache_key = hashlib.sha256(f"{client.model}\0{prompt}".encode("utf-8")).hexdigest()
     if cache_path.exists():
-        return json.loads(cache_path.read_text(encoding="utf-8"))
+        cached = json.loads(cache_path.read_text(encoding="utf-8"))
+        if cached.get("_cache_key") == cache_key:
+            return {key: value for key, value in cached.items() if key != "_cache_key"}
     result = client.complete_json(prompt, max_tokens=max_tokens)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    payload = {**result, "_cache_key": cache_key}
+    cache_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     return result
 
 
@@ -97,9 +103,9 @@ def generate_question(client: ChatClient, spec: dict, cache_dir: Path,
     prompt = template.substitute(
         patient_id=spec["patient_id"],
         task_type=spec["task_type"],
-        ask_after_stage=spec["ask_after_stage"],
+        ask_after_stage=human_stage_label(spec["ask_after_stage"]),
         gold_answer=gold_answer if gold_answer is not None else spec["gold_answer"],
-        evidence_text=compact_evidence_text([
+        evidence_text=question_evidence_text([
             {
                 "evidence_id": item["evidence_id"],
                 "introduced_stage": item["stage"],
@@ -113,8 +119,60 @@ def generate_question(client: ChatClient, spec: dict, cache_dir: Path,
     return cached_completion(client, prompt, cache_path, max_tokens=8000)
 
 
-def validate_task(client: ChatClient, task: dict, cache_dir: Path, attempt: int = 1) -> dict:
-    # 让 LLM 判断问题/金标准是否合规(是否泄题、能否在指定阶段后回答等), 结果缓存到 qa_validation/
+def evidence_payload(evidence: list[dict]) -> list[dict]:
+    return [
+        {
+            "evidence_id": item["evidence_id"],
+            "stage": item["introduced_stage"],
+            "modality": item.get("modality", []),
+            "fact_text": item["fact_text"],
+            "field": item.get("normalized", {}).get("field"),
+            "value": item.get("normalized", {}).get("value"),
+            "unit": item.get("normalized", {}).get("unit"),
+            "tooth": item.get("normalized", {}).get("tooth"),
+            "side": item.get("normalized", {}).get("side"),
+        }
+        for item in evidence
+    ]
+
+
+def validate_task_plan(
+    client: ChatClient,
+    task: dict,
+    available_evidence: list[dict],
+    cache_dir: Path,
+) -> dict:
+    cache_path = cache_dir / "task_plan_validation" / f"{task['task_id']}.json"
+    template = load_template("task_plan_validation.yaml")
+    plan = {
+        "task_id": task["task_id"],
+        "task_type": task["task_type"],
+        "ask_after_stage": task["ask_after_stage"],
+        "gold_answer": task["gold_answer"],
+        "selected_evidence": task["selected_evidence"],
+        "all_available_evidence": evidence_payload(available_evidence),
+    }
+    result = cached_completion(
+        client,
+        template.substitute(plan_json=json.dumps(plan, ensure_ascii=False, indent=2)),
+        cache_path,
+        max_tokens=8000,
+    )
+    return {
+        "accepted": bool(result.get("accepted")),
+        "feedback": str(result.get("feedback", "")),
+        "issues": result.get("issues", []) or [],
+    }
+
+
+def validate_task(
+    client: ChatClient,
+    task: dict,
+    available_evidence: list[dict],
+    cache_dir: Path,
+    attempt: int = 1,
+) -> dict:
+    # 同时基于所选证据和提问时点前的完整证据校验任务。
     cache_path = cache_dir / "qa_validation" / f"{task['task_id']}_a{attempt}.json"
     template = load_template("qa_validation.yaml")
     task_for_prompt = {
@@ -125,14 +183,23 @@ def validate_task(client: ChatClient, task: dict, cache_dir: Path, attempt: int 
         "gold_answer": task["gold_answer"],
         "required_evidence_ids": [item["evidence_id"] for item in task["selected_evidence"]],
         "selected_evidence": task["selected_evidence"],
+        "all_available_evidence": evidence_payload(available_evidence),
     }
     prompt = template.substitute(task_json=json.dumps(task_for_prompt, ensure_ascii=False, indent=2))
-    return cached_completion(client, prompt, cache_path, max_tokens=8000)
+    result = cached_completion(client, prompt, cache_path, max_tokens=8000)
+    return {
+        "accepted": bool(result.get("accepted")),
+        "feedback": str(result.get("feedback", "")),
+        "issues": result.get("issues", []) or [],
+        "fixed_question": result.get("fixed_question"),
+        "fixed_answer": result.get("fixed_answer"),
+    }
 
 
 def finalize_task(
     client: ChatClient,
     spec: dict,
+    available_evidence: list[dict],
     cache_dir: Path,
     max_iters: int = 3,
     verifier_client: ChatClient | None = None,
@@ -153,8 +220,8 @@ def finalize_task(
         task["clinical_chain"] = candidate.get("clinical_chain", "")
         task["gold_answer"] = current_gold
 
-        # (2) 问题+金标准验证
-        validation = validate_task(verifier, task, cache_dir, attempt=it)
+        # (2) 使用所选证据与完整可用历史验证问题和答案
+        validation = validate_task(verifier, task, available_evidence, cache_dir, attempt=it)
         history.append({"iteration": it, "accepted": validation.get("accepted")})
         print(f"  [loop {it}/{max_iters}] accepted={validation.get('accepted')}", flush=True)
         if validation.get("accepted"):
@@ -179,14 +246,19 @@ def finalize_task(
 
 
 def select_heldout_evidence(client: ChatClient, task_id: str, question: str, answer: str, index: EvidenceIndex, cache_dir: Path) -> list[str]:
-    # 让 LLM 基于问题、标准答案、全部证据目录与证据图, 选出该 QA 真正依赖的 evidence_id 子集, 结果缓存到 heldout_evidence/
-    cache_path = cache_dir / "heldout_evidence" / f"{task_id}.json"
+    # 只从提问时点已经释放的 EvidenceIndex 中选择权威答案所需事实。
+    catalog = evidence_catalog(index)
+    edge_catalog = edges_text(index)
+    digest = hashlib.sha256(
+        "\n".join((question, answer, catalog, edge_catalog)).encode("utf-8")
+    ).hexdigest()[:12]
+    cache_path = cache_dir / "heldout_evidence" / f"{task_id}_{digest}.json"
     template = load_template("evidence_selection.yaml")
     prompt = template.substitute(
         question=question,
         answer=answer,
-        evidence_text=evidence_catalog(index),
-        edges_text=edges_text(index),
+        evidence_text=catalog,
+        edges_text=edge_catalog,
     )
     result = cached_completion(client, prompt, cache_path, max_tokens=12000)
     return result["required_evidence_ids"]
@@ -200,29 +272,29 @@ def generate_rubric(client: ChatClient, task: dict, cache_dir: Path) -> dict:
         task_type=task["task_type"],
         question=task["question"],
         answer=task["gold_answer"],
-        evidence_text=compact_evidence_text([
-            {
-                "evidence_id": item["evidence_id"],
-                "introduced_stage": item["stage"],
-                "modality": item["modality"],
-                "fact_text": item["fact_text"],
-            }
-            for item in task["selected_evidence"]
-        ]),
     )
     result = cached_completion(client, prompt, cache_path, max_tokens=12000)
-    # rubric 只保留评分标准(name/score/description); 证据在任务里已有, 不在 rubric 中冗余存储
+    raw_criteria = result["criteria"]
+    if not 4 <= len(raw_criteria) <= 7:
+        raise ValueError(f"Rubric must contain 4-7 criteria: {task['task_id']}")
+    names = [str(item["name"]).strip() for item in raw_criteria]
+    scores = [float(item["score"]) for item in raw_criteria]
+    if any(not name for name in names) or len(set(names)) != len(names):
+        raise ValueError(f"Rubric criterion names must be non-empty and unique: {task['task_id']}")
+    if any(score < 0 for score in scores) or abs(sum(scores) - 100) > 1e-6:
+        raise ValueError(f"Rubric criterion scores must be non-negative and sum to 100: {task['task_id']}")
+    # rubric 独立依据任务类型、问题和权威答案生成，只保留声明字段。
     criteria = [
         {
-            "name": c["name"],
-            "score": c["score"],
-            "description": c.get("description", ""),
+            "name": name,
+            "score": score,
+            "description": str(item.get("description", "")),
         }
-        for c in result["criteria"]
+        for item, name, score in zip(raw_criteria, names, scores)
     ]
     return {
         "rubric_id": f"{task['task_type']}_{task['task_id']}",
         "task_id": task["task_id"],
-        "max_score": result.get("max_score", 100),
+        "max_score": 100,
         "criteria": criteria,
     }

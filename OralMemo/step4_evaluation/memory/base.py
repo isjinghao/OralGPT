@@ -16,11 +16,17 @@ def format_stage_input(stage: dict) -> str:
     modality = ", ".join(stage.get("modality", [])) or "none"
     image_paths = collect_stage_images(stage)
     lines = [f"[Stage {stage['stage_id']} | modality: {modality} | images: {len(image_paths)}]"]
-    for qa in stage.get("qa_pairs", []):
+    for qa in stage["qa_pairs"]:
+        if qa["role"] != "observation":
+
+            continue
         human = (qa.get("human") or "").replace("<image>", "").strip()
+
         assistant = (qa.get("assistant") or "").strip()
-        role = qa.get("role", "evidence")
-        tag = "" if role == "evidence" else f" [noise:{qa.get('noise_category', role)}]"
+        noise_category = qa.get("noise_category")
+        tag = f" [noise:{noise_category}]" if noise_category else ""
+
+
         lines.append(f"Q{tag}: {human}")
         lines.append(f"A: {assistant}")
     return "\n".join(lines)

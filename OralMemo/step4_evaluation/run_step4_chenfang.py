@@ -49,7 +49,10 @@ def resolve_trajectory_path(out: Path, name: str) -> Path:
     # 把轨迹名解析为文件路径
     if name in ("standard", "standard_full", "standard_trajectory"):
         return out / "trajectories" / "standard_trajectory.json"
+    if name in ("model_perception", "model_perception_trajectory"):
+        return out / "trajectories" / "model_perception_trajectory.json"
     return out / "variants" / f"{name}.json"
+
 
 
 def evaluate_trajectory(

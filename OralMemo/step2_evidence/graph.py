@@ -1,185 +1,158 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
+import unicodedata
 from collections import defaultdict
 from pathlib import Path
 from string import Template
 
 import yaml
 
-from bench.llm_client import ChatClient
+from llm_client import ChatClient
 
 
-PROMPT_PATH = Path(__file__).resolve().parent / "prompts" / "graph_edges.yaml"
+PROMPT_DIR = Path(__file__).resolve().parent / "prompts"
+EDGE_PROMPT_PATH = PROMPT_DIR / "graph_edges.yaml"
+REVIEW_PROMPT_PATH = PROMPT_DIR / "graph_edge_review.yaml"
 
-# 跨阶段语义边的关系
-ALLOWED_RELATIONS = {
-    "supports",
-    "refines",
-    "confirms",
-    "quantifies",
-    "explains",
-    "updates",
-}
 
 def stage_order(stage: str) -> int:
-    # 通用取阶段序号: 兼容按模态的 S#_...(如 S0_PROFILE) 与按时间的 T#_...(如 T0_June-2017);
-    # 取阶段 id 中的首个整数作为顺序, 解析不到则返回 0。
-    m = re.search(r"\d+", stage or "")
-    return int(m.group()) if m else 0
+    """Extract a sortable stage number from a stage identifier."""
+    match = re.search(r"\d+", stage or "")
+    return int(match.group()) if match else 0
 
 
+def _attribute_key(node: dict) -> tuple[str, str, str, str]:
+    normalized = node.get("normalized", {})
+    return (
+        str(node.get("clinical_dimension", "other")),
+        str(normalized.get("field") or ""),
+        str(normalized.get("tooth") or ""),
+        str(normalized.get("side") or ""),
+    )
 
-def build_evidence_graph(
-    evidence_json: Path,
-    client: ChatClient | None = None,
-    cache_dir: Path | None = None,
-    max_edges: int = 25,
-) -> dict:
-    """构建证据图 (结构规则 + LLM 语义边 + 规则校验)
-    以 evidence.json 的证据条目为节点
-    (1) 用确定性规则连接阶段内、同维度跨阶段递进边
-    (2) 用LLM生成跨维度/跨模态的跨阶段依赖边, 经规则校验后并入
-    (3) 去重编号返回完整图
-    """
-    evidence_data = json.loads(evidence_json.read_text(encoding="utf-8"))
-    patient_id = evidence_data["patient_id"]
-    nodes = evidence_data["evidence"]
-    node_by_id = {node["evidence_id"]: node for node in nodes}
 
+def _canonical_text(value: object) -> str:
+    if value is None:
+        return ""
+    return re.sub(r"\s+", " ", unicodedata.normalize("NFKC", str(value)).casefold().strip())
+
+
+def _normalized_value(node: dict) -> tuple[str, str]:
+    normalized = node.get("normalized", {})
+    return _canonical_text(normalized.get("value")), _canonical_text(normalized.get("unit"))
+
+
+def _node_lines(nodes: list[dict]) -> str:
+    return "\n".join(
+        f"- {node['evidence_id']} | stage={node['introduced_stage']} | "
+        f"dimension={node.get('clinical_dimension', 'other')} | "
+        f"field={node.get('normalized', {}).get('field')} | "
+        f"tooth={node.get('normalized', {}).get('tooth')} | "
+        f"side={node.get('normalized', {}).get('side')} | "
+        f"value={node.get('normalized', {}).get('value')} | "
+        f"unit={node.get('normalized', {}).get('unit')} | "
+        f"fact={node['fact_text']}"
+        for node in sorted(nodes, key=lambda item: (stage_order(item["introduced_stage"]), item["source_turn_id"], item["evidence_id"]))
+    )
+
+
+def build_strong_edges(nodes: list[dict]) -> list[dict]:
+    """Create deterministic links only for identical repeated measurements."""
     edges = []
-    edges.extend(build_intra_stage_edges(nodes))
-    edges.extend(build_same_dimension_progression_edges(nodes))
-    edges.extend(propose_cross_stage_edges(nodes, patient_id, client, cache_dir, max_edges))
-    edges = dedupe_edges(edges, node_by_id)
-    return {
-        "patient_id": patient_id,
-        "nodes": nodes,
-        "edges": edges,
-    }
-
-
-def build_intra_stage_edges(nodes: list[dict]) -> list[dict]:
-    # 构建阶段内边(确定性规则), 把同一阶段、同一维度的证据节点顺次相连 (intra_stage_link)
-    edges = []
-    groups = defaultdict(list)
+    by_attribute = defaultdict(list)
     for node in nodes:
-        if node.get("clinical_dimension", "other") == "other":
+        key = _attribute_key(node)
+        if key[0] == "other" or not key[1] or not _normalized_value(node)[0]:
             continue
-        groups[(node["introduced_stage"], node["clinical_dimension"])].append(node)
+        by_attribute[key].append(node)
 
-    for (stage, dimension), items in groups.items():
-        ordered = sorted(items, key=lambda x: (x["source_turn_id"], x["evidence_id"]))
-        for a, b in zip(ordered, ordered[1:]):
-            edges.append(
-                {
-                    "source": a["evidence_id"],
-                    "target": b["evidence_id"],
-                    "type": "intra_stage_link",
-                    "relation": "refines",
-                    "reason": f"Same stage {stage} and clinical dimension {dimension}.",
-                }
-            )
-    return edges
-
-
-def build_same_dimension_progression_edges(nodes: list[dict]) -> list[dict]:
-    # 构建同维度跨阶段递进边, 同一临床维度按阶段顺序排列, 每个节点连向下一个阶段的首个同维度节点
-    # 表示同一临床属性在后续阶段被复测/细化/更新 (cross_stage_dependency)
-
-    edges = []
-    by_dimension = defaultdict(list)
-    for node in nodes:
-        if node.get("clinical_dimension", "other") == "other":
-            continue
-        by_dimension[node["clinical_dimension"]].append(node)
-
-    for dimension, items in by_dimension.items():
-        ordered = sorted(items, key=lambda x: (stage_order(x["introduced_stage"]), x["source_turn_id"], x["evidence_id"]))
-        for early in ordered:
-            later_candidates = [node for node in ordered if stage_order(node["introduced_stage"]) > stage_order(early["introduced_stage"])]
-            if not later_candidates:
+    for items in by_attribute.values():
+        by_stage = defaultdict(list)
+        for node in items:
+            by_stage[node["introduced_stage"]].append(node)
+        ordered_stages = sorted(by_stage, key=stage_order)
+        for early_stage, later_stage in zip(ordered_stages, ordered_stages[1:]):
+            early = sorted(by_stage[early_stage], key=lambda item: (item["source_turn_id"], item["evidence_id"]))[-1]
+            later = sorted(by_stage[later_stage], key=lambda item: (item["source_turn_id"], item["evidence_id"]))[0]
+            if _normalized_value(early) != _normalized_value(later):
                 continue
-            later = later_candidates[0]
             edges.append(
                 {
                     "source": early["evidence_id"],
                     "target": later["evidence_id"],
-                    "type": "cross_stage_dependency",
-                    "relation": "refines",
-                    "reason": f"Later {dimension} evidence updates or supports earlier {dimension} evidence.",
+                    "type": "measurement_link",
+                    "relation": "confirms",
+                    "reason": "Repeated measurement of the same clinical attribute.",
                 }
             )
     return edges
 
 
-def build_edge_prompt(nodes: list[dict], patient_id: str, max_edges: int) -> str:
-    # 组装跨阶段边提议 prompt, 把阶段顺序与全部节点压成紧凑文本, 填入prompt模板
-    template = Template(yaml.safe_load(PROMPT_PATH.read_text(encoding="utf-8"))["template"])
-    stages = sorted({node["introduced_stage"] for node in nodes}, key=stage_order)
-    stage_lines = "\n".join(
-        f"  - {stage} (stage_order {stage_order(stage)})"
-        for stage in stages
-    )
-    node_lines = "\n".join(
-        f"  - {node['evidence_id']} | stage={node['introduced_stage']} (order {stage_order(node['introduced_stage'])}) | "
-        f"dimension={node.get('clinical_dimension', 'other')} | field={node.get('normalized', {}).get('field')} | "
-        f"fact={node['fact_text']}"
-        for node in sorted(nodes, key=lambda n: (stage_order(n["introduced_stage"]), n["source_turn_id"], n["evidence_id"]))
-    )
-    return template.substitute(patient_id=patient_id, stage_order=stage_lines, nodes=node_lines, max_edges=max_edges)
+def _template(path: Path) -> Template:
+    return Template(yaml.safe_load(path.read_text(encoding="utf-8"))["template"])
 
 
-def request_llm_edges(
+def _valid_pairs(items: list[dict], nodes: dict[str, dict], limit: int) -> list[dict]:
+    valid = []
+    seen = set()
+    for item in items:
+        source = str(item.get("source", "")).strip()
+        target = str(item.get("target", "")).strip()
+        reason = str(item.get("reason", "")).strip()
+        key = (source, target)
+        if (
+            key in seen
+            or source not in nodes
+            or target not in nodes
+            or source == target
+            or not reason
+            or len(reason.split()) > 15
+            or stage_order(nodes[source]["introduced_stage"]) >= stage_order(nodes[target]["introduced_stage"])
+        ):
+            continue
+        seen.add(key)
+        valid.append({"source": source, "target": target, "reason": reason})
+        if len(valid) == limit:
+            break
+    return valid
+
+
+def _review_edges(
+    client: ChatClient,
+    candidates: list[dict],
     nodes: list[dict],
-    patient_id: str,
-    client: ChatClient | None,
-    cache_dir: Path | None,
     max_edges: int,
 ) -> list[dict]:
-    # 获取 LLM 提议的原始边(带缓存)
-    cache_path = cache_dir / "graph_edges.json" if cache_dir else None
-    if cache_path and cache_path.exists():
-        cached = json.loads(cache_path.read_text(encoding="utf-8"))
-        return cached.get("edges", [])
-
-    prompt = build_edge_prompt(nodes, patient_id, max_edges)
-    result = client.complete_json(prompt, max_tokens=16000)
-    edges = result.get("edges", [])
-    if cache_path:
-        cache_path.parent.mkdir(parents=True, exist_ok=True)
-        cache_path.write_text(json.dumps({"edges": edges}, ensure_ascii=False, indent=2), encoding="utf-8")
-    return edges
-
-
-def validate_proposed_edges(proposed: list[dict], nodes: list[dict]) -> list[dict]:
-    # 校验 LLM 提议的跨阶段边 (规则gate)
-    # 逐条校验端点存在、阶段单调(source 早于 target)、关系在白名单
-    # 通过者归一化为标准边结构(type=cross_stage_dependency)
-
+    if not candidates:
+        return []
+    prompt = _template(REVIEW_PROMPT_PATH).substitute(
+        candidates=json.dumps(candidates, ensure_ascii=False),
+        nodes=_node_lines(nodes),
+        max_edges=max_edges,
+    )
+    reviewed = client.complete_json(prompt, max_tokens=12000)
     node_by_id = {node["evidence_id"]: node for node in nodes}
-    valid = []
-    for edge in proposed:
-        source = edge.get("source")
-        target = edge.get("target")
-        if source not in node_by_id or target not in node_by_id:
-            continue
-        if stage_order(node_by_id[source]["introduced_stage"]) >= stage_order(node_by_id[target]["introduced_stage"]):
-            continue
-        relation = str(edge.get("relation", "")).lower()
-        if relation not in ALLOWED_RELATIONS:
-            continue
-        valid.append(
-            {
-                "source": source,
-                "target": target,
-                "type": "cross_stage_dependency",
-                "relation": relation,
-                "reason": str(edge.get("reason", "")).strip() or f"{relation} dependency.",
-            }
-        )
-    return valid
+    candidate_keys = {(item["source"], item["target"]) for item in candidates}
+    clinical = _valid_pairs(reviewed.get("clinical_support", []), node_by_id, max_edges)
+    context = _valid_pairs(reviewed.get("context_consistency", []), node_by_id, max_edges)
+    clinical = [item for item in clinical if (item["source"], item["target"]) in candidate_keys]
+    clinical_keys = {(item["source"], item["target"]) for item in clinical}
+    context = [
+        item for item in context
+        if (item["source"], item["target"]) in candidate_keys
+        and (item["source"], item["target"]) not in clinical_keys
+    ]
+    return [
+        {**item, "type": "clinical_support", "relation": "supports"}
+        for item in clinical
+    ] + [
+        {**item, "type": "context_consistency", "relation": "compatible"}
+        for item in context
+    ]
+
 
 def propose_cross_stage_edges(
     nodes: list[dict],
@@ -188,25 +161,69 @@ def propose_cross_stage_edges(
     cache_dir: Path | None,
     max_edges: int,
 ) -> list[dict]:
-    # LLM 基于全部节点提议跨维度/跨模态的临床依赖边, 经规则校验过滤
-    proposed = request_llm_edges(nodes, patient_id, client, cache_dir, max_edges)
-    return validate_proposed_edges(proposed, nodes)
+    if client is None:
+        raise ValueError("A ChatClient is required to generate clinical evidence edges")
+
+    stage_lines = "\n".join(
+        f"- {stage} (order {stage_order(stage)})"
+        for stage in sorted({node["introduced_stage"] for node in nodes}, key=stage_order)
+    )
+    candidate_prompt = _template(EDGE_PROMPT_PATH).substitute(
+        patient_id=patient_id,
+        stage_order=stage_lines,
+        nodes=_node_lines(nodes),
+        max_edges=max_edges,
+    )
+    reviewer_template = REVIEW_PROMPT_PATH.read_text(encoding="utf-8")
+    cache_key = hashlib.sha256(f"{client.model}\0{candidate_prompt}\0{reviewer_template}".encode("utf-8")).hexdigest()
+    cache_path = cache_dir / "graph_edges.json" if cache_dir else None
+    if cache_path and cache_path.exists():
+        cached = json.loads(cache_path.read_text(encoding="utf-8"))
+        if cached.get("_cache_key") == cache_key:
+            return cached.get("edges", [])
+
+    candidates = client.complete_json(candidate_prompt, max_tokens=12000).get("candidates", [])
+    node_by_id = {node["evidence_id"]: node for node in nodes}
+    candidates = _valid_pairs(candidates, node_by_id, max_edges)
+    edges = _review_edges(client, candidates, nodes, max_edges)
+    if cache_path:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(
+            json.dumps({"edges": edges, "_cache_key": cache_key}, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+    return edges
 
 
-def dedupe_edges(edges: list[dict], node_by_id: dict[str, dict]) -> list[dict]:
-    # 去除重复边、自环、悬空边(端点不存在), 并为每条边赋 edge_id。
+def dedupe_edges(edges: list[dict], nodes: dict[str, dict]) -> list[dict]:
     seen = set()
     out = []
     for edge in edges:
         key = (edge["source"], edge["target"], edge["type"])
-        if key in seen:
-            continue
-        if edge["source"] not in node_by_id or edge["target"] not in node_by_id:
-            continue
-        if edge["source"] == edge["target"]:
+        if key in seen or edge["source"] not in nodes or edge["target"] not in nodes:
             continue
         seen.add(key)
-        edge = dict(edge)
-        edge["edge_id"] = f"edge_{len(out) + 1:04d}"
-        out.append(edge)
+        out.append({**edge, "edge_id": f"edge_{len(out) + 1:04d}"})
     return out
+
+
+def build_evidence_graph(
+    evidence_json: Path,
+    client: ChatClient | None = None,
+    cache_dir: Path | None = None,
+    max_edges: int = 25,
+) -> dict:
+    """Build strong measurement links, reviewed clinical support, and visual-only context edges."""
+    evidence_data = json.loads(evidence_json.read_text(encoding="utf-8"))
+    nodes = evidence_data["evidence"]
+    node_ids = [node["evidence_id"] for node in nodes]
+    if len(set(node_ids)) != len(node_ids):
+        raise ValueError("Evidence catalog contains duplicate evidence_id values")
+    node_by_id = {node["evidence_id"]: node for node in nodes}
+    edges = build_strong_edges(nodes)
+    edges.extend(propose_cross_stage_edges(nodes, evidence_data["patient_id"], client, cache_dir, max_edges))
+    return {
+        "patient_id": evidence_data["patient_id"],
+        "nodes": nodes,
+        "edges": dedupe_edges(edges, node_by_id),
+    }

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from bench.step2_evidence.graph import stage_order
+from step2_evidence.graph import stage_order
 
 
 @dataclass(frozen=True)
@@ -10,23 +10,59 @@ class EvidenceIndex:
     evidence: list[dict]
     graph: dict
 
+    def __post_init__(self) -> None:
+        ids = [item["evidence_id"] for item in self.evidence]
+        if len(set(ids)) != len(ids):
+            raise ValueError("Evidence catalog contains duplicate evidence_id values")
+
     def resolve(self, evidence_ids: list[str]) -> list[dict]:
-        # 把 evidence_id 列表解析为证据对象列表
-        lookup = {item["evidence_id"]: item for item in self.evidence}  # 返回 evidence_id 到证据的映射
-        seen: set[str] = set()
-        resolved = []
-        for evidence_id in evidence_ids:
-            if evidence_id in lookup and evidence_id not in seen:
-                seen.add(evidence_id)
-                resolved.append(lookup[evidence_id])
+        # 严格解析 evidence_id；非法或重复 ID 直接暴露生成错误。
+        lookup = {item["evidence_id"]: item for item in self.evidence}
+        unknown = [evidence_id for evidence_id in evidence_ids if evidence_id not in lookup]
+        if unknown:
+            raise ValueError(f"Unknown evidence_id values: {unknown}")
+        if len(set(evidence_ids)) != len(evidence_ids):
+            raise ValueError(f"Duplicate evidence_id values: {evidence_ids}")
+        return [lookup[evidence_id] for evidence_id in evidence_ids]
+
+    def available_at(self, stage: str, stage_orders: dict[str, int] | None = None) -> list[dict]:
+        # 返回指定提问时点及之前已释放的全部证据。
+        order_of = stage_orders or {
+            stage_id: stage_order(stage_id)
+            for stage_id in {item["introduced_stage"] for item in self.evidence}
+        }
+        if stage not in order_of:
+            raise ValueError(f"Unknown stage: {stage}")
+        unknown = sorted({
+            item["introduced_stage"] for item in self.evidence
+            if item["introduced_stage"] not in order_of
+        })
+        if unknown:
+            raise ValueError(f"Evidence contains unknown stages: {unknown}")
+        limit = order_of[stage]
+        return [item for item in self.evidence if order_of[item["introduced_stage"]] <= limit]
+
+    def resolve_available(
+        self,
+        evidence_ids: list[str],
+        stage: str,
+        stage_orders: dict[str, int],
+    ) -> list[dict]:
+        resolved = self.resolve(evidence_ids)
+        available_ids = {item["evidence_id"] for item in self.available_at(stage, stage_orders)}
+        future = [item["evidence_id"] for item in resolved if item["evidence_id"] not in available_ids]
+        if future:
+            raise ValueError(f"Evidence released after requested stage: {future}")
         return resolved
 
     def edges_between(self, evidence_ids: list[str]) -> list[dict]:
-        # 取证据子集间的图边
+        # 仅返回可用于推理的强关系和审核通过的临床支持边。
         selected = set(evidence_ids)
         return [
             edge for edge in self.graph["edges"]
-            if edge["source"] in selected and edge["target"] in selected
+            if edge["type"] != "context_consistency"
+            and edge["source"] in selected
+            and edge["target"] in selected
         ]
 
 
@@ -41,15 +77,43 @@ def evidence_ref(item: dict) -> dict:
         "field": normalized.get("field"),
         "value": normalized.get("value"),
         "unit": normalized.get("unit"),
+        "tooth": normalized.get("tooth"),
+        "side": normalized.get("side"),
     }
 
 
+STAGE_LABELS = {
+    "S0_PROFILE": "patient profile and history",
+    "S1_FP": "facial photographs",
+    "S2_DP": "intraoral dental photographs",
+    "S3_XR_XLA": "radiographic assessment",
+    "S4_CT": "three-dimensional CT",
+    "S5_TMJ": "temporomandibular joint clinical examination",
+}
+
+
+def human_stage_label(stage_id: str) -> str:
+    # 将内部阶段 ID 转为可出现在临床问题生成提示词中的自然语言
+    return STAGE_LABELS.get(stage_id, "the relevant clinical findings")
+
+
 def compact_evidence_text(evidence: list[dict]) -> str:
-    # 每条证据生成一行 (id|stage|modality|fact), 供 prompt 使用
+    # 每条证据生成一行 (id|stage|modality|fact), 供内部任务规划 prompt 使用
     rows = []
     for item in evidence:
         rows.append(
             f"- {item['evidence_id']} | stage={item['introduced_stage']} | "
+            f"modality={','.join(item.get('modality', []))} | fact={item['fact_text']}"
+        )
+    return "\n".join(rows)
+
+
+def question_evidence_text(evidence: list[dict]) -> str:
+    # 问题生成只展示临床模态，不把内部阶段 ID 暴露给模型
+    rows = []
+    for item in evidence:
+        rows.append(
+            f"- {item['evidence_id']} | clinical source={human_stage_label(item['introduced_stage'])} | "
             f"modality={','.join(item.get('modality', []))} | fact={item['fact_text']}"
         )
     return "\n".join(rows)
@@ -62,9 +126,11 @@ def evidence_catalog(index: EvidenceIndex) -> str:
 
 
 def edges_text(index: EvidenceIndex) -> str:
-    # 把证据图的边压成 (source -> target | type | reason) 多行文本
+    # 仅向任务生成暴露可参与推理的图边。
     rows = []
     for edge in index.graph["edges"]:
+        if edge["type"] == "context_consistency":
+            continue
         rows.append(f"- {edge['source']} -> {edge['target']} | {edge.get('type', '')} | {edge.get('reason', '')}")
     return "\n".join(rows)
 
@@ -74,7 +140,7 @@ def stages_summary(patient_stages: dict) -> str:
     rows = []
     for stage in sorted(patient_stages["stages"], key=lambda s: s["order"]):
         rows.append(
-            f"- {stage['stage_id']} (order {stage['order']}) | type={stage['stage_type']} | "
+            f"- {stage['stage_id']} (order {stage['order']}) | source={human_stage_label(stage['stage_id'])} | "
             f"modality={','.join(stage['modality'])}"
         )
     return "\n".join(rows)

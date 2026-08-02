@@ -32,9 +32,7 @@ task_types:
   - task_type: memory_update_conflict_correction
     count: 2
     instruction: >-
-      Explain how later-stage evidence confirms, refines, or corrects an
-      earlier-stage impression; required evidence should span at least two
-      different stages. Keep the update scoped to a single modality relationship:
-      include only the earlier impression being updated and the later evidence
-      (of the asked modality/stage) that updates it, so the answer is judged only
-      on that update relationship and not on unrelated findings.
+      Explain how later-stage evidence adds a clinically relevant fact or resolves
+      an earlier impression; required evidence should span at least two stages.
+      The answer must state the added fact and must not treat confirmation or a
+      measurement difference alone as an update.

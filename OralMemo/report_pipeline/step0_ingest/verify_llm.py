@@ -13,14 +13,13 @@ def verify_timeline(client, raw_dir: Path, timeline: dict, captions: list[dict] 
     fulltext, tables_text = load_source_text(raw_dir)
     prompt = tpl("timeline_verification").substitute(
         figures_block=figures_block(captions or []),
-        timeline_json=json.dumps(timeline, ensure_ascii=False)[:12000],
+        timeline_json=json.dumps(timeline, ensure_ascii=False),
         tables_text=tables_text,
         fulltext=fulltext,
     )
     result = client.complete_json(prompt, temperature=0.0, max_tokens=16000)
-    result.setdefault("issues", [])
-    if "passed" not in result:
-        result["passed"] = not any(i.get("severity") == "high" for i in result["issues"])
+    if not isinstance(result.get("passed"), bool) or not isinstance(result.get("issues"), list):
+        raise ValueError("Verifier response must contain boolean passed and list issues")
     return result
 
 

@@ -6,9 +6,9 @@ import math
 from collections import defaultdict
 from pathlib import Path
 
-from bench.config import get_settings
-from bench.llm_client import ChatClient
-from bench.step2_evidence.graph import build_evidence_graph, stage_order
+from config import get_settings
+from llm_client import ChatClient
+from step2_evidence.graph import build_evidence_graph, stage_order
 
 
 STAGE_COLORS = {
@@ -181,9 +181,10 @@ def render_html(graph: dict, html_path: Path) -> None:
         source = positions[edge["source"]]
         target = positions[edge["target"]]
         color = STAGE_COLORS[next(n["introduced_stage"] for n in nodes if n["evidence_id"] == edge["source"])]
-        cls = "edge cross" if edge["type"] == "cross_stage_dependency" else "edge intra"
-        marker = "url(#arrow)" if edge["type"] == "cross_stage_dependency" else ""
-        dash = "" if edge["type"] == "cross_stage_dependency" else 'stroke-dasharray="0"'
+        is_context = edge["type"] == "context_consistency"
+        cls = "edge context" if is_context else "edge support"
+        marker = "" if is_context else "url(#arrow)"
+        dash = 'stroke-dasharray="5 5"' if is_context else ""
         title = html.escape(edge["reason"])
         edge_svg.append(
             f'<path class="{cls}" d="{edge_path(source, target, edge["type"])}" stroke="{color}" marker-end="{marker}" {dash}>'
@@ -243,8 +244,8 @@ def render_html(graph: dict, html_path: Path) -> None:
       stroke-width: 2.1;
       opacity: 0.72;
     }}
-    .edge.intra {{ opacity: 0.55; }}
-    .edge.cross {{ stroke-width: 2.4; }}
+    .edge.support {{ stroke-width: 2.4; }}
+    .edge.context {{ opacity: 0.35; stroke-width: 1.4; }}
     .node-label {{
       font-family: "Trebuchet MS", Verdana, sans-serif;
       font-size: 12px;
@@ -289,17 +290,18 @@ def render_html(graph: dict, html_path: Path) -> None:
 def main() -> None:
     """证据图可视化入口。
 
-    功能: 读 evidence.json→(LLM 提议+规则校验)建图→写 evidence_graph.json 与 evidence_graph.html→打印统计。
+    功能: 读 evidence.json→(强关系规则+候选生成+独立审核)建图→写 evidence_graph.json 与 evidence_graph.html→打印统计。
     输入: 无(从 get_settings() 读取配置与 outputs 路径、LLM 凭据)。
     输出: 无返回值; 产生图 JSON/HTML, 控制台打印统计摘要。
     """
     settings = get_settings()
     base = settings.output_root
     evidence_json = base / "evidence" / "evidence.json"
+    cfg = settings.llm_for("benchmark")
     client = ChatClient(
-        api_key=settings.openai_api_key,
-        base_url=settings.openai_base_url,
-        model=settings.openai_model,
+        api_key=cfg.api_key,
+        base_url=cfg.base_url,
+        model=cfg.model,
     )
     graph = build_evidence_graph(evidence_json, client=client, cache_dir=base / "cache", max_edges=settings.graph_max_edges)
     graph_path = base / "graph" / "evidence_graph.json"

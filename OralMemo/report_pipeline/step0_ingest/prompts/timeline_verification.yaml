@@ -1,53 +1,42 @@
 template: |
-  You are a strict medical fact-checker for a longitudinal oral/dental case-report benchmark.
-  You are given (A) the SOURCE report text, its timeline table(s), AND its FIGURE CAPTIONS, and
-  (B) a structured timeline extracted from it. Verify (B) against (A) ONLY. No outside knowledge.
+  You are verifying a longitudinal timeline extracted from one oral or dental case report.
+  Compare the timeline only with the supplied text, tables, and figure captions. Do not use outside knowledge or infer unstated facts.
 
-  WHAT COUNTS AS SOURCE (A): the full text, the timeline table(s), AND the figure captions below
-  are ALL part of the source. A fact stated in a figure caption IS supported (do not flag it as invented).
-
-  CRITICAL ANTI-FALSE-ALARM RULES:
-  - Do NOT compute, add up, or infer totals yourself. If the source explicitly states a number
-    (e.g. "a total of 47 visits"), treat that number as CORRECT. Only flag a number as wrong when
-    the source explicitly states a DIFFERENT value for the same quantity.
-  - Before flagging something as "NOT FOUND", search ALL of (A): full text + tables + figure captions.
-  - Only flag content that truly contradicts the source or is absent from ALL of (A).
-
-  Check for:
-  1. Factual support: every "statement", "decision", "rationale", and each held_out field must be
-     supported somewhere in (A). Flag only genuinely unsupported/invented/altered content.
-  2. Numeric fidelity: numbers, units, %, tooth numbers (FDI), dates, gene/variants must match (A)
-     exactly (prefer the TABLE when narrative and table differ for the same quantity).
-  3. Internal logical consistency across timepoints (e.g. a tooth described as extracted at one
-     timepoint yet present/mobile later WITHOUT explanation). Flag real contradictions only.
-  4. Chronology: timepoints in non-decreasing time order; t_months plausible.
-  5. Leakage/over-claiming in held_out (must reflect the source).
+  Check:
+  1. Every answer is supported, stays close to complete source wording, preserves important values and negations, and does not retain obvious spacing/layout artifacts; prefer tables when sources conflict and never guess unclear values.
+  2. Questions match their answers and timepoints without revealing the answer.
+  3. The earliest stated event is a separate first timepoint with t_months=0; every later t_months is a non-negative integer elapsed from that same origin and never resets for treatment. Events less than one month apart may share the same integer value. Later timepoints are complete and chronological, and stage_type follows perception -> treatment -> followup. Staged treatment remains treatment through the final procedure or restoration. Visits reported together without distinct findings remain one combined timepoint rather than duplicated QAs.
+  4. Perception uses observations only; treatment uses evaluations only and covers the supported plans, procedures, choices, checks, and rationales without a fixed count; each followup lists observations before supported state and management evaluations.
+  5. Each clinically relevant available figure linked to perception or followup has one comprehensive image QA covering its body-linked visual findings. It is not caption-only, appears before overlapping text that would reveal it, and keeps non-visual measurements or interpretations in text observations.
+  6. Evaluation QAs have figure_ref=null, and evaluation answers from the same batch are not exposed to one another.
 
   Severity:
-  - "high": a real factual error, a wrong/invented number, or a logical contradiction.
-  - "medium": an unsupported or imprecise claim, or a chronology issue.
-  - "low": stylistic/formatting only.
+  - high: factual error, invented or wrong value, or contradiction.
+  - medium: unsupported/imprecise content, role/stage/image-rule error, or chronology problem.
+  - low: wording or formatting only.
 
-  Return STRICT VALID JSON ONLY:
+  Return strict valid JSON only:
   {
-    "passed": true or false,        // false if ANY high-severity issue exists
+    "passed": true,
     "issues": [
-      {"severity": "high|medium|low",
-       "location": "timepoint label / topic / held_out field",
-       "problem": "what is wrong",
-       "source_evidence": "short quote from (A) proving the correct value, or 'NOT FOUND IN SOURCE'",
-       "suggested_fix": "concrete instruction to correct the extraction"}
+      {
+        "severity": "high|medium|low",
+        "location": "timepoint or QA",
+        "problem": "problem description",
+        "source_evidence": "short source quote or NOT FOUND IN SOURCE",
+        "suggested_fix": "specific correction"
+      }
     ]
   }
 
-  ===== SOURCE (A): FIGURE CAPTIONS =====
+  ===== FIGURE CAPTIONS =====
   $figures_block
 
-  ===== EXTRACTED TIMELINE (B) TO VERIFY =====
+  ===== TIMELINE TO VERIFY =====
   $timeline_json
 
-  ===== SOURCE (A): TIMELINE TABLE(S) =====
+  ===== SOURCE TABLES =====
   $tables_text
 
-  ===== SOURCE (A): FULL TEXT =====
+  ===== SOURCE TEXT =====
   $fulltext

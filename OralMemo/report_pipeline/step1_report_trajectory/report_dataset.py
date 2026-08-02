@@ -2,18 +2,19 @@ from __future__ import annotations
 
 
 def build_report_dataset_entry(
-    normed_timepoints: list[dict],
-    rendered_turns: list[dict],
+    standard: dict,
     patient: dict,
-    source_pdf: str | None = None,
+    source_pdf: str,
 ) -> dict:
     conversations: list[dict] = []
     images: list[str] = []
-    for turn in rendered_turns:
-        conversations.append({"from": "human", "value": turn["human"]})
-        conversations.append({"from": "gpt", "value": turn["assistant"]})
-        for rel in turn["image_paths"]:
-            images.append("/" + rel.lstrip("/"))
+    qa_count = 0
+    for stage in standard["stages"]:
+        for turn in stage["qa_pairs"]:
+            conversations.append({"from": "human", "value": turn["human"]})
+            conversations.append({"from": "gpt", "value": turn["assistant"]})
+            images.extend("/" + rel.lstrip("/") for rel in turn["image_paths"])
+            qa_count += 1
 
     return {
         "id": patient["patient_id"],
@@ -21,9 +22,9 @@ def build_report_dataset_entry(
         "patient_name": patient["name"],
         "group": patient["group"],
         "source_pdf": source_pdf,
-        "stages": [tp["stage_id"] for tp in normed_timepoints],
+        "stages": [stage["stage_id"] for stage in standard["stages"]],
         "images": images,
         "num_images": len(images),
-        "num_qa_pairs": len(rendered_turns),
+        "num_qa_pairs": qa_count,
         "conversations": conversations,
     }

@@ -5,14 +5,10 @@ template: |
   1. Whether the answer is overall correct for the QUESTION, using the REFERENCE ANSWER.
   2. For each item in SELECTED EVIDENCE, whether the answer correctly covers that clinical fact.
 
-  Scope of judging (IMPORTANT):
-  - Judge ONLY the aspects the QUESTION actually asks about (its stated modality / stage / topic).
-    If the question asks about one modality or stage (e.g. "the CT imaging findings"), do NOT mark
-    the answer incorrect for omitting facts that belong to a different modality/stage (e.g. the chief
-    complaint, or the cephalometric X-ray analysis).
-  - For each SELECTED EVIDENCE item, set "in_scope": false when that fact lies outside what the
-    question asks about. Out-of-scope items must NOT lower the score and are excluded from evidence
-    recall; set "in_scope": true otherwise.
+  Evidence scope:
+  - SELECTED EVIDENCE was filtered during benchmark construction and contains only the evidence
+    required to answer this question. Every listed item is part of the fixed gold evidence set and
+    must be judged. Do not introduce an in-scope/out-of-scope distinction during evaluation.
 
   Clinical semantic equivalence:
   - Accept clinically equivalent or synonymous phrasing as covering the same fact; do not require
@@ -36,9 +32,9 @@ template: |
   Other rules:
   - A selected evidence item is covered only if the model answer states the same clinical fact (per the
     equivalence and tolerance rules above) without contradiction.
-  - Missing an in-scope selected evidence item means it is not covered.
+  - Missing a selected evidence item means it is not covered.
   - Extra unrelated but non-contradicting content does not by itself make the answer wrong.
-  - Set overall "correct" to true only if the answer captures the essential in-scope factual content
+  - Set overall "correct" to true only if the answer captures the essential factual content
     required by the question.
 
   QUESTION:
@@ -59,6 +55,6 @@ template: |
     "reason": "<one short clause>",
     "covered_evidence_count": 0,
     "evidence": [
-      {"evidence_id": "<id>", "in_scope": true, "covered": true, "reason": "<short>"}
+      {"evidence_id": "<id>", "covered": true, "reason": "<short>"}
     ]
   }

@@ -9,42 +9,42 @@ STAGE_DEFS = [
     {
         "stage_id": "S0_PROFILE",
         "order": 0,
-        "stage_type": "profile_text",
+        "stage_type": "perception",
         "modality": ["TEXT_QA"],
         "labels": ["profile"],
     },
     {
         "stage_id": "S1_FP",
         "order": 1,
-        "stage_type": "facial_photos",
+        "stage_type": "perception",
         "modality": ["FP"],
         "labels": ["FP"],
     },
     {
         "stage_id": "S2_DP",
         "order": 2,
-        "stage_type": "dental_photos",
+        "stage_type": "perception",
         "modality": ["DP"],
         "labels": ["DP"],
     },
     {
         "stage_id": "S3_XR_XLA",
         "order": 3,
-        "stage_type": "cephalometric_and_panoramic_xray",
+        "stage_type": "perception",
         "modality": ["XR", "XLData"],
         "labels": ["ceph", "panoramic"],
     },
     {
         "stage_id": "S4_CT",
         "order": 4,
-        "stage_type": "three_dimensional_ct",
+        "stage_type": "perception",
         "modality": ["CT"],
         "labels": ["CT"],
     },
     {
         "stage_id": "S5_TMJ",
         "order": 5,
-        "stage_type": "temporomandibular_joint",
+        "stage_type": "perception",
         "modality": ["TMJ"],
         "labels": ["TMJ", "ECT"],
     },
@@ -101,7 +101,7 @@ def build_patient_stages(source_turns: list[dict]) -> dict:
         诊断轮 → heldout_diagnosis, 其余未归入检查阶段的轮(治疗等) → heldout_treatment。
         ECT 轮归入 S5_TMJ。
     输入: source_turns - build_source_turns 产出的轮次列表。
-    输出: dict - 含 patient 信息、stages、heldout_turns 的患者阶段对象。
+    输出: dict - 含 patient 信息和完整 stages 的轨迹源对象；治疗/诊断问题以 evaluation QA 保存。
     """
     # 按模态标签归集轮次(保持原始 source_turn_id 顺序)。
     label_to_turns: dict[str, list[dict]] = defaultdict(list)
@@ -127,6 +127,7 @@ def build_patient_stages(source_turns: list[dict]) -> dict:
                     "human": src["human"],
                     "assistant": src["assistant"],
                     "image_paths": src["image_paths"],
+                    "role": "observation",
                 }
             )
             image_paths.extend(src["image_paths"])
@@ -144,23 +145,37 @@ def build_patient_stages(source_turns: list[dict]) -> dict:
             }
         )
 
-    heldout = []
-    for role, label in (("heldout_diagnosis", "diagnosis"), ("heldout_treatment", "treatment")):
+    evaluation_turns = []
+    for evaluation_type, label in (("diagnosis", "diagnosis"), ("treatment", "treatment")):
         for src in sorted(label_to_turns.get(label, []), key=lambda s: s["source_turn_id"]):
-            heldout.append(
+            evaluation_turns.append(
                 {
                     "source_turn_id": src["source_turn_id"],
                     "human": src["human"],
                     "assistant": src["assistant"],
                     "image_paths": src["image_paths"],
-                    "role": role,
+                    "role": "evaluation",
+                    "evaluation_type": evaluation_type,
+                    "ask_after_stage": "S5_TMJ",
+                    "release_after_stage": "S6_EVALUATION",
                 }
             )
+    if evaluation_turns:
+        stages.append(
+            {
+                "stage_id": "S6_EVALUATION",
+                "order": len(stages),
+                "stage_type": "treatment",
+                "modality": ["TEXT_QA"],
+                "source_turn_ids": [turn["source_turn_id"] for turn in evaluation_turns],
+                "image_paths": [],
+                "qa_pairs": evaluation_turns,
+            }
+        )
 
     return {
         "patient_id": source_turns[0]["patient_id"],
         "patient_name": source_turns[0]["patient_name"],
         "group": source_turns[0]["group"],
         "stages": stages,
-        "heldout_turns": heldout,
     }

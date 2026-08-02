@@ -9,37 +9,32 @@ from pathlib import Path
 
 
 def _stage_input(stage: dict) -> dict:
-    """抽取阶段的轨迹精简视图, 把每条QA标记为role=evidence
-    输入: stage 单个阶段对象。
-    输出: dict - 精简后的阶段(含 stage_id/order/modality/image_paths/qa_pairs)。
-    """
-    return {
+    """抽取阶段的轨迹精简视图，并保持通用字段顺序一致。"""
+    result = {
         "stage_id": stage["stage_id"],
         "order": stage["order"],
         "stage_type": stage["stage_type"],
         "modality": stage["modality"],
-        "image_paths": stage["image_paths"],
-        "qa_pairs": [
-            {
-                "source_turn_id": turn["source_turn_id"],
-                "human": turn["human"],
-                "assistant": turn["assistant"],
-                "image_paths": turn["image_paths"],
-                "role": "evidence",
-            }
-            for turn in stage["qa_pairs"]
-        ],
     }
+    if "timepoint" in stage:
+        result["timepoint"] = stage["timepoint"]
+    result["image_paths"] = stage["image_paths"]
+    result["qa_pairs"] = [dict(turn) for turn in stage["qa_pairs"]]
+    return result
 
 
 def build_standard_trajectory(patient_stages: dict) -> dict:
     # 按阶段顺序生成 standard_full 轨迹
-    return {
+    trajectory = {
         "trajectory_id": f"{patient_stages['patient_id']}__standard_full",
         "patient_id": patient_stages["patient_id"],
         "trajectory_type": "standard_full",
         "stages": [_stage_input(stage) for stage in patient_stages["stages"]],
     }
+    for key in ("patient_name", "group"):
+        if key in patient_stages:
+            trajectory[key] = patient_stages[key]
+    return trajectory
 
 
 def build_missing_modality_variants(standard: dict) -> list[dict]:
@@ -81,7 +76,7 @@ def build_missing_modality_variants(standard: dict) -> list[dict]:
 
 def build_long_noisy_variant(
     standard: dict,
-    noise_count: int = 3,
+    noise_count: int = 8,
     seed: int = 42,
 ) -> dict:
     # 生成噪声变体 (分类噪声池、采样)
@@ -119,7 +114,7 @@ def build_long_noisy_variant(
                 "human": noise["human"],
                 "assistant": noise["assistant"],
                 "image_paths": [],
-                "role": "noise",
+                "role": "observation",
                 "noise_category": noise["category"],
             }
         )

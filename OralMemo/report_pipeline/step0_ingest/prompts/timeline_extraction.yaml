@@ -1,56 +1,46 @@
 template: |
-  You are building OralMemBench-Longitudinal, a LONG-TERM (time-axis) multimodal memory benchmark,
-  from ONE published oral / maxillofacial / dental case report.
+  You are building a longitudinal multimodal benchmark from one published oral, maxillofacial, or dental case report.
 
-  Your job: read the report text and its timeline table(s), and produce a STRICTLY FACTUAL,
-  chronologically ordered structured timeline. This must generalize to ANY such report,
-  so infer the structure from the text; do NOT assume a fixed disease or fixed visits.
+  Read the source and return a factual, chronological timeline that generalizes to different diseases and visit patterns.
 
-  HARD RULES:
-  1. Use ONLY facts explicitly stated in the SOURCE below. Never invent, average, round, or "fix" values.
-  2. Preserve every number, unit, percentage, tooth number (FDI), side, date, gene/variant, and negation EXACTLY as written.
-  3. If the narrative text and a TABLE disagree, PREFER THE TABLE.
-  4. Do NOT perform arithmetic that the source did not state (e.g. do not derive counts by subtraction).
-  5. Split each distinct clinical time point into its own timepoint, in chronological order. Capture ALL of
-     them, including brief ones. In particular, INCLUDE THE EARLIEST described clinical event as the first
-     timepoint — e.g. prenatal/antenatal detection, birth, or the initial referral / first presentation —
-     EVEN when it is written as narrative background. Do not drop pre-referral findings, differential
-     diagnoses, family history, or relevant negatives stated there.
-  6. For each timepoint, break the findings into atomic items (one clinical fact per item).
-  7. Attach an image to a finding ONLY by setting "figure_ref" to one of the provided figure labels
-     whose caption clearly matches that finding (by date / description). Otherwise set figure_ref to null.
-  8. Return STRICT, VALID JSON ONLY. No markdown, no code fences, no comments, no trailing commas.
+  RULES:
+  1. Use only facts stated in the source. Preserve numbers, units, tooth numbers, sides, dates, variants, and negations exactly; prefer the table when it conflicts with narrative text. Keep answers close to complete source wording, normalize only obvious spacing/layout artifacts, and do not add facts or guess unclear values.
+  2. Include every distinct clinical timepoint, starting with the earliest stated event even when it appears as background in the same sentence as a later presentation. Put that earliest event in its own first timepoint with t_months=0, then express every later t_months as non-negative integer months elapsed from that same earliest origin, estimating from stated ages or dates when needed. Never reset the origin for treatment; events less than one month apart may share the same value. When the source reports several visits together without separate findings, keep them in one combined timepoint rather than duplicating the same answer.
+  3. Use stage_type=perception, treatment, or followup in that order. Treatment continues through staged healing, checks, uncovering, and the final procedure or restoration; followup starts only afterward. Split one source date into consecutive timepoints when it crosses stages.
+  4. Every QA uses role=observation or role=evaluation. Observation is visible memory; evaluation is answered by the benchmark model before its paper answer is released.
+  5. Perception contains observations only. For each clinically relevant available figure linked to perception or followup findings, create one comprehensive image QA covering its directly visual findings; the caption identifies the image but is not sufficient as the answer. Put the image QA before overlapping text that would reveal it, and keep non-visual measurements or interpretations as text observations. Do not add integrated reasoning questions.
+  6. Treatment contains evaluations only. Generate questions for every meaningful plan, performed procedure, choice, interim check, and rationale supported by the paper; do not force a fixed count or attach treatment images. Treatment evaluation answers are mutually hidden.
+  7. Each real followup timepoint lists observations first, then supported evaluations about state, stability or recurrence, and further management. Evaluations at the same timepoint are mutually hidden.
+  8. Questions must be paper-specific, derived from their answers and timepoints, and must not reveal the answer.
+  9. figure_ref is allowed only on observation QAs explicitly linked to that figure. Evaluation QAs use null. If several panels resolve to one extracted image, use one comprehensive image QA rather than repeated QAs.
+  10. Return strict valid JSON only, using exactly this schema:
 
-  OUTPUT JSON SCHEMA (use exactly these keys):
   {
     "timepoints": [
       {
-        "label": "short time label, e.g. 2017-06 or a period",
-        "date_text": "human-readable date/period as in source",
-        "t_months": integer months from the EARLIEST timepoint (set 0 at the first/earliest clinical time point — prenatal/birth/referral/initial visit; estimate the others from the stated ages/dates),
-        "stage_type": "baseline_visit | treatment | followup_visit | outcome",
-        "modality": ["TEXT_QA","DP","XR","CT","DERM","GENE", ...],
-        "findings": [
-          {"topic": "short topic, e.g. periodontal status", "statement": "one factual sentence copied/paraphrased faithfully from source", "figure_ref": "Figure N or null"}
-        ],
-        "decision": "key clinical decision at this timepoint (or null)",
-        "rationale": "stated rationale for the decision (or null)"
+        "date_text": "source date or period",
+        "t_months": 0,
+        "stage_type": "perception | treatment | followup",
+        "modality": ["TEXT_QA", "DP", "XR", "CT"],
+        "qa_pairs": [
+          {
+            "role": "observation | evaluation",
+            "question": "paper-specific question",
+            "answer": "source-supported answer",
+            "figure_ref": "Figure N or null"
+          }
+        ]
       }
-    ],
-    "held_out": {
-      "diagnosis": "the unifying diagnosis with its stated basis",
-      "treatment": "summary of the overall long-term treatment strategy actually delivered",
-      "prognosis": "the long-term outcomes over the whole follow-up"
-    }
+    ]
   }
 
-  Available figures (label -> caption) for figure_ref (may be empty):
+  Available figures:
   $figures_block
 
   $feedback_block
 
-  ===== SOURCE: TIMELINE TABLE(S) (authoritative for per-timepoint values) =====
+  ===== SOURCE TABLES =====
   $tables_text
 
-  ===== SOURCE: FULL TEXT =====
+  ===== SOURCE TEXT =====
   $fulltext

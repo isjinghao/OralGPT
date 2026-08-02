@@ -45,8 +45,8 @@ def load_graph(out_dir: Path) -> dict:
 
 
 def load_tmonths(out_dir: Path) -> dict[str, int]:
-    """从 patient_stages.json 读取每个阶段的 t_months(距基线月数), 供图上显示。"""
-    path = out_dir / "stages" / "patient_stages.json"
+    """从标准轨迹读取每个阶段的 t_months，供图上显示。"""
+    path = out_dir / "trajectories" / "standard_trajectory.json"
     if not path.exists():
         return {}
     stages = json.loads(path.read_text(encoding="utf-8")).get("stages", [])

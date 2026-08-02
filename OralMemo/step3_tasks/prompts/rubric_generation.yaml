@@ -1,32 +1,28 @@
 template: |
-  You are writing a scoring rubric for an OralMemBench diagnosis or treatment task.
+  You are writing a scoring rubric for an OralMemBench clinical treatment or follow-up reasoning task.
 
-  Given the task type, the clinical question, the gold answer, and the supporting evidence,
-  design a rubric that grades a model answer against the gold answer. The rubric must reflect the
-  clinically important components of THIS specific gold answer (do not use generic boilerplate that
-  is unsupported by the answer).
-
-  Clinical axes to organise the criteria around (orthognathic / craniomaxillofacial):
-  - Occlusal relationship / function.
-  - Facial aesthetics (may combine frontal symmetry and lateral profile into one criterion; no need to
-    over-subdivide).
-  - Dental disease diagnosis / treatment (caries, impacted / wisdom teeth, periodontitis, endodontic and
-    restorative status, etc.).
-  - For DIAGNOSIS tasks: the rubric MUST cover BOTH (a) the deformity / skeletal specialty diagnosis
-    (skeletal & dental malocclusion, asymmetry, vertical/transverse pattern) AND (b) the dental disease
-    diagnosis, as separate criteria, so a gap in either is scored distinctly.
-  - For TREATMENT tasks: include a criterion for the OVERALL treatment pathway and its sequencing/reasoning
-    (presurgical orthodontics -> orthognathic surgery -> postsurgical orthodontics -> dental disease
-    management), not only the surgical technique.
+  Given only the task type, clinical question, and authoritative gold answer, design a rubric that
+  grades a model answer against the gold answer. Derive every scoring criterion from the question and
+  this specific gold answer; do not use atomic evidence and do not add unsupported generic requirements.
 
   Rules:
   1. Produce 4-7 criteria whose scores sum to exactly 100.
-  2. Each criterion targets one clinically meaningful component actually present in the gold answer.
-  3. Do NOT give a minor single procedure its own high-weight criterion (e.g. do not make
-     "extraction of impacted teeth" a standalone criterion); fold it into the broader dental-disease
-     treatment criterion.
-  4. description explains what a correct answer must contain for that criterion.
-  5. Return strict JSON only.
+  2. Derive every criterion from a clinically meaningful component actually required by the question
+     and present in the gold answer. Do not add external requirements.
+  3. Cover every major requested branch, comparison, sequence, alternative, and limitation. Assign
+     meaningful weight to each major branch so omitting one cannot still earn near-full credit. Score
+     interchangeable alternatives within one branch, not as cumulative requirements.
+  4. Weight criteria by clinical importance and question emphasis. An umbrella criterion must stay
+     concise and must not rescore details covered elsewhere.
+  5. Preserve certainty, scope, dependencies, ordering, necessity, and optionality exactly. Required
+     conjunctions need all components; alternatives allow any stated option; optional components are not required.
+  6. Keep independently gradable components separate when possible. If details are grouped, state how
+     partial credit follows the correctly covered subcomponents.
+  7. Avoid high weight for a minor detail unless the question or gold answer makes it central.
+  8. Descriptions must allow clinically equivalent wording while retaining the required meaning.
+  9. Before returning, verify complete branch coverage, non-overlapping scoring, logical fidelity,
+     explicit partial-credit behavior, and an exact total of 100.
+  10. Return strict JSON only.
 
   Return schema:
   {
@@ -43,6 +39,3 @@ template: |
 
   Gold answer:
   $answer
-
-  Supporting evidence (id | stage | modality | fact):
-  $evidence_text

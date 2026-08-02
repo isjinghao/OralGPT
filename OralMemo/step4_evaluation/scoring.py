@@ -22,8 +22,35 @@ def _selected_evidence_payload(record: dict) -> list[dict]:
     ]
 
 
+def _normalize_coverage(selected_evidence: list[dict], judged_items: list[dict], covered_ids: set[str] | None = None) -> tuple[list[dict], int, int]:
+    judged_by_id = {
+        str(item.get("evidence_id", "")).strip(): item
+        for item in judged_items
+        if str(item.get("evidence_id", "")).strip()
+    }
+    normalized = []
+    covered_count = 0
+    for evidence in selected_evidence:
+        evidence_id = str(evidence.get("evidence_id", "")).strip()
+        judged = judged_by_id.get(evidence_id, {})
+        covered = (
+            evidence_id in covered_ids
+            if covered_ids is not None
+            else bool(judged.get("covered", False))
+        )
+        item = {
+            "evidence_id": evidence_id,
+            "covered": covered,
+        }
+        if judged.get("reason"):
+            item["reason"] = str(judged["reason"])
+        normalized.append(item)
+        covered_count += int(covered)
+    return normalized, covered_count, len(normalized)
+
+
 def judge_base(llm: CachedLLM, record: dict) -> dict:
-    # 判定一条 base 任务作答是否正确，并统计 selected_evidence 中被正确覆盖的证据数(ERS)
+    # 判定 base 任务，并对预先筛选的全部 selected_evidence 统一计算 ERS
     selected_evidence = _selected_evidence_payload(record)
     prompt = render(
         "judge_base",
@@ -33,39 +60,21 @@ def judge_base(llm: CachedLLM, record: dict) -> dict:
         selected_evidence=json.dumps(selected_evidence, ensure_ascii=False),
     )
     data = llm.complete(prompt, cache_key=f"judge_base_{record['task_id']}", max_tokens=8000)
-
-    evidence_items = data.get("evidence", []) or []
-    # in_scope 缺省视为 True(向后兼容); 仅统计问题范围内(in-scope)的证据用于 ERS
-    def _in_scope(item: dict) -> bool:
-        return item.get("in_scope", True) is not False
-
-    if evidence_items:
-        in_scope_items = [item for item in evidence_items if _in_scope(item)]
-        total_evidence = len(in_scope_items)
-        covered_evidence = sum(1 for item in in_scope_items if item.get("covered"))
-    else:
-        # 模型未返回逐项判定时, 回退到旧逻辑
-        total_evidence = len(selected_evidence)
-        raw_covered = data.get("covered_evidence_count", 0)
-        try:
-            covered_evidence = int(raw_covered or 0)
-        except (TypeError, ValueError):
-            covered_evidence = 0
-    covered_evidence = max(0, min(total_evidence, covered_evidence))
-
+    evidence, covered_evidence, total_evidence = _normalize_coverage(
+        selected_evidence, data.get("evidence", []) or []
+    )
     return {
         "correct": bool(data.get("correct")),
         "reason": str(data.get("reason", "")),
         "covered_evidence_count": covered_evidence,
         "total_evidence_count": total_evidence,
-        "evidence": evidence_items,
+        "evidence": evidence,
     }
 
 
 def judge_evidence(llm: CachedLLM, record: dict) -> dict:
-    # 仅测量证据召回(ERS): 让模型返回"已覆盖/超范围的证据 id 列表", 输出精简、健壮, 适合证据很多的诊断/治疗任务
+    # 仅测量证据召回；selected_evidence 已在 benchmark 生成阶段筛为该题所需证据
     selected_evidence = _selected_evidence_payload(record)
-    # 精简载荷: 只发 id / fact / modality, 缩短超长诊断任务输入, 降低空/坏输出概率
     compact = [
         {
             "evidence_id": ev.get("evidence_id", ""),
@@ -82,21 +91,11 @@ def judge_evidence(llm: CachedLLM, record: dict) -> dict:
         selected_evidence=json.dumps(compact, ensure_ascii=False),
     )
     data = llm.complete(prompt, cache_key=f"judge_evidence_{record['task_id']}", max_tokens=16000)
-
-    covered_ids = {str(x).strip() for x in (data.get("covered_evidence_ids", []) or [])}
-
-    # heldout 任务的 selected_evidence 都是为该题归因的相关证据, 全部计入分母(不做范围排除)
-    evidence: list[dict] = []
-    total_evidence = 0
-    covered_evidence = 0
-    for ev in selected_evidence:
-        eid = str(ev.get("evidence_id", "")).strip()
-        is_covered = eid in covered_ids
-        evidence.append({"evidence_id": eid, "in_scope": True, "covered": is_covered})
-        total_evidence += 1
-        if is_covered:
-            covered_evidence += 1
-
+    evidence, covered_evidence, total_evidence = _normalize_coverage(
+        selected_evidence,
+        [],
+        {str(x).strip() for x in (data.get("covered_evidence_ids", []) or [])},
+    )
     return {
         "covered_evidence_count": covered_evidence,
         "total_evidence_count": total_evidence,

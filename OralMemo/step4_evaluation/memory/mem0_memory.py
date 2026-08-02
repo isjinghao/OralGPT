@@ -12,6 +12,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+
+
 from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
 
 
@@ -51,6 +53,8 @@ class Mem0Memory(MemoryMethod):
             from mem0 import Memory
             self._memory = Memory.from_config(self._config_override or self._default_config())
         return self._memory
+
+
 
     def _default_config(self) -> dict:
         # mem0 内部 LLM 默认跟随 ANSWER_*（回答阶段）配置，未配置时回退到 OPENAI_*。
@@ -113,10 +117,11 @@ class Mem0Memory(MemoryMethod):
 
     def context(self, query: str | None = None) -> str:
         client = self._client()
+        filters = {"user_id": self.user_id}
         if query:
-            result = client.search(query, user_id=self.user_id, limit=self.search_limit)
+            result = client.search(query, filters=filters, top_k=self.search_limit)
         else:
-            result = client.get_all(user_id=self.user_id)
+            result = client.get_all(filters=filters, top_k=self.search_limit)
         items = result.get("results", result) if isinstance(result, dict) else result
         lines = []
         for item in items or []:

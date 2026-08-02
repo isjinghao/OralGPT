@@ -44,6 +44,7 @@ def score_method(
     ers_by_modality: dict[str, dict[str, int]] = {}
     diagnosis = None
     treatment: list[dict] = []
+    followup: list[dict] = []
     per_task: list[dict] = []
 
     for rec in records:
@@ -79,17 +80,8 @@ def score_method(
                 for item in verdict.get("evidence", []) or []
                 if item.get("covered")
             }
-            # 问题范围外(in_scope=false)的证据不计入分模态 ERS 分母
-            verdict_evidence = verdict.get("evidence", []) or []
-            out_of_scope_ids = {
-                str(item.get("evidence_id", "")).strip()
-                for item in verdict_evidence
-                if item.get("in_scope", True) is False
-            }
             for ev in rec.get("selected_evidence", []) or []:
                 eid = str(ev.get("evidence_id", "")).strip()
-                if eid in out_of_scope_ids:
-                    continue
                 ev_covered = 1 if eid in covered_ids else 0
                 for mod in ev.get("modality", []) or []:
                     ers_bm = ers_by_modality.setdefault(mod, {"covered": 0, "total": 0})
@@ -110,8 +102,8 @@ def score_method(
                 "validation_accepted": rec.get("validation_accepted", True),
             })
 
-        # 诊断和治疗类任务
-        elif ttype in ("heldout_diagnosis", "heldout_treatment"):
+        # 论文明确支持的诊断/治疗/随访决策任务
+        elif ttype in ("heldout_diagnosis", "heldout_treatment", "paper_treatment", "paper_followup"):
             rubric = rubric_by_task.get(rec["task_id"])
             if not rubric:
                 continue
@@ -120,6 +112,9 @@ def score_method(
             if ttype == "heldout_diagnosis":
                 diagnosis = entry
                 metric = "diagnosis"
+            elif ttype == "paper_followup":
+                followup.append(entry)
+                metric = "followup"
             else:
                 treatment.append(entry)
                 metric = "TPS"
@@ -140,15 +135,8 @@ def score_method(
                 for item in verdict.get("evidence", []) or []
                 if item.get("covered")
             }
-            out_of_scope_ids = {
-                str(item.get("evidence_id", "")).strip()
-                for item in verdict.get("evidence", []) or []
-                if item.get("in_scope", True) is False
-            }
             for ev in rec.get("selected_evidence", []) or []:
                 eid = str(ev.get("evidence_id", "")).strip()
-                if eid in out_of_scope_ids:
-                    continue
                 ev_covered = 1 if eid in covered_ids else 0
                 for mod in ev.get("modality", []) or []:
                     ers_bm = ers_by_modality.setdefault(mod, {"covered": 0, "total": 0})
@@ -168,8 +156,9 @@ def score_method(
                 "evidence": verdict.get("evidence", []),
             })
 
-    # 计算治疗类任务的平均分
+    # 分别计算治疗和随访推理任务平均分
     tps_percent = round(sum(t["percent"] for t in treatment) / len(treatment), 2) if treatment else None
+    followup_percent = round(sum(t["percent"] for t in followup) / len(followup), 2) if followup else None
 
     return {
         "method": method_name,
@@ -197,6 +186,7 @@ def score_method(
         },
         "diagnosis": diagnosis,
         "tps": {"overall_percent": tps_percent, "per_task": treatment},
+        "followup": {"overall_percent": followup_percent, "per_task": followup},
         "per_task": per_task,
     }
 
@@ -287,8 +277,10 @@ def format_console(report: dict) -> str:
         _fmt_pct(m["diagnosis"]["percent"]) if m.get("diagnosis") else "   n/a" for m in methods
     ]))
 
-    # TPS
+    # TPS 与随访推理
     lines.append(row("Treatment score", [
         _fmt_pct(m["tps"]["overall_percent"]) for m in methods]))
+    lines.append(row("Follow-up score", [
+        _fmt_pct(m["followup"]["overall_percent"]) for m in methods]))
     lines.append("=" * (34 + col * len(names)))
     return "\n".join(lines)

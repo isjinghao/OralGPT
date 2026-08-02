@@ -33,10 +33,8 @@ def process_patient(item: dict, settings: Settings, client: ChatClient):
 
     # Step1: 轨迹 / 阶段
     source_turns = build_source_turns(item)
-    patient_stages = build_patient_stages(source_turns)
-    write_json(out / "stages" / "patient_stages.json", patient_stages)
-
-    standard = build_standard_trajectory(patient_stages)
+    stages = build_patient_stages(source_turns)
+    standard = build_standard_trajectory(stages)
     write_json(out / "trajectories" / "standard_trajectory.json", standard)
 
     for variant in build_missing_modality_variants(standard):
@@ -44,7 +42,7 @@ def process_patient(item: dict, settings: Settings, client: ChatClient):
     write_json(out / "variants" / "long_noisy.json", build_long_noisy_variant(standard))
 
     # Step2: 原子证据抽取(LLM)
-    evidence = extract_all_evidence(client, patient_stages, cache_dir=out / "cache")
+    evidence = extract_all_evidence(client, standard, cache_dir=out / "cache")
     write_json(out / "evidence" / "evidence.json", evidence)
 
 

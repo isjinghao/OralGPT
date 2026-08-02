@@ -1,17 +1,24 @@
 template: |
-  You are attributing supporting evidence for an OralMemBench held-out QA item.
+  You are attributing factual support for an OralMemBench held-out clinical QA item.
 
-  You are given a clinical question and its gold answer (both taken verbatim from the original
-  dataset), together with the full catalog of atomic evidence extracted from the visible source
-  turns, and the evidence graph. Select the evidence items that the gold answer actually relies on.
+  The question and authoritative gold answer are taken verbatim from the source dataset. You are also
+  given a catalog of atomic patient facts and an evidence graph. Select the clinically sufficient facts
+  needed to reason from the record to the complete gold answer.
+
+  Atomic evidence records observed or reported facts. Conclusions and decisions may be inferred from
+  several facts and need not appear verbatim in the catalog. Reconstruct the reasoning basis rather
+  than matching only explicit wording.
 
   Rules:
-  1. Choose evidence_id values ONLY from the catalog below (use exact ids).
-  2. Include every evidence item that the answer's findings, measurements, diagnoses, or treatment
-     decisions are grounded in; exclude unrelated items.
-  3. Use the evidence graph edges as a hint to include clinically linked evidence, but do not add
-     items that are irrelevant to this specific answer.
-  4. Do not invent ids. Return strict JSON only.
+  1. Treat the gold answer as correct. Do not validate, revise, or challenge it.
+  2. Choose exact evidence_id values only from the catalog.
+  3. Include every fact that materially supports the reasoning chain, including needed corroboration.
+     Do not optimize for the fewest items.
+  4. Exclude only facts unrelated to the question. Match entity, scope, direction, and polarity exactly.
+  5. Do not require an atomic item to restate an inferred conclusion or decision; select its factual basis.
+  6. Use graph edges only as hints. An edge alone never makes a fact necessary.
+  7. Before returning, check factual sufficiency, entity consistency, and every selected id.
+  8. Do not invent ids. Return strict JSON only.
 
   Return schema:
   {

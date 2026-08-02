@@ -5,7 +5,7 @@ import re
 import time
 from datetime import datetime, timezone
 
-from openai import OpenAI, RateLimitError
+from openai import APIConnectionError, APITimeoutError, InternalServerError, OpenAI, RateLimitError
 
 
 class ChatClient:
@@ -14,7 +14,8 @@ class ChatClient:
         self.model = model
 
     def complete_json(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
-                      images: list[str] | None = None, timeout: int = 300) -> dict:
+                      images: list[str] | None = None, timeout: int = 300,
+                      system_prompt: str | None = None) -> dict:
         # 发起对话补全并解析为 JSON
         if images:
             content: list[dict] = [{"type": "text", "text": prompt}]
@@ -22,11 +23,12 @@ class ChatClient:
             message: dict = {"role": "user", "content": content}
         else:
             message = {"role": "user", "content": prompt}
+        messages = ([{"role": "system", "content": system_prompt}] if system_prompt else []) + [message]
         for attempt in range(4):
             try:
                 response = self.client.chat.completions.create(
                     model=self.model,
-                    messages=[message],
+                    messages=messages,
                     temperature=temperature,
                     max_tokens=max_tokens,
                     timeout=timeout,
@@ -37,10 +39,17 @@ class ChatClient:
                 wait_seconds = reset_wait_seconds(str(exc))
                 print(f"LLM rate limited; waiting {wait_seconds}s before retry {attempt + 1}/4.")
                 time.sleep(wait_seconds)
-        raise RuntimeError("LLM request failed after 4 rate-limit retries.")
+            except (APIConnectionError, APITimeoutError, InternalServerError) as exc:
+                if attempt >= 3:
+                    raise
+                wait_seconds = min(60, 2 ** attempt * 5)
+                print(f"LLM transient error ({type(exc).__name__}); waiting {wait_seconds}s before retry {attempt + 1}/4.")
+                time.sleep(wait_seconds)
+        raise RuntimeError("LLM request failed after retries.")
 
     def complete_text(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
-                      images: list[str] | None = None, timeout: int = 300) -> str:
+                      images: list[str] | None = None, timeout: int = 300,
+                      system_prompt: str | None = None) -> str:
         # 返回纯文本(不做 JSON 解析), 适合自由文本作答, 避免长文本被包成 JSON 时的解析问题
         if images:
             content: list[dict] = [{"type": "text", "text": prompt}]
@@ -48,11 +57,12 @@ class ChatClient:
             message: dict = {"role": "user", "content": content}
         else:
             message = {"role": "user", "content": prompt}
+        messages = ([{"role": "system", "content": system_prompt}] if system_prompt else []) + [message]
         for attempt in range(4):
             try:
                 response = self.client.chat.completions.create(
                     model=self.model,
-                    messages=[message],
+                    messages=messages,
                     temperature=temperature,
                     max_tokens=max_tokens,
                     timeout=timeout,
@@ -62,7 +72,13 @@ class ChatClient:
                 wait_seconds = reset_wait_seconds(str(exc))
                 print(f"LLM rate limited; waiting {wait_seconds}s before retry {attempt + 1}/4.")
                 time.sleep(wait_seconds)
-        raise RuntimeError("LLM request failed after 4 rate-limit retries.")
+            except (APIConnectionError, APITimeoutError, InternalServerError) as exc:
+                if attempt >= 3:
+                    raise
+                wait_seconds = min(60, 2 ** attempt * 5)
+                print(f"LLM transient error ({type(exc).__name__}); waiting {wait_seconds}s before retry {attempt + 1}/4.")
+                time.sleep(wait_seconds)
+        raise RuntimeError("LLM request failed after retries.")
 
 
 def reset_wait_seconds(text: str) -> int:

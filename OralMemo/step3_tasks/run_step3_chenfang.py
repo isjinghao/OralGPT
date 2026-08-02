@@ -3,15 +3,16 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from bench.config import get_settings
-from bench.llm_client import ChatClient
-from bench.step3_tasks.llm_tasks import (
+from config import get_settings
+from llm_client import ChatClient
+from step3_tasks.llm_tasks import (
     finalize_task,
     generate_rubric,
     plan_normal_tasks,
     select_heldout_evidence,
+    validate_task_plan,
 )
-from bench.step3_tasks.selectors import EvidenceIndex, assemble_heldout_task, assemble_normal_task
+from step3_tasks.selectors import EvidenceIndex, assemble_heldout_task, assemble_normal_task
 
 
 def read_json(path: Path) -> dict:
@@ -33,15 +34,44 @@ def build_normal_tasks(
     # 构建普通任务; 仅保留通过校验的问题, 未通过校验的直接丢弃
     planned = plan_normal_tasks(client, patient_stages, index, cache_dir)
     patient_id = patient_stages["patient_id"]
+    stage_orders = {stage["stage_id"]: int(stage["order"]) for stage in patient_stages["stages"]}
+    valid_stage_ids = set(stage_orders)
     counters: dict[str, int] = {}
     tasks = []
     dropped = 0
     for item in planned:
         task_type = item["task_type"]
         counters[task_type] = counters.get(task_type, 0) + 1
+        if item["ask_after_stage"] not in valid_stage_ids:
+            raise ValueError(f"Unknown ask_after_stage: {item['ask_after_stage']}")
         spec = assemble_normal_task(patient_id, f"{task_type}_{counters[task_type]:03d}", item, index)
+        available_evidence = index.available_at(spec["ask_after_stage"], stage_orders)
+        available_ids = {evidence["evidence_id"] for evidence in available_evidence}
+        future_ids = [
+            evidence["evidence_id"] for evidence in spec["selected_evidence"]
+            if evidence["evidence_id"] not in available_ids
+        ]
+        if future_ids:
+            raise ValueError(f"Evidence released after ask_after_stage: {future_ids}")
+        plan_validation = validate_task_plan(
+            verifier_client or client,
+            spec,
+            available_evidence,
+            cache_dir,
+        )
+        if not plan_validation["accepted"]:
+            dropped += 1
+            print(f"  dropped (plan validation failed): {spec['task_id']}", flush=True)
+            continue
         print(f"[Step3 normal] {spec['task_id']} ({spec['task_type']})", flush=True)
-        task = finalize_task(client, spec, cache_dir, verifier_client=verifier_client)
+        task = finalize_task(
+            client,
+            spec,
+            available_evidence,
+            cache_dir,
+            verifier_client=verifier_client,
+        )
+        task["plan_validation"] = plan_validation
         if not task["validation"].get("accepted"):
             dropped += 1
             print(f"  dropped (validation failed after retries): {spec['task_id']}", flush=True)
@@ -53,22 +83,33 @@ def build_normal_tasks(
     return tasks
 
 
-def build_heldout_tasks(client: ChatClient, patient_stages: dict, index: EvidenceIndex, cache_dir: Path) -> list[dict]:
-    # 构建 held-out 诊断/治疗任务
-    patient_id = patient_stages["patient_id"]
+def build_heldout_tasks(client: ChatClient, standard: dict, index: EvidenceIndex, cache_dir: Path) -> list[dict]:
+    # 从标准轨迹读取诊断/治疗 evaluation QA。
+    patient_id = standard["patient_id"]
     prefix = patient_id.replace("__", "_")
+    stage_orders = {stage["stage_id"]: int(stage["order"]) for stage in standard["stages"]}
     counters: dict[str, int] = {}
     tasks = []
-    for turn in patient_stages["heldout_turns"]:
-        task_type = turn["role"]
+    evaluation_turns = [
+        turn
+        for stage in standard["stages"]
+        for turn in stage["qa_pairs"]
+        if turn["role"] == "evaluation"
+    ]
+    for turn in evaluation_turns:
+        task_type = f"heldout_{turn['evaluation_type']}"
+        ask_after_stage = turn["ask_after_stage"]
+        if ask_after_stage not in stage_orders:
+            raise ValueError(f"Unknown ask_after_stage: {ask_after_stage}")
         counters[task_type] = counters.get(task_type, 0) + 1
         task_id = f"{prefix}_{task_type}_{counters[task_type]:03d}"
         evidence_ids = select_heldout_evidence(client, task_id, turn["human"], turn["assistant"], index, cache_dir)
+        index.resolve_available(evidence_ids, ask_after_stage, stage_orders)
         task = assemble_heldout_task(
             patient_id=patient_id,
             task_id=task_id,
             task_type=task_type,
-            ask_after_stage="S5_TMJ",
+            ask_after_stage=ask_after_stage,
             turn=turn,
             evidence_ids=evidence_ids,
             index=index,
@@ -86,7 +127,7 @@ def main() -> None:
     # (1) 读取 Step1/Step2 产物
     settings = get_settings()
     out = settings.output_root
-    patient_stages = read_json(out / "stages" / "patient_stages.json")
+    standard = read_json(out / "trajectories" / "standard_trajectory.json")
     evidence_data = read_json(out / "evidence" / "evidence.json")
     evidence_graph = read_json(out / "graph" / "evidence_graph.json")
 
@@ -106,10 +147,10 @@ def main() -> None:
     cache_dir = out / "cache" / "step3"
 
     # (2) LLM 规划并生成普通任务
-    tasks = build_normal_tasks(client, patient_stages, index, cache_dir, verifier_client=verifier_client)
+    tasks = build_normal_tasks(client, standard, index, cache_dir, verifier_client=verifier_client)
 
-    # (3) 拆分 held-out 诊断/治疗任务并由 LLM 归因证据
-    tasks.extend(build_heldout_tasks(client, patient_stages, index, cache_dir))
+    # (3) 从标准轨迹中的 evaluation QA 构造诊断/治疗任务
+    tasks.extend(build_heldout_tasks(client, standard, index, cache_dir))
 
     # (4) 为诊断/治疗任务生成 rubric
     rubrics = {"diagnosis_rubrics": [], "treatment_rubrics": []}
@@ -125,16 +166,16 @@ def main() -> None:
         groups.setdefault(task["task_type"], []).append(task)
 
     tasks_dir = out / "tasks"
-    write_json(tasks_dir / "all_tasks.json", {"patient_id": patient_stages["patient_id"], "tasks": tasks})
+    write_json(tasks_dir / "all_tasks.json", {"patient_id": standard["patient_id"], "tasks": tasks})
     for group_name, items in groups.items():
-        write_json(tasks_dir / f"{group_name}.json", {"patient_id": patient_stages["patient_id"], "tasks": items})
+        write_json(tasks_dir / f"{group_name}.json", {"patient_id": standard["patient_id"], "tasks": items})
 
     rubric_dir = out / "rubrics"
     write_json(rubric_dir / "diagnosis_rubrics.json", rubrics["diagnosis_rubrics"])
     write_json(rubric_dir / "treatment_rubrics.json", rubrics["treatment_rubrics"])
 
     result = {
-        "patient_id": patient_stages["patient_id"],
+        "patient_id": standard["patient_id"],
         "task_count": len(tasks),
         "accepted_count": sum(1 for task in tasks if task.get("validation", {}).get("accepted", True)),
         "group_counts": {name: len(items) for name, items in sorted(groups.items())},
