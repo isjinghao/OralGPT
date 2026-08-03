@@ -10,26 +10,19 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-import types
 from pathlib import Path
 
 BENCH_ROOT = Path(__file__).resolve().parent.parent
 if str(BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(BENCH_ROOT))
 
-if "bench" not in sys.modules:
-    _bench = types.ModuleType("bench")
-    _bench.__path__ = [str(BENCH_ROOT)]
-    sys.modules["bench"] = _bench
-
-from bench.config import get_settings, load_env
-from bench.llm_client import ChatClient
-from bench.step2_evidence.evidence import extract_all_evidence
-from bench.step2_evidence.graph import build_evidence_graph
-from bench.step3_tasks.llm_tasks import generate_rubric, select_heldout_evidence
-from bench.step3_tasks.run_step3_chenfang import build_normal_tasks
-from bench.step3_tasks.selectors import EvidenceIndex, assemble_heldout_task
-
+from config import get_settings, load_env
+from llm_client import ChatClient
+from step2_evidence.evidence import extract_all_evidence
+from step2_evidence.graph import build_evidence_graph
+from step3_tasks.llm_tasks import generate_rubric
+from step3_tasks.run_step3_chenfang import build_evaluation_tasks, build_normal_tasks
+from step3_tasks.selectors import EvidenceIndex
 from step4_evaluation.evaluator import CachedLLM, run_streaming
 from step4_evaluation.memory import build_methods
 from step4_evaluation.report import build_report, format_console
@@ -65,69 +58,6 @@ def run_step2(out: Path, client: ChatClient, settings) -> None:
 
 
 # ------------------------------ step3 ------------------------------
-def build_paper_tasks(client, standard, index, cache_dir):
-    """从标准轨迹中读取任意数量的 treatment/followup evaluation QA。"""
-    patient_id = standard["patient_id"]
-    prefix = patient_id.replace("__", "_")
-    stage_orders = {stage["stage_id"]: stage["order"] for stage in standard["stages"]}
-    counters: dict[str, int] = {}
-    tasks = []
-    evaluation_turns = [
-        {**turn, "source_stage_id": stage["stage_id"]}
-        for stage in standard["stages"]
-        for turn in stage["qa_pairs"]
-        if turn["role"] == "evaluation"
-    ]
-    for turn in evaluation_turns:
-        evaluation_type = turn["evaluation_type"]
-        task_type = f"paper_{evaluation_type}"
-        ask_after_stage = turn["ask_after_stage"]
-        available = index.available_at(ask_after_stage, stage_orders)
-        available_ids = {item["evidence_id"] for item in available}
-        available_graph = {
-            **index.graph,
-            "edges": [
-                edge for edge in index.graph["edges"]
-                if edge["source"] in available_ids and edge["target"] in available_ids
-            ],
-        }
-        available_index = EvidenceIndex(evidence=available, graph=available_graph)
-        counters[task_type] = counters.get(task_type, 0) + 1
-        task_id = f"{prefix}_{task_type}_{counters[task_type]:03d}"
-        evidence_ids = select_heldout_evidence(
-            client,
-            task_id,
-            turn["human"],
-            turn["assistant"],
-            available_index,
-            cache_dir,
-        )
-        task = assemble_heldout_task(
-            patient_id=patient_id,
-            task_id=task_id,
-            task_type=task_type,
-            ask_after_stage=ask_after_stage,
-            turn=turn,
-            evidence_ids=evidence_ids,
-            index=available_index,
-        )
-        task.update(
-            {
-                "release_to_memory": True,
-                "release_after_stage": turn["release_after_stage"],
-                "release_group": evaluation_type,
-                "source_stage_id": turn["source_stage_id"],
-            }
-        )
-        tasks.append(task)
-        print(
-            f"[step3 paper] {task_id} ({task_type}) @ {ask_after_stage} "
-            f"-> release {turn['release_after_stage']} | evidence={len(task['selected_evidence'])}",
-            flush=True,
-        )
-    return tasks
-
-
 def run_step3(out: Path, client: ChatClient, verifier_client: ChatClient) -> None:
     standard = read_json(out / "trajectories" / "standard_trajectory.json")
     evidence_data = read_json(out / "evidence" / "evidence.json")
@@ -136,12 +66,13 @@ def run_step3(out: Path, client: ChatClient, verifier_client: ChatClient) -> Non
     cache_dir = out / "cache" / "step3"
 
     tasks = build_normal_tasks(client, standard, index, cache_dir, verifier_client=verifier_client)
-    tasks.extend(build_paper_tasks(client, standard, index, cache_dir))
+    tasks.extend(build_evaluation_tasks(client, standard, index, cache_dir))
 
-    rubrics = {"diagnosis_rubrics": [], "treatment_rubrics": []}
-    for task in tasks:
-        if task["task_type"] in {"paper_treatment", "paper_followup"}:
-            rubrics["treatment_rubrics"].append(generate_rubric(client, task, cache_dir))
+    treatment_rubrics = [
+        generate_rubric(client, task, cache_dir)
+        for task in tasks
+        if task["task_type"] in {"treatment", "followup"}
+    ]
 
     groups: dict[str, list[dict]] = {}
     for task in tasks:
@@ -151,8 +82,7 @@ def run_step3(out: Path, client: ChatClient, verifier_client: ChatClient) -> Non
     write_json(out / "tasks" / "all_tasks.json", {"patient_id": pid, "tasks": tasks})
     for name, items in groups.items():
         write_json(out / "tasks" / f"{name}.json", {"patient_id": pid, "tasks": items})
-    write_json(out / "rubrics" / "diagnosis_rubrics.json", rubrics["diagnosis_rubrics"])
-    write_json(out / "rubrics" / "treatment_rubrics.json", rubrics["treatment_rubrics"])
+    write_json(out / "rubrics" / "treatment_rubrics.json", treatment_rubrics)
     print(f"[step3] 任务={len(tasks)} 分组={ {k: len(v) for k, v in groups.items()} }", flush=True)
 
 
@@ -165,13 +95,8 @@ def group_tasks_by_stage(tasks: list[dict]) -> dict[str, list[dict]]:
 
 
 def load_rubric_index(out: Path) -> dict[str, dict]:
-    index: dict[str, dict] = {}
-    for name in ("diagnosis_rubrics.json", "treatment_rubrics.json"):
-        path = out / "rubrics" / name
-        if path.exists():
-            for rubric in read_json(path):
-                index[rubric["task_id"]] = rubric
-    return index
+    rubrics = read_json(out / "rubrics" / "treatment_rubrics.json")
+    return {rubric["task_id"]: rubric for rubric in rubrics}
 
 
 def run_step4(

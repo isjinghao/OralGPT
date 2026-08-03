@@ -37,20 +37,15 @@ def node_label(node: dict) -> str:
 
 
 def load_graph(out_dir: Path) -> dict:
-    graph = json.loads((out_dir / "graph" / "evidence_graph.json").read_text(encoding="utf-8"))
-    if not graph.get("nodes"):  # 若图未含节点, 回退到 evidence.json
-        ev = json.loads((out_dir / "evidence" / "evidence.json").read_text(encoding="utf-8"))
-        graph["nodes"] = ev["evidence"]
-    return graph
+    path = out_dir / "graph" / "evidence_graph.json"
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def load_tmonths(out_dir: Path) -> dict[str, int]:
     """从标准轨迹读取每个阶段的 t_months，供图上显示。"""
     path = out_dir / "trajectories" / "standard_trajectory.json"
-    if not path.exists():
-        return {}
-    stages = json.loads(path.read_text(encoding="utf-8")).get("stages", [])
-    return {s["stage_id"]: (s.get("timepoint") or {}).get("t_months") for s in stages}
+    stages = json.loads(path.read_text(encoding="utf-8"))["stages"]
+    return {stage["stage_id"]: stage["timepoint"]["t_months"] for stage in stages}
 
 
 def select_visible(nodes: list[dict]) -> list[dict]:

@@ -1,0 +1,32 @@
+verifier_prompt: |
+  You are evaluating one multimodal perception answer for a dental and maxillofacial benchmark.
+
+  Compare the MODEL ANSWER with the QUESTION, GOLD ANSWER, and the ATOMIC EVIDENCE for this exact source turn.
+
+  Judge atomic clinical claims, not wording. Match synonyms, tolerate small numeric differences, but require correct category, unit, sign, tooth number, and laterality when those attributes are present. A claim is supported only when it is supported by the provided atomic evidence and is within the question scope. Mark a claim as a contradiction when it conflicts with the evidence. Claims not covered by the curated evidence are unsupported, but do not automatically call them hallucinations if they are plausible and not contradicted. Mark hallucination true for fabricated, contradicted, or unjustifiably specific clinical claims; do not mark a justified uncertainty or limitation statement as hallucination.
+
+  Return only valid JSON with this structure:
+  {{
+    "matched_evidence_ids": ["evidence_id"],
+    "predicted_claims": [
+      {{
+        "claim": "atomic claim from the model answer",
+        "matched_evidence_ids": ["evidence_id"],
+        "supported": true,
+        "contradiction": false,
+        "hallucination": false
+      }}
+    ]
+  }}
+
+  QUESTION:
+  {question}
+
+  GOLD ANSWER:
+  {gold_answer}
+
+  ATOMIC EVIDENCE:
+  {evidence}
+
+  MODEL ANSWER:
+  {model_answer}

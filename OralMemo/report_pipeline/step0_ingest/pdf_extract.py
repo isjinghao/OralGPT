@@ -61,18 +61,14 @@ def _block_text(blk: dict) -> str:
     return ""
 
 
-def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path | None = None) -> dict:
+def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
     if images_dir.exists():
         shutil.rmtree(images_dir)  # 清理历史残留图片
     images_dir.mkdir(parents=True, exist_ok=True)
-    rel_base = rel_base or images_dir
 
     def _rel(p: Path) -> str:
-        try:
-            return p.relative_to(rel_base).as_posix()
-        except ValueError:
-            return p.as_posix()
+        return p.relative_to(rel_base).as_posix()
 
     content, auto = _run_mineru(pdf_path, out_dir / "_mineru")
 

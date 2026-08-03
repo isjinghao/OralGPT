@@ -18,7 +18,6 @@ def build_report_dataset_entry(
 
     return {
         "id": patient["patient_id"],
-        "patient_uid": patient["patient_id"],
         "patient_name": patient["name"],
         "group": patient["group"],
         "source_pdf": source_pdf,

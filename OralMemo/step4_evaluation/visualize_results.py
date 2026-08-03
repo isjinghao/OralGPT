@@ -24,6 +24,11 @@ def collect_perception(eval_root: Path) -> dict:
 
     model = read_json(model_path)
     standard = read_json(standard_path) if standard_path.exists() else {"stages": []}
+    report = read_json(report_path) if report_path.exists() else {}
+    evaluated_keys = {
+        (item["stage_id"], item["source_turn_id"])
+        for item in report.get("per_question", [])
+    }
     standard_answers = {
         (stage["stage_id"], qa["source_turn_id"]): qa.get("assistant", "")
         for stage in standard.get("stages", [])
@@ -41,6 +46,9 @@ def collect_perception(eval_root: Path) -> dict:
             ]
             continue
         for qa in stage.get("qa_pairs", []):
+            key = (stage["stage_id"], qa["source_turn_id"])
+            if key not in evaluated_keys:
+                continue
             image_paths = []
             for image_index, image_path in enumerate(qa.get("image_paths", []) or [], start=1):
                 absolute = BENCH_ROOT / image_path
@@ -51,7 +59,6 @@ def collect_perception(eval_root: Path) -> dict:
                 )
                 shutil.copy2(absolute, destination)
                 image_paths.append(Path(os.path.relpath(destination, eval_root)).as_posix())
-            key = (stage["stage_id"], qa["source_turn_id"])
             items.append({
                 "stage_id": stage["stage_id"],
                 "order": stage.get("order", 0),
@@ -64,7 +71,6 @@ def collect_perception(eval_root: Path) -> dict:
                 "image_paths": image_paths,
             })
     items.sort(key=lambda item: item["source_turn_id"])
-    report = read_json(report_path) if report_path.exists() else {}
     return {"profile": profile, "items": items, "report": report}
 
 
@@ -89,8 +95,6 @@ def collect_results(eval_root: Path) -> dict:
             method_report = method_reports.get(method, {})
             per_task = {x["task_id"]: x for x in method_report.get("per_task", [])}
             detail_by_task = {}
-            if method_report.get("diagnosis"):
-                detail_by_task[method_report["diagnosis"]["task_id"]] = method_report["diagnosis"]
             for item in method_report.get("tps", {}).get("per_task", []) or []:
                 detail_by_task[item["task_id"]] = item
 
@@ -254,8 +258,8 @@ const TASK_TYPE_LABELS = {
   longitudinal_evidence_recall:'纵向证据任务',
   cross_modal_reasoning:'跨模态推理任务',
   memory_update_conflict_correction:'记忆更新/冲突纠正任务',
-  heldout_diagnosis:'诊断任务',
-  heldout_treatment:'治疗任务'
+  treatment:'治疗任务',
+  followup:'随访任务'
 };
 const STAGE_LABELS = {
   S0_PROFILE:'基本信息阶段', S1_FP:'面像照片阶段', S2_DP:'口内照片阶段',
@@ -358,14 +362,14 @@ function renderSummary(){
   $('summary').innerHTML = methods.map(m => {
     const acc = m.acc?.overall || {};
     const ers = m.ers?.overall || {};
-    const diag = m.diagnosis?.percent;
     const treatment = m.tps?.overall_percent;
+    const followup = m.followup?.overall_percent;
     return `<div class="metric-card">
       <h3>${esc(methodLabel(m.method))}</h3>
       ${statLine('准确率（ACC）', `${pct(acc.score)} (${ratio(acc.correct, acc.total)})`)}
       ${statLine('证据召回分数（ERS）', `${pct(ers.score)} (${ratio(ers.covered, ers.total)})`)}
-      ${statLine('诊断分', pct(diag))}
       ${statLine('治疗分', pct(treatment))}
+      ${statLine('随访分', pct(followup))}
     </div>`;
   }).join('');
 }

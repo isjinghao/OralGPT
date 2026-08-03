@@ -52,10 +52,7 @@ STAGE_DEFS = [
 
 
 def classify_turn(human: str) -> str:
-    """依据 human 提问文本匹配模态, 返回标签之一: profile / FP / DP / ceph / panoramic / CT / TMJ / ECT / diagnosis / treatment。
-    输入: human - 该轮 human 提问原文(可含 <image> 占位符)。
-    输出: str - 模态标签。
-    """
+    """依据 human 提问文本匹配模态；诊断与治疗问题统一返回 treatment。"""
     t = human.lower()
     # 1. ECT(纯文本, 无图片): 紧随 TMJ 的髁突稳定性问诊。
     if "single-photon emission" in t or "(ect)" in t:
@@ -87,22 +84,12 @@ def classify_turn(human: str) -> str:
         or "chief complaint" in t
     ):
         return "profile"
-    # 9. 诊断(置于 profile 之后, 避免 primary concern 误判)
-    if "what is the diagnosis" in t or "diagnosis based on" in t:
-        return "diagnosis"
-    # 10. 其余问诊轮均视为治疗规划
+    # 9. 诊断与其余决策问题统一视为治疗规划
     return "treatment"
 
 
 def build_patient_stages(source_turns: list[dict]) -> dict:
-    """按临床释放顺序切分阶段(语义驱动, 动态映射 source_turn_ids)。
-
-    功能: 先用 classify_turn 给每个问答轮打模态标签, 再按 STAGE_DEFS 把对应标签的轮次组装为 6 个阶段(含图片与 QA); 缺失模态的阶段 source_turn_ids/image_paths/qa_pairs 均留空。
-        诊断轮 → heldout_diagnosis, 其余未归入检查阶段的轮(治疗等) → heldout_treatment。
-        ECT 轮归入 S5_TMJ。
-    输入: source_turns - build_source_turns 产出的轮次列表。
-    输出: dict - 含 patient 信息和完整 stages 的轨迹源对象；治疗/诊断问题以 evaluation QA 保存。
-    """
+    """按临床释放顺序切分阶段；诊断和治疗统一进入 `S6_TREATMENT`。"""
     # 按模态标签归集轮次(保持原始 source_turn_id 顺序)。
     label_to_turns: dict[str, list[dict]] = defaultdict(list)
     for src in source_turns:
@@ -119,7 +106,6 @@ def build_patient_stages(source_turns: list[dict]) -> dict:
 
         turns = []
         image_paths = []
-        source_turn_ids = []
         for src in collected:
             turns.append(
                 {
@@ -131,7 +117,6 @@ def build_patient_stages(source_turns: list[dict]) -> dict:
                 }
             )
             image_paths.extend(src["image_paths"])
-            source_turn_ids.append(src["source_turn_id"])
 
         stages.append(
             {
@@ -139,35 +124,30 @@ def build_patient_stages(source_turns: list[dict]) -> dict:
                 "order": stage_def["order"],
                 "stage_type": stage_def["stage_type"],
                 "modality": stage_def["modality"],
-                "source_turn_ids": source_turn_ids,  # 缺失模态时为 []
                 "image_paths": image_paths,
                 "qa_pairs": turns,
             }
         )
 
-    evaluation_turns = []
-    for evaluation_type, label in (("diagnosis", "diagnosis"), ("treatment", "treatment")):
-        for src in sorted(label_to_turns.get(label, []), key=lambda s: s["source_turn_id"]):
-            evaluation_turns.append(
-                {
-                    "source_turn_id": src["source_turn_id"],
-                    "human": src["human"],
-                    "assistant": src["assistant"],
-                    "image_paths": src["image_paths"],
-                    "role": "evaluation",
-                    "evaluation_type": evaluation_type,
-                    "ask_after_stage": "S5_TMJ",
-                    "release_after_stage": "S6_EVALUATION",
-                }
-            )
+    evaluation_turns = [
+        {
+            "source_turn_id": src["source_turn_id"],
+            "human": src["human"],
+            "assistant": src["assistant"],
+            "image_paths": src["image_paths"],
+            "role": "evaluation",
+            "ask_after_stage": "S5_TMJ",
+            "release_after_stage": "S6_TREATMENT",
+        }
+        for src in label_to_turns.get("treatment", [])
+    ]
     if evaluation_turns:
         stages.append(
             {
-                "stage_id": "S6_EVALUATION",
+                "stage_id": "S6_TREATMENT",
                 "order": len(stages),
                 "stage_type": "treatment",
                 "modality": ["TEXT_QA"],
-                "source_turn_ids": [turn["source_turn_id"] for turn in evaluation_turns],
                 "image_paths": [],
                 "qa_pairs": evaluation_turns,
             }

@@ -28,12 +28,16 @@ def build_standard_trajectory(patient_stages: dict) -> dict:
     trajectory = {
         "trajectory_id": f"{patient_stages['patient_id']}__standard_full",
         "patient_id": patient_stages["patient_id"],
-        "trajectory_type": "standard_full",
-        "stages": [_stage_input(stage) for stage in patient_stages["stages"]],
     }
     for key in ("patient_name", "group"):
         if key in patient_stages:
             trajectory[key] = patient_stages[key]
+    trajectory.update(
+        {
+            "trajectory_type": "standard_full",
+            "stages": [_stage_input(stage) for stage in patient_stages["stages"]],
+        }
+    )
     return trajectory
 
 

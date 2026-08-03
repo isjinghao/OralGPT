@@ -9,10 +9,10 @@ from step3_tasks.llm_tasks import (
     finalize_task,
     generate_rubric,
     plan_normal_tasks,
-    select_heldout_evidence,
+    select_evaluation_evidence,
     validate_task_plan,
 )
-from step3_tasks.selectors import EvidenceIndex, assemble_heldout_task, assemble_normal_task
+from step3_tasks.selectors import EvidenceIndex, assemble_evaluation_task, assemble_normal_task
 
 
 def read_json(path: Path) -> dict:
@@ -71,7 +71,6 @@ def build_normal_tasks(
             cache_dir,
             verifier_client=verifier_client,
         )
-        task["plan_validation"] = plan_validation
         if not task["validation"].get("accepted"):
             dropped += 1
             print(f"  dropped (validation failed after retries): {spec['task_id']}", flush=True)
@@ -83,43 +82,52 @@ def build_normal_tasks(
     return tasks
 
 
-def build_heldout_tasks(client: ChatClient, standard: dict, index: EvidenceIndex, cache_dir: Path) -> list[dict]:
-    # 从标准轨迹读取诊断/治疗 evaluation QA。
+def build_evaluation_tasks(client: ChatClient, standard: dict, index: EvidenceIndex, cache_dir: Path) -> list[dict]:
+    """从标准轨迹构造 treatment/followup evaluation 任务。"""
     patient_id = standard["patient_id"]
     prefix = patient_id.replace("__", "_")
     stage_orders = {stage["stage_id"]: int(stage["order"]) for stage in standard["stages"]}
     counters: dict[str, int] = {}
     tasks = []
-    evaluation_turns = [
-        turn
-        for stage in standard["stages"]
-        for turn in stage["qa_pairs"]
-        if turn["role"] == "evaluation"
-    ]
-    for turn in evaluation_turns:
-        task_type = f"heldout_{turn['evaluation_type']}"
-        ask_after_stage = turn["ask_after_stage"]
-        if ask_after_stage not in stage_orders:
-            raise ValueError(f"Unknown ask_after_stage: {ask_after_stage}")
-        counters[task_type] = counters.get(task_type, 0) + 1
-        task_id = f"{prefix}_{task_type}_{counters[task_type]:03d}"
-        evidence_ids = select_heldout_evidence(client, task_id, turn["human"], turn["assistant"], index, cache_dir)
-        index.resolve_available(evidence_ids, ask_after_stage, stage_orders)
-        task = assemble_heldout_task(
-            patient_id=patient_id,
-            task_id=task_id,
-            task_type=task_type,
-            ask_after_stage=ask_after_stage,
-            turn=turn,
-            evidence_ids=evidence_ids,
-            index=index,
-        )
-        print(
-            f"[Step3 heldout] {task_id} ({task_type}) <- turn {turn['source_turn_id']} "
-            f"| evidence={len(task['selected_evidence'])}",
-            flush=True,
-        )
-        tasks.append(task)
+    for stage in standard["stages"]:
+        task_type = stage["stage_type"]
+        for turn in stage["qa_pairs"]:
+            if turn["role"] != "evaluation":
+                continue
+            ask_after_stage = turn["ask_after_stage"]
+            available = index.available_at(ask_after_stage, stage_orders)
+            available_ids = {item["evidence_id"] for item in available}
+            available_graph = {
+                "edges": [
+                    edge for edge in index.graph["edges"]
+                    if edge["source"] in available_ids and edge["target"] in available_ids
+                ]
+            }
+            available_index = EvidenceIndex(evidence=available, graph=available_graph)
+            counters[task_type] = counters.get(task_type, 0) + 1
+            task_id = f"{prefix}_{task_type}_{counters[task_type]:03d}"
+            evidence_ids = select_evaluation_evidence(
+                client,
+                task_id,
+                turn["human"],
+                turn["assistant"],
+                available_index,
+                cache_dir,
+            )
+            task = assemble_evaluation_task(
+                patient_id=patient_id,
+                task_id=task_id,
+                task_type=task_type,
+                turn=turn,
+                evidence_ids=evidence_ids,
+                index=available_index,
+            )
+            tasks.append(task)
+            print(
+                f"[Step3 evaluation] {task_id} ({task_type}) @ {ask_after_stage} "
+                f"-> release {turn['release_after_stage']} | evidence={len(task['selected_evidence'])}",
+                flush=True,
+            )
     return tasks
 
 
@@ -149,16 +157,15 @@ def main() -> None:
     # (2) LLM 规划并生成普通任务
     tasks = build_normal_tasks(client, standard, index, cache_dir, verifier_client=verifier_client)
 
-    # (3) 从标准轨迹中的 evaluation QA 构造诊断/治疗任务
-    tasks.extend(build_heldout_tasks(client, standard, index, cache_dir))
+    # (3) 从标准轨迹中的 evaluation QA 构造治疗/随访任务
+    tasks.extend(build_evaluation_tasks(client, standard, index, cache_dir))
 
-    # (4) 为诊断/治疗任务生成 rubric
-    rubrics = {"diagnosis_rubrics": [], "treatment_rubrics": []}
-    for task in tasks:
-        if task["task_type"] == "heldout_diagnosis":
-            rubrics["diagnosis_rubrics"].append(generate_rubric(client, task, cache_dir))
-        elif task["task_type"] == "heldout_treatment":
-            rubrics["treatment_rubrics"].append(generate_rubric(client, task, cache_dir))
+    # (4) 为治疗/随访任务生成 rubric
+    treatment_rubrics = [
+        generate_rubric(client, task, cache_dir)
+        for task in tasks
+        if task["task_type"] in {"treatment", "followup"}
+    ]
 
     # (5) 写 all_tasks.json、各分组 json 与 rubric 文件
     groups: dict[str, list[dict]] = {}
@@ -171,15 +178,13 @@ def main() -> None:
         write_json(tasks_dir / f"{group_name}.json", {"patient_id": standard["patient_id"], "tasks": items})
 
     rubric_dir = out / "rubrics"
-    write_json(rubric_dir / "diagnosis_rubrics.json", rubrics["diagnosis_rubrics"])
-    write_json(rubric_dir / "treatment_rubrics.json", rubrics["treatment_rubrics"])
+    write_json(rubric_dir / "treatment_rubrics.json", treatment_rubrics)
 
     result = {
         "patient_id": standard["patient_id"],
         "task_count": len(tasks),
-        "accepted_count": sum(1 for task in tasks if task.get("validation", {}).get("accepted", True)),
         "group_counts": {name: len(items) for name, items in sorted(groups.items())},
-        "rubric_counts": {key: len(value) for key, value in rubrics.items()},
+        "rubric_count": len(treatment_rubrics),
     }
     print(json.dumps(result, ensure_ascii=False, indent=2))
 

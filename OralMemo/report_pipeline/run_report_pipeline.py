@@ -16,7 +16,7 @@ from llm_client import ChatClient
 from report_pipeline.step0_ingest.pdf_extract import extract_pdf
 from report_pipeline.step1_report_trajectory.qa_render import normalize_timepoints, render_turns
 from report_pipeline.step0_ingest.timeline_llm import extract_timeline
-from report_pipeline.step0_ingest.verify_llm import high_severity_issues, verify_timeline
+from report_pipeline.step0_ingest.verify_llm import verify_timeline
 from report_pipeline.step1_report_trajectory.report_dataset import build_report_dataset_entry
 from report_pipeline.step1_report_trajectory.report_stages import build_report_stages
 from step1_patient_trajectory.trajectories import build_standard_trajectory
@@ -44,25 +44,25 @@ def extract_with_feedback(
         timeline = extract_timeline(extract_client, raw_dir, figures, feedback_issues=feedback)
 
         print(f"[loop {it}/{max_iters}] 校验模型核验 ...", flush=True)
-        verification = verify_timeline(verifier_client, raw_dir, timeline, captions=figures)
-        highs = high_severity_issues(verification)
+        verification = verify_timeline(verifier_client, raw_dir, timeline, figures)
         feedback = [
             issue for issue in verification["issues"]
             if issue["severity"] in ("high", "medium")
         ]
+        n_high = sum(issue["severity"] == "high" for issue in feedback)
         history.append(
             {
                 "iteration": it,
                 "passed": verification["passed"],
                 "n_issues": len(verification["issues"]),
-                "n_high": len(highs),
+                "n_high": n_high,
                 "n_actionable": len(feedback),
                 "verification": verification,
             }
         )
         print(
             f"[loop {it}/{max_iters}] passed={verification['passed']} "
-            f"issues={len(verification['issues'])} high={len(highs)} "
+            f"issues={len(verification['issues'])} high={n_high} "
             f"actionable={len(feedback)}",
             flush=True,
         )
@@ -137,9 +137,7 @@ def main() -> None:
     write_json(out_dir / "timeline.extracted.json", timeline)
     write_json(out_dir / "verification_report.json", verif_history)
     final = verif_history[-1]
-    final_passed = bool(
-        final["passed"] and final["n_high"] == 0 and final["n_actionable"] == 0
-    )
+    final_passed = bool(final["passed"] and final["n_actionable"] == 0)
 
     # Step1: 阶段化 + 轨迹 + 数据集
     print("[step1] 规整时间点 / 问答构造 / 组装数据集 / 切分阶段 / 构造标准轨迹")

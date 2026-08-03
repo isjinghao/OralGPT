@@ -1,4 +1,4 @@
-"""Step5 评分: base 任务 ACC / ERS 与 rubric 清单打分 (TPS / 诊断)。"""
+"""Step5 评分: base 任务 ACC / ERS 与 rubric 清单打分。"""
 from __future__ import annotations
 
 import json
@@ -104,7 +104,7 @@ def judge_evidence(llm: CachedLLM, record: dict) -> dict:
 
 
 def judge_rubric(llm: CachedLLM, record: dict, rubric: dict) -> dict:
-    # 按 rubric 清单为一条治疗/诊断作答打分
+    # 按 rubric 清单为一条治疗/随访作答打分
     criteria_defs = rubric.get("criteria", [])
     payload = [
         {
@@ -123,42 +123,31 @@ def judge_rubric(llm: CachedLLM, record: dict, rubric: dict) -> dict:
     )
     data = llm.complete(prompt, cache_key=f"rubric_{record['task_id']}", max_tokens=16000)
 
-    # 先按名字收集模型给分与理由
-    awarded_by_name: dict[str, float] = {}
-    reason_by_name: dict[str, str] = {}
-    for item in data.get("criteria", []) or []:
-        nm = str(item.get("name", "")).strip()
-        awarded_by_name[nm] = float(item.get("awarded", 0) or 0)
-        reason_by_name[nm] = str(item.get("reason", "") or "")
+    graded = data["criteria"]
+    graded_by_name = {str(item["name"]).strip(): item for item in graded}
+    expected_names = {str(item["name"]).strip() for item in criteria_defs}
+    if len(graded_by_name) != len(graded) or set(graded_by_name) != expected_names:
+        raise ValueError(f"Rubric criteria mismatch for task {record['task_id']}")
 
     detailed = []
     total_awarded = 0.0
-    graded = data.get("criteria", []) or []
-
-    # 按原始 rubric 顺序逐项处理，本地代码不直接信大模型的总分
-    for idx, c in enumerate(criteria_defs):
-        max_score = float(c["score"])
-        name = c["name"]
-        # 优先按 name 对齐
-        if name.strip() in awarded_by_name:
-            raw = awarded_by_name[name.strip()]
-            reason = reason_by_name.get(name.strip(), "")
-        # 如果名字没对上，就按顺序兜底
-        elif idx < len(graded):
-            try:
-                raw = float(graded[idx].get("awarded", 0) or 0)
-            except (TypeError, ValueError):
-                raw = 0.0
-            reason = str(graded[idx].get("reason", "") or "")
-        else:
-            raw = 0.0
-            reason = ""
-        # 封顶
+    for criterion in criteria_defs:
+        max_score = float(criterion["score"])
+        name = str(criterion["name"]).strip()
+        graded_item = graded_by_name[name]
+        raw = float(graded_item["awarded"])
         awarded = max(0.0, min(max_score, raw))
         total_awarded += awarded
-        detailed.append({"name": name, "max": max_score, "awarded": awarded, "reason": reason})
+        detailed.append({
+            "name": name,
+            "max": max_score,
+            "awarded": awarded,
+            "reason": str(graded_item.get("reason", "")),
+        })
 
-    max_total = float(sum(c["score"] for c in criteria_defs)) or float(rubric.get("max_score", 0)) or 1.0
+    max_total = float(sum(criterion["score"] for criterion in criteria_defs))
+    if max_total <= 0:
+        raise ValueError(f"Rubric max score must be positive: {record['task_id']}")
     return {
         "awarded": round(total_awarded, 2),
         "max_total": round(max_total, 2),

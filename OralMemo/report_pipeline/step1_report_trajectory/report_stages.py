@@ -17,7 +17,6 @@ def _qa_from_turn(
     if turn["role"] == "evaluation":
         qa.update(
             {
-                "evaluation_type": turn["stage_type"],
                 "ask_after_stage": ask_after_stage,
                 "release_after_stage": release_after_stage,
             }
@@ -84,7 +83,6 @@ def build_report_stages(
                     "date_text": timepoint["date_text"],
                     "t_months": timepoint["t_months"],
                 },
-                "source_turn_ids": [qa["source_turn_id"] for qa in qa_pairs],
                 "image_paths": [path for qa in observations for path in qa["image_paths"]],
                 "qa_pairs": qa_pairs,
             }

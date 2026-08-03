@@ -163,7 +163,7 @@ python step4_evaluation/run_step4_chenfang.py
 
 | Step2 | `evidence/evidence.json`、`cache/evidence_*.json` |
 | Step2 可视化 | `graph/evidence_graph.json`、`graph/evidence_graph.html` |
-| Step3 | `tasks/all_tasks.json` 及按类型分组的 6 个 json、`rubrics/{diagnosis,treatment}_rubrics.json`、`cache/step3/...` |
+| Step3 | `tasks/all_tasks.json` 及按实际任务类型分组的 JSON、`rubrics/treatment_rubrics.json`、`cache/step3/...` |
 | Step4 | `evaluation/<轨迹>[_mm]/answers_<方法>.json`、`report.json`、`report.txt`、`cache/step4/...` |
 
 ---
@@ -180,7 +180,8 @@ python step4_evaluation/run_step4_chenfang.py
 | `S3_XR_XLA` | 头影测量 + 全景片 | XR, XLData | 7,9 |
 | `S4_CT` | 三维 CT | CT | 8 |
 | `S5_TMJ` | 颞下颌关节 | TMJ | 6 |
-| held-out | 诊断 / 治疗（金标准） | — | 10（诊断），11–18（治疗） |
+| `S6_TREATMENT` | 诊断与治疗 evaluation（金标准） | TEXT_QA | 10–18 |
+
 
 ### 任务类型
 
@@ -190,8 +191,9 @@ python step4_evaluation/run_step4_chenfang.py
 | `longitudinal_evidence_recall` | 2 | 纵向证据回忆 |
 | `cross_modal_reasoning` | 2 | 跨模态整合推理 |
 | `memory_update_conflict_correction` | 2 | 记忆更新 / 冲突纠正 |
-| `heldout_diagnosis` | 1 | 综合诊断（held-out Q10，原始 QA 直用，不改写） |
-| `heldout_treatment` | 8 | 治疗方案（held-out Q11–Q18，每题一个任务，原始 QA 直用，不改写） |
+| `treatment` | 9 | 诊断与治疗 evaluation（Q10–Q18，每题一个任务，原始 QA 直用，不改写） |
+
+
 
 ---
 
@@ -239,9 +241,10 @@ python step4_evaluation/run_step4_chenfang.py --methods single_stage_memory,summ
 | 指标 | 适用任务 | 说明 |
 | --- | --- | --- |
 | **ACC** | base 任务（感知/纵向证据/跨模态/记忆更新） | LLM 裁判二元判定准确率；另按任务类型、模态细分 |
-| **ERS** | 全部任务（感知/纵向证据/跨模态/记忆更新/诊断/治疗） | benchmark 生成阶段预先筛选的 `selected_evidence` 中，被模型答案正确覆盖的证据数 / 证据总数；所有任务统一口径，另按任务类型、模态细分 |
-| **Diagnosis** | `heldout_diagnosis` | 按诊断 rubric 打分（百分比） |
-| **TPS** | `heldout_treatment` | 各治疗任务 rubric 得分的均值（百分比） |
+| **ERS** | 全部任务（感知/纵向证据/跨模态/记忆更新/治疗） | benchmark 生成阶段预先筛选的 `selected_evidence` 中，被模型答案正确覆盖的证据数 / 证据总数；所有任务统一口径，另按任务类型、模态细分 |
+| **TPS** | `treatment` | 所有诊断与治疗 evaluation 的 rubric 得分均值（百分比） |
+
+
 
 ### 产物（`outputs/.../evaluation/<轨迹>[_mm]/`）
 

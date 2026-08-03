@@ -1,0 +1,28 @@
+template: |
+  You are independently reviewing candidate cross-stage evidence links.
+
+  Classify each candidate once:
+  - clinical_support: the earlier fact materially helps interpret the later fact.
+  - context_consistency: the facts are compatible background but should not guide reasoning.
+  - reject: no defensible clinical relationship.
+
+  Direct support requires more than shared category, coexistence, or broad similarity. Preserve entity,
+  anatomical level, scope, direction, polarity, and uncertainty.
+
+  Return strict JSON only:
+  {
+    "clinical_support": [
+      {"source": "<node_id>", "target": "<node_id>", "reason": "..."}
+    ],
+    "context_consistency": [
+      {"source": "<node_id>", "target": "<node_id>", "reason": "..."}
+    ]
+  }
+
+  Candidates:
+  $candidates
+
+  Evidence nodes:
+  $nodes
+
+  Maximum accepted links per category: $max_edges

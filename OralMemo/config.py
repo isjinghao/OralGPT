@@ -74,7 +74,7 @@ def _model_config(prefix: str) -> ModelConfig:
             f"{prefix}_OPENAI_BASE_URL",
             "OPENAI_BASE_URL",
             default="https://api.openai.com/v1",
-        ).rstrip("/"),
+        ),
         model=_env_first(f"{prefix}_OPENAI_MODEL", "OPENAI_MODEL", default="qwen3.6-chat"),
     )
 

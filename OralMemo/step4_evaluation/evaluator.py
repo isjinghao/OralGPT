@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import mimetypes
 from pathlib import Path
@@ -11,8 +12,6 @@ from step4_evaluation.templating import render
 
 
 class CachedLLM:
-    """对 ChatClient 的缓存封装: 相同 cache_key 直接读磁盘, 避免重复调用。"""
-
     def __init__(self, client, cache_dir: Path) -> None:
         self.client = client
         self.cache_dir = cache_dir
@@ -20,9 +19,31 @@ class CachedLLM:
         self.calls = 0
         self.hits = 0
 
+    def _cache_path(
+        self,
+        cache_key: str,
+        prompt: str,
+        temperature: float,
+        max_tokens: int,
+        images: list[str] | None,
+    ) -> Path:
+        payload = json.dumps(
+            {
+                "model": self.client.model,
+                "prompt": prompt,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+                "images": images or [],
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+        digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+        return self.cache_dir / f"{cache_key}_{digest}.json"
+
     def complete(self, prompt: str, cache_key: str, max_tokens: int = 8000,
                  temperature: float = 0.0, images: list[str] | None = None) -> dict:
-        path = self.cache_dir / f"{cache_key}.json"
+        path = self._cache_path(cache_key, prompt, temperature, max_tokens, images)
         if path.exists():
             self.hits += 1
             return json.loads(path.read_text(encoding="utf-8"))
@@ -33,10 +54,10 @@ class CachedLLM:
 
     def complete_text(self, prompt: str, cache_key: str, max_tokens: int = 8000,
                       temperature: float = 0.0, images: list[str] | None = None) -> str:
-        # 纯文本作答的缓存封装; 缓存沿用 {"answer": ...} 格式以兼容既有缓存
-        path = self.cache_dir / f"{cache_key}.json"
+        path = self._cache_path(cache_key, prompt, temperature, max_tokens, images)
         if path.exists():
-            return json.loads(path.read_text(encoding="utf-8")).get("answer", "")
+            self.hits += 1
+            return json.loads(path.read_text(encoding="utf-8"))["answer"]
         text = self.client.complete_text(prompt, temperature=temperature, max_tokens=max_tokens, images=images)
         path.write_text(json.dumps({"answer": text}, ensure_ascii=False, indent=2), encoding="utf-8")
         self.calls += 1
@@ -53,7 +74,7 @@ def encode_image(path: Path) -> str | None:
 
 
 def gather_image_urls(method: MemoryMethod, image_root: Path) -> list[str]:
-    # 把记忆中的图片路径转成可传给大模型的 data URL 列表
+    # 把记忆中的图片路径转成 data URL 列表
     urls: list[str] = []
     for rel in method.images():
         url = encode_image(image_root / rel)
@@ -85,7 +106,6 @@ def answer_question(method: MemoryMethod, task: dict, llm: CachedLLM, image_root
         "gold_answer": task.get("gold_answer", ""),
         "model_answer": answer,
         "selected_evidence": task.get("selected_evidence", []),
-        "validation_accepted": task.get("validation", {}).get("accepted", True),
         "n_images": len(images) if images else 0,
     }
 
@@ -101,10 +121,7 @@ def _release_task_answers(
         return
     qa_pairs = []
     for record in records:
-        use_gold = (
-            record.get("release_group") == "treatment"
-            and release_treatment_ground_truth
-        )
+        use_gold = record["task_type"] == "treatment" and release_treatment_ground_truth
         qa_pairs.append(
             {
                 "source_turn_id": record["task_id"],
@@ -112,13 +129,12 @@ def _release_task_answers(
                 "assistant": record["gold_answer"] if use_gold else record["model_answer"],
                 "image_paths": [],
                 "role": "observation",
-
             }
         )
     release_stage = {
         "stage_id": f"{stage_id}__evaluation_release",
         "order": 0,
-        "stage_type": "treatment" if records[0].get("release_group") == "treatment" else "followup",
+        "stage_type": records[0]["task_type"],
         "modality": ["TEXT_QA"],
         "image_paths": [],
         "qa_pairs": qa_pairs,
@@ -166,23 +182,14 @@ def run_streaming(
             stage_id,
             release_treatment_ground_truth,
         )
-        stage_records: list[dict] = []
         for task in tasks_by_stage.get(stage_id, []):
-
             print(f"  [{method.name}] answer {task['task_id']} @ {stage_id}", flush=True)
             record = answer_question(method, task, llm, image_root)
-            record.update(
-                {
-                    "release_to_memory": bool(task.get("release_to_memory")),
-                    "release_after_stage": task.get("release_after_stage"),
-                    "release_group": task.get("release_group"),
-                }
-            )
             records.append(record)
-            stage_records.append(record)
-        for record in stage_records:
-            if record["release_to_memory"]:
-                pending_releases.setdefault(record["release_after_stage"], []).append(record)
+            release_after_stage = task.get("release_after_stage")
+            if release_after_stage is not None:
+                record["release_after_stage"] = release_after_stage
+                pending_releases.setdefault(release_after_stage, []).append(record)
         _release_task_answers(
             method,
             pending_releases.pop(stage_id, []),
@@ -190,7 +197,6 @@ def run_streaming(
             stage_id,
             release_treatment_ground_truth,
         )
-
 
     if pending_releases:
         raise ValueError(f"Unreached evaluation release stages: {sorted(pending_releases)}")

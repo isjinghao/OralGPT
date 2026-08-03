@@ -36,23 +36,16 @@ def group_tasks_by_stage(tasks: list[dict]) -> dict[str, list[dict]]:
 
 
 def load_rubric_index(out: Path) -> dict[str, dict]:
-    index: dict[str, dict] = {}
-    for name in ("diagnosis_rubrics.json", "treatment_rubrics.json"):
-        path = out / "rubrics" / name
-        if path.exists():
-            for rubric in read_json(path):
-                index[rubric["task_id"]] = rubric
-    return index
+    rubrics = read_json(out / "rubrics" / "treatment_rubrics.json")
+    return {rubric["task_id"]: rubric for rubric in rubrics}
 
 
 def resolve_trajectory_path(out: Path, name: str) -> Path:
-    # 把轨迹名解析为文件路径
-    if name in ("standard", "standard_full", "standard_trajectory"):
+    if name == "standard":
         return out / "trajectories" / "standard_trajectory.json"
-    if name in ("model_perception", "model_perception_trajectory"):
+    if name == "model_perception":
         return out / "trajectories" / "model_perception_trajectory.json"
     return out / "variants" / f"{name}.json"
-
 
 
 def evaluate_trajectory(
@@ -67,7 +60,6 @@ def evaluate_trajectory(
     image_root: Path | None = None,
 ) -> dict:
     # 对单条轨迹跑选定记忆方法并打分, 返回报告
-    # 缓存/输出按 trajectory_type(及模态)隔离
     ttype = trajectory["trajectory_type"]
     mode = "multimodal" if multimodal else "text"
     suffix = "_mm" if multimodal else ""
@@ -127,7 +119,7 @@ def main() -> None:
     multimodal = args.multimodal
     methods = args.methods
     names = args.trajectories or ["standard"]
-    
+
     # 轨迹里的图片路径
     image_root = BENCH_ROOT if multimodal else None
 
@@ -156,9 +148,6 @@ def main() -> None:
     reports = []
     for name in names:
         path = resolve_trajectory_path(out, name)
-        if not path.exists():
-            print(f"[skip] trajectory file not found: {path}", flush=True)
-            continue
         reports.append(evaluate_trajectory(
             read_json(path), tasks_by_stage, rubric_by_task, answer_client, verifier_client, out,
             methods, multimodal, image_root,
@@ -167,7 +156,7 @@ def main() -> None:
     # 跨轨迹总览
     if len(reports) > 1:
         print("\n\n########## Cross-trajectory summary (summary_memory baseline) ##########")
-        header = f"{'Trajectory':<20}{'ACC(mem)':>14}{'ERS(mem)':>14}{'Diag(mem)':>14}{'TPS(mem)':>14}"
+        header = f"{'Trajectory':<20}{'ACC(mem)':>14}{'ERS(mem)':>14}{'TPS(mem)':>14}"
         print(header)
         print("-" * len(header))
         for rep in reports:
@@ -176,9 +165,8 @@ def main() -> None:
                 continue
             acc = f"{mem['acc']['overall']['score']:.1f}%"
             ers = f"{mem['ers']['overall']['score']:.1f}%"
-            diag = f"{mem['diagnosis']['percent']:.1f}%" if mem.get("diagnosis") else "n/a"
             tps = f"{mem['tps']['overall_percent']:.1f}%" if mem['tps']['overall_percent'] is not None else "n/a"
-            print(f"{rep['trajectory_type']:<20}{acc:>14}{ers:>14}{diag:>14}{tps:>14}")
+            print(f"{rep['trajectory_type']:<20}{acc:>14}{ers:>14}{tps:>14}")
 
 
 if __name__ == "__main__":

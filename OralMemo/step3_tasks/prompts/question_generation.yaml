@@ -27,8 +27,7 @@ template: |
 
   Return schema:
   {
-    "question": "...",
-    "clinical_chain": "..."
+    "question": "..."
   }
 
   Patient: $patient_id

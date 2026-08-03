@@ -17,16 +17,15 @@ def format_stage_input(stage: dict) -> str:
     image_paths = collect_stage_images(stage)
     lines = [f"[Stage {stage['stage_id']} | modality: {modality} | images: {len(image_paths)}]"]
     for qa in stage["qa_pairs"]:
-        if qa["role"] != "observation":
-
+        role = qa["role"]
+        if role == "evaluation":
             continue
+        if role != "observation":
+            raise ValueError(f"Unsupported QA role in trajectory: {role}")
         human = (qa.get("human") or "").replace("<image>", "").strip()
-
         assistant = (qa.get("assistant") or "").strip()
         noise_category = qa.get("noise_category")
         tag = f" [noise:{noise_category}]" if noise_category else ""
-
-
         lines.append(f"Q{tag}: {human}")
         lines.append(f"A: {assistant}")
     return "\n".join(lines)

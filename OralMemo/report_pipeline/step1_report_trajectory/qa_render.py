@@ -144,7 +144,6 @@ def render_turns(normed_timepoints: list[dict], images_map: dict) -> list[dict]:
                 {
                     "source_turn_id": source_turn_id,
                     "stage_id": timepoint["stage_id"],
-                    "stage_type": timepoint["stage_type"],
                     "role": role,
                     "human": prefix_images(question, len(images)),
                     "assistant": answer,

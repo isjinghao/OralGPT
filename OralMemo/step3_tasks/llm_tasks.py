@@ -210,19 +210,16 @@ def finalize_task(
     task = dict(spec)
     feedback: dict | None = None
     validation: dict = {}
-    history: list[dict] = []
     current_gold = spec["gold_answer"]
     for it in range(1, max_iters + 1):
         # (1) 生成问题(可带上一轮反馈, 使用当前(可能已修复的)金标准)
         candidate = generate_question(client, spec, cache_dir, feedback=feedback,
                                       attempt=it, gold_answer=current_gold)
         task["question"] = candidate["question"]
-        task["clinical_chain"] = candidate.get("clinical_chain", "")
         task["gold_answer"] = current_gold
 
         # (2) 使用所选证据与完整可用历史验证问题和答案
         validation = validate_task(verifier, task, available_evidence, cache_dir, attempt=it)
-        history.append({"iteration": it, "accepted": validation.get("accepted")})
         print(f"  [loop {it}/{max_iters}] accepted={validation.get('accepted')}", flush=True)
         if validation.get("accepted"):
             # 校验通过时也应用其给出的修正(如修剪后的金标准/问题)
@@ -241,18 +238,17 @@ def finalize_task(
 
     task["gold_answer"] = current_gold
     task["validation"] = validation
-    task["validation_history"] = history
     return task
 
 
-def select_heldout_evidence(client: ChatClient, task_id: str, question: str, answer: str, index: EvidenceIndex, cache_dir: Path) -> list[str]:
+def select_evaluation_evidence(client: ChatClient, task_id: str, question: str, answer: str, index: EvidenceIndex, cache_dir: Path) -> list[str]:
     # 只从提问时点已经释放的 EvidenceIndex 中选择权威答案所需事实。
     catalog = evidence_catalog(index)
     edge_catalog = edges_text(index)
     digest = hashlib.sha256(
         "\n".join((question, answer, catalog, edge_catalog)).encode("utf-8")
     ).hexdigest()[:12]
-    cache_path = cache_dir / "heldout_evidence" / f"{task_id}_{digest}.json"
+    cache_path = cache_dir / "evaluation_evidence" / f"{task_id}_{digest}.json"
     template = load_template("evidence_selection.yaml")
     prompt = template.substitute(
         question=question,
@@ -265,7 +261,7 @@ def select_heldout_evidence(client: ChatClient, task_id: str, question: str, ans
 
 
 def generate_rubric(client: ChatClient, task: dict, cache_dir: Path) -> dict:
-    # 为诊断/治疗任务生成评分 rubric, 结果缓存到 rubric_generation/。
+    # 为治疗/随访任务生成评分 rubric, 结果缓存到 rubric_generation/。
     cache_path = cache_dir / "rubric_generation" / f"{task['task_id']}.json"
     template = load_template("rubric_generation.yaml")
     prompt = template.substitute(

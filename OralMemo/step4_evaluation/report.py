@@ -1,4 +1,4 @@
-"""Step5 报告: 汇总 ACC / ERS(总体/分模态/分任务类型)、诊断分与 TPS，并对比不同记忆方法。"""
+"""Step5 报告: 汇总 ACC / ERS、治疗与随访评分，并对比不同记忆方法。"""
 from __future__ import annotations
 
 from step4_evaluation.evaluator import CachedLLM
@@ -42,7 +42,6 @@ def score_method(
     acc_by_modality: dict[str, dict[str, int]] = {}
     ers_by_type: dict[str, dict[str, int]] = {}
     ers_by_modality: dict[str, dict[str, int]] = {}
-    diagnosis = None
     treatment: list[dict] = []
     followup: list[dict] = []
     per_task: list[dict] = []
@@ -99,27 +98,20 @@ def score_method(
                 "ers_score": ratio(covered_evidence, total_evidence),
                 "evidence": verdict.get("evidence", []),
                 "modalities": modalities,
-                "validation_accepted": rec.get("validation_accepted", True),
             })
 
-        # 论文明确支持的诊断/治疗/随访决策任务
-        elif ttype in ("heldout_diagnosis", "heldout_treatment", "paper_treatment", "paper_followup"):
-            rubric = rubric_by_task.get(rec["task_id"])
-            if not rubric:
-                continue
-            scored = judge_rubric(llm, rec, rubric)
+        # 论文明确支持的治疗/随访决策任务
+        elif ttype in ("treatment", "followup"):
+            scored = judge_rubric(llm, rec, rubric_by_task[rec["task_id"]])
             entry = {"task_id": rec["task_id"], **scored}
-            if ttype == "heldout_diagnosis":
-                diagnosis = entry
-                metric = "diagnosis"
-            elif ttype == "paper_followup":
+            if ttype == "followup":
                 followup.append(entry)
                 metric = "followup"
             else:
                 treatment.append(entry)
                 metric = "TPS"
 
-            # 证据召回(ERS): 诊断/治疗任务同样有 selected_evidence, 用精简的证据召回判定
+            # 证据召回(ERS): 治疗/随访任务同样有 selected_evidence
             verdict = judge_evidence(llm, rec)
             covered_evidence = int(verdict.get("covered_evidence_count", 0) or 0)
             total_evidence = int(verdict.get("total_evidence_count", 0) or 0)
@@ -184,7 +176,6 @@ def score_method(
                 for k, v in sorted(ers_by_modality.items())
             },
         },
-        "diagnosis": diagnosis,
         "tps": {"overall_percent": tps_percent, "per_task": treatment},
         "followup": {"overall_percent": followup_percent, "per_task": followup},
         "per_task": per_task,
@@ -272,15 +263,10 @@ def format_console(report: dict) -> str:
 
     lines.append("-" * (34 + col * len(names)))
 
-    # 诊断分
-    lines.append(row("Diagnosis score", [
-        _fmt_pct(m["diagnosis"]["percent"]) if m.get("diagnosis") else "   n/a" for m in methods
-    ]))
-
     # TPS 与随访推理
     lines.append(row("Treatment score", [
-        _fmt_pct(m["tps"]["overall_percent"]) for m in methods]))
+        _fmt_pct(m.get("tps", {}).get("overall_percent")) for m in methods]))
     lines.append(row("Follow-up score", [
-        _fmt_pct(m["followup"]["overall_percent"]) for m in methods]))
+        _fmt_pct(m.get("followup", {}).get("overall_percent")) for m in methods]))
     lines.append("=" * (34 + col * len(names)))
     return "\n".join(lines)

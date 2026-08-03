@@ -14,10 +14,10 @@
 
 硬性规则：
 1. 只使用 SOURCE 明确陈述的事实，原样保留数字、单位、牙位、侧别、日期、变异和否定表述；叙述与表格冲突时以表格为准。答案尽量保留完整原文，只清理明显的空格/版面伪影，不增加事实或猜改不清楚的值。
-2. 完整抽取真实临床时间点。最早明确事件即使与后续首诊写在同一句，也要单独作为 t_months=0 的首个 timepoint；后续时间点按时序排列。所有后续 t_months 都表示从该最早事件起经过的非负整数月，可依据原文年龄或日期估算，进入治疗阶段也不得重置原点；不足一个月的相邻事件可使用同一整数值。原文合并报告且没有独立发现的多次访视保留为一个联合 timepoint，不复制相同答案。
-3. stage_type 只使用 perception、treatment、followup，且按该顺序排列；分期治疗中的愈合、检查、二期暴露和最终操作或修复都属于 treatment，完成后才进入 followup。同一日期跨阶段时拆成连续 timepoint。
+2. 完整抽取真实临床时间点。最早明确事件即使与后续首诊写在同一句，也要单独作为 t_months=0 的首个 timepoint；后续时间点按时序排列。所有后续 t_months 都表示从该最早事件起经过的非负整数月，可依据原文年龄或日期估算，进入治疗阶段也不得重置原点；不足一个月的相邻事件可使用同一整数值。无明确日期的事实可并入相关且有原文日期的 timepoint，但不得声称它发生于该日期或改写 date_text。原文合并报告且没有独立发现的多次访视保留为一个联合 timepoint，不复制相同答案。
+3. stage_type 只使用 perception、treatment、followup，且按该顺序排列。perception 是初次诊断检查；treatment 只包含首次诊断后、首次治疗后访前连续的初始干预课程；其后立即进入 followup。后续就诊即使包含分期愈合、检查、二期暴露、进一步观察或诊断、追加操作或二期手术、修复或管理，仍属于 followup，不再新开 treatment 阶段；同一日期跨阶段时拆成连续 timepoint。
 4. 每条 QA 的 role 为 observation 或 evaluation：observation 是可见记忆，evaluation 先由评测模型作答，再释放论文答案。
-5. perception 只含 observation。每个与 perception 或 followup 发现关联的临床相关可用图片都生成一条综合图片 QA，覆盖正文关联的直接视觉发现，不能只复述图注；图片 QA 放在会泄露其答案的重叠文本之前，非视觉测量或解释作为文本 observation；不生成综合推理题。
+5. perception 只含 observation。每个与 perception 或 followup 发现关联的临床相关可用图片都生成一条综合图片 QA，覆盖正文关联的直接视觉发现，不能只复述图注；图片答案只能描述可见的解剖、对象或外观，不能写图片的临床用途、规划、推理或解释性结论；图片 QA 放在会泄露其答案的重叠文本之前，非视觉测量或解释作为文本 observation；不生成综合推理题。
 6. treatment 只含 evaluation；按论文内容覆盖每个重要计划、实际操作、术式选择、中间检查和理由，不固定数量，也不附加治疗图片；同批 evaluation 互不展示答案。
 7. 每个真实 followup 时间点先放 observation，再放原文支持的状态、稳定性/复发和后续管理 evaluation；同批 evaluation 互不展示答案。
 8. 问题必须由对应论文答案和时间点生成，针对论文且不泄露答案。
@@ -71,9 +71,9 @@ $fulltext
 核查项：
 1. 每条答案都有原文支持，尽量保留完整原文及重要数值和否定表述，不保留明显的空格/版面伪影；冲突时以表格为准，不猜改不清楚的值。
 2. 问题与答案及时间点一致，且不泄露答案。
-3. 最早事件单独作为 t_months=0 的首个 timepoint；所有后续 t_months 均为从该原点经过的非负整数月，治疗阶段不得重置，不足一个月的相邻事件可共享同一整数值；后续时间点完整、按时序排列，stage_type 遵循 perception → treatment → followup，分期治疗直到最终操作或修复完成都属于 treatment。原文合并报告且没有独立发现的多次访视保留为一个联合 timepoint，不拆成重复 QA。
+3. 最早事件单独作为 t_months=0 的首个 timepoint；所有后续 t_months 均为从该原点经过的非负整数月，治疗阶段不得重置，不足一个月的相邻事件可共享同一整数值；无明确日期的事实可并入相关且有原文日期的 timepoint，但不得声称它发生于该日期或改写 date_text；后续时间点完整、按时序排列，stage_type 遵循 perception → treatment → followup。perception 为初次诊断检查，treatment 只包含首次诊断后、首次治疗后访前连续的初始干预课程；其后所有就诊均为 followup，即使包含分期愈合、检查、进一步观察或诊断、追加操作或二期手术、修复或管理。原文合并报告且没有独立发现的多次访视保留为一个联合 timepoint，不拆成重复 QA。
 4. perception 只含 observation；treatment 只含 evaluation，并按论文覆盖计划、操作、选择、检查和理由且不固定数量；followup 先 observation，再放原文支持的状态和管理 evaluation。
-5. 每个与 perception 或 followup 关联的临床相关可用图片都有一条综合图片 QA，覆盖正文关联的视觉发现而非只复述图注，放在会泄露答案的重叠文本之前；非视觉测量或解释放在文本 observation。
+5. 每个与 perception 或 followup 关联的临床相关可用图片都有一条综合图片 QA，覆盖正文关联的视觉发现而非只复述图注，放在会泄露答案的重叠文本之前；图片答案只能描述可见的解剖、对象或外观，图片的临床用途、规划、推理和解释性结论放在文本 observation；非视觉测量或解释也放在文本 observation。
 6. evaluation 的 figure_ref 必须为 null，同批 evaluation 的答案互不展示。
 
 严重级别：
@@ -114,7 +114,7 @@ $fulltext
 
 三个阶段统一采用 `qa_pairs`，问题和答案都由论文内容驱动，`qa_render.py` 只校验与渲染，不再生成固定问题。
 
-- `observation`：文本事实直接进入 memory；有图 QA 在标准轨迹使用论文答案，在模型感知轨迹使用视觉模型答案。无图文本在两条轨迹中完全一致。
+- `observation`：文本事实直接进入 memory；一般有图 QA 在标准轨迹使用论文答案，在模型感知轨迹使用视觉模型答案。`S0_PROFILE` 与 `S5_TMJ`（含可选 ECT）始终作为权威上下文直接注入，不进入视觉感知生成与感知指标；无图文本在两条轨迹中完全一致。
 - `evaluation`：先由模型作答，论文答案仅作 gold。治疗阶段所有问题互不共享 gold；完成整个治疗阶段后，按开关向随访释放论文治疗答案或模型治疗答案。
 - followup 每个真实时间点先释放文本/图片 observation，再批量回答当前时间点的状态/复发和后续治疗问题；同一时间点内不共享答案，完成该时间点后模型答案进入下一随访时间点的 memory。
 - `--release-perception-ground-truth` 默认开启；关闭后读取 `model_perception_trajectory.json`。
@@ -345,7 +345,7 @@ $plan_json
 
 规则：
 1. 写成一句自然的英文问题，不提 evidence_id，不照抄原始问题，也不泄露答案。
-2. 问题中禁止出现 S0、S1_FP、S2_DP、S3_XR_XLA、S4_CT、S5_TMJ 等内部阶段 ID；clinical_chain 可保留为内部元数据。
+2. 问题中禁止出现 S0、S1_FP、S2_DP、S3_XR_XLA、S4_CT、S5_TMJ 等内部阶段 ID。
 3. 仅当问题确实比较不同时间的证据时，才使用「较早」「后续」等时间表达；否则直接点明检查类型。
 4. 只使用所选证据对应的真实检查或影像来源，不得扩大来源范围，也不把口内照片称为全景片或 X 光。
 5. 对更新或纠错任务，问题必须明确比较早期发现与后续证据新增或改变的内容。
@@ -362,8 +362,7 @@ $plan_json
 
 返回格式：
 {
-  "question": "...",
-  "clinical_chain": "..."
+  "question": "..."
 }
 
 患者：$patient_id

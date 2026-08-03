@@ -42,30 +42,6 @@ class EvidenceIndex:
         limit = order_of[stage]
         return [item for item in self.evidence if order_of[item["introduced_stage"]] <= limit]
 
-    def resolve_available(
-        self,
-        evidence_ids: list[str],
-        stage: str,
-        stage_orders: dict[str, int],
-    ) -> list[dict]:
-        resolved = self.resolve(evidence_ids)
-        available_ids = {item["evidence_id"] for item in self.available_at(stage, stage_orders)}
-        future = [item["evidence_id"] for item in resolved if item["evidence_id"] not in available_ids]
-        if future:
-            raise ValueError(f"Evidence released after requested stage: {future}")
-        return resolved
-
-    def edges_between(self, evidence_ids: list[str]) -> list[dict]:
-        # 仅返回可用于推理的强关系和审核通过的临床支持边。
-        selected = set(evidence_ids)
-        return [
-            edge for edge in self.graph["edges"]
-            if edge["type"] != "context_consistency"
-            and edge["source"] in selected
-            and edge["target"] in selected
-        ]
-
-
 def evidence_ref(item: dict) -> dict:
     # 生成证据引用视图
     normalized = item.get("normalized", {})
@@ -149,40 +125,33 @@ def stages_summary(patient_stages: dict) -> str:
 def assemble_normal_task(patient_id: str, suffix: str, planned: dict, index: EvidenceIndex) -> dict:
     # 把 LLM 规划结果与解析后的证据组装为一条普通任务，待 finalize_task 生成问题并校验
     evidence = index.resolve(planned["required_evidence_ids"])
-    evidence_ids = [item["evidence_id"] for item in evidence]
-    gold = planned["gold_answer"]
     return {
         "task_id": f"{patient_id.replace('__', '_')}_{suffix}",
         "patient_id": patient_id,
         "task_type": planned["task_type"],
         "ask_after_stage": planned["ask_after_stage"],
         "selected_evidence": [evidence_ref(item) for item in evidence],
-        "evidence_graph_edges": index.edges_between(evidence_ids),
-        "gold_answer": gold["natural_answer"],
+        "gold_answer": planned["gold_answer"]["natural_answer"],
     }
 
 
-def assemble_heldout_task(
+def assemble_evaluation_task(
     *,
     patient_id: str,
     task_id: str,
     task_type: str,
-    ask_after_stage: str,
     turn: dict,
     evidence_ids: list[str],
     index: EvidenceIndex,
 ) -> dict:
-    # 组装 held-out QA 任务
     evidence = index.resolve(evidence_ids)
-    resolved_ids = [item["evidence_id"] for item in evidence]
     return {
         "task_id": task_id,
         "patient_id": patient_id,
         "task_type": task_type,
-        "ask_after_stage": ask_after_stage,
+        "ask_after_stage": turn["ask_after_stage"],
+        "release_after_stage": turn["release_after_stage"],
         "selected_evidence": [evidence_ref(item) for item in evidence],
-        "evidence_graph_edges": index.edges_between(resolved_ids),
-        "heldout_source_turn_ids": [turn["source_turn_id"]],
         "question": turn["human"],
         "gold_answer": turn["assistant"],
     }

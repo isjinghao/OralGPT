@@ -12,16 +12,13 @@ def load_dataset(dataset_json: Path) -> list[dict]:
 def index_by_patient_id(data: list[dict]) -> dict[str, dict]:
     index: dict[str, dict] = {}
     for item in data:
-        patient_id = item.get("id") or item.get("patient_uid")
-        if patient_id:
-            index[patient_id] = item
+        index[item["id"]] = item
     return index
 
 
-def load_patient_item(dataset_json: Path, patient_id: str) -> dict:
-    # 读取数据集 JSON, 按 id 或 patient_uid 查找目标患者条目
-    item = index_by_patient_id(load_dataset(dataset_json)).get(patient_id)
-    return item
+def load_patient_item(dataset_json: Path, patient_id: str) -> dict | None:
+    # 读取数据集 JSON, 按 id 查找目标患者条目
+    return index_by_patient_id(load_dataset(dataset_json)).get(patient_id)
 
 
 def local_image_path(image_path: str) -> str:
