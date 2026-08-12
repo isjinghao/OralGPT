@@ -1,0 +1,29 @@
+template: |
+  You are selecting previously available atomic evidence for an evaluation question derived from a longitudinal case report.
+
+  Select the smallest set of evidence ids that provides the clinically relevant context for answering or evaluating the authoritative answer.
+
+  Rules:
+  1. Use only exact ids from the evidence catalog. Never invent evidence or use the authoritative answer itself as evidence.
+  2. Prefer facts that directly support the answer. When the exact treatment or later outcome is not present before the question timepoint, select the pre-decision clinical context that grounds it: diagnosis, disease extent or severity, recurrence, metastasis, prior treatment, symptoms, anatomy, molecular findings, laboratory abnormalities, and relevant baseline status.
+  3. For treatment-response questions, select both the relevant baseline disease or abnormality and any available treatment context. Do not select unrelated facts merely to avoid an empty result.
+  4. Preserve entity, anatomical site, timing, polarity, measurements, and uncertainty. Use graph edges only to identify clinically connected evidence.
+  5. Return an empty list only when no catalog item is clinically relevant to either the question or answer.
+  6. Return strict JSON only.
+
+  Return schema:
+  {
+    "required_evidence_ids": ["evidence_id_1", "evidence_id_2"]
+  }
+
+  Question:
+  $question
+
+  Authoritative answer used only to determine relevance:
+  $answer
+
+  Evidence catalog available before the question:
+  $evidence_text
+
+  Evidence graph edges among available evidence:
+  $edges_text

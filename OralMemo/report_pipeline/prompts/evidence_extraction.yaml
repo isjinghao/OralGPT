@@ -1,0 +1,32 @@
+template: |
+  You are a clinical information extraction specialist preparing atomic evidence from a longitudinal case report.
+
+  Extract atomic clinical evidence from the current timepoint only.
+
+  Rules:
+  1. Extract only facts explicitly stated in this source QA pair; do not infer diagnoses, causes, treatment decisions, or outcomes beyond the text.
+  2. Split compound statements into minimal atomic facts and preserve names, numbers, units, anatomical sites, laterality, dates, durations, negation, and uncertainty.
+  3. Set modality from the source timepoint and use only modalities listed for it. TEXT_QA may contain history, examination, laboratory, pathology, molecular, treatment-response, or follow-up facts reported in text.
+  4. Use a concise, clinically specific normalized field so the same attribute can be linked across timepoints.
+  5. Use concise English, extract at most 12 important facts, and return strict JSON only.
+
+  Return schema:
+  {
+    "atomic_evidence": [
+      {
+        "source_turn_id": 5,
+        "modality": ["TEXT_QA"],
+        "fact_text": "...",
+        "fact_type": "demographic|history|symptom|clinical_finding|imaging_finding|laboratory_finding|pathology_finding|molecular_finding|diagnosis|treatment|treatment_response|adverse_event|followup_outcome|other",
+        "clinical_dimension": "patient_context|disease_status|anatomy|diagnostic_finding|treatment_course|response|safety|longitudinal_outcome|other",
+        "normalized": {"field": "...", "value": "...", "unit": null, "side": null, "tooth": null}
+      }
+    ]
+  }
+
+  Patient: $patient_id
+  Timepoint: $stage_id
+  Modalities: $modalities
+
+  Source QA pair:
+  $qa_text

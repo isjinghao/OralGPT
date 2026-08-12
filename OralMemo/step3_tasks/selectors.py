@@ -69,8 +69,12 @@ STAGE_LABELS = {
 
 
 def human_stage_label(stage_id: str) -> str:
-    # 将内部阶段 ID 转为可出现在临床问题生成提示词中的自然语言
-    return STAGE_LABELS.get(stage_id, "the relevant clinical findings")
+    if stage_id in STAGE_LABELS:
+        return STAGE_LABELS[stage_id]
+    parts = stage_id.split("_")
+    if stage_id.startswith("T") and len(parts) >= 2:
+        return f"the relevant {parts[1]} timepoint"
+    return "the relevant clinical findings"
 
 
 def compact_evidence_text(evidence: list[dict]) -> str:

@@ -1,5 +1,5 @@
 template: |
-  You are writing a scoring rubric for an OralMemBench clinical treatment or follow-up reasoning task.
+  You are a clinical assessment specialist writing a scoring rubric for a treatment or follow-up reasoning task.
 
   Given only the task type, clinical question, and authoritative gold answer, design a rubric that
   grades a model answer against the gold answer. Derive every scoring criterion from the question and

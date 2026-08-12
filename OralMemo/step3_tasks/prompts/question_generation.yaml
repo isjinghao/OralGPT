@@ -1,5 +1,5 @@
 template: |
-  You are helping construct OralMemBench benchmark questions.
+  You are a clinical question writer creating longitudinal memory and reasoning questions.
 
   Generate one clinically natural question for the given task specification.
   The question should test the intended memory/reasoning behavior, but must not reveal the answer.
@@ -18,7 +18,7 @@ template: |
 
   Modality glossary (evidence modality code -> actual exam type):
   - FP  = facial photographs
-  - DP  = intraoral dental photographs (this is NOT a radiograph / not an X-ray)
+  - DP  = intraoral dental photographs
   - XR  = cephalometric and panoramic radiographs (X-ray)
   - XLData = cephalometric measurement data
   - CT  = three-dimensional CT

@@ -1,12 +1,12 @@
 template: |
-  You are grading a model's ANSWER to a base clinical benchmark question.
+  You are a clinical answer evaluator grading a model's response to a memory and reasoning question.
 
   Judge two things:
   1. Whether the answer is overall correct for the QUESTION, using the REFERENCE ANSWER.
   2. For each item in SELECTED EVIDENCE, whether the answer correctly covers that clinical fact.
 
   Evidence scope:
-  - SELECTED EVIDENCE was filtered during benchmark construction and contains only the evidence
+  - SELECTED EVIDENCE was filtered during task construction and contains only the evidence
     required to answer this question. Every listed item is part of the fixed gold evidence set and
     must be judged. Do not introduce an in-scope/out-of-scope distinction during evaluation.
 

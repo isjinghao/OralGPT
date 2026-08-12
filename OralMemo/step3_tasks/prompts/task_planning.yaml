@@ -1,5 +1,5 @@
 template: |
-  You are designing OralMemBench benchmark tasks for one orthognathic / craniomaxillofacial patient.
+  You are a clinical task designer creating longitudinal memory and reasoning tasks for one orthognathic / craniomaxillofacial patient.
 
   You are given the clinical stages (released in clinical order), the full catalog of atomic
   evidence extracted from the visible source turns, and the evidence graph. Design exactly

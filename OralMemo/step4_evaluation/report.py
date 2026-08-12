@@ -1,6 +1,7 @@
 """Step5 报告: 汇总 ACC / ERS、治疗与随访评分，并对比不同记忆方法。"""
 from __future__ import annotations
 
+from batch_utils import log
 from step4_evaluation.evaluator import CachedLLM
 from step4_evaluation.scoring import judge_base, judge_evidence, judge_rubric
 
@@ -32,6 +33,7 @@ def score_method(
     records: list[dict],
     rubric_by_task: dict[str, dict],
     llm: CachedLLM,
+    log_prefix: str,
 ) -> dict:
     # 对单个记忆方法的所有作答记录打分并聚合
     acc_overall = {"correct": 0, "total": 0}
@@ -46,8 +48,12 @@ def score_method(
     followup: list[dict] = []
     per_task: list[dict] = []
 
-    for rec in records:
+    for task_index, rec in enumerate(records, start=1):
         ttype = rec["task_type"]
+        log(
+            f"{log_prefix}[step4/scoring] method={method_name} "
+            f"task={task_index}/{len(records)} id={rec['task_id']}"
+        )
 
         # base 任务
         if ttype in BASE_TYPES:
@@ -186,10 +192,13 @@ def build_report(
     records_by_method: dict[str, list[dict]],
     rubric_by_task: dict[str, dict],
     llm_by_method: dict[str, CachedLLM],
+    log_prefix: str = "[evaluation][unknown]",
 ) -> dict:
     """对每个记忆方法评分，汇总为总报告。"""
-    methods = [score_method(name, recs, rubric_by_task, llm_by_method[name])
-               for name, recs in records_by_method.items()]
+    methods = [
+        score_method(name, recs, rubric_by_task, llm_by_method[name], log_prefix)
+        for name, recs in records_by_method.items()
+    ]
     return {"methods": methods}
 
 

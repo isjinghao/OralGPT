@@ -37,8 +37,11 @@ def node_label(node: dict) -> str:
 
 
 def load_graph(out_dir: Path) -> dict:
-    path = out_dir / "graph" / "evidence_graph.json"
-    return json.loads(path.read_text(encoding="utf-8"))
+    graph = json.loads((out_dir / "graph" / "evidence_graph.json").read_text(encoding="utf-8"))
+    graph["nodes"] = json.loads(
+        (out_dir / "evidence" / "evidence.json").read_text(encoding="utf-8")
+    )["evidence"]
+    return graph
 
 
 def load_tmonths(out_dir: Path) -> dict[str, int]:

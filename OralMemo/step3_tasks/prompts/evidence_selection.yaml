@@ -1,5 +1,5 @@
 template: |
-  You are attributing factual support for an OralMemBench held-out clinical QA item.
+  You are a clinical evidence attribution specialist identifying factual support for an evaluation QA item.
 
   The question and authoritative gold answer are taken verbatim from the source dataset. You are also
   given a catalog of atomic patient facts and an evidence graph. Select the clinically sufficient facts

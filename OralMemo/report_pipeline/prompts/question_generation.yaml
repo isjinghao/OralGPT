@@ -1,0 +1,28 @@
+template: |
+  You are a clinical question writer creating a longitudinal memory or reasoning question from a case report.
+
+  Generate one natural English question for the task specification without revealing the answer.
+
+  Rules:
+  1. Write one focused question and do not mention evidence ids or copy a source question verbatim.
+  2. Never expose internal timepoint ids such as T0_perception_00.
+  3. Use temporal wording only when the task genuinely compares different timepoints.
+  4. Name only the source supported by the evidence, such as history, clinical examination, imaging, laboratory testing, pathology, molecular testing, treatment course, or follow-up.
+  5. For update or correction tasks, ask what later evidence added, refined, or changed relative to the earlier record.
+  6. Preserve the report's clinical scope and do not assume an orthognathic workflow or fixed modality sequence.
+  7. Return strict JSON only.
+
+  Return schema:
+  {
+    "question": "..."
+  }
+
+  Patient: $patient_id
+  Task type: $task_type
+  The question will be asked after: $ask_after_stage
+  Gold answer: $gold_answer
+
+  Evidence available to support the answer:
+  $evidence_text
+
+  $feedback_block

@@ -1,0 +1,44 @@
+template: |
+  You are a clinical task designer creating longitudinal memory and reasoning tasks from one published case report.
+
+  You are given the report timepoints in release order, the atomic evidence extracted from visible source turns, and the evidence graph. Design exactly $task_count task(s) of type "$task_type". The report may cover any oral, dental, or maxillofacial condition and may have any number of timepoints. Ground every task only in the supplied record.
+
+  Definition of this task type:
+  $type_instruction
+
+  Hard rules:
+  1. required_evidence_ids must use exact ids from the evidence catalog only.
+  2. ask_after_stage must be an id from the timepoint list, and all required evidence must be available at or before it.
+  3. gold_answer must be fully supported, clinically natural, no longer than 4 sentences, and must not expose internal T-stage ids.
+  4. The $task_count tasks must be clinically distinct.
+  5. Select every fact materially required for the answer, but exclude unrelated facts.
+  6. Respect the actual source and timepoint of each finding. Do not attribute text, examination, imaging, pathology, laboratory, molecular, treatment, or outcome facts to a different source.
+  7. Preserve entity, anatomical site, scope, direction, polarity, numbers, timing, and uncertainty.
+  8. Comparative, temporal, response, or causal conclusions require evidence that supports that relationship, not simple coexistence.
+  9. Before calling later evidence new, refining, updating, or corrective, compare it with all earlier available evidence. Confirmation alone is not an update.
+  10. Before returning, verify that every specific diagnosis, classification, stage, treatment or drug name, measurement, date, and finding stated in gold_answer has an explicit selected evidence item when one exists in the catalog. If the answer relates a response to a treatment, select evidence for both the treatment exposure and the response.
+  11. Use the report's actual clinical content; do not assume a fixed disease, examination sequence, or five-stage workflow.
+  12. Return strict JSON only.
+
+  Return schema:
+  {
+    "tasks": [
+      {
+        "task_type": "$task_type",
+        "ask_after_stage": "T#_...",
+        "required_evidence_ids": ["..."],
+        "gold_answer": {"natural_answer": "..."}
+      }
+    ]
+  }
+
+  Patient: $patient_id
+
+  Report timepoints (release order):
+  $stages_text
+
+  Evidence catalog (id | timepoint | modality | fact):
+  $evidence_text
+
+  Evidence graph edges (source -> target | type | reason):
+  $edges_text

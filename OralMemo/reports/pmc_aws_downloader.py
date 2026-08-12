@@ -36,7 +36,7 @@ DEFAULT_TARGETS_CSV = SCRIPT_DIR / "pmcid_targets.csv"
 DEFAULT_PMCID_CSV = SCRIPT_DIR / "pmcid_top100.csv"
 DEFAULT_METADATA_DIR = SCRIPT_DIR / "metadata" / "srma"
 DEFAULT_OUTPUT_ROOT = SCRIPT_DIR / "full_text"
-DEFAULT_REPORT_DIR = SCRIPT_DIR / "reports"
+DEFAULT_REPORT_DIR = SCRIPT_DIR
 BUCKET = "pmc-oa-opendata"
 BUCKET_HTTPS_ROOT = f"https://{BUCKET}.s3.amazonaws.com"
 S3_NS = {"s3": "http://s3.amazonaws.com/doc/2006-03-01/"}
@@ -388,13 +388,16 @@ def main() -> int:
 
     total = len(targets)
     progress_enabled = tqdm is not None and not args.no_progress
-    progress = tqdm(
-        targets,
-        total=total,
-        unit="study",
-        dynamic_ncols=True,
-        disable=not progress_enabled,
-        file=sys.stderr,
+    progress = (
+        tqdm(
+            targets,
+            total=total,
+            unit="study",
+            dynamic_ncols=True,
+            file=sys.stderr,
+        )
+        if progress_enabled
+        else targets
     )
 
     for index, target in enumerate(progress, start=1):

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import base64
-import hashlib
 import json
 import mimetypes
 from pathlib import Path
@@ -101,19 +100,8 @@ def initial_profile_records(stages: list[dict]) -> list[dict]:
     return records
 
 
-def cache_path(
-    cache_dir: Path,
-    model: str,
-    role: str,
-    stage_id: str,
-    source_turn_id: int,
-    question: str,
-    system_prompt: str,
-    prompt: str,
-) -> Path:
-    raw = "\n".join((model, role, stage_id, str(source_turn_id), question, system_prompt, prompt))
-    digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
-    return cache_dir / f"perception_{stage_id}_{source_turn_id}_{digest}.json"
+def cache_path(cache_dir: Path, stage_id: str, source_turn_id: int) -> Path:
+    return cache_dir / f"perception_{stage_id}_{source_turn_id}.json"
 
 
 def generate_answer(
@@ -137,19 +125,18 @@ def generate_answer(
         modality=", ".join(stage.get("modality", [])) or "unknown",
         question=question,
     )
-    path = cache_path(
-        cache_dir,
-        client.model,
-        "perception",
-        stage["stage_id"],
-        int(qa.get("source_turn_id", 0)),
-        question,
-        system_prompt,
-        prompt,
-    )
+    cache_input = {
+        "model": client.model,
+        "system_prompt": system_prompt,
+        "prompt": prompt,
+        "image_paths": qa.get("image_paths", []) or [],
+        "max_tokens": 16000,
+    }
+    path = cache_path(cache_dir, stage["stage_id"], int(qa.get("source_turn_id", 0)))
     if path.exists() and not force:
         cached = read_json(path)
-        return str(cached.get("answer", "")).strip()
+        if cached.get("input") == cache_input:
+            return str(cached["answer"]).strip()
 
     urls = image_urls(image_root, qa.get("image_paths", []) or [])
     if not urls:
@@ -167,7 +154,15 @@ def generate_answer(
         raise RuntimeError(
             f"Empty model answer for {stage['stage_id']} source_turn_id={qa.get('source_turn_id')}"
         )
-    write_json(path, {"answer": answer, "stage_id": stage["stage_id"], "source_turn_id": qa.get("source_turn_id")})
+    write_json(
+        path,
+        {
+            "input": cache_input,
+            "answer": answer,
+            "stage_id": stage["stage_id"],
+            "source_turn_id": qa.get("source_turn_id"),
+        },
+    )
     return answer
 
 

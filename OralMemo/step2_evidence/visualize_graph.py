@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import html
 import json
-import math
 from collections import defaultdict
 from pathlib import Path
+
+from playwright.sync_api import sync_playwright
 
 from config import get_settings
 from llm_client import ChatClient
@@ -12,13 +13,14 @@ from step2_evidence.graph import build_evidence_graph, stage_order
 
 
 STAGE_COLORS = {
-    "S0_PROFILE": "#7c5cff",
+    "S0_PROFILE": "#0f9fb4",
     "S1_FP": "#7c5cff",
     "S2_DP": "#f06423",
     "S3_XR_XLA": "#f7a21b",
     "S4_CT": "#21a663",
     "S5_TMJ": "#126be8",
 }
+PALETTE = ["#0f9fb4", "#7c5cff", "#f06423", "#f7a21b", "#21a663", "#126be8", "#d14f8f", "#6f7d3c"]
 
 STAGE_LABELS = {
     "S0_PROFILE": "Stage 0  Profile",
@@ -40,29 +42,6 @@ DIMENSION_LABELS = {
     "other": "other",
 }
 
-IMPORTANT_FIELDS = [
-    "chief_complaint",
-    "chin_deviation",
-    "facial_profile",
-    "molar_relationship",
-    "overjet",
-    "overbite",
-    "lower_midline_deviation",
-    "caries",
-    "gingival_fistula",
-    "skeletal_class",
-    "ANB",
-    "Wits",
-    "SNB",
-    "impaction_status",
-    "menton_deviation",
-    "mandible_sagittal_position",
-    "maxilla_sagittal_position",
-    "mouth_opening",
-    "opening_clicks",
-]
-
-
 def label_from_field(field: str, fact_text: str) -> str:
     """生成节点短标签(仅服务可视化)。
 
@@ -76,130 +55,111 @@ def label_from_field(field: str, fact_text: str) -> str:
     return fact_text[:34]
 
 
-def select_visible_nodes(graph: dict) -> list[dict]:
-    """挑选可视化展示的节点。
-
-    功能: 按重点字段与临床维度打分, 每阶段择优挑选(S0 取 3, 其余取 6); 现场派生显示短标签。
-    输入: graph 证据图对象。
-    输出: list[dict] - 按阶段/标签排序的待展示节点。
-    """
-    by_stage = defaultdict(list)
-    for node in graph["nodes"]:
-        field = str(node.get("normalized", {}).get("field", ""))
-        score = 0
-        for rank, key in enumerate(IMPORTANT_FIELDS):
-            if key.lower() in field.lower():
-                score = 100 - rank
-                break
-        if node.get("clinical_dimension", "other") in {"sagittal_relationship", "facial_asymmetry", "dental_status", "tmj_status"}:
-            score += 10
-        node = dict(node)
-        node["_score"] = score
-        node["label"] = label_from_field(field, node["fact_text"])
-        by_stage[node["introduced_stage"]].append(node)
-
-    visible = []
-    for stage, nodes in by_stage.items():
-        limit = 3 if stage == "S0_PROFILE" else 6
-        visible.extend(sorted(nodes, key=lambda n: (-n["_score"], n["source_turn_id"], n["label"]))[:limit])
-    return sorted(visible, key=lambda n: (stage_order(n["introduced_stage"]), n["label"]))
-
-
-def layout_nodes(nodes: list[dict]) -> dict[str, tuple[float, float]]:
-    """计算节点布局坐标。
-
-    功能: 按阶段分层(纵向), 同层节点水平均布。
-    输入: nodes 待展示节点列表。
-    输出: dict - 节点 id 到 (x, y) 坐标的映射。
-    """
+def layout_nodes(
+    nodes: list[dict],
+    width: int,
+    stage_indexes: dict[str, int],
+) -> dict[str, tuple[float, float]]:
+    """按阶段分层并水平排列全部节点。"""
     by_stage = defaultdict(list)
     for node in nodes:
         by_stage[node["introduced_stage"]].append(node)
 
     positions = {}
-    width = 1380
-    left = 190
-    right = width - 260
-    y_base = 920
-    y_gap = 145
+    left = 100
+    right = width - 300
     for stage, items in by_stage.items():
-        order = stage_order(stage)
-        y = y_base - order * y_gap
-        count = len(items)
-        if count == 1:
-            xs = [(left + right) / 2]
-        else:
-            xs = [left + (right - left) * i / (count - 1) for i in range(count)]
-        for x, node in zip(xs, sorted(items, key=lambda n: n["label"])):
+        y = 100 + stage_indexes[stage] * 145
+        ordered = sorted(items, key=lambda node: (node["source_turn_id"], node["label"]))
+        count = len(ordered)
+        xs = [(left + right) / 2] if count == 1 else [left + (right - left) * i / (count - 1) for i in range(count)]
+        for x, node in zip(xs, ordered):
             positions[node["evidence_id"]] = (x, y)
     return positions
 
 
-def edge_path(source: tuple[float, float], target: tuple[float, float], edge_type: str) -> str:
-    """生成边的 SVG 路径。
-
-    功能: 按边类型生成不同弯曲度的贝塞尔曲线路径(阶段内/跨阶段)。
-    输入: source 起点坐标; target 终点坐标; edge_type 边类型。
-    输出: str - SVG path 的 d 属性字符串。
-    """
+def edge_path(source: tuple[float, float], target: tuple[float, float]) -> str:
+    """生成跨阶段边的 SVG 贝塞尔曲线路径。"""
     sx, sy = source
     tx, ty = target
-    if edge_type == "intra_stage_link":
-        dx = tx - sx
-        lift = 34 if dx >= 0 else -34
-        return f"M {sx:.1f} {sy:.1f} C {sx + dx * 0.35:.1f} {sy - lift:.1f}, {sx + dx * 0.65:.1f} {ty - lift:.1f}, {tx:.1f} {ty:.1f}"
     mid_y = (sy + ty) / 2
     bend = 60 if tx >= sx else -60
     return f"M {sx:.1f} {sy:.1f} C {sx + bend:.1f} {mid_y:.1f}, {tx - bend:.1f} {mid_y:.1f}, {tx:.1f} {ty:.1f}"
 
 
-def render_html(graph: dict, html_path: Path) -> None:
-    """渲染证据图为交互式 HTML。
-
-    功能: 选点→布局→绘制阶段平面/边/节点, 生成纯白背景、仅含图形主体的 SVG/HTML 并写文件。
-    输入: graph 证据图对象; html_path 输出 HTML 路径。
-    输出: 无返回值, 产生 HTML 文件。
-    """
-    nodes = select_visible_nodes(graph)
-    visible_ids = {node["evidence_id"] for node in nodes}
-    positions = layout_nodes(nodes)
-    edge_list = [e for e in graph["edges"] if e["source"] in visible_ids and e["target"] in visible_ids]
+def render_html(
+    graph: dict,
+    evidence: list[dict],
+    stages: list[dict],
+    html_path: Path,
+) -> None:
+    """使用完整阶段、evidence 节点与 graph 边渲染证据图 HTML。"""
+    nodes = []
+    for item in evidence:
+        node = dict(item)
+        node["label"] = label_from_field(
+            str(node.get("normalized", {}).get("field", "")),
+            node["fact_text"],
+        )
+        nodes.append(node)
+    nodes.sort(key=lambda node: (stage_order(node["introduced_stage"]), node["source_turn_id"], node["label"]))
+    stage_counts = defaultdict(int)
+    for node in nodes:
+        stage_counts[node["introduced_stage"]] += 1
+    ordered_stages = [stage["stage_id"] for stage in sorted(stages, key=lambda item: item["order"])]
+    stages_by_id = {stage["stage_id"]: stage for stage in stages}
+    stage_indexes = {stage: index for index, stage in enumerate(ordered_stages)}
+    stage_colors = {
+        stage: STAGE_COLORS.get(stage, PALETTE[index % len(PALETTE)])
+        for index, stage in enumerate(ordered_stages)
+    }
+    canvas_width = max(1560, max(stage_counts.values(), default=1) * 115 + 360)
+    canvas_height = max(360, len(ordered_stages) * 145 + 100)
+    positions = layout_nodes(nodes, canvas_width, stage_indexes)
+    node_by_id = {node["evidence_id"]: node for node in nodes}
+    edge_list = graph["edges"]
 
     planes = []
-    for stage, label in STAGE_LABELS.items():
-        order = stage_order(stage)
-        y = 920 - order * 145
-        color = STAGE_COLORS[stage]
-        points = f"120,{y+45} 960,{y+92} 1250,{y+18} 405,{y-28}"
+    for stage in ordered_stages:
+        stage_data = stages_by_id[stage]
+        timepoint = stage_data.get("timepoint", {})
+        date_text = str(timepoint.get("date_text") or "").strip()
+        stage_type = stage_data["stage_type"].capitalize()
+        label = STAGE_LABELS.get(stage, f"{date_text} · {stage_type}" if date_text else stage_type)
+        label = f"{label}  ·  n={stage_counts[stage]}"
+        y = 100 + stage_indexes[stage] * 145
+        color = stage_colors[stage]
+        points = f"60,{y+45} {canvas_width-620},{y+92} {canvas_width-300},{y+18} 380,{y-28}"
         planes.append(
             f'<polygon points="{points}" fill="{color}" fill-opacity="0.055" stroke="{color}" stroke-opacity="0.42" stroke-width="1.5" />'
-            f'<text x="1270" y="{y+18}" class="stage-label" fill="{color}">{html.escape(label)}</text>'
+            f'<text x="{canvas_width-40}" y="{y+18}" class="stage-label" fill="{color}">{html.escape(label)}</text>'
         )
 
     edge_svg = []
     for edge in edge_list:
         source = positions[edge["source"]]
         target = positions[edge["target"]]
-        color = STAGE_COLORS[next(n["introduced_stage"] for n in nodes if n["evidence_id"] == edge["source"])]
-        is_context = edge["type"] == "context_consistency"
-        cls = "edge context" if is_context else "edge support"
-        marker = "" if is_context else "url(#arrow)"
-        dash = 'stroke-dasharray="5 5"' if is_context else ""
+        color = stage_colors[node_by_id[edge["source"]]["introduced_stage"]]
         title = html.escape(edge["reason"])
         edge_svg.append(
-            f'<path class="{cls}" d="{edge_path(source, target, edge["type"])}" stroke="{color}" marker-end="{marker}" {dash}>'
+            f'<path class="edge support" d="{edge_path(source, target)}" stroke="{color}" marker-end="url(#arrow)">'
             f'<title>{title}</title></path>'
         )
 
     node_svg = []
     for node in nodes:
         x, y = positions[node["evidence_id"]]
-        color = STAGE_COLORS[node["introduced_stage"]]
+        color = stage_colors[node["introduced_stage"]]
         label = html.escape(node["label"])
         fact = html.escape(node["fact_text"])
         dim = html.escape(DIMENSION_LABELS.get(node.get("clinical_dimension", "other"), "other"))
+        search_text = html.escape(
+            f"{node['label']} {node['fact_text']} {node['introduced_stage']} {dim}".lower(),
+            quote=True,
+        )
         node_svg.append(
-            f'<g class="node" transform="translate({x:.1f},{y:.1f})">'
+            f'<g class="node" data-search="{search_text}" data-fact="{fact}" '
+            f'transform="translate({x:.1f},{y:.1f})">'
             f'<title>{fact}</title>'
             f'<ellipse cx="0" cy="6" rx="23" ry="8" fill="#1d2430" opacity="0.20"/>'
             f'<ellipse cx="0" cy="0" rx="22" ry="12" fill="{color}" opacity="0.88" stroke="#0b315f" stroke-width="1.2"/>'
@@ -214,30 +174,63 @@ def render_html(graph: dict, html_path: Path) -> None:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OralMemBench Evidence Graph - CHENFANG</title>
+  <title>Evidence Graph - {html.escape(graph['patient_id'])}</title>
   <style>
     :root {{
       --ink: #17324d;
     }}
+    * {{ box-sizing: border-box; }}
     body {{
       margin: 0;
-      background: #ffffff;
+      background: #f4f7fb;
       color: var(--ink);
-      font-family: Georgia, "Times New Roman", serif;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
     }}
-    .wrap {{
-      max-width: 1480px;
-      margin: 0 auto;
-      padding: 28px;
+    .toolbar {{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.96);
+      border-bottom: 1px solid #d9e2ec;
+      box-shadow: 0 2px 10px rgba(23,50,77,0.08);
     }}
+    .title {{ font-size: 17px; font-weight: 700; white-space: nowrap; }}
+    .summary {{ color: #667085; font-size: 13px; white-space: nowrap; }}
+    .toolbar input {{
+      width: min(360px, 32vw);
+      padding: 8px 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 13px;
+    }}
+    .toolbar label {{ font-size: 13px; white-space: nowrap; }}
+    .detail {{
+      min-height: 42px;
+      padding: 10px 18px;
+      background: #eef5ff;
+      border-bottom: 1px solid #d9e2ec;
+      font-size: 13px;
+      line-height: 1.45;
+    }}
+    .viewport {{ overflow: auto; max-height: calc(100vh - 104px); padding: 16px; }}
     .canvas {{
+      width: {canvas_width}px;
       background: #ffffff;
+      border: 1px solid #dfe7ef;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(23,50,77,0.08);
+      overflow: hidden;
     }}
-    svg {{ width: 100%; height: auto; display: block; }}
+    svg {{ width: {canvas_width}px; height: {canvas_height}px; display: block; }}
     .stage-label {{
       font-family: Georgia, "Times New Roman", serif;
       font-size: 23px;
       font-weight: 700;
+      text-anchor: end;
     }}
     .edge {{
       fill: none;
@@ -245,7 +238,6 @@ def render_html(graph: dict, html_path: Path) -> None:
       opacity: 0.72;
     }}
     .edge.support {{ stroke-width: 2.4; }}
-    .edge.context {{ opacity: 0.35; stroke-width: 1.4; }}
     .node-label {{
       font-family: "Trebuchet MS", Verdana, sans-serif;
       font-size: 12px;
@@ -259,16 +251,27 @@ def render_html(graph: dict, html_path: Path) -> None:
       fill: #667085;
       text-anchor: middle;
     }}
+    .node {{ cursor: pointer; transition: opacity 0.15s ease; }}
+    .node.muted {{ opacity: 0.10; }}
+    .node.selected ellipse:nth-of-type(2),
     .node:hover ellipse:nth-of-type(2) {{
-      filter: drop-shadow(0 0 10px rgba(18, 107, 232, 0.28));
-      stroke-width: 2.4;
+      filter: drop-shadow(0 0 10px rgba(18, 107, 232, 0.35));
+      stroke-width: 2.8;
     }}
+    body.hide-edges .edge {{ display: none; }}
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="toolbar">
+    <div class="title">{html.escape(graph['patient_id'])}</div>
+    <div class="summary">{len(nodes)} evidence · {len(edge_list)} edges · {len(ordered_stages)} timepoints</div>
+    <input id="search" type="search" placeholder="Search evidence or timepoint" />
+    <label><input id="edges" type="checkbox" checked /> Show edges</label>
+  </div>
+  <div id="detail" class="detail">Click a node to inspect its full evidence text.</div>
+  <div class="viewport">
     <div class="canvas">
-      <svg viewBox="0 0 1560 1040" role="img" aria-label="Layered evidence graph">
+      <svg viewBox="0 0 {canvas_width} {canvas_height}" role="img" aria-label="Layered evidence graph">
         <defs>
           <marker id="arrow" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
             <path d="M0,0 L10,4 L0,8 Z" fill="#126be8" opacity="0.78"></path>
@@ -280,6 +283,23 @@ def render_html(graph: dict, html_path: Path) -> None:
       </svg>
     </div>
   </div>
+  <script>
+    const nodes = [...document.querySelectorAll('.node')];
+    const search = document.getElementById('search');
+    const detail = document.getElementById('detail');
+    search.addEventListener('input', () => {{
+      const query = search.value.trim().toLowerCase();
+      nodes.forEach(node => node.classList.toggle('muted', query && !node.dataset.search.includes(query)));
+    }});
+    document.getElementById('edges').addEventListener('change', event => {{
+      document.body.classList.toggle('hide-edges', !event.target.checked);
+    }});
+    nodes.forEach(node => node.addEventListener('click', () => {{
+      nodes.forEach(item => item.classList.remove('selected'));
+      node.classList.add('selected');
+      detail.textContent = node.dataset.fact;
+    }}));
+  </script>
 </body>
 </html>
 """
@@ -287,12 +307,23 @@ def render_html(graph: dict, html_path: Path) -> None:
     html_path.write_text(html_text, encoding="utf-8")
 
 
+def render_png(html_path: Path, png_path: Path) -> None:
+    """使用无头浏览器截图 HTML 中的完整证据图。"""
+    png_path.parent.mkdir(parents=True, exist_ok=True)
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1600, "height": 1100}, device_scale_factor=1)
+        page.goto(html_path.resolve().as_uri())
+        page.locator(".canvas").screenshot(path=str(png_path))
+        browser.close()
+
+
 def main() -> None:
     """证据图可视化入口。
 
-    功能: 读 evidence.json→(强关系规则+候选生成+独立审核)建图→写 evidence_graph.json 与 evidence_graph.html→打印统计。
+    功能: 读 evidence.json→(强关系规则+候选生成+独立审核)建图→写 JSON、HTML 与 PNG→打印统计。
     输入: 无(从 get_settings() 读取配置与 outputs 路径、LLM 凭据)。
-    输出: 无返回值; 产生图 JSON/HTML, 控制台打印统计摘要。
+    输出: 无返回值; 产生图 JSON/HTML/PNG, 控制台打印统计摘要。
     """
     settings = get_settings()
     base = settings.output_root
@@ -303,20 +334,24 @@ def main() -> None:
         base_url=cfg.base_url,
         model=cfg.model,
     )
+    evidence = json.loads(evidence_json.read_text(encoding="utf-8"))["evidence"]
+    standard = json.loads(
+        (base / "trajectories" / "standard_trajectory.json").read_text(encoding="utf-8")
+    )
     graph = build_evidence_graph(evidence_json, client=client, cache_dir=base / "cache", max_edges=settings.graph_max_edges)
     graph_path = base / "graph" / "evidence_graph.json"
     html_path = base / "graph" / "evidence_graph.html"
+    png_path = base / "graph" / "evidence_graph.png"
     graph_path.parent.mkdir(parents=True, exist_ok=True)
-    # 落盘精简图: step3 只消费 edges; nodes 仅服务可视化, 渲染时由内存图即时生成, 不落盘。
-    persisted = {key: value for key, value in graph.items() if key != "nodes"}
-    graph_path.write_text(json.dumps(persisted, ensure_ascii=False, indent=2), encoding="utf-8")
-    render_html(graph, html_path)
-    print(json.dumps({
-        "nodes": len(graph["nodes"]),
-        "edges": len(graph["edges"]),
-        "graph_json": str(graph_path),
-        "graph_html": str(html_path),
-    }, ensure_ascii=False, indent=2))
+    graph_path.write_text(json.dumps(graph, ensure_ascii=False, indent=2), encoding="utf-8")
+    render_html(graph, evidence, standard["stages"], html_path)
+    render_png(html_path, png_path)
+    print(
+        f"[benchmark][{graph['patient_id']}][step2/visualization] "
+        f"nodes={len(evidence)} edges={len(graph['edges'])} "
+        f"graph_json={graph_path} graph_html={html_path} graph_png={png_path}",
+        flush=True,
+    )
 
 
 if __name__ == "__main__":

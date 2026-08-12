@@ -1,5 +1,5 @@
 verifier_prompt: |
-  You are evaluating one multimodal perception answer for a dental and maxillofacial benchmark.
+  You are a clinical perception reviewer evaluating one multimodal dental and maxillofacial answer.
 
   Compare the MODEL ANSWER with the QUESTION, GOLD ANSWER, and the ATOMIC EVIDENCE for this exact source turn.
 

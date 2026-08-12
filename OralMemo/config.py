@@ -91,5 +91,5 @@ def get_settings() -> Settings:
         benchmark_llm=_model_config("BENCHMARK"),
         answer_llm=_model_config("ANSWER"),
         verifier_llm=_model_config("VERIFIER"),
-        graph_max_edges=int(os.environ.get("GRAPH_MAX_EDGES", "25")),
+        graph_max_edges=int(os.environ.get("GRAPH_MAX_EDGES", "40")),
     )

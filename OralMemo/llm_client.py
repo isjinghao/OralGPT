@@ -7,11 +7,17 @@ from datetime import datetime, timezone
 
 from openai import APIConnectionError, APITimeoutError, InternalServerError, OpenAI, RateLimitError
 
+from batch_utils import log
+
 
 class ChatClient:
-    def __init__(self, api_key: str, base_url: str, model: str):
+    def __init__(self, api_key: str, base_url: str, model: str, log_prefix: str = "[llm]"):
         self.client = OpenAI(api_key=api_key, base_url=base_url.rstrip("/") + "/")
         self.model = model
+        self.log_prefix = log_prefix
+
+    def log(self, scope: str, message: str) -> None:
+        log(f"{self.log_prefix}[{scope}] {message}")
 
     @staticmethod
     def _messages(prompt: str, images: list[str] | None, system_prompt: str | None) -> list[dict]:
@@ -46,16 +52,19 @@ class ChatClient:
                 )
                 return response.choices[0].message.content or ""
             except RateLimitError as exc:
+                if attempt >= 3:
+                    self.log("llm/error", "RateLimitError after 4 attempts")
+                    raise
                 wait_seconds = reset_wait_seconds(str(exc))
-                print(f"LLM rate limited; waiting {wait_seconds}s before retry {attempt + 1}/4.")
+                self.log("llm/retry", f"RateLimitError; wait={wait_seconds}s next_attempt={attempt + 2}/4")
                 time.sleep(wait_seconds)
             except (APIConnectionError, APITimeoutError, InternalServerError) as exc:
                 if attempt >= 3:
+                    self.log("llm/error", f"{type(exc).__name__} after 4 attempts")
                     raise
                 wait_seconds = min(60, 2 ** attempt * 5)
-                print(f"LLM transient error ({type(exc).__name__}); waiting {wait_seconds}s before retry {attempt + 1}/4.")
+                self.log("llm/retry", f"{type(exc).__name__}; wait={wait_seconds}s next_attempt={attempt + 2}/4")
                 time.sleep(wait_seconds)
-        raise RuntimeError("LLM request failed after retries.")
 
     def complete_json(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
                       images: list[str] | None = None, timeout: int = 300,

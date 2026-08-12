@@ -1,5 +1,5 @@
 template: |
-  You are validating a benchmark task plan before question generation.
+  You are a clinical task-plan reviewer validating a longitudinal memory and reasoning plan before question generation.
 
   Judge the plan against the full evidence available at its requested point.
 

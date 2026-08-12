@@ -1,5 +1,5 @@
 template: |
-  You are constructing OralMemBench, a multimodal longitudinal memory benchmark for oral and maxillofacial clinical reasoning.
+  You are a clinical information extraction specialist preparing atomic evidence for longitudinal oral and maxillofacial reasoning tasks.
 
   Extract atomic clinical evidence from the current stage only.
 

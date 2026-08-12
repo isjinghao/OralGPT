@@ -65,7 +65,7 @@ def normalize_timepoints(extracted: dict) -> list[dict]:
         timepoint["stage_type"] = stage_type
         normalized.append(timepoint)
 
-    if normalized and normalized[0]["stage_type"] != "perception":
+    if normalized[0]["stage_type"] != "perception":
         raise ValueError("The trajectory must begin with at least one perception timepoint")
     return normalized
 

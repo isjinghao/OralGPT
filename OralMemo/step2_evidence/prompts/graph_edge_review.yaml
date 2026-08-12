@@ -2,12 +2,14 @@ template: |
   You are independently reviewing candidate cross-stage evidence links.
 
   Classify each candidate once:
-  - clinical_support: the earlier fact materially helps interpret the later fact.
-  - context_consistency: the facts are compatible background but should not guide reasoning.
-  - reject: no defensible clinical relationship.
+  - clinical_support: the earlier fact confirms, refines, updates, or meaningfully contributes to interpreting the later fact. This may include complementary findings from different modalities or fields that support the same specific clinical interpretation.
+  - context_consistency: the facts share a clinically relevant, fact-specific theme that helps contextualize the later fact but is not needed for reasoning.
+  - reject: the facts are unrelated, incompatible, or connected only by a broad category or simple coexistence.
 
-  Direct support requires more than shared category, coexistence, or broad similarity. Preserve entity,
-  anatomical level, scope, direction, polarity, and uncertainty.
+  Preserve entity, anatomical level, scope, direction, polarity, and uncertainty. Prefer context_consistency
+  when a broad finding is related to, but does not specifically support, a localized finding. Accept
+  same-attribute measurement links when a later observation confirms, quantifies, or updates the earlier
+  value, unless their entity or scope conflicts.
 
   Return strict JSON only:
   {

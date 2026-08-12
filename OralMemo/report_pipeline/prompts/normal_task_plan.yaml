@@ -1,0 +1,28 @@
+task_types:
+  - task_type: modality_perception
+    count: 3
+    instruction: >-
+      Read a finding directly reported by one source at one timepoint; required
+      evidence should come from a single timepoint.
+
+  - task_type: longitudinal_evidence_recall
+    count: 2
+    instruction: >-
+      Recall evidence introduced at an earlier timepoint while reasoning later
+      in the clinical course; the answer must identify the earlier clinical
+      context, and required evidence should span at least two timepoints.
+
+  - task_type: cross_modal_reasoning
+    count: 2
+    instruction: >-
+      Integrate clinically complementary evidence from multiple timepoints or
+      source modalities to derive one supported interpretation; required
+      evidence should span at least two timepoints.
+
+  - task_type: memory_update_conflict_correction
+    count: 2
+    instruction: >-
+      Explain how later evidence adds a clinically relevant fact, refines the
+      disease course, or resolves an earlier impression; required evidence
+      should span at least two timepoints. The answer must state the added or
+      revised fact and must not treat confirmation alone as an update.

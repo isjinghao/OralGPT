@@ -1,5 +1,5 @@
 template: |
-  You are validating an OralMemBench benchmark QA item.
+  You are a clinical QA reviewer validating a longitudinal memory and reasoning task.
 
   Judge whether the question and gold answer are valid for the requested task type.
 

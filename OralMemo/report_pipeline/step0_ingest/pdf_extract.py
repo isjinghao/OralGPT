@@ -2,7 +2,7 @@
   - fulltext.json : {"pages": [{"page","text"}]}(按阅读顺序聚合文本)
   - tables.json   : [{"page","caption","html"}](MinerU 表格结构识别; 表格即图片也识别为表)
   - images/*.jpg  : 图片区域
-  - 返回 images_map(图注↔图片, 以 "Figure N" 为权威身份) 与 captions 列表
+  - 返回 images_map(图注↔图片, 以 "Figure N" 为权威身份)
 
 MinerU 由 `pip install "mineru[core]"` 提供; 模型源用 ModelScope(可用 MINERU_MODEL_SOURCE 覆盖)。
 """
@@ -67,9 +67,6 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
         shutil.rmtree(images_dir)  # 清理历史残留图片
     images_dir.mkdir(parents=True, exist_ok=True)
 
-    def _rel(p: Path) -> str:
-        return p.relative_to(rel_base).as_posix()
-
     content, auto = _run_mineru(pdf_path, out_dir / "_mineru")
 
     # (1) 逐页文本(阅读顺序)
@@ -117,7 +114,6 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
             for m in CAP_FIG_RE.finditer(txt):
                 cap_by_fig.setdefault(int(m.group(1)), txt[m.start():m.start() + 300].strip())
     all_figs = sorted(cap_by_fig)
-    captions = [{"figure": f"Figure {n}", "caption": cap_by_fig[n]} for n in all_figs]
 
     def _y(b):
         return (b.get("bbox") or [0, 0, 0, 0])[1]
@@ -149,7 +145,7 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
         fname = f"p{int(b.get('page_idx', 0)) + 1:02d}_img{kept:03d}.{ext}"
         shutil.copyfile(src, images_dir / fname)
         kept += 1
-        return _rel(images_dir / fname)
+        return (images_dir / fname).relative_to(rel_base).as_posix()
 
     images_map: dict = {}
     if img_blocks and len(img_blocks) == len(all_figs):
@@ -186,5 +182,4 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
         "n_images_kept": kept,
         "n_tables": len(tables),
         "images_map": images_map,
-        "captions": captions,
     }

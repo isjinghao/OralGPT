@@ -1,7 +1,6 @@
 """使用 verifier LLM 对阶段1模型感知回答做事实级评估。"""
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
 
@@ -110,10 +109,8 @@ class PerceptionEvaluator:
             for qa in stage.get("qa_pairs", [])
         }
 
-    def _cache_path(self, stage_id: str, source_turn_id: int, prompt: str) -> Path:
-        raw = "\n".join((self.verifier.model, stage_id, str(source_turn_id), prompt))
-        digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
-        return self.cache_dir / f"perception_verifier_{stage_id}_{source_turn_id}_{digest}.json"
+    def _cache_path(self, stage_id: str, source_turn_id: int) -> Path:
+        return self.cache_dir / f"perception_verifier_{stage_id}_{source_turn_id}.json"
 
     def evaluate(self, stage: dict, qa: dict, model_answer: str) -> dict:
         stage_id = stage["stage_id"]
@@ -133,12 +130,14 @@ class PerceptionEvaluator:
             evidence=json.dumps(evidence_payload, ensure_ascii=False, indent=2),
             model_answer=model_answer,
         )
-        cache_path = self._cache_path(stage_id, source_turn_id, prompt)
-        if cache_path.exists():
-            verdict = read_json(cache_path)
+        cache_input = {"model": self.verifier.model, "prompt": prompt, "max_tokens": 12000}
+        cache_path = self._cache_path(stage_id, source_turn_id)
+        cached = read_json(cache_path) if cache_path.exists() else None
+        if cached and cached.get("input") == cache_input:
+            verdict = cached["result"]
         else:
             verdict = self.verifier.complete_json(prompt, max_tokens=12000)
-            write_json(cache_path, verdict)
+            write_json(cache_path, {"input": cache_input, "result": verdict})
         metrics = calculate_metrics(verdict, gold_evidence)
         return {
             "stage_id": stage_id,

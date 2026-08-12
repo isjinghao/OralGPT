@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 import unicodedata
@@ -10,6 +9,7 @@ from string import Template
 
 import yaml
 
+from batch_utils import log
 from llm_client import ChatClient
 
 
@@ -26,9 +26,12 @@ def stage_order(stage: str) -> int:
 
 def _attribute_key(node: dict) -> tuple[str, str, str, str]:
     normalized = node.get("normalized", {})
+    field = str(normalized.get("field") or "")
+    if field == "chin_deviation":
+        field = "menton_deviation"
     return (
         str(node.get("clinical_dimension", "other")),
-        str(normalized.get("field") or ""),
+        field,
         str(normalized.get("tooth") or ""),
         str(normalized.get("side") or ""),
     )
@@ -42,7 +45,13 @@ def _canonical_text(value: object) -> str:
 
 def _normalized_value(node: dict) -> tuple[str, str]:
     normalized = node.get("normalized", {})
-    return _canonical_text(normalized.get("value")), _canonical_text(normalized.get("unit"))
+    value = _canonical_text(normalized.get("value"))
+    if value.startswith("class "):
+        value = value.removeprefix("class ")
+    if normalized.get("field") == "overjet" and value == "reverse":
+        match = re.search(r"\d+(?:\.\d+)?", node["fact_text"])
+        value = f"-{match.group()}" if match else value
+    return value, _canonical_text(normalized.get("unit"))
 
 
 def _node_lines(nodes: list[dict]) -> str:
@@ -59,9 +68,9 @@ def _node_lines(nodes: list[dict]) -> str:
     )
 
 
-def build_strong_edges(nodes: list[dict]) -> list[dict]:
-    """Create deterministic links only for identical repeated measurements."""
-    edges = []
+def build_structured_candidates(nodes: list[dict]) -> list[dict]:
+    """Propose repeated attributes and related normalized fields for model review."""
+    candidates = []
     by_attribute = defaultdict(list)
     for node in nodes:
         key = _attribute_key(node)
@@ -77,18 +86,51 @@ def build_strong_edges(nodes: list[dict]) -> list[dict]:
         for early_stage, later_stage in zip(ordered_stages, ordered_stages[1:]):
             early = sorted(by_stage[early_stage], key=lambda item: (item["source_turn_id"], item["evidence_id"]))[-1]
             later = sorted(by_stage[later_stage], key=lambda item: (item["source_turn_id"], item["evidence_id"]))[0]
-            if _normalized_value(early) != _normalized_value(later):
-                continue
-            edges.append(
+            confirms = _normalized_value(early) == _normalized_value(later)
+            candidates.append(
                 {
                     "source": early["evidence_id"],
                     "target": later["evidence_id"],
                     "type": "measurement_link",
-                    "relation": "confirms",
-                    "reason": "Repeated measurement of the same clinical attribute.",
+                    "relation": "confirms" if confirms else "updates",
+                    "reason": (
+                        "Repeated observation confirms the same clinical attribute."
+                        if confirms
+                        else "Later observation updates the same clinical attribute."
+                    ),
                 }
             )
-    return edges
+
+    seen = {(item["source"], item["target"]) for item in candidates}
+    ordered = sorted(
+        nodes,
+        key=lambda item: (stage_order(item["introduced_stage"]), item["source_turn_id"], item["evidence_id"]),
+    )
+    for index, early in enumerate(ordered):
+        early_key = _attribute_key(early)
+        early_terms = set(re.findall(r"[a-z0-9]+", _canonical_text(early_key[1])))
+        if early_key[0] == "other" or not early_terms:
+            continue
+        for later in ordered[index + 1:]:
+            later_key = _attribute_key(later)
+            if (
+                stage_order(early["introduced_stage"]) >= stage_order(later["introduced_stage"])
+                or early_key[0] != later_key[0]
+                or not early_terms.intersection(re.findall(r"[a-z0-9]+", _canonical_text(later_key[1])))
+                or (early_key[2] and later_key[2] and early_key[2] != later_key[2])
+                or (early_key[3] and later_key[3] and early_key[3] != later_key[3])
+                or (early["evidence_id"], later["evidence_id"]) in seen
+            ):
+                continue
+            seen.add((early["evidence_id"], later["evidence_id"]))
+            candidates.append(
+                {
+                    "source": early["evidence_id"],
+                    "target": later["evidence_id"],
+                    "reason": "Related normalized fields suggest a cross-stage clinical association.",
+                }
+            )
+    return candidates
 
 
 def _template(path: Path) -> Template:
@@ -109,12 +151,14 @@ def _valid_pairs(items: list[dict], nodes: dict[str, dict], limit: int) -> list[
             or target not in nodes
             or source == target
             or not reason
-            or len(reason.split()) > 15
             or stage_order(nodes[source]["introduced_stage"]) >= stage_order(nodes[target]["introduced_stage"])
         ):
             continue
         seen.add(key)
-        valid.append({"source": source, "target": target, "reason": reason})
+        candidate = {"source": source, "target": target, "reason": reason}
+        if item.get("type") == "measurement_link":
+            candidate.update(type="measurement_link", relation=item["relation"])
+        valid.append(candidate)
         if len(valid) == limit:
             break
     return valid
@@ -135,23 +179,28 @@ def _review_edges(
     )
     reviewed = client.complete_json(prompt, max_tokens=12000)
     node_by_id = {node["evidence_id"]: node for node in nodes}
-    candidate_keys = {(item["source"], item["target"]) for item in candidates}
+    candidate_by_key = {(item["source"], item["target"]): item for item in candidates}
     clinical = _valid_pairs(reviewed.get("clinical_support", []), node_by_id, max_edges)
     context = _valid_pairs(reviewed.get("context_consistency", []), node_by_id, max_edges)
-    clinical = [item for item in clinical if (item["source"], item["target"]) in candidate_keys]
+    clinical = [item for item in clinical if (item["source"], item["target"]) in candidate_by_key]
     clinical_keys = {(item["source"], item["target"]) for item in clinical}
     context = [
         item for item in context
-        if (item["source"], item["target"]) in candidate_keys
+        if (item["source"], item["target"]) in candidate_by_key
         and (item["source"], item["target"]) not in clinical_keys
     ]
-    return [
-        {**item, "type": "clinical_support", "relation": "supports"}
-        for item in clinical
-    ] + [
+    accepted = []
+    for item in clinical:
+        proposed = candidate_by_key[(item["source"], item["target"])]
+        if proposed.get("type") == "measurement_link":
+            accepted.append({**item, "type": "measurement_link", "relation": proposed["relation"]})
+        else:
+            accepted.append({**item, "type": "clinical_support", "relation": "supports"})
+    accepted.extend(
         {**item, "type": "context_consistency", "relation": "compatible"}
         for item in context
-    ]
+    )
+    return accepted
 
 
 def propose_cross_stage_edges(
@@ -160,6 +209,8 @@ def propose_cross_stage_edges(
     client: ChatClient | None,
     cache_dir: Path | None,
     max_edges: int,
+    log_prefix: str,
+    structured_candidates: list[dict],
 ) -> list[dict]:
     if client is None:
         raise ValueError("A ChatClient is required to generate clinical evidence edges")
@@ -175,21 +226,34 @@ def propose_cross_stage_edges(
         max_edges=max_edges,
     )
     reviewer_template = REVIEW_PROMPT_PATH.read_text(encoding="utf-8")
-    cache_key = hashlib.sha256(f"{client.model}\0{candidate_prompt}\0{reviewer_template}".encode("utf-8")).hexdigest()
+    cache_input = {
+        "model": client.model,
+        "candidate_prompt": candidate_prompt,
+        "reviewer_template": reviewer_template,
+        "structured_candidates": structured_candidates,
+    }
     cache_path = cache_dir / "graph_edges.json" if cache_dir else None
     if cache_path and cache_path.exists():
         cached = json.loads(cache_path.read_text(encoding="utf-8"))
-        if cached.get("_cache_key") == cache_key:
-            return cached.get("edges", [])
+        if cached.get("input") == cache_input:
+            edges = cached.get("edges", [])
+            log(f"{log_prefix}[step2/graph] cache_hit reviewed_edges={len(edges)}")
+            return edges
 
-    candidates = client.complete_json(candidate_prompt, max_tokens=12000).get("candidates", [])
+    log(f"{log_prefix}[step2/graph] generating_candidates nodes={len(nodes)}")
+    proposed = client.complete_json(candidate_prompt, max_tokens=12000).get("candidates", [])
     node_by_id = {node["evidence_id"]: node for node in nodes}
-    candidates = _valid_pairs(candidates, node_by_id, max_edges)
+    candidates = _valid_pairs(structured_candidates + proposed, node_by_id, max_edges)
+    log(
+        f"{log_prefix}[step2/graph] reviewing_candidates count={len(candidates)} "
+        f"structured={len(structured_candidates)}"
+    )
     edges = _review_edges(client, candidates, nodes, max_edges)
+    log(f"{log_prefix}[step2/graph] review_completed edges={len(edges)}")
     if cache_path:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         cache_path.write_text(
-            json.dumps({"edges": edges, "_cache_key": cache_key}, ensure_ascii=False, indent=2),
+            json.dumps({"input": cache_input, "edges": edges}, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
     return edges
@@ -211,19 +275,37 @@ def build_evidence_graph(
     evidence_json: Path,
     client: ChatClient | None = None,
     cache_dir: Path | None = None,
-    max_edges: int = 25,
+    max_edges: int = 40,
+    log_prefix: str | None = None,
 ) -> dict:
-    """Build strong measurement links, reviewed clinical support, and visual-only context edges."""
+    """Build independently reviewed structured and model-proposed cross-stage edges."""
     evidence_data = json.loads(evidence_json.read_text(encoding="utf-8"))
     nodes = evidence_data["evidence"]
     node_ids = [node["evidence_id"] for node in nodes]
     if len(set(node_ids)) != len(node_ids):
         raise ValueError("Evidence catalog contains duplicate evidence_id values")
     node_by_id = {node["evidence_id"]: node for node in nodes}
-    edges = build_strong_edges(nodes)
-    edges.extend(propose_cross_stage_edges(nodes, evidence_data["patient_id"], client, cache_dir, max_edges))
+    prefix = log_prefix or f"[benchmark][{evidence_data['patient_id']}]"
+    structured_candidates = build_structured_candidates(nodes)
+    deterministic_edges = [
+        item for item in structured_candidates
+        if item.get("type") == "measurement_link"
+    ]
+    log(
+        f"{prefix}[step2/graph] deterministic_edges={len(deterministic_edges)} "
+        f"structured_candidates={len(structured_candidates)}"
+    )
+    reviewed_edges = propose_cross_stage_edges(
+        nodes,
+        evidence_data["patient_id"],
+        client,
+        cache_dir,
+        max_edges,
+        prefix,
+        structured_candidates,
+    )
+    edges = dedupe_edges(deterministic_edges + reviewed_edges, node_by_id)
     return {
         "patient_id": evidence_data["patient_id"],
-        "nodes": nodes,
-        "edges": dedupe_edges(edges, node_by_id),
+        "edges": edges,
     }

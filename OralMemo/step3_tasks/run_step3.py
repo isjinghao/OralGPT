@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
+from batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
 from config import get_settings
 from llm_client import ChatClient
 from step3_tasks.llm_tasks import (
+    PROMPT_DIR,
     finalize_task,
     generate_rubric,
     plan_normal_tasks,
@@ -29,11 +32,13 @@ def build_normal_tasks(
     patient_stages: dict,
     index: EvidenceIndex,
     cache_dir: Path,
-    verifier_client: ChatClient | None = None,
+    verifier_client: ChatClient,
+    prompt_dir: Path,
 ) -> list[dict]:
-    # 构建普通任务; 仅保留通过校验的问题, 未通过校验的直接丢弃
-    planned = plan_normal_tasks(client, patient_stages, index, cache_dir)
     patient_id = patient_stages["patient_id"]
+    prefix = f"[benchmark][{patient_id}]"
+    log(f"{prefix}[step3/planning] started")
+    planned = plan_normal_tasks(client, patient_stages, index, cache_dir, prompt_dir)
     stage_orders = {stage["stage_id"]: int(stage["order"]) for stage in patient_stages["stages"]}
     valid_stage_ids = set(stage_orders)
     counters: dict[str, int] = {}
@@ -53,39 +58,41 @@ def build_normal_tasks(
         ]
         if future_ids:
             raise ValueError(f"Evidence released after ask_after_stage: {future_ids}")
-        plan_validation = validate_task_plan(
-            verifier_client or client,
-            spec,
-            available_evidence,
-            cache_dir,
-        )
+        plan_validation = validate_task_plan(verifier_client, spec, available_evidence, cache_dir)
         if not plan_validation["accepted"]:
             dropped += 1
-            print(f"  dropped (plan validation failed): {spec['task_id']}", flush=True)
+            log(f"{prefix}[step3/planning] task={spec['task_id']} dropped=plan_validation")
             continue
-        print(f"[Step3 normal] {spec['task_id']} ({spec['task_type']})", flush=True)
+        log(f"{prefix}[step3/question] task={spec['task_id']} type={spec['task_type']}")
         task = finalize_task(
             client,
             spec,
             available_evidence,
             cache_dir,
             verifier_client=verifier_client,
+            log_prefix=prefix,
+            prompt_dir=prompt_dir,
         )
         if not task["validation"].get("accepted"):
             dropped += 1
-            print(f"  dropped (validation failed after retries): {spec['task_id']}", flush=True)
+            log(f"{prefix}[step3/question] task={spec['task_id']} dropped=qa_validation")
             continue
-        print(f"  accepted={task['validation'].get('accepted')}", flush=True)
         tasks.append(task)
-    if dropped:
-        print(f"[Step3 normal] dropped {dropped} task(s) that failed validation", flush=True)
+        log(f"{prefix}[step3/question] task={spec['task_id']} accepted")
+    log(f"{prefix}[step3/planning] completed accepted={len(tasks)} dropped={dropped}")
     return tasks
 
 
-def build_evaluation_tasks(client: ChatClient, standard: dict, index: EvidenceIndex, cache_dir: Path) -> list[dict]:
-    """从标准轨迹构造 treatment/followup evaluation 任务。"""
+def build_evaluation_tasks(
+    client: ChatClient,
+    standard: dict,
+    index: EvidenceIndex,
+    cache_dir: Path,
+    prompt_dir: Path,
+) -> list[dict]:
     patient_id = standard["patient_id"]
-    prefix = patient_id.replace("__", "_")
+    prefix = f"[benchmark][{patient_id}]"
+    task_prefix = patient_id.replace("__", "_")
     stage_orders = {stage["stage_id"]: int(stage["order"]) for stage in standard["stages"]}
     counters: dict[str, int] = {}
     tasks = []
@@ -103,9 +110,9 @@ def build_evaluation_tasks(client: ChatClient, standard: dict, index: EvidenceIn
                     if edge["source"] in available_ids and edge["target"] in available_ids
                 ]
             }
-            available_index = EvidenceIndex(evidence=available, graph=available_graph)
             counters[task_type] = counters.get(task_type, 0) + 1
-            task_id = f"{prefix}_{task_type}_{counters[task_type]:03d}"
+            task_id = f"{task_prefix}_{task_type}_{counters[task_type]:03d}"
+            available_index = EvidenceIndex(evidence=available, graph=available_graph)
             evidence_ids = select_evaluation_evidence(
                 client,
                 task_id,
@@ -113,6 +120,7 @@ def build_evaluation_tasks(client: ChatClient, standard: dict, index: EvidenceIn
                 turn["assistant"],
                 available_index,
                 cache_dir,
+                prompt_dir,
             )
             task = assemble_evaluation_task(
                 patient_id=patient_id,
@@ -123,71 +131,94 @@ def build_evaluation_tasks(client: ChatClient, standard: dict, index: EvidenceIn
                 index=available_index,
             )
             tasks.append(task)
-            print(
-                f"[Step3 evaluation] {task_id} ({task_type}) @ {ask_after_stage} "
-                f"-> release {turn['release_after_stage']} | evidence={len(task['selected_evidence'])}",
-                flush=True,
+            log(
+                f"{prefix}[step3/evaluation-task] task={task_id} type={task_type} "
+                f"ask={ask_after_stage} evidence={len(task['selected_evidence'])}"
             )
     return tasks
 
 
-def main() -> None:
-    # (1) 读取 Step1/Step2 产物
-    settings = get_settings()
-    out = settings.output_root
+def build_client(settings, role: str, patient_id: str) -> ChatClient:
+    cfg = settings.llm_for(role)
+    return ChatClient(
+        api_key=cfg.api_key,
+        base_url=cfg.base_url,
+        model=cfg.model,
+        log_prefix=f"[benchmark][{patient_id}]",
+    )
+
+
+def run_patient(
+    out: Path,
+    patient_id: str,
+    settings,
+    prompt_dir: Path = PROMPT_DIR,
+) -> None:
+    prefix = f"[benchmark][{patient_id}]"
     standard = read_json(out / "trajectories" / "standard_trajectory.json")
     evidence_data = read_json(out / "evidence" / "evidence.json")
     evidence_graph = read_json(out / "graph" / "evidence_graph.json")
-
-    benchmark_cfg = settings.llm_for("benchmark")
-    verifier_cfg = settings.llm_for("verifier")
-    client = ChatClient(
-        api_key=benchmark_cfg.api_key,
-        base_url=benchmark_cfg.base_url,
-        model=benchmark_cfg.model,
-    )
-    verifier_client = ChatClient(
-        api_key=verifier_cfg.api_key,
-        base_url=verifier_cfg.base_url,
-        model=verifier_cfg.model,
-    )
     index = EvidenceIndex(evidence=evidence_data["evidence"], graph=evidence_graph)
     cache_dir = out / "cache" / "step3"
+    client = build_client(settings, "benchmark", patient_id)
+    verifier_client = build_client(settings, "verifier", patient_id)
 
-    # (2) LLM 规划并生成普通任务
-    tasks = build_normal_tasks(client, standard, index, cache_dir, verifier_client=verifier_client)
+    log(f"{prefix}[step3/start] evidence={len(evidence_data['evidence'])}")
+    tasks = build_normal_tasks(
+        client,
+        standard,
+        index,
+        cache_dir,
+        verifier_client,
+        prompt_dir,
+    )
+    tasks.extend(build_evaluation_tasks(client, standard, index, cache_dir, prompt_dir))
 
-    # (3) 从标准轨迹中的 evaluation QA 构造治疗/随访任务
-    tasks.extend(build_evaluation_tasks(client, standard, index, cache_dir))
+    rubric_tasks = [task for task in tasks if task["task_type"] in {"treatment", "followup"}]
+    treatment_rubrics = []
+    for index_number, task in enumerate(rubric_tasks, start=1):
+        log(f"{prefix}[step3/rubric] task={index_number}/{len(rubric_tasks)} id={task['task_id']}")
+        treatment_rubrics.append(generate_rubric(client, task, cache_dir))
 
-    # (4) 为治疗/随访任务生成 rubric
-    treatment_rubrics = [
-        generate_rubric(client, task, cache_dir)
-        for task in tasks
-        if task["task_type"] in {"treatment", "followup"}
-    ]
-
-    # (5) 写 all_tasks.json、各分组 json 与 rubric 文件
     groups: dict[str, list[dict]] = {}
     for task in tasks:
         groups.setdefault(task["task_type"], []).append(task)
-
     tasks_dir = out / "tasks"
-    write_json(tasks_dir / "all_tasks.json", {"patient_id": standard["patient_id"], "tasks": tasks})
+    write_json(tasks_dir / "all_tasks.json", {"patient_id": patient_id, "tasks": tasks})
     for group_name, items in groups.items():
-        write_json(tasks_dir / f"{group_name}.json", {"patient_id": standard["patient_id"], "tasks": items})
+        write_json(tasks_dir / f"{group_name}.json", {"patient_id": patient_id, "tasks": items})
+    write_json(out / "rubrics" / "treatment_rubrics.json", treatment_rubrics)
+    log(f"{prefix}[step3/done] tasks={len(tasks)} rubrics={len(treatment_rubrics)} groups={len(groups)}")
 
-    rubric_dir = out / "rubrics"
-    write_json(rubric_dir / "treatment_rubrics.json", treatment_rubrics)
 
-    result = {
-        "patient_id": standard["patient_id"],
-        "task_count": len(tasks),
-        "group_counts": {name: len(items) for name, items in sorted(groups.items())},
-        "rubric_count": len(treatment_rubrics),
-    }
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Generate benchmark tasks and rubrics")
+    add_batch_arguments(parser)
+    return parser.parse_args()
+
+
+def completed(out: Path) -> bool:
+    return (out / "tasks" / "all_tasks.json").is_file() and (
+        out / "rubrics" / "treatment_rubrics.json"
+    ).is_file()
+
+
+def main() -> int:
+    args = parse_args()
+    settings = get_settings()
+    patients = selected_patients(settings.dataset_json, args.all, args.limit)
+
+    def worker(item: dict) -> str:
+        patient_id = item["id"]
+        out = patient_output_root(settings.bench_root, patient_id)
+        if not args.force and completed(out):
+            log(f"[benchmark][{patient_id}][step3/resume] completed outputs found; skipped")
+            return "skipped"
+        run_patient(out, patient_id, settings)
+        return "completed"
+
+    return run_patient_batch(patients, args.num_workers, "benchmark", worker)
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

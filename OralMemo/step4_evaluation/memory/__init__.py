@@ -22,8 +22,8 @@ _REGISTRY: dict[str, type[MemoryMethod]] = {
     Mem0Memory.name: Mem0Memory,                 # mem0_memory
 }
 
-# 不指定 --methods 时默认只跑单阶段基线
-DEFAULT_METHOD: str = SingleStageMemory.name
+# 不指定 --methods 时默认使用完整上下文
+DEFAULT_METHOD: str = FullContextMemory.name
 
 
 def available_methods() -> list[str]:

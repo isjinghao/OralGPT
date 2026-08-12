@@ -61,7 +61,6 @@ def collect_perception(eval_root: Path) -> dict:
                 image_paths.append(Path(os.path.relpath(destination, eval_root)).as_posix())
             items.append({
                 "stage_id": stage["stage_id"],
-                "order": stage.get("order", 0),
                 "stage_type": stage.get("stage_type", ""),
                 "modality": stage.get("modality", []),
                 "source_turn_id": qa["source_turn_id"],
@@ -124,7 +123,6 @@ def collect_results(eval_root: Path) -> dict:
                     "question": ans.get("question", ""),
                     "gold_answer": ans.get("gold_answer", ""),
                     "model_answer": ans.get("model_answer", ""),
-                    "validation_accepted": ans.get("validation_accepted", True),
                     "n_images": ans.get("n_images", 0),
                     "score": score,
                     "detail": detail,
@@ -150,7 +148,6 @@ HTML_TEMPLATE = r'''<!doctype html>
 body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif; background:var(--bg); color:var(--text); }
 header { padding:24px 28px 18px; background:linear-gradient(135deg,#0f172a,#1d4ed8); color:#fff; }
 h1 { margin:0 0 8px; font-size:26px; }
-.subtitle { opacity:.88; font-size:14px; }
 .container { padding:20px 28px 36px; max-width:1500px; margin:0 auto; }
 .panel { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; box-shadow:0 4px 14px rgba(15,23,42,.05); margin-bottom:16px; }
 .controls { display:grid; grid-template-columns:repeat(4,minmax(160px,1fr)); gap:12px; align-items:end; }
@@ -177,12 +174,7 @@ select,input { width:100%; padding:9px 10px; border:1px solid var(--line); borde
 .block { border:1px solid var(--line); border-radius:12px; padding:12px; background:#fcfcfd; }
 .block h4 { margin:0 0 8px; font-size:14px; color:#344054; }
 .text { white-space:pre-wrap; font-size:14px; line-height:1.55; }
-.evidence { display:grid; gap:8px; }
-.ev { border:1px solid var(--line); border-radius:10px; padding:9px; background:#fff; }
-.ev.covered { border-color:#86efac; background:#f0fdf4; }
-.ev.missed { border-color:#fecaca; background:#fff7f7; }
 .ev-id { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12px; color:#475467; }
-.ev-fact { margin-top:4px; font-size:14px; }
 .criteria { width:100%; border-collapse:collapse; font-size:13px; }
 .criteria th,.criteria td { border-bottom:1px solid var(--line); padding:7px 6px; text-align:left; vertical-align:top; }
 .criteria th { color:#475467; background:#f9fafb; }
@@ -401,7 +393,6 @@ function scorePills(r){
       out.push(pill(`证据召回分数（ERS）${s.covered_evidence_count ?? 0}/${s.total_evidence_count ?? 0}`, 'blue'));
     }
   }
-  if(r.validation_accepted === false) out.push(pill('校验未通过','red'));
   if(r.n_images) out.push(pill(`图片 ${r.n_images}`,'blue'));
   return out.join('');
 }
@@ -416,7 +407,6 @@ function scoreSummaryHtml(r){
       <div class="score-grid">
         <div class="score-box"><div class="label">准确率（ACC，整题正确性）</div><div class="value">${pill(accText, accCls)}</div><div class="desc">判定理由：${esc(s.reason || '')}</div></div>
         <div class="score-box"><div class="label">证据召回分数（ERS）</div><div class="value">${ersPct}</div><div class="desc">正确召回证据数 / selected_evidence 总数：${esc(s.covered_evidence_count ?? 0)} / ${esc(s.total_evidence_count ?? 0)}</div></div>
-        <div class="score-box"><div class="label">问题校验</div><div class="value">${pill(r.validation_accepted === false ? '未通过' : '通过', r.validation_accepted === false ? 'red' : 'green')}</div><div class="desc">Step3 问题校验结果</div></div>
       </div>
     </div>`;
   }
@@ -466,8 +456,8 @@ function criteriaHtml(r){
 function rawScoreHtml(r){
   return `<details class="block"><summary style="cursor:pointer;font-weight:650;">原始评分 JSON</summary><pre class="text">${esc(JSON.stringify({score:r.score || {}, rubric_detail:r.detail || {}}, null, 2))}</pre></details>`;
 }
-function cardHtml(r, idx){
-  return `<article class="card" data-i="${idx}">
+function cardHtml(r){
+  return `<article class="card">
     <div class="card-head" onclick="this.parentElement.classList.toggle('open')">
       <div><div class="card-title">${esc(r.question)}</div><div class="card-meta">${scorePills(r)}</div></div>
       <div class="small">${esc(r.task_id)}</div>
@@ -510,7 +500,8 @@ def main() -> None:
     output = args.output or (args.eval_root / "chenfang_step4_results.html")
     html = HTML_TEMPLATE.replace("__DATA__", json.dumps(data, ensure_ascii=False))
     output.write_text(html, encoding="utf-8")
-    print(f"HTML written to: {output}")
+    patient_id = f"{args.eval_root.parent.parent.name}__{args.eval_root.parent.name}"
+    print(f"[evaluation][{patient_id}][step4/html] written path={output}", flush=True)
 
 
 if __name__ == "__main__":

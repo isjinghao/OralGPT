@@ -12,13 +12,19 @@
 ## 一、目录结构
 
 ```
-bench/
+OralMemo/
 ├── __init__.py                       # 包说明
 ├── config.py                         # 配置：路径 + .env / OpenAI 设置
 ├── llm_client.py                     # OpenAI 兼容客户端（限流重试 + JSON 解析）
+├── batch_utils.py                    # 多病人选择、输出路径与并行执行
+├── scripts/                          # WSL 批量运行入口
+│   ├── run_step1_step2.sh
+│   ├── run_step3.sh
+│   └── run_step4.sh
+├── reports/                          # 报告下载、统计脚本及本地 PDF/图表
 ├── oralgpt_cmf_llamafactory_sft_dataset.json   # 原始患者数据集（SFT 格式）
 ├── SH9HCMFdata/                      # 影像与表格原始数据（png/xlsx/jpg）
-├── outputs/group<N>/<NAME>/          # 每个病人独立的流水线产物（stages/trajectories/variants/evidence/cache 等），路径与原始数据 group<N>__<NAME> 命名一致
+├── outputs/group<N>/<NAME>/          # 每个病人独立的流水线产物
 │
 ├── step1_patient_trajectory/         # Step1：阶段切分与轨迹生成
 │   ├── dataset.py                    #   加载患者、拆分问答轮次、对齐图片
@@ -27,12 +33,11 @@ bench/
 │   └── noise_pool.json               #   冻结的长噪声池（按 patient_id 确定性采样）
 │
 ├── step2_evidence/                   # Step2：原子证据与证据图
-│   ├── pipeline.py                   #   单病人核心流程（Step1 轨迹 + Step2 证据），供两个入口复用
-│   ├── run_one.py                    #   入口①a：处理单个病人（可单独重跑某个失败病人）
-│   ├── run_all.py                    #   入口①b：批量处理全部病人（遇错继续 + 进度 + 报告）
+│   ├── pipeline.py                   #   单病人串行核心流程（轨迹、证据、证据图）
+│   ├── run_step1_step2.py            #   并行多病人 Step1/2 入口
 │   ├── evidence.py                   #   调用 LLM 逐阶段抽取原子证据（带缓存）
 │   ├── graph.py                      #   规则化构建证据图（节点 / 边）
-│   ├── visualize_graph.py            #   入口②：渲染证据图 HTML
+│   ├── visualize_graph.py            #   渲染证据图 HTML 与 PNG
 │   └── prompts/
 │       ├── evidence_extraction.yaml  #   证据抽取 prompt 模板
 │       └── graph_edges.yaml          #   跨阶段证据图边生成 prompt 模板
@@ -40,7 +45,7 @@ bench/
 └── step3_tasks/                      # Step3：Benchmark 任务与评分 rubric
     ├── selectors.py                  #   证据索引/引用、规范化答案、任务规格组装
     ├── llm_tasks.py                  #   LLM 任务规划 + 问题生成 + 校验 + held-out 证据归因 + rubric 生成（带缓存）
-    ├── run_step3_chenfang.py         #   入口③：生成全部任务与 rubric
+    ├── run_step3.py                  #   并行多病人任务与 rubric 生成入口
     └── prompts/
         ├── normal_task_plan.yaml     #   普通任务的类型/数量/定义配置
         ├── task_planning.yaml        #   普通任务规划 prompt 模板（按任务类型逐类调用）
@@ -50,7 +55,7 @@ bench/
         └── rubric_generation.yaml    #   诊断/治疗任务评分 rubric 生成 prompt 模板
 
 └── step4_evaluation/                 # Step4 + Step5：记忆方法评测与打分
-    ├── run_step4_chenfang.py         #   入口④：按阶段流式提问作答并打分，汇总对比报告
+    ├── run_step4.py                  #   并行多病人流式测评与打分入口
     ├── evaluator.py                  #   流式评测引擎（缓存 LLM、逐阶段读取轨迹、多模态图片编码）
     ├── report.py                     #   汇总 ACC / ERS / 诊断分 / TPS，多方法对比表
     ├── scoring.py                    #   base 任务 ACC 判定与 rubric 打分（调用 LLM 裁判）
@@ -78,29 +83,16 @@ bench/
 conda create -n cmfbench python=3.10 -y
 conda activate cmfbench
 pip install -r requirement.txt
+playwright install chromium
 ```
 
-> 代码需 **Python ≥ 3.10**。`requirement.txt` 已含全部依赖（其中 `mem0ai` 仅 Step4 `--methods mem0_memory` 时用到）。
 
 ### 配置项（`.env`）
 
 `config.py` 通过 `load_env()` 从项目根目录的 `.env` 读取环境变量，再由 `get_settings()` 组装成 `Settings`：
 
-| 环境变量 | 必填 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| `OPENAI_API_KEY` | 条件必填 | 无 | 通用 OpenAI 兼容接口 API Key；各角色未单独配置时回退到它（若三类角色 key 都单独配置，则可不填） |
-| `OPENAI_BASE_URL` | 否 | `https://api.openai.com/v1` | 通用接口基址（末尾 `/` 会被去除） |
-| `OPENAI_MODEL` | 否 | `qwen3.6-chat` | 通用模型名 |
-| `BENCHMARK_OPENAI_API_KEY` / `BENCHMARK_OPENAI_BASE_URL` / `BENCHMARK_OPENAI_MODEL` | 否 | 回退到 `OPENAI_*` | 生成 benchmark 用：时间线抽取、证据抽取、任务/问题/rubric 生成 |
-| `ANSWER_OPENAI_API_KEY` / `ANSWER_OPENAI_BASE_URL` / `ANSWER_OPENAI_MODEL` | 否 | 回退到 `OPENAI_*` | 被测模型作答用：Step4 记忆更新与回答问题 |
-| `VERIFIER_OPENAI_API_KEY` / `VERIFIER_OPENAI_BASE_URL` / `VERIFIER_OPENAI_MODEL` | 否 | 回退到 `OPENAI_*` | 校验/评分用：时间线校验、QA 校验、judge/rubric/evidence 评分 |
-| `EMBEDDING_OPENAI_API_KEY` / `EMBEDDING_OPENAI_BASE_URL` / `EMBEDDING_MODEL` | 否 | key/url 回退到 `OPENAI_*`；模型默认 `text-embedding-3-small` | 仅 Step4 `mem0_memory` 用；向量化模型可单独配置 key 和 URL |
-
-在项目根目录创建 `.env`：
-
 ```bash
-cat > .env << 'EOF'
-# 通用默认配置（角色未单独配置时使用）
+# 通用默认配置
 OPENAI_API_KEY=你的默认key
 OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=qwen3.6-chat
@@ -127,43 +119,77 @@ EMBEDDING_MODEL=text-embedding-3-small
 EOF
 ```
 
-`Settings` 中固定的路径（无需配置）：
+固定数据路径：
 
-- `dataset_json` = `bench/oralgpt_cmf_llamafactory_sft_dataset.json`
-- `data_root`    = `bench/SH9HCMFdata`
-- `output_root`  = `bench/outputs/group1/CHENFANG`
+- 数据集：`oralgpt_cmf_llamafactory_sft_dataset.json`
+- 原始数据：`SH9HCMFdata/group1` 至 `SH9HCMFdata/group9`
+- 病人输出：`outputs/<group>/<patient_name>`
 
 ---
 
-## 三、运行方式
+## 三、批量运行
+
+三个阶段必须分开手动启动。单个病人内部始终串行，不同病人通过 `--num-workers` 并行。所有脚本在 WSL 中自动激活 `cmfbench`。
+
+患者范围：
+
+- `--all`：运行数据集中的全部病人；
+- `--limit N`：按数据集顺序只运行前 N 个病人。
+
+默认会检查最终产物并跳过已完成病人；中断后重新执行相同命令即可继续，已有 LLM 缓存会复用。`--force` 仅忽略病人级完成判断。
+
+### 1. 生成 Step1/2
 
 ```bash
-conda activate cmfbench
+# 前 4 个病人，4 个病人并行
+bash scripts/run_step1_step2.sh --limit 4 --num-workers 4
 
-# Step1 + Step2
-python -m bench.step2_evidence.run_all                  # 批量处理全部病人，默认断点续跑
-python -m bench.step2_evidence.run_all --force          # 忽略已有结果，强制重跑全部
-python -m bench.step2_evidence.run_one group1__CHENFANG # 仅处理单个病人
-
-# Step2 可视化
-python -m bench.step2_evidence.visualize_graph
-
-# Step3：生成任务与评分
-python -m bench.step3_tasks.run_step3_chenfang
-
-# Step4：记忆方法评测与打分（详见「五、Step4 评测」）
-python step4_evaluation/run_step4_chenfang.py
+# 全部病人
+bash scripts/run_step1_step2.sh --all --num-workers 8
 ```
+
+Step1/2 对每个病人串行生成标准轨迹、缺失模态/长噪声变体、原子证据和证据图。
+
+### 2. 生成 Step3 benchmark
+
+Step1/2 全部完成后再手动执行：
+
+```bash
+bash scripts/run_step3.sh --limit 4 --num-workers 4
+bash scripts/run_step3.sh --all --num-workers 8
+```
+
+### 3. 运行 Step4 测评
+
+Step3 全部完成后再手动执行。默认是标准轨迹和 `full_context_memory`：
+
+```bash
+bash scripts/run_step4.sh --limit 4 --num-workers 4
+bash scripts/run_step4.sh --all --num-workers 4
+```
+
+指定多条轨迹、多个 memo 方法或多模态模式：
+
+```bash
+bash scripts/run_step4.sh --all --num-workers 4 \
+  --trajectories standard,model_perception \
+  --methods single_stage_memory,full_context_memory,summary_memory
+
+bash scripts/run_step4.sh --all --num-workers 3 \
+  --trajectories standard,model_perception \
+  --methods full_context_memory,summary_memory \
+  --multimodal
+```
+
+`model_perception` 要求病人目录中已存在 `trajectories/model_perception_trajectory.json`。其他轨迹名从 `variants/<name>.json` 读取。`report.json` 和 `report.txt` 记录本次命令指定的方法；需要对比多个 memo 方法时，请在同一次命令中全部传给 `--methods`。
 
 ### 产物
 
 | 步骤 | 产物 |
 | --- | --- |
 | Step1 | `trajectories/standard_trajectory.json`、`variants/*.json` |
-
-| Step2 | `evidence/evidence.json`、`cache/evidence_*.json` |
-| Step2 可视化 | `graph/evidence_graph.json`、`graph/evidence_graph.html` |
-| Step3 | `tasks/all_tasks.json` 及按实际任务类型分组的 JSON、`rubrics/treatment_rubrics.json`、`cache/step3/...` |
+| Step2 | `evidence/evidence.json`、`graph/evidence_graph.json`、`graph/evidence_graph.html`、`graph/evidence_graph.png`、`cache/...` |
+| Step3 | `tasks/all_tasks.json`、按任务类型分组的 JSON、`rubrics/treatment_rubrics.json`、`cache/step3/...` |
 | Step4 | `evaluation/<轨迹>[_mm]/answers_<方法>.json`、`report.json`、`report.txt`、`cache/step4/...` |
 
 ---
@@ -197,33 +223,37 @@ python step4_evaluation/run_step4_chenfang.py
 
 ---
 
-## 五、Step4 评测（记忆方法对比）
+## 五、Step4 评测
 
-对同一条临床轨迹，按阶段**流式**读取信息（`observe` → `update`），并在每个阶段结束后释放并回答该阶段的任务；再对作答打分，汇总不同记忆方法的对比报告。缓存与输出均按 `trajectory_type`（及模态）隔离，互不污染。
+对同一条临床轨迹，按阶段流式读取信息，并在每个阶段结束后释放并回答该阶段的任务；再对作答打分，汇总不同记忆方法的对比报告。
 
 ### 运行
 
+使用前文的 `scripts/run_step4.sh` 独立启动测评。示例：
+
 ```bash
-# 默认：标准轨迹 + single_stage_memory 一种方法
-python step4_evaluation/run_step4_chenfang.py
+# 默认：前 4 个病人的标准轨迹 + full_context_memory
+bash scripts/run_step4.sh --limit 4 --num-workers 4
 
-# 指定多条轨迹（逗号分隔）
-python step4_evaluation/run_step4_chenfang.py --trajectories long_noisy,no_ct
+# 指定多条轨迹和记忆方法
+bash scripts/run_step4.sh --all --num-workers 4 \
+  --trajectories long_noisy,no_ct \
+  --methods single_stage_memory,summary_memory,mem0_memory
 
-# 多模态：把记忆中的图片以 image_url 附给大模型（缓存/输出加 _mm 后缀，与纯文本互不污染）
-python step4_evaluation/run_step4_chenfang.py --multimodal
-
-# 指定要跑的记忆方法（逗号分隔，可多个）
-python step4_evaluation/run_step4_chenfang.py --methods single_stage_memory,summary_memory,mem0_memory
+# 多模态；缓存和输出使用 _mm 后缀
+bash scripts/run_step4.sh --all --num-workers 3 --multimodal
 ```
 
-### 命令行参数（均为可选，逗号分隔）
+### 命令行参数
 
 | 参数 | 缺省 | 说明 |
 | --- | --- | --- |
-| `--trajectories` | `standard` | 轨迹名：`standard` 或 `variants/` 下文件名（如 `long_noisy`、`no_ct`、`no_tmj`） |
-| `--methods` | `single_stage_memory` | 要跑的记忆方法，取值 == `memory/` 下的文件名（也是类的 `name`） |
+| `--all` / `--limit N` | 必选 | 全部病人，或数据集中的前 N 个病人 |
+| `--num-workers` | `1` | 并行处理的病人数；单病人内部仍串行 |
+| `--trajectories` | `standard` | 逗号分隔的轨迹名；支持 `standard`、`model_perception` 和 `variants/` 下文件名 |
+| `--methods` | `full_context_memory` | 逗号分隔的记忆方法 |
 | `--multimodal` | 关闭 | 开启多模态图片输入 |
+| `--force` | 关闭 | 忽略病人级完成判断，继续复用细粒度缓存 |
 
 ### 记忆方法（`step4_evaluation/memory/`）
 
@@ -251,7 +281,7 @@ python step4_evaluation/run_step4_chenfang.py --methods single_stage_memory,summ
 - `answers_<方法>.json`：各方法逐任务的作答记录（含 `n_images`）
 - `report.json` / `report.txt`：多方法对比报告（结构化 + 控制台表格）
 
-> mem0 的向量库持久化在 `cache/step4/<轨迹>[_mm]/mem0_memory/vector_store/`，由方法自身经 `setup()` 配置；嵌入模型由 `.env` 的 `EMBEDDING_MODEL`（默认 `text-embedding-3-small`）指定，复用 `OPENAI_API_KEY` / `OPENAI_BASE_URL`。
+> mem0 的向量库持久化在 `cache/step4/<轨迹>[_mm]/mem0_memory/vector_store/`，由方法自身经 `setup()` 配置；嵌入模型由 `.env` 的 `EMBEDDING_MODEL`（默认 `text-embedding-3-small`）指定。embedding key/url 优先使用 `EMBEDDING_OPENAI_*`，否则回退到通用 `OPENAI_*`；若未配置通用 key，必须配置 `EMBEDDING_OPENAI_API_KEY`。
 
 ---
 
@@ -289,59 +319,57 @@ PDF ─MinerU─► 全文/表格/图片 ─►  抽取模型 extract_timeline �
 
 ```
 report_pipeline/
-├── step0_ingest/
-│   ├── pdf_extract.py                 # MinerU 解析: 全文/表格(HTML)/图片 + 图注↔图片映射
-│   ├── timeline_llm.py                # 抽取模型(反馈感知 + 头/尾裁剪)
-│   ├── verify_llm.py                  # 校验模型(critic, 对照原文核验)
-│   └── prompts/
-│       ├── timeline_extraction.yaml   # 时间线抽取 prompt(通用)
-│       └── timeline_verification.yaml # 校验 prompt(critic)
-├── step1_report_trajectory/
-│   ├── qa_render.py                   # 校验时间点/角色并解析图片问答
-│   ├── report_dataset.py              # -> 单篇报告的 SFT 条目
-│   └── report_stages.py               # 按时间点切分阶段并设置评测释放时序
-└── run_report_pipeline.py             # 主编排(step0 + 反馈循环 + step1)
+├── step0_ingest/                      # PDF 摄取、时间线抽取与校验
+├── step1_report_trajectory/           # 报告时间点阶段化与标准轨迹
+├── run_step0_step1_report.py          # PDF -> 标准轨迹
+├── run_step2_step3_report.py          # 标准轨迹 -> evidence/tasks/rubrics
+└── run_step4_report.py                # 独立评估已生成的 benchmark
 ```
+
+输入目录固定为 `reports/pdf/`。报告名称、输出目录和 `patient_id` 自动取自 PDF 文件名：例如 `CR0001.pdf` 对应 `outputs/report/CR0001/` 和 `report__CR0001`，不再需要手动传入 `--name`。
 
 ### 运行
 
 ```bash
 conda activate cmfbench
 
-# 处理一篇报告(PDF 路径 + name)
-python report_pipeline/run_report_pipeline.py --pdf reports/s12903-026-09034-7_reference.pdf --name pls_8y --max-iters 3
+# 运行 reports/pdf/ 下全部报告
+bash scripts/run_step0_step1_report.sh --all
+bash scripts/run_step2_step3_report.sh --all
+bash scripts/run_step4_report.sh --all
+
+# 前 4 篇报告并行运行；单篇报告内部的 Step0 和 Step1 保持串行
+bash scripts/run_step0_step1_report.sh --limit 4 --num-workers 4
+bash scripts/run_step2_step3_report.sh --limit 4 --num-workers 4
+bash scripts/run_step4_report.sh --limit 4 --num-workers 4
 ```
 
-| 参数 | 缺省 | 说明 |
-| --- | --- | --- |
-| `--pdf` | 必填 | 报告 PDF 路径（相对工作区根或绝对） |
-| `--name` | 必填 | 报告标识，用于输出目录与病人 id（`report__<name>`） |
-| `--max-iters` | 3 | 抽取↔校验反馈循环最大轮数 |
-| `--model` | `.env` 的 benchmark 模型 | 覆盖时间线抽取模型 |
-| `--reuse-ingest` | false | 复用现有 `raw` 与 `images`，只重新执行时间线 QA 抽取、校验和轨迹生成 |
+也可以直接运行 Python 入口：
 
-### 产物（`outputs/report/<name>/`）
+```bash
+python -m report_pipeline.run_step0_step1_report --all --num-workers 1
+python -m report_pipeline.run_step2_step3_report --all --num-workers 1
+python -m report_pipeline.run_step4_report --all --num-workers 1 --methods full_context_memory
+```
 
-| 文件 | 说明 |
+通用参数与病人侧一致：
+
+| 参数 | 说明 |
 | --- | --- |
-| `raw/{fulltext.json,tables.json,captions.json}` | step0 确定性抽取的中间产物（`captions.json` 仅存图注↔图片对齐表） |
-| `images/*.jpeg` | 过滤去重后的内嵌图片 |
-| `timeline.extracted.json` | LLM 抽取并经校验的结构化时间线（timepoints） |
-| `verification_report.json` | 每轮校验记录（passed / issues / 反馈） |
-| `trajectories/standard_trajectory.json` | 唯一阶段数据源，包含完整 observation/evaluation QA 与 `timepoint` |
-| `dataset_entry.json` | 该报告的独立 SFT 条目 |
+| `--all` | 处理 `reports/pdf/` 下全部 PDF |
+| `--limit N` | 处理按文件名排序后的前 N 篇报告 |
+| `--num-workers N` | 并行处理的报告数，默认 1 |
+| `--force` | 已有最终产物时仍重新运行 |
 
-### 已验证样本（通用性）
+Step0-1 额外支持 `--max-iters` 和 `--model`；Step4 额外支持 `--methods` 与 `--multimodal`。Step0 摄取、时间线抽取和 Step1 轨迹分别检查已有产物并自动续跑，`--force` 才会从头重跑。三个 Bash 脚本会自动激活 `cmfbench`，并将命令行参数原样传给对应 Python 入口。
 
-同一套代码/prompt 已跑通三篇结构迥异的纵向报告，均通过校验：
+### 产物（`outputs/report/<PDF stem>/`）
 
-| name | 报告 | 时间点* | 说明 |
-| --- | --- | --- | --- |
-| `pls_8y` | Papillon–Lefèvre 8 年牙周维护 | ~6 | 有 CARE 时间线表(MinerU 解析为 HTML)；BOP 跨时间点可追踪 |
-| `ph1_14m` | PH1 种植修复 14 个月 | ~12 | 用 ISQ 而非 BOP；童年病史→术前→植入→6 月→14 月 |
-| `pax7_dup` | PAX7 颅面重复畸形分期手术 | ~4 | 含产前/新生儿节点；ACMG 表(图片形式)被 MinerU 识别为表 |
-
-> *时间点数量会因 LLM 抽取略有浮动，由 critic 每轮把关。
-
-> **依赖**：`requirement.txt` 含 `mineru[core]`（含 torch + 版面/表格/OCR 模型；CPU 可跑，建议 GPU）。首次运行会联网下模型（默认 ModelScope 源）。
-> **注意**：若所配置模型为推理型（思维链计入 `max_tokens`），本流水线已把抽取/校验的 `max_tokens` 提到 16000、`llm_client` 超时提到 300s；生产建议使用稳定支持 JSON 输出的模型。图注↔图片由 MinerU 按版面语义配对（以 `Figure N` 为身份），多面板密集图仍可能不完美。
+| 路径 | 说明 |
+| --- | --- |
+| `raw/`、`images/` | Step0 的 PDF 解析结果与图片 |
+| `timeline.extracted.json`、`verification_report.json` | 时间线抽取和校验记录 |
+| `trajectories/standard_trajectory.json`、`dataset_entry.json` | Step1 标准轨迹和 SFT 条目 |
+| `evidence/evidence.json`、`graph/` | Step2 证据及证据图 |
+| `tasks/`、`rubrics/` | Step3 benchmark 任务和评分 rubric |
+| `evaluation/standard_full[_mm]/` | Step4 文本或多模态评估结果 |
