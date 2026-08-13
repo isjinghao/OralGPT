@@ -8,21 +8,21 @@ task_types:
   - task_type: longitudinal_evidence_recall
     count: 2
     instruction: >-
-      Recall evidence introduced at an earlier timepoint while reasoning later
-      in the clinical course; the answer must identify the earlier clinical
-      context, and required evidence should span at least two timepoints.
+      Retrieve earlier evidence needed in a later clinical context; the answer
+      must identify that earlier context and use at least two timepoints. Do not
+      turn recall into a new integrated interpretation, state update, or outcome summary.
 
   - task_type: cross_modal_reasoning
     count: 2
     instruction: >-
-      Integrate clinically complementary evidence from multiple timepoints or
-      source modalities to derive one supported interpretation; required
-      evidence should span at least two timepoints.
+      Integrate complementary evidence across different modalities, clinically
+      distinct sources, or timepoints to derive one supported interpretation;
+      each selected item must materially contribute rather than merely repeat another.
 
   - task_type: memory_update_conflict_correction
     count: 2
     instruction: >-
-      Explain how later evidence adds a clinically relevant fact, refines the
-      disease course, or resolves an earlier impression; required evidence
-      should span at least two timepoints. The answer must state the added or
-      revised fact and must not treat confirmation alone as an update.
+      Explain how later evidence adds to or revises the stored clinical state;
+      required evidence should span at least two timepoints. The answer must
+      state the added or revised fact. Confirmation, generic comparison,
+      longitudinal recall, and outcome summary are not updates.

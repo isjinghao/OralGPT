@@ -59,7 +59,7 @@ def judge_base(llm: CachedLLM, record: dict) -> dict:
         answer=record["model_answer"],
         selected_evidence=json.dumps(selected_evidence, ensure_ascii=False),
     )
-    data = llm.complete(prompt, cache_key=f"judge_base_{record['task_id']}", max_tokens=8000)
+    data = llm.complete(prompt, cache_key=f"judge_base_{record['task_id']}", max_tokens=2048)
     evidence, covered_evidence, total_evidence = _normalize_coverage(
         selected_evidence, data.get("evidence", []) or []
     )
@@ -90,7 +90,7 @@ def judge_evidence(llm: CachedLLM, record: dict) -> dict:
         answer=record["model_answer"],
         selected_evidence=json.dumps(compact, ensure_ascii=False),
     )
-    data = llm.complete(prompt, cache_key=f"judge_evidence_{record['task_id']}", max_tokens=16000)
+    data = llm.complete(prompt, cache_key=f"judge_evidence_{record['task_id']}", max_tokens=2048)
     evidence, covered_evidence, total_evidence = _normalize_coverage(
         selected_evidence,
         [],
@@ -121,7 +121,7 @@ def judge_rubric(llm: CachedLLM, record: dict, rubric: dict) -> dict:
         answer=record["model_answer"],
         criteria=json.dumps(payload, ensure_ascii=False),
     )
-    data = llm.complete(prompt, cache_key=f"rubric_{record['task_id']}", max_tokens=16000)
+    data = llm.complete(prompt, cache_key=f"rubric_{record['task_id']}", max_tokens=2048)
 
     graded = data["criteria"]
     graded_by_name = {str(item["name"]).strip(): item for item in graded}

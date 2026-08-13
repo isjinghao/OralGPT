@@ -1,0 +1,54 @@
+template: |
+  You are repairing selected timepoints in a longitudinal oral or dental case-report timeline after whole-timeline verification.
+
+  Use only the supplied source. Fix every reviewer issue, but do not rewrite timepoints that are not implicated by the feedback. Each current timepoint has a zero-based timepoint_index.
+
+  Return only replacement patches. A patch replaces the inclusive range start_index..end_index with replacement_timepoints. It may replace one timepoint, merge several timepoints, split one timepoint, or delete an invalid timepoint with an empty replacement list. Keep unaffected content inside a repaired range unchanged unless a reviewer issue requires changing it. Preserve chronological order and the original timepoint schema; do not include timepoint_index inside replacement_timepoints.
+
+  Follow the same timeline rules as the original extraction:
+  - use only source-supported facts and preserve values, negations, anatomy, dates, and uncertainty;
+  - reconcile t_months with all explicit dates, elapsed-time statements, and total follow-up anchors; treat durations as local or overlapping unless explicitly sequential;
+  - keep stages ordered perception -> treatment -> followup; treatment answers exclude later follow-up facts;
+  - every followup contains at least one observation before any evaluation;
+  - image QAs cover only visible findings; panels from different dates belong to their own timepoints; evaluation QAs have figure_ref=null;
+  - use only TEXT_QA for text QAs and FIGURE_QA for QAs with figure_ref; do not encode the figure type.
+
+  Return strict JSON only:
+  {
+    "repairs": [
+      {
+        "start_index": 0,
+        "end_index": 0,
+        "replacement_timepoints": [
+          {
+            "date_text": "source date or period",
+            "t_months": 0,
+            "stage_type": "perception | treatment | followup",
+            "modality": ["TEXT_QA", "FIGURE_QA"],
+            "qa_pairs": [
+              {
+                "role": "observation | evaluation",
+                "question": "paper-specific question",
+                "answer": "source-supported answer",
+                "figure_ref": "Figure N or null"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+
+  $feedback_block
+
+  ===== AVAILABLE FIGURES =====
+  $figures_block
+
+  ===== CURRENT INDEXED TIMELINE =====
+  $timeline_json
+
+  ===== SOURCE TABLES =====
+  $tables_text
+
+  ===== SOURCE TEXT =====
+  $fulltext

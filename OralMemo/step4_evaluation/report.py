@@ -1,6 +1,9 @@
 """Step5 报告: 汇总 ACC / ERS、治疗与随访评分，并对比不同记忆方法。"""
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
+from threading import Semaphore
+
 from batch_utils import log
 from step4_evaluation.evaluator import CachedLLM
 from step4_evaluation.scoring import judge_base, judge_evidence, judge_rubric
@@ -28,12 +31,26 @@ def ratio(correct: int | float, total: int | float) -> float:
     return round(correct / total * 100, 2) if total else 0.0
 
 
+def _judge_record(
+    record: dict,
+    rubric_by_task: dict[str, dict],
+    llm: CachedLLM,
+    semaphore: Semaphore,
+) -> tuple[dict | None, dict | None]:
+    with semaphore:
+        if record["task_type"] in BASE_TYPES:
+            return None, judge_base(llm, record)
+        return judge_rubric(llm, record, rubric_by_task[record["task_id"]]), judge_evidence(llm, record)
+
+
 def score_method(
     method_name: str,
     records: list[dict],
     rubric_by_task: dict[str, dict],
     llm: CachedLLM,
     log_prefix: str,
+    score_workers: int,
+    score_semaphore: Semaphore,
 ) -> dict:
     # 对单个记忆方法的所有作答记录打分并聚合
     acc_overall = {"correct": 0, "total": 0}
@@ -48,16 +65,35 @@ def score_method(
     followup: list[dict] = []
     per_task: list[dict] = []
 
-    for task_index, rec in enumerate(records, start=1):
+    with ThreadPoolExecutor(max_workers=score_workers) as executor:
+        futures = [
+            executor.submit(_judge_record, rec, rubric_by_task, llm, score_semaphore)
+            for rec in records
+        ]
+
+    failed_tasks: list[dict] = []
+    for task_index, (rec, future) in enumerate(zip(records, futures), start=1):
         ttype = rec["task_type"]
         log(
             f"{log_prefix}[step4/scoring] method={method_name} "
             f"task={task_index}/{len(records)} id={rec['task_id']}"
         )
+        try:
+            scored, verdict = future.result()
+        except Exception as exc:
+            error = f"{type(exc).__name__}: {exc}"
+            log(f"{log_prefix}[step4/scoring][error] task={rec['task_id']} {error}")
+            failed_tasks.append({"task_id": rec["task_id"], "task_type": ttype, "error": error})
+            per_task.append({
+                "task_id": rec["task_id"],
+                "task_type": ttype,
+                "metric": "ERROR",
+                "error": error,
+            })
+            continue
 
         # base 任务
         if ttype in BASE_TYPES:
-            verdict = judge_base(llm, rec)
             correct = 1 if verdict["correct"] else 0
             covered_evidence = int(verdict.get("covered_evidence_count", 0) or 0)
             total_evidence = int(verdict.get("total_evidence_count", 0) or 0)
@@ -108,7 +144,6 @@ def score_method(
 
         # 论文明确支持的治疗/随访决策任务
         elif ttype in ("treatment", "followup"):
-            scored = judge_rubric(llm, rec, rubric_by_task[rec["task_id"]])
             entry = {"task_id": rec["task_id"], **scored}
             if ttype == "followup":
                 followup.append(entry)
@@ -118,7 +153,6 @@ def score_method(
                 metric = "TPS"
 
             # 证据召回(ERS): 治疗/随访任务同样有 selected_evidence
-            verdict = judge_evidence(llm, rec)
             covered_evidence = int(verdict.get("covered_evidence_count", 0) or 0)
             total_evidence = int(verdict.get("total_evidence_count", 0) or 0)
 
@@ -184,6 +218,7 @@ def score_method(
         },
         "tps": {"overall_percent": tps_percent, "per_task": treatment},
         "followup": {"overall_percent": followup_percent, "per_task": followup},
+        "failed_tasks": failed_tasks,
         "per_task": per_task,
     }
 
@@ -195,8 +230,12 @@ def build_report(
     log_prefix: str = "[evaluation][unknown]",
 ) -> dict:
     """对每个记忆方法评分，汇总为总报告。"""
+    score_workers = 4
+    semaphore = Semaphore(score_workers)
     methods = [
-        score_method(name, recs, rubric_by_task, llm_by_method[name], log_prefix)
+        score_method(
+            name, recs, rubric_by_task, llm_by_method[name], log_prefix, score_workers, semaphore
+        )
         for name, recs in records_by_method.items()
     ]
     return {"methods": methods}
@@ -277,5 +316,7 @@ def format_console(report: dict) -> str:
         _fmt_pct(m.get("tps", {}).get("overall_percent")) for m in methods]))
     lines.append(row("Follow-up score", [
         _fmt_pct(m.get("followup", {}).get("overall_percent")) for m in methods]))
+    lines.append(row("Failed scoring tasks", [
+        str(len(m.get("failed_tasks", []))) for m in methods]))
     lines.append("=" * (34 + col * len(names)))
     return "\n".join(lines)

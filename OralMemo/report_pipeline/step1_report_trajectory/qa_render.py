@@ -48,6 +48,8 @@ def normalize_timepoints(extracted: dict) -> list[dict]:
                 raise ValueError("Evaluation QAs cannot attach unreleased answer images")
         if stage_type == "treatment" and any(role != "evaluation" for role in roles):
             raise ValueError("Treatment timepoints must contain evaluation QAs only")
+        if stage_type == "followup" and "observation" not in roles:
+            raise ValueError(f"Followup timepoint {order} must contain at least one observation QA")
 
         type_index = type_counts[stage_type]
         type_counts[stage_type] += 1

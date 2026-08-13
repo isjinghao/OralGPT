@@ -21,24 +21,31 @@ class ChatClient:
         log(f"{self.log_prefix}[{scope}] {message}")
 
     @staticmethod
-    def _content_text(content) -> str:
+    def _content_text(content, nested: bool = False) -> str:
+        if content is None:
+            return ""
         if isinstance(content, str):
             return content
         if isinstance(content, list):
-            parts: list[str] = []
-            for item in content:
-                if isinstance(item, str):
-                    text = item
-                elif isinstance(item, dict):
-                    text = item.get("text") or item.get("content") or ""
-                else:
-                    text = getattr(item, "text", None) or getattr(item, "content", None) or str(item)
-                text = str(text)
-                if text:
-                    parts.append(text)
-            return "".join(parts)
-        if content is None:
-            return ""
+            return "\n".join(
+                text for item in content
+                if (text := ChatClient._content_text(item, nested=True).strip())
+            )
+        if isinstance(content, dict):
+            if not nested:
+                return json.dumps(content, ensure_ascii=False)
+            parts = [
+                ChatClient._content_text(content[key], nested=True).strip()
+                for key in ("text", "content", "memory")
+                if key in content
+            ]
+            if parts:
+                return "\n".join(part for part in parts if part)
+            return json.dumps(content, ensure_ascii=False)
+        for key in ("text", "content", "memory"):
+            value = getattr(content, key, None)
+            if value is not None:
+                return ChatClient._content_text(value, nested=True)
         return str(content)
 
     @staticmethod
@@ -72,7 +79,17 @@ class ChatClient:
                     max_tokens=max_tokens,
                     timeout=timeout,
                 )
-                return self._content_text(response.choices[0].message.content)
+                if not response.choices:
+                    raise ValueError("LLM response contains no choices")
+                content = self._content_text(response.choices[0].message.content).strip()
+                if not content:
+                    if attempt >= 3:
+                        self.log("llm/error", "Empty message.content after 4 attempts")
+                        raise ValueError("LLM response message.content is empty")
+                    self.log("llm/retry", f"Empty message.content; next_attempt={attempt + 2}/4")
+                    time.sleep(5)
+                    continue
+                return content
             except RateLimitError as exc:
                 if attempt >= 3:
                     self.log("llm/error", "RateLimitError after 4 attempts")
@@ -109,8 +126,18 @@ def reset_wait_seconds(text: str) -> int:
     return max(5, min(180, int((reset_at - datetime.now(timezone.utc)).total_seconds()) + 3))
 
 
+def _clean_object_pairs(pairs: list[tuple[str, object]]) -> dict:
+    cleaned: dict = {}
+    for raw_key, value in pairs:
+        key = raw_key.strip().rstrip(":：").rstrip()
+        if key in cleaned:
+            raise ValueError(f"Duplicate JSON key after cleaning: {key!r}")
+        cleaned[key] = value
+    return cleaned
+
+
 def parse_json_object(text: str) -> dict:
-    # 从模型输出中解析 JSON 对象
+    # 从模型输出中解析 JSON 对象，并只清理确定性的键名标点噪声。
     text = text.strip()
     fence = chr(96) * 3
     if text.startswith(fence):
@@ -118,10 +145,13 @@ def parse_json_object(text: str) -> dict:
         if text.endswith(fence):
             text = text[:-3].strip()
     try:
-        return json.loads(text)
+        result = json.loads(text, object_pairs_hook=_clean_object_pairs)
     except json.JSONDecodeError:
         start = text.find("{")
         end = text.rfind("}")
         if start == -1 or end == -1 or end <= start:
             raise
-        return json.loads(text[start:end + 1])
+        result = json.loads(text[start:end + 1], object_pairs_hook=_clean_object_pairs)
+    if not isinstance(result, dict):
+        raise TypeError(f"Expected top-level JSON object, got {type(result).__name__}")
+    return result

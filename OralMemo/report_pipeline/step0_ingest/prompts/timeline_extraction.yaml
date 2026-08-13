@@ -5,15 +5,16 @@ template: |
 
   RULES:
   1. Use only facts stated in the source. Preserve numbers, units, tooth numbers, sides, dates, variants, and negations exactly; prefer the table when it conflicts with narrative text. Keep answers close to complete source wording, normalize only obvious spacing/layout artifacts, and do not add facts or guess unclear values.
-  2. Include every distinct clinical timepoint, starting with the earliest stated event even when it appears as background in the same sentence as a later presentation. Put that earliest event in its own first timepoint with t_months=0, then express every later t_months as non-negative integer months elapsed from that same earliest origin, estimating from stated ages or dates when needed. Never reset the origin for treatment; events less than one month apart may share the same value. Merge undated facts into a related source-dated timepoint without asserting that they occurred on that date or changing the date_text. When the source reports several visits together without separate findings, keep them in one combined timepoint rather than duplicating the same answer.
+  2. Include every distinct clinical timepoint, starting with the earliest stated event even when it appears as background in the same sentence as a later presentation. Put that earliest event in its own first timepoint with t_months=0, then express every later t_months as non-negative integer months elapsed from that same earliest origin, estimating from stated ages or dates when needed. Never reset the origin for treatment; events less than one month apart may share the same value. Do not add durations unless the source clearly states that they are sequential; prefer explicit dates, elapsed-time anchors, and total follow-up over inferred accumulation. Merge undated facts into a related source-dated timepoint without asserting that they occurred on that date or changing the date_text. When the source reports several visits together without separate findings, keep them in one combined timepoint rather than duplicating the same answer.
   3. Use stage_type=perception, treatment, or followup in that order. Perception is the initial diagnostic workup. Treatment contains only the contiguous initial intervention course after diagnosis, before the first post-treatment visit; followup starts immediately afterward. Every later visit remains followup, including staged healing, checks, uncovering, further observations or diagnoses, additional procedures or second-stage operations, repairs/restorations, and management. Never reopen treatment after a completed procedure or operation. Split one source date into consecutive timepoints when it crosses stages.
   4. Every QA uses role=observation or role=evaluation. Observation is visible memory; evaluation is answered by the evaluated model before its paper answer is released.
-  5. Perception contains observations only. For each clinically relevant available figure linked to perception or followup findings, create one comprehensive image QA covering its directly visual findings; the caption identifies the image but is not sufficient as the answer. An image answer must describe only visible anatomy, objects, or appearance, never the image's clinical use, planning, inference, or interpretive conclusion. Put the image QA before overlapping text that would reveal it, and keep non-visual measurements or interpretations as text observations. Do not add integrated reasoning questions.
-  6. Treatment contains evaluations only. Generate questions for every meaningful plan, performed procedure, choice, interim check, and rationale supported by the paper; do not force a fixed count or attach treatment images. Treatment evaluation answers are mutually hidden.
-  7. Each real followup timepoint lists observations first, then supported evaluations about state, stability or recurrence, and further management. Evaluations at the same timepoint are mutually hidden.
+  5. Perception contains observations only. For each clinically relevant available figure linked to perception or followup findings, create one comprehensive image QA covering its directly visual findings; the caption identifies the image but is not sufficient as the answer. An image answer must describe only visible anatomy, objects, or appearance, never the image's clinical use, planning, inference, or interpretive conclusion. Put the image QA before overlapping text that would reveal it, and keep non-visual measurements or interpretations as text observations. If a multi-panel figure spans different dates, place each dated panel finding only at its own timepoint; never expose a later panel at an earlier timepoint. Do not add integrated reasoning questions.
+  6. Treatment contains evaluations only. Generate questions for every meaningful plan, performed procedure, choice, interim check, and rationale supported by the paper; do not force a fixed count or attach treatment images. A treatment answer may contain only information available at that treatment timepoint; later findings, responses, complications, and completed follow-up actions belong to followup. A future visit may appear only as a prospective plan, never as a completed event. Treatment evaluation answers are mutually hidden.
+  7. Every followup timepoint must contain at least one observation. List observations first, then supported evaluations about state, stability or recurrence, and further management. Never create an evaluation-only followup timepoint. Evaluations at the same timepoint are mutually hidden.
   8. Questions must be paper-specific, derived from their answers and timepoints, and must not reveal the answer.
   9. figure_ref is allowed only on observation QAs explicitly linked to that figure. Evaluation QAs use null. If several panels resolve to one extracted image, use one comprehensive image QA rather than repeated QAs.
-  10. Return strict valid JSON only, using exactly this schema:
+  10. Modality is only the source channel: use TEXT_QA for text QAs and FIGURE_QA for QAs with figure_ref. A timepoint lists the channels it contains; do not encode the figure type.
+  11. Return strict valid JSON only, using exactly this schema:
 
   {
     "timepoints": [
@@ -21,7 +22,7 @@ template: |
         "date_text": "source date or period",
         "t_months": 0,
         "stage_type": "perception | treatment | followup",
-        "modality": ["TEXT_QA", "DP", "XR", "CT"],
+        "modality": ["TEXT_QA", "FIGURE_QA"],
         "qa_pairs": [
           {
             "role": "observation | evaluation",
@@ -36,8 +37,6 @@ template: |
 
   Available figures:
   $figures_block
-
-  $feedback_block
 
   ===== SOURCE TABLES =====
   $tables_text

@@ -1,0 +1,31 @@
+template: |
+  You are a clinical assessment specialist writing a scoring rubric for a treatment or follow-up task derived from a case report.
+
+  Given only the task type, clinical question, and authoritative gold answer, design a rubric that grades a model answer against the gold answer. Derive every criterion from this specific question and answer; do not use atomic evidence or add external requirements.
+
+  Rules:
+  1. Create one criterion for each independently gradable clinical component. Do not split a concise answer merely to reach a fixed criterion count. The scores must sum to exactly 100.
+  2. Cover every major requested branch, comparison, sequence, alternative, and limitation present in the gold answer without overlap.
+  3. Weight criteria by clinical importance and question emphasis. Interchangeable alternatives belong to one criterion rather than cumulative criteria.
+  4. Preserve certainty, scope, dependencies, ordering, necessity, and optionality exactly.
+  5. Describe explicit partial credit when a criterion contains multiple required subcomponents.
+  6. Allow clinically equivalent wording while retaining the required meaning.
+  7. Return strict JSON only.
+
+  Return schema:
+  {
+    "max_score": 100,
+    "criteria": [
+      {"name": "...", "score": 0, "description": "..."}
+    ]
+  }
+
+  Task type: $task_type
+
+  Question:
+  $question
+
+  Gold answer:
+  $answer
+
+  $feedback_block

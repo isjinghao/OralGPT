@@ -23,6 +23,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--multimodal", action="store_true")
     parser.add_argument("--answer-model", default=None, help="Override ANSWER_OPENAI_MODEL for this run")
     parser.add_argument("--answer-base-url", default=None, help="Override ANSWER_OPENAI_BASE_URL for this run")
+    parser.add_argument("--answer-workers", type=int, choices=(1, 2), default=2)
+    parser.add_argument("--score-workers", type=int, choices=(1, 2, 3, 4), default=1)
+    parser.add_argument("--method-workers", type=int, default=1)
     return parser.parse_args()
 
 
@@ -61,6 +64,10 @@ def main() -> int:
             args.multimodal,
             answer_model=answer_model,
             answer_base_url=args.answer_base_url,
+            force=args.force,
+            answer_workers=args.answer_workers,
+            score_workers=args.score_workers,
+            method_workers=args.method_workers,
         )
         return "completed"
 

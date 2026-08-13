@@ -5,7 +5,9 @@ import base64
 import json
 import mimetypes
 import re
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Semaphore
 
 from batch_utils import log
 from step4_evaluation.memory import MemoryMethod
@@ -32,9 +34,9 @@ class CachedLLM:
         tmp_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
         tmp_path.replace(path)
 
-    def complete(self, prompt: str, cache_key: str, max_tokens: int = 8000,
+    def complete(self, prompt: str, cache_key: str, max_tokens: int = 4096,
                  temperature: float = 0.0, images: list[str] | None = None,
-                 timeout: int = 900) -> dict:
+                 timeout: int = 300) -> dict:
         path = self.cache_dir / f"{cache_key}.json"
         cache_input = {
             "type": "json",
@@ -54,9 +56,9 @@ class CachedLLM:
         self.calls += 1
         return result
 
-    def complete_text(self, prompt: str, cache_key: str, max_tokens: int = 8000,
+    def complete_text(self, prompt: str, cache_key: str, max_tokens: int = 4096,
                       temperature: float = 0.0, images: list[str] | None = None,
-                      timeout: int = 900) -> str:
+                      timeout: int = 300) -> str:
         path = self.cache_dir / f"{cache_key}.json"
         cache_input = {
             "type": "text",
@@ -85,17 +87,30 @@ def encode_image(path: Path) -> str | None:
     return f"data:{mime};base64,{encoded}"
 
 
-def gather_image_urls(method: MemoryMethod, image_root: Path) -> list[str]:
-    # 把记忆中的图片路径转成 data URL 列表
+def gather_image_urls(
+    method: MemoryMethod,
+    image_root: Path,
+    image_cache: dict[Path, str | None],
+) -> list[str]:
+    # 同一轨迹内跨问题、跨记忆方法复用图片 data URL，避免重复读取和编码。
     urls: list[str] = []
     for rel in method.images():
-        url = encode_image(image_root / rel)
+        path = image_root / rel
+        if path not in image_cache:
+            image_cache[path] = encode_image(path)
+        url = image_cache[path]
         if url:
             urls.append(url)
     return urls
 
 
-def answer_question(method: MemoryMethod, task: dict, llm: CachedLLM, image_root: Path | None = None) -> dict:
+def answer_question(
+    method: MemoryMethod,
+    task: dict,
+    llm: CachedLLM,
+    image_root: Path | None,
+    image_cache: dict[Path, str | None],
+) -> dict:
     """基于记忆方法当前上下文回答一个任务的问题, 返回作答记录。
 
     method.multimodal=True 且提供 image_root 时, 会把记忆中的图片以 image_url 分块附带给大模型。
@@ -108,9 +123,12 @@ def answer_question(method: MemoryMethod, task: dict, llm: CachedLLM, image_root
     )
     images: list[str] | None = None
     if method.multimodal and image_root is not None:
-        images = gather_image_urls(method, image_root) or None
+        images = gather_image_urls(method, image_root, image_cache) or None
 
-    answer = llm.complete_text(prompt, cache_key=f"answer_{task['task_id']}", max_tokens=16000, images=images, timeout=900)
+    max_tokens = 4096 if task["task_type"] == "treatment" else 2048
+    answer = llm.complete_text(
+        prompt, cache_key=f"answer_{task['task_id']}", max_tokens=max_tokens, images=images
+    )
     return {
         "task_id": task["task_id"],
         "task_type": task["task_type"],
@@ -169,8 +187,11 @@ def run_streaming(
     trajectory: dict,
     tasks_by_stage: dict[str, list[dict]],
     llm: CachedLLM,
-    image_root: Path | None = None,
+    image_root: Path | None,
     *,
+    image_cache: dict[Path, str | None],
+    answer_semaphore: Semaphore,
+    answer_workers: int = 2,
     release_treatment_ground_truth: bool = True,
     log_prefix: str | None = None,
 ) -> list[dict]:
@@ -198,14 +219,21 @@ def run_streaming(
     answered_missing: set[str] = set()
 
     def answer_tasks(stage_id: str, missing_stage: bool = False) -> None:
-        for task in tasks_by_stage.get(stage_id, []):
-            detail = f" missing_stage={stage_id}" if missing_stage else ""
+        tasks = tasks_by_stage.get(stage_id, [])
+        detail = f" missing_stage={stage_id}" if missing_stage else ""
+
+        def answer(task: dict) -> dict:
             log(
                 f"{prefix}[step4/answer] method={method.name} task={task['task_id']} "
                 f"stage={stage_id}{detail}"
             )
-            record = answer_question(method, task, llm, image_root)
-            records.append(record)
+            with answer_semaphore:
+                return answer_question(method, task, llm, image_root, image_cache)
+
+        with ThreadPoolExecutor(max_workers=answer_workers) as executor:
+            stage_records = list(executor.map(answer, tasks))
+        records.extend(stage_records)
+        for task, record in zip(tasks, stage_records):
             release_after_stage = task.get("release_after_stage")
             if release_after_stage is not None:
                 record["release_after_stage"] = release_after_stage

@@ -17,10 +17,14 @@ OralMemo/
 ├── config.py                         # 配置：路径 + .env / OpenAI 设置
 ├── llm_client.py                     # OpenAI 兼容客户端（限流重试 + JSON 解析）
 ├── batch_utils.py                    # 多病人选择、输出路径与并行执行
-├── scripts/                          # WSL 批量运行入口
+├── scripts/                          # WSL 批量运行入口（自动激活 cmfbench）
 │   ├── run_step1_step2.sh
 │   ├── run_step3.sh
-│   └── run_step4.sh
+│   ├── run_step4.sh
+│   ├── run_perception_trajectory.sh
+│   ├── run_step0_step1_report.sh
+│   ├── run_step2_step3_report.sh
+│   └── run_step4_report.sh
 ├── reports/                          # 报告下载、统计脚本及本地 PDF/图表
 ├── oralgpt_cmf_llamafactory_sft_dataset.json   # 原始患者数据集（SFT 格式）
 ├── SH9HCMFdata/                      # 影像与表格原始数据（png/xlsx/jpg）
@@ -33,9 +37,9 @@ OralMemo/
 │   └── noise_pool.json               #   冻结的长噪声池（按 patient_id 确定性采样）
 │
 ├── step2_evidence/                   # Step2：原子证据与证据图
-│   ├── pipeline.py                   #   单病人串行核心流程（轨迹、证据、证据图）
-│   ├── run_step1_step2.py            #   并行多病人 Step1/2 入口
-│   ├── evidence.py                   #   调用 LLM 逐阶段抽取原子证据（带缓存）
+│   ├── pipeline.py                   #   单病人核心流程（轨迹、证据、证据图）
+│   ├── run_step1_step2.py            #   多病人 Step1/2 入口
+│   ├── evidence.py                   #   调用 LLM 并行抽取各阶段原子证据（带缓存）
 │   ├── graph.py                      #   规则化构建证据图（节点 / 边）
 │   ├── visualize_graph.py            #   渲染证据图 HTML 与 PNG
 │   └── prompts/
@@ -129,59 +133,62 @@ EOF
 
 ## 三、批量运行
 
-三个阶段必须分开手动启动。单个病人内部始终串行，不同病人通过 `--num-workers` 并行。所有脚本在 WSL 中自动激活 `cmfbench`。
+三个阶段分开启动。`--num-workers` 控制病人级并行；Step2、Step3 和 Step4 还分别支持阶段、任务和评估内部并行。总请求压力会叠加，本地单实例 VLM 建议保持 `--num-workers 1`，再按下面的内部并发参数逐步调高。所有脚本在 WSL 中自动激活 `cmfbench`。
 
 患者范围：
 
 - `--all`：运行数据集中的全部病人；
 - `--limit N`：按数据集顺序只运行前 N 个病人。
 
-默认会检查最终产物并跳过已完成病人；中断后重新执行相同命令即可继续，已有 LLM 缓存会复用。`--force` 仅忽略病人级完成判断。
+默认会检查最终产物并跳过已完成病人；中断后重新执行相同命令即可继续，已有 LLM 缓存会复用。Step4 还会分别复用每个 memory method 的 `answers.json` 和 `report.json`。`--force` 会绕过完成判断；在 Step4 中会重新执行所选方法，但底层单请求缓存仍可命中。
 
 ### 1. 生成 Step1/2
 
 ```bash
-# 前 4 个病人，4 个病人并行
-bash scripts/run_step1_step2.sh --limit 4 --num-workers 4
+# 前 4 个病人并行；每个病人最多并行抽取 2 个 stage
+bash scripts/run_step1_step2.sh --limit 4 --num-workers 4 --stage-workers 2
 
-# 全部病人
-bash scripts/run_step1_step2.sh --all --num-workers 8
+# 全部病人；根据 benchmark API 吞吐量调整外层并发
+bash scripts/run_step1_step2.sh --all --num-workers 4 --stage-workers 2
 ```
 
-Step1/2 对每个病人串行生成标准轨迹、缺失模态/长噪声变体、原子证据和证据图。
+Step1 顺序生成标准轨迹及变体；Step2 使用 `--stage-workers` 并行抽取不同阶段的原子证据，随后构建证据图。输出仍按原阶段顺序汇总。
 
 ### 2. 生成 Step3 benchmark
 
-Step1/2 全部完成后再手动执行：
+Step1/2 完成后执行：
 
 ```bash
-bash scripts/run_step3.sh --limit 4 --num-workers 4
-bash scripts/run_step3.sh --all --num-workers 8
+bash scripts/run_step3.sh --limit 4 --num-workers 2 --task-workers 4
+bash scripts/run_step3.sh --all --num-workers 2 --task-workers 4
 ```
+
+`--task-workers` 同时用于 evaluation QA 的证据选择和 treatment/followup rubric 生成；任务规划中的多轮生成、校验和反馈仍保持串行。
 
 ### 3. 运行 Step4 测评
 
-Step3 全部完成后再手动执行。默认是标准轨迹和 `full_context_memory`：
+Step3 完成后执行。默认评估 `standard_trajectory` 和 `full_context_memory`：
 
 ```bash
-bash scripts/run_step4.sh --limit 4 --num-workers 4
-bash scripts/run_step4.sh --all --num-workers 4
+bash scripts/run_step4.sh --limit 4 --num-workers 1 \
+  --answer-workers 2 --score-workers 1 --method-workers 1
 ```
 
-指定多条轨迹、多个 memo 方法或多模态模式：
+指定多条轨迹、多个 memory method 或多模态模式：
 
 ```bash
-bash scripts/run_step4.sh --all --num-workers 4 \
-  --trajectories standard,model_perception \
-  --methods single_stage_memory,full_context_memory,summary_memory
+bash scripts/run_step4.sh --all --num-workers 1 \
+  --trajectories standard_trajectory,model_perception_trajectory \
+  --methods single_stage_memory,full_context_memory,summary_memory \
+  --answer-workers 2 --score-workers 1 --method-workers 1
 
-bash scripts/run_step4.sh --all --num-workers 3 \
-  --trajectories standard,model_perception \
+bash scripts/run_step4.sh --all --num-workers 1 --multimodal \
+  --trajectories standard_trajectory,model_perception_trajectory \
   --methods full_context_memory,summary_memory \
-  --multimodal
+  --answer-workers 2 --score-workers 1 --method-workers 1
 ```
 
-`model_perception` 必须先按被测模型生成对应轨迹；轨迹路径为 `trajectories/model_perception_trajectory/<answer_model>/model_perception_trajectory.json`。其他轨迹名从 `trajectories/<name>/<name>.json` 读取。一次命令中的多个 memo 方法会写入同一个模型目录下的独立方法目录。
+`model_perception_trajectory` 必须先按被测模型生成，路径为 `trajectories/model_perception_trajectory/<answer_model>/model_perception_trajectory.json`。其他轨迹从 `trajectories/<name>/<name>.json` 读取。`--method-workers` 默认 `1`；只有多 GPU 或多服务实例时才建议设置为大于 `1`。Step4 会用共享并发额度限制跨方法的 Answer 总并发和 Verifier 总并发。
 
 ### 三个本地 VLM 的评测流程
 
@@ -213,7 +220,7 @@ curl http://127.0.0.1:8001/v1/models
 模型感知轨迹也必须用同一个被测模型生成。下面以 LLaVA-Med 为例；另外两个模型只替换地址和 model id：
 
 ```bash
-bash scripts/run_perception_trajectory.sh --limit 4 --num-workers 1 \
+bash scripts/run_perception_trajectory.sh --limit 1 --num-workers 1 \
   --model llava-med-7b --base-url http://127.0.0.1:8001/v1
 ```
 
@@ -232,26 +239,28 @@ bash scripts/run_step4.sh \
   --trajectories standard_trajectory,model_perception_trajectory \
   --methods full_context_memory,summary_memory \
   --answer-model llava-med-7b \
-  --answer-base-url http://127.0.0.1:8001/v1
+  --answer-base-url http://127.0.0.1:8001/v1 \
+  --answer-workers 2 --score-workers 1 --method-workers 1
 ```
 
 MedGemma 和 OralGPT-Omni 分别使用：
 
 ```bash
-bash scripts/run_step4.sh --limit 4 --num-workers 1 --trajectories standard_trajectory,model_perception_trajectory --methods full_context_memory,summary_memory --answer-model medgemma --answer-base-url http://127.0.0.1:8002/v1
-bash scripts/run_step4.sh --limit 4 --num-workers 1 --trajectories standard_trajectory,model_perception_trajectory --methods full_context_memory,summary_memory --answer-model oralgpt-omni-7b --answer-base-url http://127.0.0.1:8003/v1
+bash scripts/run_step4.sh --limit 4 --num-workers 1 --trajectories standard_trajectory,model_perception_trajectory --methods full_context_memory,summary_memory --answer-model medgemma --answer-base-url http://127.0.0.1:8002/v1 --answer-workers 2 --score-workers 1 --method-workers 1
+
+bash scripts/run_step4.sh --limit 4 --num-workers 1 --trajectories standard_trajectory,model_perception_trajectory --methods full_context_memory,summary_memory --answer-model oralgpt-omni-7b --answer-base-url http://127.0.0.1:8003/v1 --answer-workers 2 --score-workers 1 --method-workers 1
 ```
 
-建议先以 `--num-workers 1` 做单模型冒烟测试；本地 VLM 服务内部有单请求生成锁，多病人并发只会增加显存/队列压力。
+建议先以 `--num-workers 1 --answer-workers 1 --method-workers 1` 做单模型冒烟测试，再将 `--answer-workers` 提高到 `2`。MedGemma / OralGPT-Omni-7B 的长 prompt 和 `summary_memory` 较慢，不建议同时提高病人级与 method 级并发；`--score-workers` 主要作用于独立 verifier 服务。
 
 ### 产物
 
 | 步骤 | 产物 |
 | --- | --- |
-| Step1 | `trajectories/standard_trajectory.json`、`variants/*.json` |
+| Step1 | `trajectories/standard_trajectory.json`、`trajectories/<变体名>/<变体名>.json` |
 | Step2 | `evidence/evidence.json`、`graph/evidence_graph.json`、`graph/evidence_graph.html`、`graph/evidence_graph.png`、`cache/...` |
 | Step3 | `tasks/all_tasks.json`、按任务类型分组的 JSON、`rubrics/treatment_rubrics.json`、`cache/step3/...` |
-| Step4 | `evaluation/<轨迹>/<answer_model>/<方法>/<text|multimodal>/answers.json`；同模型多方法汇总在 `evaluation/<轨迹>/<answer_model>/<text|multimodal>/report.json/report.txt`；缓存对应位于 `cache/step4/<轨迹>/<answer_model>/...` |
+| Step4 | 每个方法的 `evaluation/<轨迹>/<answer_model>/<方法>/<text|multimodal>/answers.json` 和 `report.json`；多方法汇总位于 `evaluation/<轨迹>/<answer_model>/<text|multimodal>/report.json`、`report.txt`；缓存位于 `cache/step4/<轨迹>/<answer_model>/...` |
 
 ---
 
@@ -290,19 +299,22 @@ bash scripts/run_step4.sh --limit 4 --num-workers 1 --trajectories standard_traj
 
 ### 运行
 
-使用前文的 `scripts/run_step4.sh` 独立启动测评。示例：
+使用 `scripts/run_step4.sh` 独立启动测评：
 
 ```bash
 # 默认：前 4 个病人的标准轨迹 + full_context_memory
-bash scripts/run_step4.sh --limit 4 --num-workers 4
+bash scripts/run_step4.sh --limit 4 --num-workers 1 \
+  --answer-workers 2 --score-workers 1 --method-workers 1
 
-# 指定多条轨迹和记忆方法
-bash scripts/run_step4.sh --all --num-workers 4 \
+# 指定轨迹变体和多种记忆方法
+bash scripts/run_step4.sh --all --num-workers 1 \
   --trajectories long_noisy,no_ct \
-  --methods single_stage_memory,summary_memory,mem0_memory
+  --methods single_stage_memory,summary_memory,mem0_memory \
+  --answer-workers 2 --score-workers 1 --method-workers 1
 
-# 多模态；缓存和输出使用 _mm 后缀
-bash scripts/run_step4.sh --all --num-workers 3 --multimodal
+# 多模态输入
+bash scripts/run_step4.sh --all --num-workers 1 --multimodal \
+  --answer-workers 2 --score-workers 1 --method-workers 1
 ```
 
 ### 命令行参数
@@ -310,13 +322,20 @@ bash scripts/run_step4.sh --all --num-workers 3 --multimodal
 | 参数 | 缺省 | 说明 |
 | --- | --- | --- |
 | `--all` / `--limit N` | 必选 | 全部病人，或数据集中的前 N 个病人 |
-| `--num-workers` | `1` | 并行处理的病人数；单病人内部仍串行 |
-| `--trajectories` | `standard` | 逗号分隔的轨迹名；支持 `standard`、`model_perception` 和 `variants/` 下文件名 |
+| `--num-workers` | `1` | 并行处理的病人数 |
+| `--trajectories` | `standard_trajectory` | 逗号分隔的完整轨迹名；模型感知轨迹使用 `model_perception_trajectory` |
 | `--methods` | `full_context_memory` | 逗号分隔的记忆方法 |
 | `--multimodal` | 关闭 | 开启多模态图片输入 |
-| `--force` | 关闭 | 忽略病人级完成判断，继续复用细粒度缓存 |
+| `--answer-workers` | `2` | 同一轨迹内并行回答数，只允许 `1` 或 `2`；跨 method 共享此上限 |
+| `--score-workers` | `1` | verifier 并行评分数，允许 `1`–`4`；跨 method 共享此上限。默认单路评分以获得最高稳定性 |
+| `--method-workers` | `1` | 并行 memory method 数；仅多 GPU 或多服务实例时建议大于 `1` |
+| `--force` | 关闭 | 重新执行所选方法和评分；底层单请求缓存仍可复用 |
 | `--answer-model` | `.env` 的 `ANSWER_OPENAI_MODEL` | 覆盖本次被测回答模型名，并用于结果目录隔离 |
 | `--answer-base-url` | `.env` 的 `ANSWER_OPENAI_BASE_URL` | 覆盖本次被测模型的 OpenAI-compatible 地址 |
+
+同一阶段的问题会并行回答，阶段之间及 `summary_memory` 更新仍按时间顺序执行。评分按任务并行。Answer 与 Verifier 使用不同服务时，默认还能在方法之间形成回答/评分流水线；`--method-workers > 1` 则会直接并行运行不同 memory method。
+
+当前 Step4 单次请求超时为 300 秒。输出上限分别为：treatment 回答 4096、其他回答 2048、`summary_memory` 4096、base/rubric/evidence 评分 2048 tokens。单个评分请求连续四次失败时，该题会记录到方法报告的 `failed_tasks` 并跳过，其他题和患者继续运行；含失败任务的报告不会被视为完成，重新执行同一命令会复用成功缓存并补评失败题。
 
 ### 记忆方法（`step4_evaluation/memory/`）
 
@@ -341,13 +360,14 @@ bash scripts/run_step4.sh --all --num-workers 3 --multimodal
 
 ### 产物（`outputs/.../evaluation/<轨迹>/<answer_model>/`）
 
-- `<方法>/<text|multimodal>/answers.json`：该模型、轨迹和 memo 方法的逐任务作答记录
+- `<方法>/<text|multimodal>/answers.json`：该模型、轨迹和 memory method 的逐任务作答记录
+- `<方法>/<text|multimodal>/report.json`：单个 method 的评分检查点，用于中断续跑
 - `<text|multimodal>/report.json` / `report.txt`：同一模型下的多方法对比报告
 - `report.json` 同时记录 `answer_model`、`answer_base_url`、`verifier_model`、`verifier_base_url` 和 `memory_methods`
 
 > mem0 的向量库持久化在 `cache/step4/<轨迹>/<answer_model>/mem0_memory/<text|multimodal>/vector_store/`，由方法自身经 `setup()` 配置；嵌入模型由 `.env` 的 `EMBEDDING_MODEL`（默认 `text-embedding-3-small`）指定。embedding key/url 优先使用 `EMBEDDING_OPENAI_*`，否则回退到通用 `OPENAI_*`；若未配置通用 key，必须配置 `EMBEDDING_OPENAI_API_KEY`。
 
-## 实验设计与归因
+
 
 评测结果按“轨迹 × 被测回答模型 × memo 方法 × 输入模式”比较。verifier/judge、benchmark 任务、rubric、随机种子和 generation 参数固定，只改变正在研究的因素。
 
@@ -364,8 +384,6 @@ retrieval loss 上界 = score(full_context) - score(actual_memo)
 推理误差：增加 oracle-context 条件，把该题 `selected_evidence` 对应的 gold facts 或人工核验后的完整相关证据直接注入 answer model，不经过感知、压缩和检索。固定同一个 answer model 比较 `oracle-context` 与实际 memo：oracle-context 仍答错的部分是回答模型的推理/表达失败；oracle-context 正确而实际 memo 错的部分属于记忆/检索链路损失。oracle 结果是诊断上界，不替代主结果。
 
 当前轨迹变体可支持：`standard` vs `model_perception`（感知传播）、单缺失 vs 双缺失模态（模态协同）、`long_noisy`（抗噪和幻觉）、text vs multimodal（视觉输入收益）、不同历史长度/阶段位置（长上下文退化和 recency bias），以及 full-context/summary/mem0 的交叉比较。报告时按 overall、任务类型、模态和轨迹严重度分层，并按病人报告均值、标准差和 bootstrap 置信区间；单病人或极少任务不应写成稳定统计结论。
-
----
 
 ## 六、Report 长程病例流水线（`report_pipeline/`）
 
@@ -390,12 +408,11 @@ PDF ─MinerU─► 全文/表格/图片 ─►  抽取模型 extract_timeline �
                                    (对照原文+表格+图注核验)
 ```
 
-- **step0 摄取**（不经 LLM，确定性、通用）：用 **MinerU（pipeline 后端）** 解析 PDF，产出逐页全文（`fulltext.json`）、**结构化表格 HTML**（`tables.json`，表格即图片也能识别为表）、图片，并用 MinerU 的**图注↔图片语义配对**（以 `Figure N` 为权威身份）生成 `captions.json`。
-- **抽取模型**：从（通用头/尾裁剪后的）病例正文+表格+图注中直接抽取按时间点组织的 `qa_pairs`；以 `stage_type=perception|treatment|followup` 和 `role=observation|evaluation` 区分可见事实与隐藏评测答案，数量由论文内容决定。
-- **校验模型（critic）**：对照原文+表格+图注核验事实、问题、角色、阶段、图片 QA、最早事件覆盖、数值与时序；high/medium 问题会作为**反馈**回灌给抽取模型，最多 `--max-iters` 轮。
-- **step1**（确定性、通用）：校验 schema 和时序、解析图片、按时间点切分阶段，生成 `dataset_entry.json` 和唯一阶段数据源 `standard_trajectory.json`。
+- **step0 摄取**：用 **MinerU** 解析 PDF，产出逐页全文（`fulltext.json`）、**结构化表格 HTML**（`tables.json`，表格即图片也能识别为表）、图片，并用 MinerU 的**图注↔图片语义配对**（以 `Figure N` 为权威身份）生成 `captions.json`。
+- **抽取模型**：从病例正文+表格+图注中直接抽取按时间点组织的 `qa_pairs`；以 `stage_type=perception|treatment|followup` 和 `role=observation|evaluation` 区分可见事实与隐藏评测答案，数量由论文内容决定。
+- **校验模型**：对照原文+表格+图注核验事实、问题、角色、阶段、图片 QA、最早事件覆盖、数值与时序；high/medium 问题会作为**反馈**回灌给抽取模型，最多 `--max-iters` 轮。
+- **step1**：校验 schema 和时序、解析图片、按时间点切分阶段，生成 `dataset_entry.json` 和唯一阶段数据源 `standard_trajectory.json`。
 
-> 全流程**无任何针对单篇 report 的写死内容**，换 PDF 即可复用。
 
 ### 目录结构
 
@@ -408,30 +425,28 @@ report_pipeline/
 └── run_step4_report.py                # 独立评估已生成的 benchmark
 ```
 
-输入目录固定为 `reports/pdf/`。报告名称、输出目录和 `patient_id` 自动取自 PDF 文件名：例如 `CR0001.pdf` 对应 `outputs/report/CR0001/` 和 `report__CR0001`，不再需要手动传入 `--name`。
-
 ### 运行
 
 ```bash
-conda activate cmfbench
-
 # 运行 reports/pdf/ 下全部报告
-bash scripts/run_step0_step1_report.sh --all
-bash scripts/run_step2_step3_report.sh --all
-bash scripts/run_step4_report.sh --all
+bash scripts/run_step0_step1_report.sh --all --num-workers 2
 
-# 前 4 篇报告并行运行；单篇报告内部的 Step0 和 Step1 保持串行
-bash scripts/run_step0_step1_report.sh --limit 4 --num-workers 4
-bash scripts/run_step2_step3_report.sh --limit 4 --num-workers 4
-bash scripts/run_step4_report.sh --limit 4 --num-workers 4
-```
+bash scripts/run_step2_step3_report.sh --all --num-workers 2 \
+  --stage-workers 2 --task-workers 4
 
-也可以直接运行 Python 入口：
+bash scripts/run_step4_report.sh --all --num-workers 1 \
+  --methods full_context_memory \
+  --answer-workers 2 --score-workers 1 --method-workers 1
 
-```bash
-bash scripts/run_step0_step1_report.sh --all --num-workers 1
-bash scripts/run_step2_step3_report.sh --all --num-workers 1
-bash scripts/run_step4_report.sh --all --num-workers 1 --methods full_context_memory
+# 先用一篇报告做测试
+bash scripts/run_step0_step1_report.sh --limit 1 --num-workers 1
+
+bash scripts/run_step2_step3_report.sh --limit 1 --num-workers 1 \
+  --stage-workers 2 --task-workers 4
+
+bash scripts/run_step4_report.sh --limit 1 --num-workers 1 \
+  --methods full_context_memory \
+  --answer-workers 1 --score-workers 1 --method-workers 1
 ```
 
 通用参数与病人侧一致：
@@ -443,7 +458,13 @@ bash scripts/run_step4_report.sh --all --num-workers 1 --methods full_context_me
 | `--num-workers N` | 并行处理的报告数，默认 1 |
 | `--force` | 已有最终产物时仍重新运行 |
 
-Step0-1 额外支持 `--max-iters` 和 `--model`；Step4 额外支持 `--methods` 与 `--multimodal`。Step0 摄取、时间线抽取和 Step1 轨迹分别检查已有产物并自动续跑，`--force` 才会从头重跑。三个 Bash 脚本会自动激活 `cmfbench`，并将命令行参数原样传给对应 Python 入口。
+额外参数：
+
+- Step0/1：`--max-iters`、`--model`；单篇报告内部的摄取、抽取/校验反馈循环和轨迹生成保持串行。
+- Step2/3：`--stage-workers` 默认 `2`，`--task-workers` 默认 `4`。
+- Step4：`--methods`、`--multimodal`、`--answer-model`、`--answer-base-url`、`--answer-workers`、`--score-workers`、`--method-workers`。
+
+Step0 摄取、时间线抽取和 Step1 轨迹分别检查已有产物并自动续跑。Step4 支持 method 级答案和评分续跑。三个 report 脚本会自动激活 `cmfbench`，并将额外命令行参数传给对应 Python 入口。
 
 ### 产物（`outputs/report/<PDF stem>/`）
 
@@ -454,4 +475,4 @@ Step0-1 额外支持 `--max-iters` 和 `--model`；Step4 额外支持 `--methods
 | `trajectories/standard_trajectory.json`、`dataset_entry.json` | Step1 标准轨迹和 SFT 条目 |
 | `evidence/evidence.json`、`graph/` | Step2 证据及证据图 |
 | `tasks/`、`rubrics/` | Step3 benchmark 任务和评分 rubric |
-| `evaluation/standard_trajectory/<answer_model>/<text|multimodal>/` | Step4 文本或多模态评估结果；各 memo 方法的答案位于同模型目录下的方法子目录 |
+| `evaluation/standard_trajectory/<answer_model>/` | Step4 评估根目录；各方法的答案和评分位于 `<方法>/<text|multimodal>/`，多方法汇总位于 `<text|multimodal>/` |

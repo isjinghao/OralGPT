@@ -168,9 +168,9 @@ def generate_answer(
     answer = client.complete_text(
         prompt,
         temperature=0.0,
-        max_tokens=1024,
+        max_tokens=2048,
         images=urls,
-        timeout=900,
+        timeout=300,
         system_prompt=system_prompt,
     ).strip()
     if not answer:

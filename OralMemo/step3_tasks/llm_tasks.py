@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from decimal import Decimal
 from pathlib import Path
 from string import Template
 
@@ -31,6 +32,13 @@ def load_normal_task_plan(prompt_dir: Path) -> list[dict]:
     return config["task_types"]
 
 
+def _write_json(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    tmp_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp_path.replace(path)
+
+
 def cached_completion(client: ChatClient, prompt: str, cache_path: Path, max_tokens: int) -> dict:
     cache_input = {"model": client.model, "prompt": prompt, "max_tokens": max_tokens}
     if cache_path.exists():
@@ -39,44 +47,41 @@ def cached_completion(client: ChatClient, prompt: str, cache_path: Path, max_tok
             client.log("step3/cache", f"cache_hit file={cache_path.name}")
             return cached["result"]
     result = client.complete_json(prompt, max_tokens=max_tokens)
-    cache_path.parent.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(
-        json.dumps({"input": cache_input, "result": result}, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    _write_json(cache_path, {"input": cache_input, "result": result})
     return result
 
 
-def plan_normal_tasks(
+def plan_task_candidates(
     client: ChatClient,
     patient_stages: dict,
     index: EvidenceIndex,
     cache_dir: Path,
-    prompt_dir: Path = PROMPT_DIR,
+    prompt_dir: Path,
+    entry: dict,
+    count: int,
+    attempt: int,
+    feedback: list[str],
 ) -> list[dict]:
     patient_id = patient_stages["patient_id"]
-    prefix = patient_id.replace("__", "_")
-    template = load_template(prompt_dir, "task_planning.yaml")
-    stages_text = stages_summary(patient_stages)
-    evidence_text = evidence_catalog(index)
-    graph_text = edges_text(index)
-
-    planned = []
-    for entry in load_normal_task_plan(prompt_dir):
-        task_type = entry["task_type"]
-        cache_path = cache_dir / "task_planning" / f"{prefix}_{task_type}.json"
-        prompt = template.substitute(
-            patient_id=patient_id,
-            task_type=task_type,
-            task_count=entry["count"],
-            type_instruction=entry["instruction"],
-            stages_text=stages_text,
-            evidence_text=evidence_text,
-            edges_text=graph_text,
+    task_type = entry["task_type"]
+    prompt = load_template(prompt_dir, "task_planning.yaml").substitute(
+        patient_id=patient_id,
+        task_type=task_type,
+        task_count=count,
+        type_instruction=entry["instruction"],
+        stages_text=stages_summary(patient_stages),
+        evidence_text=evidence_catalog(index),
+        edges_text=edges_text(index),
+    )
+    if feedback:
+        prompt += (
+            "\n\nReviewer feedback from rejected candidates; fix these issues in the replacements:\n- "
+            + "\n- ".join(feedback)
         )
-        result = cached_completion(client, prompt, cache_path, max_tokens=8000)
-        planned.extend(result["tasks"])
-    return planned
+    prefix = patient_id.replace("__", "_")
+    cache_path = cache_dir / "task_planning" / f"{prefix}_{task_type}_a{attempt}.json"
+    result = cached_completion(client, prompt, cache_path, max_tokens=8000)
+    return result["tasks"]
 
 
 def question_feedback_block(validation: dict | None) -> str:
@@ -152,9 +157,10 @@ def validate_task_plan(
     task: dict,
     available_evidence: list[dict],
     cache_dir: Path,
+    prompt_dir: Path,
 ) -> dict:
     cache_path = cache_dir / "task_plan_validation" / f"{task['task_id']}.json"
-    template = load_template(PROMPT_DIR, "task_plan_validation.yaml")
+    template = load_template(prompt_dir, "task_plan_validation.yaml")
     plan = {
         "task_id": task["task_id"],
         "task_type": task["task_type"],
@@ -170,7 +176,7 @@ def validate_task_plan(
         max_tokens=8000,
     )
     return {
-        "accepted": bool(result.get("accepted")),
+        "accepted": result["accepted"],
         "feedback": str(result.get("feedback", "")),
         "issues": result.get("issues", []) or [],
     }
@@ -200,7 +206,7 @@ def validate_task(
     prompt = template.substitute(task_json=json.dumps(task_for_prompt, ensure_ascii=False, indent=2))
     result = cached_completion(client, prompt, cache_path, max_tokens=8000)
     return {
-        "accepted": bool(result.get("accepted")),
+        "accepted": result["accepted"],
         "feedback": str(result.get("feedback", "")),
         "issues": result.get("issues", []) or [],
         "fixed_question": result.get("fixed_question"),
@@ -280,51 +286,54 @@ def select_evaluation_evidence(
     prompt_dir: Path = PROMPT_DIR,
 ) -> list[str]:
     # 只从提问时点已经释放的 EvidenceIndex 中选择权威答案所需事实。
-    catalog = evidence_catalog(index)
-    edge_catalog = edges_text(index)
     cache_path = cache_dir / "evaluation_evidence" / f"{task_id}.json"
     template = load_template(prompt_dir, "evidence_selection.yaml")
     prompt = template.substitute(
         question=question,
         answer=answer,
-        evidence_text=catalog,
-        edges_text=edge_catalog,
+        evidence_text=evidence_catalog(index),
+        edges_text=edges_text(index),
     )
     result = cached_completion(client, prompt, cache_path, max_tokens=12000)
     return result["required_evidence_ids"]
 
 
-def generate_rubric(client: ChatClient, task: dict, cache_dir: Path) -> dict:
-    # 为治疗/随访任务生成评分 rubric, 结果缓存到 rubric_generation/。
-    cache_path = cache_dir / "rubric_generation" / f"{task['task_id']}.json"
-    template = load_template(PROMPT_DIR, "rubric_generation.yaml")
-    prompt = template.substitute(
-        task_type=task["task_type"],
-        question=task["question"],
-        answer=task["gold_answer"],
-    )
-    result = cached_completion(client, prompt, cache_path, max_tokens=12000)
-    raw_criteria = result["criteria"]
-    if not raw_criteria:
-        raise ValueError(f"Rubric must contain at least 1 criterion: {task['task_id']}")
-    names = [str(item["name"]).strip() for item in raw_criteria]
-    scores = [float(item["score"]) for item in raw_criteria]
-    if any(not name for name in names) or len(set(names)) != len(names):
-        raise ValueError(f"Rubric criterion names must be non-empty and unique: {task['task_id']}")
-    if any(score < 0 for score in scores) or abs(sum(scores) - 100) > 1e-6:
-        raise ValueError(f"Rubric criterion scores must be non-negative and sum to 100: {task['task_id']}")
-    # rubric 独立依据任务类型、问题和权威答案生成，只保留声明字段。
-    criteria = [
-        {
-            "name": name,
-            "score": score,
-            "description": str(item.get("description", "")),
-        }
-        for item, name, score in zip(raw_criteria, names, scores)
-    ]
-    return {
-        "rubric_id": f"{task['task_type']}_{task['task_id']}",
-        "task_id": task["task_id"],
-        "max_score": 100,
-        "criteria": criteria,
-    }
+def generate_rubric(
+    client: ChatClient,
+    task: dict,
+    cache_dir: Path,
+    prompt_dir: Path,
+) -> dict:
+    template = load_template(prompt_dir, "rubric_generation.yaml")
+    feedback = ""
+    for attempt in range(1, 3):
+        prompt = template.substitute(
+            task_type=task["task_type"],
+            question=task["question"],
+            answer=task["gold_answer"],
+            feedback_block=feedback,
+        )
+        cache_path = cache_dir / "rubric_generation" / f"{task['task_id']}_a{attempt}.json"
+        result = cached_completion(client, prompt, cache_path, max_tokens=12000)
+        raw_criteria = result["criteria"]
+        total = sum(Decimal(str(item["score"])) for item in raw_criteria)
+        if Decimal(str(result["max_score"])) == 100 and total == 100:
+            criteria = [
+                {
+                    "name": str(item["name"]).strip(),
+                    "score": float(item["score"]),
+                    "description": str(item.get("description", "")),
+                }
+                for item in raw_criteria
+            ]
+            return {
+                "rubric_id": f"{task['task_type']}_{task['task_id']}",
+                "task_id": task["task_id"],
+                "max_score": 100,
+                "criteria": criteria,
+            }
+        feedback = (
+            f"Your previous rubric declared max_score={result['max_score']} and its criteria summed to {total}, "
+            "but both must equal exactly 100. Regenerate the complete rubric and reallocate the criterion scores."
+        )
+    raise ValueError(f"Rubric scores for {task['task_id']} do not sum to 100 after 2 attempts")

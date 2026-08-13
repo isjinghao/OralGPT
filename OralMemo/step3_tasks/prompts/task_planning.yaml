@@ -35,9 +35,10 @@ template: |
   12. For updates or corrections, the answer must state a later fact not previously available. Confirmation
       alone or a measurement difference alone is not an update.
   13. Every selected modality must be necessary, and source wording must not name a different source.
-  14. When the clinical question has a definite answer, gold_answer must commit to a clear conclusion
-      without exceeding the evidence.
-  15. Return strict JSON only.
+  14. When sources conflict, do not let a qualitative impression override an objective measurement-based conclusion. State the disagreement and preserve appropriate uncertainty.
+  15. For memory_update_conflict_correction, prioritize the most clinically consequential unresolved contradiction in the available record.
+  16. When the clinical question has a definite answer, gold_answer must commit to a clear conclusion without exceeding the evidence.
+  17. Return strict JSON only.
 
 
   Return schema:

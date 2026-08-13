@@ -10,4 +10,4 @@ if ! command -v conda >/dev/null; then
 fi
 eval "$(conda shell.bash hook)"
 conda activate cmfbench
-python -u -m step3_tasks.run_step3 "$@"
+python -u -m step3_tasks.run_step3 --task-workers 4 "$@"

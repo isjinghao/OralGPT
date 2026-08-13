@@ -23,7 +23,7 @@ def write_json(path: Path, data: dict | list) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def process_patient(item: dict, settings: Settings, client: ChatClient) -> None:
+def process_patient(item: dict, settings: Settings, client: ChatClient, stage_workers: int = 2) -> None:
     patient_id = item["id"]
     out = patient_output_root(settings.bench_root, patient_id)
 
@@ -45,6 +45,7 @@ def process_patient(item: dict, settings: Settings, client: ChatClient) -> None:
         standard,
         cache_dir=out / "cache",
         log_prefix=f"[benchmark][{patient_id}]",
+        stage_workers=stage_workers,
     )
     evidence_path = out / "evidence" / "evidence.json"
     write_json(evidence_path, evidence)

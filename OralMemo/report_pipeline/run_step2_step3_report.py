@@ -33,7 +33,7 @@ def step2_completed(out: Path) -> bool:
     )
 
 
-def run_step2(out: Path, patient_id: str, settings) -> None:
+def run_step2(out: Path, patient_id: str, settings, stage_workers: int = 2) -> None:
     prefix = f"[benchmark][{patient_id}]"
     standard = json.loads(
         (out / "trajectories" / "standard_trajectory.json").read_text(encoding="utf-8")
@@ -47,6 +47,7 @@ def run_step2(out: Path, patient_id: str, settings) -> None:
         cache_dir=out / "cache",
         log_prefix=prefix,
         prompt_path=EVIDENCE_PROMPT,
+        stage_workers=stage_workers,
     )
     evidence_path = out / "evidence" / "evidence.json"
     write_json(evidence_path, evidence)
@@ -76,6 +77,8 @@ def run_step2(out: Path, patient_id: str, settings) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run report Step2 evidence and Step3 benchmark generation")
     add_batch_arguments(parser)
+    parser.add_argument("--stage-workers", type=int, default=2)
+    parser.add_argument("--task-workers", type=int, default=4)
     return parser.parse_args()
 
 
@@ -91,10 +94,10 @@ def main() -> int:
             log(f"[benchmark][{patient_id}][step2-step3/resume] completed outputs found; skipped")
             return "skipped"
         if args.force or not step2_completed(out):
-            run_step2(out, patient_id, settings)
+            run_step2(out, patient_id, settings, args.stage_workers)
         else:
             log(f"[benchmark][{patient_id}][step2/resume] completed outputs found; skipped")
-        run_step3(out, patient_id, settings, PROMPT_DIR)
+        run_step3(out, patient_id, settings, PROMPT_DIR, args.task_workers)
         return "completed"
 
     return run_patient_batch(reports, args.num_workers, "benchmark", worker)

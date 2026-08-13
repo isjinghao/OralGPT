@@ -9,7 +9,7 @@ template: |
   3. Use all available evidence to check temporal consistency. Later evidence is not new, refining, updating, or corrective when the same content was already available.
   4. Preserve entity, anatomical site, timing, certainty, scope, numbers, and polarity. Comparative, response, or causal claims require relational support.
   5. An update or correction must compare earlier information with a later fact that was not previously available; confirmation alone is insufficient.
-  6. Source wording must match the actual evidence source and timepoint.
+  6. Modality must match the evidence source channel: TEXT_QA or FIGURE_QA. Source wording may name the actual examination or figure type stated in the evidence.
   7. Reject or repair internal ids such as T0_perception_00 in the question or answer.
   8. Do not impose a fixed disease, examination sequence, or orthognathic workflow on the report.
 

@@ -72,18 +72,39 @@ def feedback_block(issues: list[dict] | None) -> str:
     return "\n".join(lines)
 
 
-def extract_timeline(
-    client,
-    raw_dir: Path,
-    figures: list[dict],
-    feedback_issues: list[dict] | None = None,
-) -> dict:
-    # 用LLM从抽取的源文本中提取结构化时间线，可带上一轮的评审反馈以自我修正
+def extract_timeline(client, raw_dir: Path, figures: list[dict]) -> dict:
+    # 首轮从源文本中提取完整时间线。
     fulltext, tables_text = load_source_text(raw_dir)
     prompt = tpl("timeline_extraction").substitute(
         figures_block=figures_block(figures),
-        feedback_block=feedback_block(feedback_issues),
         tables_text=tables_text,
         fulltext=fulltext,
     )
     return client.complete_json(prompt, temperature=0.0, max_tokens=16000)
+
+
+def repair_timeline(
+    client,
+    raw_dir: Path,
+    figures: list[dict],
+    timeline: dict,
+    issues: list[dict],
+) -> dict:
+    # 后续轮次只替换反馈涉及的时间点，保留其余时间点不变。
+    fulltext, tables_text = load_source_text(raw_dir)
+    indexed_timeline = [
+        {"timepoint_index": index, **timepoint}
+        for index, timepoint in enumerate(timeline["timepoints"])
+    ]
+    prompt = tpl("timeline_repair").substitute(
+        figures_block=figures_block(figures),
+        feedback_block=feedback_block(issues),
+        timeline_json=json.dumps(indexed_timeline, ensure_ascii=False),
+        tables_text=tables_text,
+        fulltext=fulltext,
+    )
+    result = client.complete_json(prompt, temperature=0.0, max_tokens=16000)
+    repaired = {"timepoints": list(timeline["timepoints"])}
+    for patch in sorted(result["repairs"], key=lambda item: item["start_index"], reverse=True):
+        repaired["timepoints"][patch["start_index"]:patch["end_index"] + 1] = patch["replacement_timepoints"]
+    return repaired

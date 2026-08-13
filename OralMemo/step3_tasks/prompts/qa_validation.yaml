@@ -15,6 +15,7 @@ template: |
   7. Temporal wording is valid only when the question genuinely compares evidence from different times.
   8. The question must name the actual examination or imaging modality, not an internal stage ID.
      Reject or repair any S0, S1_FP, S2_DP, S3_XR_XLA, S4_CT, or S5_TMJ token in the question or gold answer.
+  9. When sources conflict, a qualitative impression must not override an objective measurement-based conclusion. The answer should acknowledge the disagreement and preserve appropriate uncertainty.
 
   Modality glossary (evidence modality code -> actual exam type):
   - FP = facial photographs; DP = intraoral dental photographs (NOT a radiograph/X-ray);

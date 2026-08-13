@@ -6,7 +6,7 @@ template: |
   Rules:
   1. Extract only facts explicitly stated in this source QA pair; do not infer diagnoses, causes, treatment decisions, or outcomes beyond the text.
   2. Split compound statements into minimal atomic facts and preserve names, numbers, units, anatomical sites, laterality, dates, durations, negation, and uncertainty.
-  3. Set modality from the source timepoint and use only modalities listed for it. TEXT_QA may contain history, examination, laboratory, pathology, molecular, treatment-response, or follow-up facts reported in text.
+  3. Set modality from this source QA pair: TEXT_QA for text and FIGURE_QA for facts directly visible in a supplied figure. Do not encode the figure type.
   4. Use a concise, clinically specific normalized field so the same attribute can be linked across timepoints.
   5. Use concise English, extract at most 12 important facts, and return strict JSON only.
 

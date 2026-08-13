@@ -21,12 +21,14 @@ template: |
     the measurements, imaging findings, occlusal/skeletal/dental observations across the relevant
     stages and modalities that justify each conclusion or plan step (the "because"), and the clinical
     reasoning that connects them.
-  - For treatment/surgery, describe the overall pathway and sequencing (e.g. restorative/endodontic
-    dental preparation -> presurgical orthodontic decompensation -> extractions if needed ->
-    orthognathic surgery -> postsurgical orthodontic finishing -> dental disease management), and tie
-    each part to the findings that motivate it.
-  - Be thorough rather than terse: enumerate the relevant supporting findings. When the findings
-    support a definitive clinical judgement, commit to it rather than staying vague.
+  - For treatment/surgery, give a concise but complete reasoning chain: state the treatment goal, the
+    clinically necessary sequence, and the key finding that justifies each major step. Include only
+    patient-relevant steps; do not enumerate generic options, repeat the same evidence, or expand minor
+    details that do not change the plan.
+  - Be concise and information-dense. State each conclusion and its strongest supporting evidence once.
+    When the findings support a definitive clinical judgement, commit to it rather than staying vague.
+  - Give a complete but concise reasoning chain in no more than 800 words. Do not use headings,
+    numbered lists, or bullet points.
 
   MEMORY (everything the model has observed so far):
   $memory

@@ -7,23 +7,17 @@ from step4_evaluation.templating import render
 
 
 def _to_text(value) -> str:
+    if value is None:
+        return ""
     if isinstance(value, str):
         return value.strip()
     if isinstance(value, list):
-        parts: list[str] = []
-        for item in value:
-            if isinstance(item, str):
-                text = item
-            elif isinstance(item, dict):
-                text = item.get("text") or item.get("content") or item.get("memory") or ""
-            else:
-                text = getattr(item, "text", None) or getattr(item, "content", None) or getattr(item, "memory", None) or str(item)
-            text = str(text).strip()
-            if text:
-                parts.append(text)
-        return "\n".join(parts).strip()
-    if value is None:
-        return ""
+        return "\n".join(text for item in value if (text := _to_text(item)))
+    if isinstance(value, dict):
+        return "\n".join(
+            text for key in ("text", "content", "memory")
+            if key in value and (text := _to_text(value[key]))
+        )
     return str(value).strip()
 
 
@@ -58,7 +52,7 @@ class SummaryMemory(MemoryMethod):
             existing_memory=self._summary or "(empty)",
             new_stage=self._pending,
         )
-        data = llm.complete(prompt, cache_key=cache_key, max_tokens=16000)
+        data = llm.complete(prompt, cache_key=cache_key, max_tokens=4096)
         memory = _to_text(data.get("memory"))
         if memory:
             self._summary = memory

@@ -141,8 +141,18 @@ def render_html(
         target = positions[edge["target"]]
         color = stage_colors[node_by_id[edge["source"]]["introduced_stage"]]
         title = html.escape(edge["reason"])
+        path = edge_path(source, target)
+        attributes = (
+            f'data-edge-id="{html.escape(str(edge.get("edge_id", "")), quote=True)}" '
+            f'data-source="{html.escape(edge["source"], quote=True)}" '
+            f'data-target="{html.escape(edge["target"], quote=True)}" '
+            f'data-type="{html.escape(str(edge.get("type", "")), quote=True)}" '
+            f'data-relation="{html.escape(str(edge.get("relation", "")), quote=True)}" '
+            f'data-reason="{html.escape(edge["reason"], quote=True)}"'
+        )
         edge_svg.append(
-            f'<path class="edge support" d="{edge_path(source, target)}" stroke="{color}" marker-end="url(#arrow)">'
+            f'<path class="edge-hit" d="{path}" {attributes}></path>'
+            f'<path class="edge support" d="{path}" stroke="{color}" marker-end="url(#arrow)" {attributes}>'
             f'<title>{title}</title></path>'
         )
 
@@ -158,8 +168,15 @@ def render_html(
             quote=True,
         )
         node_svg.append(
-            f'<g class="node" data-search="{search_text}" data-fact="{fact}" '
-            f'transform="translate({x:.1f},{y:.1f})">'
+            f'<g class="node" data-id="{html.escape(node["evidence_id"], quote=True)}" '
+            f'data-search="{search_text}" data-fact="{fact}" '
+            f'data-stage="{html.escape(node["introduced_stage"], quote=True)}" '
+            f'data-source-turn="{html.escape(str(node["source_turn_id"]), quote=True)}" '
+            f'data-modality="{html.escape(", ".join(node.get("modality", [])), quote=True)}" '
+            f'data-fact-type="{html.escape(str(node.get("fact_type", "")), quote=True)}" '
+            f'data-dimension="{html.escape(str(node.get("clinical_dimension", "")), quote=True)}" '
+            f'data-normalized="{html.escape(json.dumps(node.get("normalized", {}), ensure_ascii=False), quote=True)}" '
+            f'data-x="{x:.1f}" data-y="{y:.1f}" transform="translate({x:.1f},{y:.1f})">'
             f'<title>{fact}</title>'
             f'<ellipse cx="0" cy="6" rx="23" ry="8" fill="#1d2430" opacity="0.20"/>'
             f'<ellipse cx="0" cy="0" rx="22" ry="12" fill="{color}" opacity="0.88" stroke="#0b315f" stroke-width="1.2"/>'
@@ -169,6 +186,7 @@ def render_html(
             f'</g>'
         )
 
+    patient_slug = graph["patient_id"].split("__")[-1].lower()
     html_text = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -208,6 +226,10 @@ def render_html(
       font-size: 13px;
     }}
     .toolbar label {{ font-size: 13px; white-space: nowrap; }}
+    .toolbar a {{ color: #126be8; text-decoration: none; font-size: 13px; white-space: nowrap; }}
+    .toolbar a:hover {{ text-decoration: underline; }}
+    .toolbar button {{ padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 7px; background: #fff; color: var(--ink); cursor: pointer; font-size: 13px; }}
+    .toolbar button:hover {{ background: #eef5ff; border-color: #93b4df; }}
     .detail {{
       min-height: 42px;
       padding: 10px 18px;
@@ -215,8 +237,10 @@ def render_html(
       border-bottom: 1px solid #d9e2ec;
       font-size: 13px;
       line-height: 1.45;
+      white-space: pre-wrap;
     }}
-    .viewport {{ overflow: auto; max-height: calc(100vh - 104px); padding: 16px; }}
+    .viewport {{ overflow: hidden; max-height: calc(100vh - 104px); padding: 16px; cursor: grab; }}
+    .viewport.panning {{ cursor: grabbing; }}
     .canvas {{
       width: {canvas_width}px;
       background: #ffffff;
@@ -236,8 +260,12 @@ def render_html(
       fill: none;
       stroke-width: 2.1;
       opacity: 0.72;
+      pointer-events: stroke;
+      cursor: pointer;
     }}
     .edge.support {{ stroke-width: 2.4; }}
+    .edge-hit {{ fill:none; stroke:transparent; stroke-width:14; pointer-events:stroke; cursor:pointer; }}
+    .edge:hover, .edge.selected {{ opacity: 1; stroke-width: 4; filter: drop-shadow(0 0 4px rgba(18,107,232,.45)); }}
     .node-label {{
       font-family: "Trebuchet MS", Verdana, sans-serif;
       font-size: 12px;
@@ -251,24 +279,30 @@ def render_html(
       fill: #667085;
       text-anchor: middle;
     }}
-    .node {{ cursor: pointer; transition: opacity 0.15s ease; }}
+    .node {{ cursor: grab; transition: opacity 0.15s ease; }}
+    .node.dragging {{ cursor: grabbing; }}
     .node.muted {{ opacity: 0.10; }}
+    .node.related ellipse:nth-of-type(2) {{ stroke: #f59e0b; stroke-width: 2.8; }}
     .node.selected ellipse:nth-of-type(2),
     .node:hover ellipse:nth-of-type(2) {{
       filter: drop-shadow(0 0 10px rgba(18, 107, 232, 0.35));
       stroke-width: 2.8;
     }}
-    body.hide-edges .edge {{ display: none; }}
+    body.hide-edges .edge, body.hide-edges .edge-hit {{ display: none; }}
   </style>
 </head>
 <body>
   <div class="toolbar">
     <div class="title">{html.escape(graph['patient_id'])}</div>
+    <a href="../evaluation/{patient_slug}_results.html">← 返回病人结果</a>
     <div class="summary">{len(nodes)} evidence · {len(edge_list)} edges · {len(ordered_stages)} timepoints</div>
     <input id="search" type="search" placeholder="Search evidence or timepoint" />
     <label><input id="edges" type="checkbox" checked /> Show edges</label>
+    <button id="zoom-out" type="button">−</button>
+    <button id="zoom-in" type="button">＋</button>
+    <button id="reset" type="button">Reset view</button>
   </div>
-  <div id="detail" class="detail">Click a node to inspect its full evidence text.</div>
+  <div id="detail" class="detail">拖动画布可平移，滚轮可缩放，节点可拖动；点击节点或边查看详细信息。</div>
   <div class="viewport">
     <div class="canvas">
       <svg viewBox="0 0 {canvas_width} {canvas_height}" role="img" aria-label="Layered evidence graph">
@@ -277,28 +311,100 @@ def render_html(
             <path d="M0,0 L10,4 L0,8 Z" fill="#126be8" opacity="0.78"></path>
           </marker>
         </defs>
-        {"".join(planes)}
-        {"".join(edge_svg)}
-        {"".join(node_svg)}
+        <g id="graph-layer">
+          {"".join(planes)}
+          {"".join(edge_svg)}
+          {"".join(node_svg)}
+        </g>
       </svg>
     </div>
   </div>
   <script>
+    const svg = document.querySelector('svg');
+    const layer = document.getElementById('graph-layer');
+    const viewport = document.querySelector('.viewport');
     const nodes = [...document.querySelectorAll('.node')];
+    const edges = [...document.querySelectorAll('.edge')];
+    const edgeHits = [...document.querySelectorAll('.edge-hit')];
+    const nodeById = Object.fromEntries(nodes.map(node => [node.dataset.id, node]));
     const search = document.getElementById('search');
     const detail = document.getElementById('detail');
+    let scale = 1, panX = 0, panY = 0, draggingNode = null, panning = false, lastX = 0, lastY = 0;
+
+    function applyView() {{ layer.setAttribute('transform', `translate(${{panX}} ${{panY}}) scale(${{scale}})`); }}
+    function edgePath(source, target) {{
+      const sx = Number(source.dataset.x), sy = Number(source.dataset.y);
+      const tx = Number(target.dataset.x), ty = Number(target.dataset.y);
+      const midY = (sy + ty) / 2, bend = tx >= sx ? 60 : -60;
+      return `M ${{sx.toFixed(1)}} ${{sy.toFixed(1)}} C ${{(sx+bend).toFixed(1)}} ${{midY.toFixed(1)}}, ${{(tx-bend).toFixed(1)}} ${{midY.toFixed(1)}}, ${{tx.toFixed(1)}} ${{ty.toFixed(1)}}`;
+    }}
+    function updateEdges(nodeId) {{
+      [...edges, ...edgeHits].filter(edge => edge.dataset.source === nodeId || edge.dataset.target === nodeId).forEach(edge => {{
+        edge.setAttribute('d', edgePath(nodeById[edge.dataset.source], nodeById[edge.dataset.target]));
+      }});
+    }}
+    function clearSelection() {{
+      nodes.forEach(node => node.classList.remove('selected', 'related'));
+      edges.forEach(edge => edge.classList.remove('selected'));
+    }}
+    function showNode(node) {{
+      clearSelection(); node.classList.add('selected');
+      edges.filter(edge => edge.dataset.source === node.dataset.id || edge.dataset.target === node.dataset.id).forEach(edge => {{
+        edge.classList.add('selected');
+        nodeById[edge.dataset.source].classList.add('related');
+        nodeById[edge.dataset.target].classList.add('related');
+      }});
+      detail.textContent = `节点 ${{node.dataset.id}} | 阶段 ${{node.dataset.stage}} | 来源 turn ${{node.dataset.sourceTurn}} | 模态 ${{node.dataset.modality || '-'}} | 类型 ${{node.dataset.factType || '-'}} | 维度 ${{node.dataset.dimension || '-'}}\n${{node.dataset.fact}}\n规范化: ${{node.dataset.normalized}}`;
+    }}
+    function showEdge(edge) {{
+      clearSelection();
+      const visibleEdge = edges.find(item => item.dataset.edgeId === edge.dataset.edgeId);
+      if (visibleEdge) visibleEdge.classList.add('selected');
+      nodeById[edge.dataset.source].classList.add('related');
+      nodeById[edge.dataset.target].classList.add('related');
+      detail.textContent = `边 ${{edge.dataset.edgeId || '-'}} | ${{edge.dataset.type || '-'}} / ${{edge.dataset.relation || '-'}}\n${{edge.dataset.source}} → ${{edge.dataset.target}}\n${{edge.dataset.reason}}`;
+    }}
+    function pointInLayer(event) {{
+      const point = svg.createSVGPoint(); point.x = event.clientX; point.y = event.clientY;
+      return point.matrixTransform(layer.getScreenCTM().inverse());
+    }}
+    function setScale(next) {{ scale = Math.max(.35, Math.min(2.5, next)); applyView(); }}
+
     search.addEventListener('input', () => {{
       const query = search.value.trim().toLowerCase();
-      nodes.forEach(node => node.classList.toggle('muted', query && !node.dataset.search.includes(query)));
+      nodes.forEach(node => node.classList.toggle('muted', Boolean(query && !node.dataset.search.includes(query))));
     }});
-    document.getElementById('edges').addEventListener('change', event => {{
-      document.body.classList.toggle('hide-edges', !event.target.checked);
+    document.getElementById('edges').addEventListener('change', event => document.body.classList.toggle('hide-edges', !event.target.checked));
+    document.getElementById('zoom-in').addEventListener('click', () => setScale(scale * 1.2));
+    document.getElementById('zoom-out').addEventListener('click', () => setScale(scale / 1.2));
+    document.getElementById('reset').addEventListener('click', () => {{
+      scale = 1; panX = 0; panY = 0; applyView(); clearSelection();
+      detail.textContent = '拖动画布可平移，滚轮可缩放，节点可拖动；点击节点或边查看详细信息。';
     }});
-    nodes.forEach(node => node.addEventListener('click', () => {{
-      nodes.forEach(item => item.classList.remove('selected'));
-      node.classList.add('selected');
-      detail.textContent = node.dataset.fact;
-    }}));
+    viewport.addEventListener('wheel', event => {{ event.preventDefault(); setScale(scale * (event.deltaY < 0 ? 1.12 : .89)); }}, {{passive:false}});
+    svg.addEventListener('pointerdown', event => {{
+      const node = event.target.closest('.node');
+      if (node) {{ draggingNode = node; node.classList.add('dragging'); event.stopPropagation(); return; }}
+      if (event.target.closest('.edge, .edge-hit')) return;
+      panning = true; lastX = event.clientX; lastY = event.clientY; viewport.classList.add('panning');
+    }});
+    window.addEventListener('pointermove', event => {{
+      if (draggingNode) {{
+        const point = pointInLayer(event);
+        draggingNode.dataset.x = point.x.toFixed(1); draggingNode.dataset.y = point.y.toFixed(1);
+        draggingNode.setAttribute('transform', `translate(${{point.x.toFixed(1)}},${{point.y.toFixed(1)}})`);
+        updateEdges(draggingNode.dataset.id);
+      }} else if (panning) {{
+        panX += (event.clientX-lastX)/scale; panY += (event.clientY-lastY)/scale;
+        lastX = event.clientX; lastY = event.clientY; applyView();
+      }}
+    }});
+    window.addEventListener('pointerup', () => {{
+      if (draggingNode) draggingNode.classList.remove('dragging');
+      draggingNode = null; panning = false; viewport.classList.remove('panning');
+    }});
+    nodes.forEach(node => node.addEventListener('click', event => {{ event.stopPropagation(); showNode(node); }}));
+    [...edges, ...edgeHits].forEach(edge => edge.addEventListener('click', event => {{ event.stopPropagation(); showEdge(edge); }}));
   </script>
 </body>
 </html>

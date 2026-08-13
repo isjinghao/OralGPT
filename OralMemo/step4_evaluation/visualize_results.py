@@ -1,4 +1,4 @@
-"""生成 CHENFANG 评测结果的交互式 HTML 可视化。"""
+"""生成 Step4 评测结果的交互式 HTML 可视化。"""
 from __future__ import annotations
 
 import argparse
@@ -14,19 +14,14 @@ def read_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def collect_perception(eval_root: Path) -> dict:
+def collect_perception(eval_root: Path, answer_model: str) -> dict:
     trajectory_root = eval_root.parent / "trajectories" / "model_perception_trajectory"
     standard_path = eval_root.parent / "trajectories" / "standard_trajectory.json"
-    if not trajectory_root.exists():
-        return {"profile": [], "items": [], "report": {}, "answer_model": ""}
-    model_dirs = sorted(path for path in trajectory_root.iterdir() if path.is_dir())
-    if not model_dirs:
-        return {"profile": [], "items": [], "report": {}, "answer_model": ""}
-    model_dir = model_dirs[0]
+    model_dir = trajectory_root / answer_model
     model_path = model_dir / "model_perception_trajectory.json"
-    report_path = trajectory_root / model_dir.name / "perception_report.json"
+    report_path = model_dir / "perception_report.json"
     if not model_path.exists():
-        return {"profile": [], "items": [], "report": {}, "answer_model": model_dir.name}
+        return {"profile": [], "items": [], "report": {}, "answer_model": answer_model}
 
     model = read_json(model_path)
     trajectory_dir = eval_root.parent / "trajectories"
@@ -57,10 +52,12 @@ def collect_perception(eval_root: Path) -> dict:
             if key not in evaluated_keys:
                 continue
             image_paths = []
+            missing_images = []
             for image_index, image_path in enumerate(qa.get("image_paths", []) or [], start=1):
                 absolute = BENCH_ROOT / image_path
                 if not absolute.is_file():
-                    raise FileNotFoundError(f"Perception image not found: {absolute}")
+                    missing_images.append(str(image_path))
+                    continue
                 destination = assets_dir / (
                     f"{stage['stage_id']}_turn{qa['source_turn_id']}_img{image_index}_{absolute.name}"
                 )
@@ -75,6 +72,7 @@ def collect_perception(eval_root: Path) -> dict:
                 "ground_truth_answer": standard_answers.get(key, ""),
                 "model_answer": qa.get("assistant", ""),
                 "image_paths": image_paths,
+                "missing_images": missing_images,
             })
     items.sort(key=lambda item: item["source_turn_id"])
     return {"profile": profile, "items": items, "report": report, "answer_model": model_dir.name}
@@ -82,10 +80,17 @@ def collect_perception(eval_root: Path) -> dict:
 
 def collect_results(eval_root: Path) -> dict:
     trajectories = []
+    answer_models = set()
+    patient_id = eval_root.parent.name
     for trajectory_root in sorted(path for path in eval_root.iterdir() if path.is_dir()):
         for model_root in sorted(path for path in trajectory_root.iterdir() if path.is_dir()):
             for mode_dir in sorted(path for path in model_root.iterdir() if path.is_dir() and (path / "report.json").exists()):
                 report = read_json(mode_dir / "report.json")
+                answer_model = report.get("answer_model", model_root.name)
+                mode = report.get("mode", mode_dir.name)
+                trajectory_type = report.get("trajectory_type", trajectory_root.name)
+                answer_models.add(answer_model)
+                patient_id = report.get("patient_id", patient_id)
                 method_reports = {m["method"]: m for m in report.get("methods", [])}
                 rows = []
                 for method in sorted(method_reports):
@@ -117,9 +122,9 @@ def collect_results(eval_root: Path) -> dict:
                             selected_evidence.append(ev)
 
                         rows.append({
-                            "trajectory": trajectory_root.name,
-                            "answer_model": model_root.name,
-                            "mode": mode_dir.name,
+                            "trajectory": trajectory_type,
+                            "answer_model": answer_model,
+                            "mode": mode,
                             "method": method,
                             "task_id": task_id,
                             "task_type": ans.get("task_type", ""),
@@ -134,11 +139,15 @@ def collect_results(eval_root: Path) -> dict:
                             "selected_evidence": selected_evidence,
                         })
                 trajectories.append({
-                    "name": f"{trajectory_root.name}/{model_root.name}/{mode_dir.name}",
+                    "name": f"{trajectory_type}/{answer_model}/{mode}",
+                    "trajectory_type": trajectory_type,
+                    "answer_model": answer_model,
+                    "mode": mode,
                     "report": report,
                     "rows": rows,
                 })
-    return {"trajectories": trajectories, "perception": collect_perception(eval_root)}
+    perceptions = {model: collect_perception(eval_root, model) for model in sorted(answer_models)}
+    return {"patient_id": patient_id, "trajectories": trajectories, "perceptions": perceptions}
 
 
 HTML_TEMPLATE = r'''<!doctype html>
@@ -146,13 +155,15 @@ HTML_TEMPLATE = r'''<!doctype html>
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>CHENFANG 评测结果</title>
+<title>Step4 评测结果</title>
 <style>
 :root { --bg:#f6f8fb; --card:#fff; --text:#15202b; --muted:#667085; --line:#e5e7eb; --blue:#2563eb; --green:#16a34a; --red:#dc2626; --amber:#d97706; --purple:#7c3aed; }
 * { box-sizing:border-box; }
 body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif; background:var(--bg); color:var(--text); }
 header { padding:24px 28px 18px; background:linear-gradient(135deg,#0f172a,#1d4ed8); color:#fff; }
 h1 { margin:0 0 8px; font-size:26px; }
+.back-link { display:inline-block; margin-top:10px; color:#fff; text-decoration:none; border:1px solid rgba(255,255,255,.55); border-radius:8px; padding:7px 12px; font-size:13px; }
+.back-link:hover { background:rgba(255,255,255,.12); }
 .container { padding:20px 28px 36px; max-width:1500px; margin:0 auto; }
 .panel { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; box-shadow:0 4px 14px rgba(15,23,42,.05); margin-bottom:16px; }
 .controls { display:grid; grid-template-columns:repeat(4,minmax(160px,1fr)); gap:12px; align-items:end; }
@@ -209,14 +220,22 @@ select,input { width:100%; padding:9px 10px; border:1px solid var(--line); borde
 .image-item { border:1px solid var(--line); border-radius:10px; background:#fff; padding:6px; }
 .image-item img { display:block; width:100%; height:180px; object-fit:contain; background:#f8fafc; border-radius:7px; }
 .image-item figcaption { margin-top:5px; color:var(--muted); font-size:11px; word-break:break-all; }
+.image-missing { min-height:100px; display:flex; align-items:center; justify-content:center; padding:16px; border:1px dashed #f59e0b; border-radius:8px; background:#fffbeb; color:#92400e; font-size:12px; text-align:center; }
 @media (max-width:900px){ .controls,.two-col{grid-template-columns:1fr;} .card-head{display:block;} .perception-head{display:block;} }
 </style>
 </head>
 <body>
 <header>
-  <h1>CHENFANG 评测结果</h1>
+  <h1 id="page-title">Step4 评测结果</h1>
+  <a class="back-link" href="../../four_patient_summary.html">← 返回四病例汇总</a>
+  <a class="back-link" href="../graph/evidence_graph.html">查看交互式证据图</a>
 </header>
 <div class="container">
+  <section class="panel summary-grid">
+    <div class="metric-card"><h3>answer model</h3><div id="meta-answer-model"></div></div>
+    <div class="metric-card"><h3>mode</h3><div id="meta-mode"></div></div>
+    <div class="metric-card"><h3>memory method</h3><div id="meta-memory-method"></div></div>
+  </section>
   <nav class="tabs" aria-label="评测阶段">
     <button class="tab active" data-panel="perception-panel">感知</button>
     <button class="tab" data-panel="treatment-panel">治疗</button>
@@ -224,7 +243,7 @@ select,input { width:100%; padding:9px 10px; border:1px solid var(--line); borde
   </nav>
   <section id="perception-panel" class="tab-panel active">
     <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">患者 Profile</h2><div id="profile" class="profile-list"></div></section>
-    <section class="panel"><h2 style="margin:0 0 8px;font-size:18px;">模型感知轨迹</h2><div class="small">展示模型基于患者 profile 与各阶段图片生成的感知回答；问题保留原始轨迹文本。请将本 HTML 与同目录下的 `step4_results_assets` 文件夹一起发送给牙医，以确保图片可以正常显示。</div></section>
+    <section class="panel"><h2 style="margin:0 0 8px;font-size:18px;">模型感知轨迹</h2></section>
     <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">感知评估指标</h2><div id="perception-summary" class="summary-grid"></div><div style="height:12px"></div><div id="perception-metrics"></div></section>
     <section class="panel"><div id="perception-count" class="small"></div><div id="perception-cards"></div></section>
   </section>
@@ -248,7 +267,13 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct = (v) => (typeof v === 'number' ? v.toFixed(1) + '%' : 'n/a');
 const ratio = (a,b) => `${a ?? 0}/${b ?? 0}`;
-const TRAJECTORY_LABELS = {standard_full:'标准轨迹', standard_full_mm:'标准轨迹（多模态）', standard:'标准轨迹', long_noisy:'长噪声轨迹', model_perception:'模型感知轨迹', model_perception_mm:'模型感知轨迹（多模态）'};
+const TRAJECTORY_LABELS = {
+  standard_full:'standard_trajectory', standard:'standard_trajectory', standard_trajectory:'standard_trajectory',
+  model_perception:'model_perception_trajectory', model_perception_trajectory:'model_perception_trajectory',
+  long_noisy:'long_noisy', long_noisy_trajectory:'long_noisy',
+  no_dp:'no_dp', no_dp_trajectory:'no_dp',
+  no_xr_ct:'no_xr_ct', no_xr_ct_trajectory:'no_xr_ct'
+};
 const METHOD_LABELS = {single_stage_memory:'单阶段记忆', full_context_memory:'全上下文记忆', summary_memory:'摘要记忆'};
 const TASK_TYPE_LABELS = {
   modality_perception:'模态感知任务',
@@ -269,6 +294,7 @@ function taskTypeLabel(v){ return mapLabel(TASK_TYPE_LABELS, v); }
 function stageLabel(v){ return mapLabel(STAGE_LABELS, v); }
 
 function currentTraj(){ return DATA.trajectories.find(t => t.name === $('traj').value) || DATA.trajectories[0]; }
+function trajectoryOptionLabel(t){ return `${trajLabel(t.trajectory_type)} · ${t.answer_model} · ${t.mode}`; }
 function uniq(arr){ return [...new Set(arr)].filter(Boolean).sort(); }
 function fillSelect(sel, values, allLabel, labelFn=(v)=>v){ sel.innerHTML = `<option value="__all__">${allLabel}</option>` + values.map(v=>`<option value="${esc(v)}">${esc(labelFn(v))}</option>`).join(''); }
 function pill(text, cls=''){ return `<span class="pill ${cls}">${esc(text)}</span>`; }
@@ -284,9 +310,10 @@ function renderProfile(profile){
 }
 function perceptionCardHtml(item){
   const images = item.image_paths || [];
-  const imageHtml = images.length
-    ? `<div class="image-grid">${images.map((path, index) => `<figure class="image-item"><img src="${esc(path)}" alt="${esc(item.stage_id)} image" loading="lazy" /><figcaption>第 ${index + 1} 张图片</figcaption></figure>`).join('')}</div>`
-    : '<div class="small">该感知问题没有图片</div>';
+  const missing = item.missing_images || [];
+  const figures = images.map((path, index) => `<figure class="image-item"><img src="${esc(path)}" alt="${esc(item.stage_id)} image" loading="lazy" onerror="this.outerHTML='<div class=&quot;image-missing&quot;>图片文件不可用</div>'" /><figcaption>第 ${index + 1} 张图片</figcaption></figure>`);
+  figures.push(...missing.map(path => `<div class="image-missing">感知图片缺失：${esc(path)}</div>`));
+  const imageHtml = figures.length ? `<div class="image-grid">${figures.join('')}</div>` : '<div class="small">该感知问题没有图片</div>';
   return `<article class="perception-card">
     <div class="perception-head">
       <div>
@@ -296,7 +323,7 @@ function perceptionCardHtml(item){
       <div class="small">${esc(item.stage_type)}</div>
     </div>
     <details class="fold">
-      <summary>查看图片（${images.length}）</summary>
+      <summary>查看图片（${images.length + missing.length}）</summary>
       <div class="fold-body">${imageHtml}</div>
     </details>
     <div style="height:10px"></div>
@@ -329,7 +356,8 @@ function renderPerceptionMetrics(report){
     : '<div class="empty">没有感知评估报告</div>';
 }
 function renderPerception(){
-  const perception = DATA.perception || {profile: [], items: [], report: {}};
+  const t = currentTraj();
+  const perception = DATA.perceptions[t.answer_model] || {profile: [], items: [], report: {}};
   const items = perception.items || [];
   renderProfile(perception.profile || []);
   renderPerceptionMetrics(perception.report || {});
@@ -340,11 +368,24 @@ function setPanel(panelId){
   document.querySelectorAll('.tab').forEach(tab => tab.classList.toggle('active', tab.dataset.panel === panelId));
   document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.toggle('active', panel.id === panelId));
 }
+function renderConfiguration(){
+  const t = currentTraj();
+  $('meta-answer-model').textContent = t.answer_model;
+  $('meta-mode').textContent = t.mode;
+  $('meta-memory-method').textContent = $('method').value === '__all__' ? 'all' : $('method').value;
+}
 function init(){
-  $('traj').innerHTML = DATA.trajectories.map(t=>`<option value="${esc(t.name)}">${esc(trajLabel(t.name))}</option>`).join('');
+  document.title = `${DATA.patient_id} Step4 评测结果`;
+  $('page-title').textContent = document.title;
+  $('traj').innerHTML = DATA.trajectories.map(t=>`<option value="${esc(t.name)}">${esc(trajectoryOptionLabel(t))}</option>`).join('');
   updateFilters();
   document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => setPanel(tab.dataset.panel)));
-  ['traj','method','type','search'].forEach(id => $(id).addEventListener(id==='traj'?'change':'input', () => { if(id==='traj') updateFilters(); render(); }));
+  ['traj','method','type','search'].forEach(id => $(id).addEventListener(id==='traj'?'change':'input', () => {
+    if(id==='traj') { updateFilters(); renderPerception(); }
+    renderConfiguration();
+    render();
+  }));
+  renderConfiguration();
   renderPerception();
   render();
 }
@@ -388,7 +429,14 @@ function filteredRows(){
 function scorePills(r){
   const s = r.score || {};
   const d = r.detail || {};
-  let out = [pill(trajLabel(r.trajectory),'blue'), pill(methodLabel(r.method),'purple'), pill(taskTypeLabel(r.task_type)), pill(stageLabel(r.ask_after_stage || 'END'),'amber')];
+  let out = [
+    pill(trajLabel(r.trajectory),'blue'),
+    pill(`answer model: ${r.answer_model}`),
+    pill(`mode: ${r.mode}`,'blue'),
+    pill(`memory method: ${r.method}`,'purple'),
+    pill(taskTypeLabel(r.task_type)),
+    pill(stageLabel(r.ask_after_stage || 'END'),'amber')
+  ];
   if(s.metric && String(s.metric).includes('ACC')){
     out.push(pill(`准确率（ACC）${s.correct ? '正确' : '错误'}`, s.correct ? 'green' : 'red'));
     out.push(pill(`证据召回分数（ERS）${s.covered_evidence_count ?? 0}/${s.total_evidence_count ?? 0}`, 'blue'));
@@ -496,13 +544,13 @@ init();
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="生成 CHENFANG 评测结果 HTML 可视化")
+    parser = argparse.ArgumentParser(description="生成 Step4 评测结果 HTML 可视化")
     parser.add_argument("--eval-root", type=Path, default=BENCH_ROOT / "outputs" / "group1" / "CHENFANG" / "evaluation")
     parser.add_argument("--output", type=Path, default=None)
     args = parser.parse_args()
 
     data = collect_results(args.eval_root)
-    output = args.output or (args.eval_root / "chenfang_step4_results.html")
+    output = args.output or (args.eval_root / f"{args.eval_root.parent.name.lower()}_step4_results.html")
     html = HTML_TEMPLATE.replace("__DATA__", json.dumps(data, ensure_ascii=False))
     output.write_text(html, encoding="utf-8")
     patient_id = f"{args.eval_root.parent.parent.name}__{args.eval_root.parent.name}"

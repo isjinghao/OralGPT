@@ -34,5 +34,7 @@ task_types:
     instruction: >-
       Explain how later-stage evidence adds a clinically relevant fact or resolves
       an earlier impression; required evidence should span at least two stages.
-      The answer must state the added fact and must not treat confirmation or a
-      measurement difference alone as an update.
+      Prioritize the most clinically consequential unresolved contradiction. The
+      answer must state the added fact and must not treat confirmation or a
+      measurement difference alone as an update. A qualitative impression must not
+      override a conflicting objective measurement-based conclusion.

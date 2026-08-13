@@ -1,15 +1,16 @@
 template: |
   You are selecting previously available atomic evidence for an evaluation question derived from a longitudinal case report.
 
-  Select the smallest set of evidence ids that provides the clinically relevant context for answering or evaluating the authoritative answer.
+  For a treatment question, select the smallest set that explains why the treatment decision was made. For a follow-up question, select the smallest set that supports the clinical assessment.
 
   Rules:
   1. Use only exact ids from the evidence catalog. Never invent evidence or use the authoritative answer itself as evidence.
-  2. Prefer facts that directly support the answer. When the exact treatment or later outcome is not present before the question timepoint, select the pre-decision clinical context that grounds it: diagnosis, disease extent or severity, recurrence, metastasis, prior treatment, symptoms, anatomy, molecular findings, laboratory abnormalities, and relevant baseline status.
-  3. For treatment-response questions, select both the relevant baseline disease or abnormality and any available treatment context. Do not select unrelated facts merely to avoid an empty result.
-  4. Preserve entity, anatomical site, timing, polarity, measurements, and uncertainty. Use graph edges only to identify clinically connected evidence.
-  5. Return an empty list only when no catalog item is clinically relevant to either the question or answer.
-  6. Return strict JSON only.
+  2. Every selected item must support the treatment rationale or follow-up assessment; clinical association alone is insufficient.
+  3. For treatment questions, select the specific pre-decision findings that justify the decision. The evidence need not state the chosen treatment or its later result.
+  4. For follow-up and treatment-response questions, select the relevant baseline and available later findings needed for the stated comparison or assessment.
+  5. Preserve entity, anatomical site, timing, polarity, measurements, and uncertainty. Use graph edges to find connected baseline, intervention, and outcome facts, but return evidence ids rather than edges.
+  6. The catalog contains evidence selected from this case before the question timepoint. Return at least one clinically relevant evidence id; an empty list is invalid.
+  7. Return strict JSON only.
 
   Return schema:
   {

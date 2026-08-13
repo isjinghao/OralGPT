@@ -13,11 +13,51 @@ import os
 import re
 import shutil
 import subprocess
+from html import unescape
 from pathlib import Path
 
-FIG_RE = re.compile(r"(?:Figure|Fig\.?)\s*(\d+)", re.IGNORECASE)
-# 图注式: "Figure N." / "Figure N:" (数字后跟句点或冒号), 用于识别真正的图注、排除正文中的 "(Figure 4)" 等引用
-CAP_FIG_RE = re.compile(r"(?:Figure|Fig\.?)\s*(\d+)\s*[.:]", re.IGNORECASE)
+HSPACE = r"[ \t\u00a0]"
+NORMAL_FIG_PREFIX = r"(?:Figure|Fig\.?|Fi\.?)"
+OCR_FIG_PREFIX = rf"F{HSPACE}+I{HSPACE}+G{HSPACE}+U{HSPACE}+R{HSPACE}+E"
+FIG_PATTERN = rf"(?:{NORMAL_FIG_PREFIX}{HSPACE}*(\d+)|{OCR_FIG_PREFIX}{HSPACE}*(\d(?:{HSPACE}+\d)+|\d+))"
+FIG_RE = re.compile(rf"\b{FIG_PATTERN}[A-Za-z]?", re.IGNORECASE)
+TABLE_PREFIX = rf"(?:Table|T{HSPACE}*A{HSPACE}*B{HSPACE}*L{HSPACE}*E)"
+TABLE_RE = re.compile(rf"^{TABLE_PREFIX}{HSPACE}*\d+", re.IGNORECASE)
+# 图注须从行首开始；兼容不换行空格、OCR 字符间空格、Fi 缩写及简单 HTML 标点。
+CAP_FIG_RE = re.compile(
+    rf"^{HSPACE}*{FIG_PATTERN}[A-Za-z]?(?:<[^>]+>[.:]</[^>]+>)?(?:{HSPACE}*[.:]{HSPACE}*|{HSPACE}+|{HSPACE}*$)",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+
+def _figure_number(match: re.Match) -> int:
+    return int(re.sub(HSPACE, "", match.group(1) or match.group(2)))
+
+
+def _plain_caption(value: str) -> str:
+    return unescape(re.sub(r"<[^>]+>", "", str(value)))
+
+
+def _caption_figures(value: str) -> list[int]:
+    text = _plain_caption(value)
+    if not CAP_FIG_RE.search(text):
+        return []
+    return [_figure_number(match) for match in FIG_RE.finditer(text)]
+
+
+def _pdf_captions(pdf_path: Path) -> dict[int, list[tuple[int, str]]]:
+    from pypdf import PdfReader
+
+    captions = {}
+    for page, pdf_page in enumerate(PdfReader(pdf_path).pages):
+        text = pdf_page.extract_text() or ""
+        matches = [
+            (_figure_number(match), text[match.start():].splitlines()[0].strip())
+            for match in CAP_FIG_RE.finditer(text)
+        ]
+        if matches:
+            captions[page] = matches
+    return captions
 
 
 def build_fulltext(pages: list[dict]) -> str:
@@ -47,6 +87,14 @@ def _run_mineru(pdf_path: Path, work_dir: Path) -> tuple[list, Path]:
     return content, auto
 
 
+def _visual_captions(blk: dict) -> list[str]:
+    key = {
+        "chart": "chart_caption",
+        "table": "table_caption",
+    }.get(blk.get("type"), "image_caption")
+    return blk.get(key) or []
+
+
 def _block_text(blk: dict) -> str:
     t = blk.get("type")
     if t in ("text", "header", "page_footnote"):
@@ -56,9 +104,50 @@ def _block_text(blk: dict) -> str:
         return "\n".join(str(x) for x in items).strip()
     if t == "table":
         return " ".join(blk.get("table_caption") or []).strip()
-    if t == "image":
-        return " ".join(c for c in (blk.get("image_caption") or []) if FIG_RE.search(str(c))).strip()
+    if t in ("image", "chart"):
+        return " ".join(c for c in _visual_captions(blk) if _caption_figures(c)).strip()
     return ""
+
+
+def _markdown_captions(auto_dir: Path) -> dict[str, list[str]]:
+    lines = next(auto_dir.glob("*.md")).read_text(encoding="utf-8").splitlines()
+    captions = {}
+    for index, line in enumerate(lines):
+        match = re.search(r"!\[[^]]*\]\(([^)]+)\)", line)
+        if not match:
+            continue
+        following_captions = []
+        for following in lines[index + 1:]:
+            following = following.strip()
+            if not following:
+                continue
+            if following.startswith("![") or not _caption_figures(following):
+                break
+            following_captions.append(following)
+        if following_captions:
+            captions[Path(match.group(1)).name] = following_captions
+    return captions
+
+
+def _markdown_table_captions(auto_dir: Path) -> dict[str, str]:
+    lines = next(auto_dir.glob("*.md")).read_text(encoding="utf-8").splitlines()
+    captions = {}
+    for index, line in enumerate(lines):
+        if not line.strip().startswith("<table"):
+            continue
+        previous = next((item.strip() for item in reversed(lines[:index]) if item.strip()), "")
+        if TABLE_RE.match(previous):
+            captions[line.strip()] = previous
+    return captions
+
+
+def _table_caption(captions: list[str], body: str, markdown_caption: str = "") -> str:
+    caption = " ".join(captions).strip() or markdown_caption
+    if caption:
+        return caption
+    rows = re.findall(r"<tr[^>]*>(.*?)</tr>", body, re.IGNORECASE | re.DOTALL)[:2]
+    text = [re.sub(r"\s+", " ", unescape(re.sub(r"<[^>]+>", " ", row))).strip() for row in rows]
+    return " ".join(text) if text and TABLE_RE.match(text[0]) else ""
 
 
 def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path) -> dict:
@@ -68,12 +157,22 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
     images_dir.mkdir(parents=True, exist_ok=True)
 
     content, auto = _run_mineru(pdf_path, out_dir / "_mineru")
+    markdown_captions = _markdown_captions(auto)
+    markdown_table_captions = _markdown_table_captions(auto)
+    pdf_captions = _pdf_captions(pdf_path)
 
     # (1) 逐页文本(阅读顺序)
     pages_map: dict[int, list[str]] = {}
+    used_pdf_caption_pages = set()
     for blk in content:
-        page = int(blk.get("page_idx", 0)) + 1
+        page_idx = int(blk.get("page_idx", 0))
+        page = page_idx + 1
         txt = _block_text(blk)
+        if blk.get("type") in ("image", "chart") and not txt:
+            txt = " ".join(markdown_captions.get(Path(blk.get("img_path") or "").name, []))
+            if not txt and len(pdf_captions.get(page_idx, [])) == 1 and page_idx not in used_pdf_caption_pages:
+                txt = pdf_captions[page_idx][0][1]
+                used_pdf_caption_pages.add(page_idx)
         if txt:
             pages_map.setdefault(page, []).append(txt)
     pages = [{"page": p, "text": "\n".join(pages_map[p])} for p in sorted(pages_map)]
@@ -84,35 +183,66 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
     tables = []
     for blk in content:
         if blk.get("type") == "table":
+            captions = blk.get("table_caption") or []
+            figure_captions = [caption for caption in captions if _caption_figures(caption)]
+            table_captions = [caption for caption in captions if TABLE_RE.match(str(caption).strip())]
+            if figure_captions and not table_captions:
+                continue
             html = (blk.get("table_body") or "").strip()
             if html:
                 tables.append({
                     "page": int(blk.get("page_idx", 0)) + 1,
-                    "caption": " ".join(blk.get("table_caption") or []).strip(),
+                    "caption": _table_caption(
+                        table_captions or captions,
+                        html,
+                        markdown_table_captions.get(html, ""),
+                    ),
                     "html": html,
                 })
     (out_dir / "tables.json").write_text(
         json.dumps(tables, ensure_ascii=False, indent=2), encoding="utf-8")
 
     # (3) 图片 + 图注
-    #   - 先从"图注式" (Figure N. / Figure N:) 统计全篇 figure(含 text 块里的图注/图注页)。
+    #   - 先从 Figure/Fig 图注统计全篇 figure(含 text 块里的图注/图注页)。
     #   - 若 图块数 == figure 数: 按阅读顺序 1:1 分配(每张图一个独立 figure)。
     #   - 否则(图块多于 figure, 说明存在多面板图): 按页纵向聚类, 每个 figure 的 image 为其全部子图列表。
-    img_blocks = [b for b in content if b.get("type") == "image"]
+    img_blocks = [
+        block for block in content
+        if block.get("type") in ("image", "chart")
+        or (
+            block.get("type") == "table"
+            and any(_caption_figures(caption) for caption in _visual_captions(block))
+        )
+    ]
 
     cap_by_fig: dict[int, str] = {}
-    # 图片块自带的图注(最干净, 每条一个 figure)
+    figs_by_page: dict[int, set[int]] = {}
+    figs_by_block: dict[int, set[int]] = {}
+    # 图片块自带的图注(最干净, 也可能一张复合图对应多个 figure)
     for b in img_blocks:
-        for cap in (b.get("image_caption") or []):
-            m = CAP_FIG_RE.search(str(cap))
-            if m:
-                cap_by_fig.setdefault(int(m.group(1)), str(cap).strip())
+        page = int(b.get("page_idx", 0))
+        captions = list(_visual_captions(b))
+        captions.extend(markdown_captions.get(Path(b.get("img_path") or "").name, []))
+        for cap in captions:
+            for fig in _caption_figures(cap):
+                cap_by_fig.setdefault(fig, str(cap).strip())
+                figs_by_page.setdefault(page, set()).add(fig)
+                figs_by_block.setdefault(id(b), set()).add(fig)
     # 补充: text/header 块里的图注(某些 figure 的 caption 是独立文本块)
     for b in content:
         if b.get("type") in ("text", "header"):
-            txt = b.get("text") or ""
+            txt = _plain_caption(b.get("text") or "")
             for m in CAP_FIG_RE.finditer(txt):
-                cap_by_fig.setdefault(int(m.group(1)), txt[m.start():m.start() + 300].strip())
+                fig = _figure_number(m)
+                cap_by_fig.setdefault(fig, txt[m.start():m.start() + 300].strip())
+                figs_by_page.setdefault(int(b.get("page_idx", 0)), set()).add(fig)
+    visual_pages = {int(block.get("page_idx", 0)) for block in img_blocks}
+    for page, captions in pdf_captions.items():
+        missing = [(fig, caption) for fig, caption in captions if fig not in cap_by_fig]
+        if page in visual_pages and len(missing) == 1:
+            fig, caption = missing[0]
+            cap_by_fig[fig] = caption
+            figs_by_page.setdefault(page, set()).add(fig)
     all_figs = sorted(cap_by_fig)
 
     def _y(b):
@@ -148,31 +278,52 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
         return (images_dir / fname).relative_to(rel_base).as_posix()
 
     images_map: dict = {}
-    if img_blocks and len(img_blocks) == len(all_figs):
+    combined_blocks = {block_id for block_id, figs in figs_by_block.items() if len(figs) > 1}
+    for block in img_blocks:
+        if id(block) not in combined_blocks:
+            continue
+        path = _copy(block)
+        if path:
+            for fig in sorted(figs_by_block[id(block)]):
+                images_map[f"Figure {fig}"] = {
+                    "images": [path],
+                    "caption": cap_by_fig.get(fig, ""),
+                }
+
+    remaining_blocks = [block for block in img_blocks if id(block) not in combined_blocks]
+    remaining_figs = [fig for fig in all_figs if f"Figure {fig}" not in images_map]
+    if remaining_blocks and len(remaining_blocks) == len(remaining_figs):
         # 图块数 == figure 数 → 按阅读顺序 1:1(每张图独立一个 figure)
-        for b, fig in zip(img_blocks, all_figs):
+        for b, fig in zip(remaining_blocks, remaining_figs):
             p = _copy(b)
             if p:
                 images_map[f"Figure {fig}"] = {"images": [p], "caption": cap_by_fig[fig]}
     else:
         # 多面板图: 按页纵向聚类, figure 按编号升序 <-> 聚类自上而下
         by_page: dict[int, list] = {}
-        for b in img_blocks:
+        for b in remaining_blocks:
             by_page.setdefault(int(b.get("page_idx", 0)), []).append(b)
         for page in sorted(by_page):
             blocks = by_page[page]
-            figs = sorted({int(m.group(1)) for b in blocks for c in (b.get("image_caption") or [])
-                           if (m := CAP_FIG_RE.search(str(c)))})
+            figs = [
+                fig for fig in sorted(figs_by_page.get(page, set()))
+                if f"Figure {fig}" not in images_map
+            ]
             if not figs:
                 continue
             clusters = _cluster(blocks, len(figs))
             for fig, cluster in zip(figs, clusters):
-                figkey = f"Figure {fig}"
-                if figkey in images_map:
-                    continue
                 paths = [p for b in cluster if (p := _copy(b))]
                 if paths:
-                    images_map[figkey] = {"images": paths, "caption": cap_by_fig.get(fig, "")}
+                    images_map[f"Figure {fig}"] = {
+                        "images": paths,
+                        "caption": cap_by_fig.get(fig, ""),
+                    }
+
+    images_map = dict(sorted(
+        images_map.items(),
+        key=lambda item: int(item[0].split()[1]),
+    ))
 
     # 清理 MinerU 中间产物(已提取所需内容)
     shutil.rmtree(out_dir / "_mineru", ignore_errors=True)

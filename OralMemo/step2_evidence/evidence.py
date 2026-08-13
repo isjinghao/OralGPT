@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from string import Template
 
@@ -19,9 +20,7 @@ def load_prompt_template(prompt_path: Path) -> Template:
     return Template(config["template"])
 
 
-def canonical_modalities(stage: dict, item: dict) -> list[str]:
-    # 只保留当前源阶段允许的模态；错误输出回退到阶段模态
-    allowed = list(stage.get("modality", []))
+def canonical_modalities(allowed: list[str], item: dict) -> list[str]:
     reported = [modality for modality in item.get("modality", []) or [] if modality in allowed]
     return reported or allowed
 
@@ -49,10 +48,14 @@ def extract_stage_evidence(
     used_counts = defaultdict(int)
 
     for turn in stage["qa_pairs"]:
+        if "<image>" in turn["human"]:
+            source_modalities = [modality for modality in stage["modality"] if modality != "TEXT_QA"]
+        else:
+            source_modalities = ["TEXT_QA"]
         prompt = prompt_template.substitute(
             patient_id=patient_id,
             stage_id=stage["stage_id"],
-            modalities=", ".join(stage["modality"]),
+            modalities=", ".join(source_modalities),
             qa_text=(
                 f"[source_turn_id={turn['source_turn_id']}]\n"
                 f"Question: {turn['human'].replace('<image>', '').strip()}\n"
@@ -75,7 +78,7 @@ def extract_stage_evidence(
                         "evidence_id": evidence_id,
                         "source_turn_id": source_turn_id,
                         "introduced_stage": stage["stage_id"],
-                        "modality": canonical_modalities(stage, item),
+                        "modality": canonical_modalities(source_modalities, item),
                         "fact_text": item.get("fact_text", ""),
                         "fact_type": item.get("fact_type", "other"),
                         "clinical_dimension": item.get("clinical_dimension", "other"),
@@ -92,25 +95,20 @@ def extract_all_evidence(
     cache_dir: Path | None = None,
     log_prefix: str | None = None,
     prompt_path: Path = PROMPT_PATH,
+    stage_workers: int = 2,
 ) -> dict:
     prefix = log_prefix or f"[benchmark][{patient_stages['patient_id']}]"
     prompt_text = prompt_path.read_text(encoding="utf-8")
     prompt_template = load_prompt_template(prompt_path)
-    all_evidence = []
     stages = patient_stages["stages"]
-    for stage_index, stage in enumerate(stages, start=1):
+
+    def extract(item: tuple[int, dict]) -> list[dict]:
+        stage_index, stage = item
         evidence_stage = {
             **stage,
-            "qa_pairs": [
-                turn for turn in stage["qa_pairs"]
-                if turn["role"] == "observation"
-            ],
+            "qa_pairs": [turn for turn in stage["qa_pairs"] if turn["role"] == "observation"],
         }
-        cache_input = {
-            "model": client.model,
-            "prompt": prompt_text,
-            "stage": evidence_stage,
-        }
+        cache_input = {"model": client.model, "prompt": prompt_text, "stage": evidence_stage}
         cache_path = cache_dir / "evidence" / f"{stage['stage_id']}.json" if cache_dir else None
         cached = json.loads(cache_path.read_text(encoding="utf-8")) if cache_path and cache_path.exists() else None
         if cached and cached.get("input") == cache_input:
@@ -119,32 +117,30 @@ def extract_all_evidence(
                 f"{prefix}[step2/evidence] stage={stage_index}/{len(stages)} "
                 f"id={stage['stage_id']} cache_hit count={len(stage_evidence)}"
             )
-        else:
-            log(
-                f"{prefix}[step2/evidence] stage={stage_index}/{len(stages)} "
-                f"id={stage['stage_id']} extracting"
+            return stage_evidence
+
+        log(
+            f"{prefix}[step2/evidence] stage={stage_index}/{len(stages)} "
+            f"id={stage['stage_id']} extracting"
+        )
+        stage_evidence = extract_stage_evidence(
+            client, patient_stages["patient_id"], evidence_stage, prompt_template
+        )
+        if cache_path:
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            cache_path.write_text(
+                json.dumps({"input": cache_input, "evidence": stage_evidence}, ensure_ascii=False, indent=2),
+                encoding="utf-8",
             )
-            stage_evidence = extract_stage_evidence(
-                client,
-                patient_stages["patient_id"],
-                evidence_stage,
-                prompt_template,
-            )
-            if cache_path:
-                cache_path.parent.mkdir(parents=True, exist_ok=True)
-                cache_path.write_text(
-                    json.dumps(
-                        {"input": cache_input, "evidence": stage_evidence},
-                        ensure_ascii=False,
-                        indent=2,
-                    ),
-                    encoding="utf-8",
-                )
-            log(
-                f"{prefix}[step2/evidence] stage={stage_index}/{len(stages)} "
-                f"id={stage['stage_id']} extracted count={len(stage_evidence)}"
-            )
-        all_evidence.extend(slim_evidence(e) for e in stage_evidence)
+        log(
+            f"{prefix}[step2/evidence] stage={stage_index}/{len(stages)} "
+            f"id={stage['stage_id']} extracted count={len(stage_evidence)}"
+        )
+        return stage_evidence
+
+    with ThreadPoolExecutor(max_workers=stage_workers) as executor:
+        evidence_by_stage = executor.map(extract, enumerate(stages, start=1))
+        all_evidence = [slim_evidence(item) for evidence in evidence_by_stage for item in evidence]
     return {
         "patient_id": patient_stages["patient_id"],
         "evidence": all_evidence,

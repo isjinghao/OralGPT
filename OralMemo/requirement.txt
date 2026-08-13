@@ -9,4 +9,5 @@ paramiko
 openpyxl
 mem0ai
 mineru[core]
+pypdf==6.14.2
 playwright

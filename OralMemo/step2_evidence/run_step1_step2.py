@@ -10,6 +10,7 @@ from step2_evidence.pipeline import build_client, process_patient
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build Step1 trajectories and Step2 evidence graphs")
     add_batch_arguments(parser)
+    parser.add_argument("--stage-workers", type=int, default=2)
     return parser.parse_args()
 
 
@@ -35,7 +36,7 @@ def main() -> int:
             log(f"[benchmark][{patient_id}][step1-step2/resume] completed outputs found; skipped")
             return "skipped"
         client = build_client(settings, patient_id)
-        process_patient(item, settings, client)
+        process_patient(item, settings, client, args.stage_workers)
         return "completed"
 
     return run_patient_batch(patients, args.num_workers, "benchmark", run_patient)

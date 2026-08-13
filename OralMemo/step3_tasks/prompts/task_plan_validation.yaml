@@ -9,8 +9,9 @@ template: |
   3. For an update or correction task, accept only when the answer explicitly states a later fact not previously available. Confirmation alone is insufficient.
   4. Every selected modality must be necessary for the intended task, and source wording must not name a different source.
   5. Preserve entity, scope, direction, polarity, and uncertainty.
-  6. Reject a plan that needs different evidence, a different relationship, a different source scope, or a different task type.
-  7. Reject only material invalidity. Equivalent conservative wording does not require rejection.
+  6. Reject a plan that lets a qualitative impression override a conflicting objective measurement-based conclusion without acknowledging the disagreement and uncertainty.
+  7. Reject a plan that needs different evidence, a different relationship, a different source scope, or a different task type.
+  8. Reject only material invalidity. Equivalent conservative wording does not require rejection.
 
   Return strict JSON only:
   {

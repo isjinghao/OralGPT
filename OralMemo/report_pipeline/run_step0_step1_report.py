@@ -10,7 +10,7 @@ from batch_utils import add_batch_arguments, log, run_patient_batch, selected_re
 from config import get_settings
 from llm_client import ChatClient
 from report_pipeline.step0_ingest.pdf_extract import extract_pdf
-from report_pipeline.step0_ingest.timeline_llm import extract_timeline
+from report_pipeline.step0_ingest.timeline_llm import extract_timeline, repair_timeline
 from report_pipeline.step0_ingest.verify_llm import verify_timeline
 from report_pipeline.step1_report_trajectory.qa_render import normalize_timepoints, render_turns
 from report_pipeline.step1_report_trajectory.report_dataset import build_report_dataset_entry
@@ -42,23 +42,43 @@ def extract_with_feedback(
     verifier_client: ChatClient,
     raw_dir: Path,
     figures: list[dict],
+    images_map: dict,
     max_iters: int,
     patient_id: str,
 ) -> tuple[dict, list[dict]]:
     history: list[dict] = []
-    feedback: list[dict] | None = None
+    feedback: list[dict] = []
     timeline: dict = {}
     prefix = f"[benchmark][{patient_id}]"
 
     for iteration in range(1, max_iters + 1):
-        log(f"{prefix}[step0/extract] iteration={iteration}/{max_iters}")
-        timeline = extract_timeline(extract_client, raw_dir, figures, feedback_issues=feedback)
+        if iteration == 1:
+            log(f"{prefix}[step0/extract] iteration={iteration}/{max_iters}")
+            timeline = extract_timeline(extract_client, raw_dir, figures)
+        else:
+            log(f"{prefix}[step0/repair] iteration={iteration}/{max_iters}")
+            timeline = repair_timeline(extract_client, raw_dir, figures, timeline, feedback)
+
         log(f"{prefix}[step0/verify] iteration={iteration}/{max_iters}")
         verification = verify_timeline(verifier_client, raw_dir, timeline, figures)
+        try:
+            render_turns(normalize_timepoints(timeline), images_map)
+        except (KeyError, TypeError, ValueError) as exc:
+            verification["issues"].append(
+                {
+                    "severity": "high",
+                    "location": "timeline structure",
+                    "problem": str(exc),
+                    "source_evidence": "",
+                    "suggested_fix": "Revise the affected timepoint so it satisfies the required stage and QA structure.",
+                }
+            )
+
         feedback = [
             issue for issue in verification["issues"]
             if issue["severity"] in {"high", "medium"}
         ]
+        verification["passed"] = not feedback
         n_high = sum(issue["severity"] == "high" for issue in feedback)
         history.append(
             {
@@ -74,22 +94,14 @@ def extract_with_feedback(
             f"{prefix}[step0/verify] passed={verification['passed']} "
             f"issues={len(verification['issues'])} high={n_high} actionable={len(feedback)}"
         )
-        if not feedback:
+        if verification["passed"]:
             break
 
-    return timeline, history
-
-
-def completed(out_dir: Path) -> bool:
-    return all(
-        path.is_file()
-        for path in (
-            out_dir / "timeline.extracted.json",
-            out_dir / "verification_report.json",
-            out_dir / "trajectories" / "standard_trajectory.json",
-            out_dir / "dataset_entry.json",
+    if feedback:
+        raise ValueError(
+            f"Timeline verification failed after {max_iters} iterations with {len(feedback)} actionable issues"
         )
-    )
+    return timeline, history
 
 
 def run_report(report: dict, settings, args: argparse.Namespace) -> None:
@@ -119,7 +131,18 @@ def run_report(report: dict, settings, args: argparse.Namespace) -> None:
         log(f"{prefix}[step0/ingest] completed outputs found; skipped")
         images_map = json.loads((raw_dir / "captions.json").read_text(encoding="utf-8"))
 
-    if args.force or not (timeline_path.is_file() and verification_path.is_file()):
+    reuse_timeline = not args.force and timeline_path.is_file() and verification_path.is_file()
+    if reuse_timeline:
+        timeline = json.loads(timeline_path.read_text(encoding="utf-8"))
+        try:
+            render_turns(normalize_timepoints(timeline), images_map)
+        except (KeyError, TypeError, ValueError) as exc:
+            log(f"{prefix}[step0/timeline] cached timeline invalid; regenerating: {exc}")
+            reuse_timeline = False
+
+    if reuse_timeline:
+        log(f"{prefix}[step0/timeline] completed valid outputs found; skipped")
+    else:
         captions = [
             {"figure": figure, "caption": entry.get("caption", "")}
             for figure, entry in images_map.items()
@@ -129,16 +152,14 @@ def run_report(report: dict, settings, args: argparse.Namespace) -> None:
             build_client(settings, "verifier", patient_id),
             raw_dir,
             captions,
+            images_map,
             args.max_iters,
             patient_id,
         )
         write_json(timeline_path, timeline)
         write_json(verification_path, verification_history)
-    else:
-        log(f"{prefix}[step0/timeline] completed outputs found; skipped")
-        timeline = json.loads(timeline_path.read_text(encoding="utf-8"))
 
-    if not args.force and trajectory_path.is_file() and dataset_path.is_file():
+    if reuse_timeline and trajectory_path.is_file() and dataset_path.is_file():
         log(f"{prefix}[step1/trajectory] completed outputs found; skipped")
         return
 
@@ -169,7 +190,7 @@ def run_report(report: dict, settings, args: argparse.Namespace) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run report Step0 ingestion and Step1 trajectory construction")
     add_batch_arguments(parser)
-    parser.add_argument("--max-iters", type=int, default=3)
+    parser.add_argument("--max-iters", type=int, default=5)
     parser.add_argument("--model", default=None)
     return parser.parse_args()
 
@@ -180,10 +201,6 @@ def main() -> int:
     reports = selected_reports(PDF_DIR, args.all, args.limit)
 
     def worker(report: dict) -> str:
-        out_dir = OUTPUT_ROOT / report["name"]
-        if not args.force and completed(out_dir):
-            log(f"[benchmark][{report['id']}][step0-step1/resume] completed outputs found; skipped")
-            return "skipped"
         run_report(report, settings, args)
         return "completed"
 

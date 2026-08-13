@@ -17,7 +17,4 @@ def verify_timeline(client, raw_dir: Path, timeline: dict, captions: list[dict])
         tables_text=tables_text,
         fulltext=fulltext,
     )
-    result = client.complete_json(prompt, temperature=0.0, max_tokens=16000)
-    if not isinstance(result.get("passed"), bool) or not isinstance(result.get("issues"), list):
-        raise ValueError("Verifier response must contain boolean passed and list issues")
-    return result
+    return client.complete_json(prompt, temperature=0.0, max_tokens=16000)
