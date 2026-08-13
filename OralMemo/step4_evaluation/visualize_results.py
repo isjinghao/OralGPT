@@ -15,14 +15,21 @@ def read_json(path: Path):
 
 
 def collect_perception(eval_root: Path) -> dict:
-    trajectory_dir = eval_root.parent / "trajectories"
-    model_path = trajectory_dir / "model_perception_trajectory.json"
-    standard_path = trajectory_dir / "standard_trajectory.json"
-    report_path = eval_root / "perception_report.json"
+    trajectory_root = eval_root.parent / "trajectories" / "model_perception_trajectory"
+    standard_path = eval_root.parent / "trajectories" / "standard_trajectory.json"
+    if not trajectory_root.exists():
+        return {"profile": [], "items": [], "report": {}, "answer_model": ""}
+    model_dirs = sorted(path for path in trajectory_root.iterdir() if path.is_dir())
+    if not model_dirs:
+        return {"profile": [], "items": [], "report": {}, "answer_model": ""}
+    model_dir = model_dirs[0]
+    model_path = model_dir / "model_perception_trajectory.json"
+    report_path = trajectory_root / model_dir.name / "perception_report.json"
     if not model_path.exists():
-        return {"profile": [], "items": [], "report": {}}
+        return {"profile": [], "items": [], "report": {}, "answer_model": model_dir.name}
 
     model = read_json(model_path)
+    trajectory_dir = eval_root.parent / "trajectories"
     standard = read_json(standard_path) if standard_path.exists() else {"stages": []}
     report = read_json(report_path) if report_path.exists() else {}
     evaluated_keys = {
@@ -36,7 +43,7 @@ def collect_perception(eval_root: Path) -> dict:
     }
     profile = []
     items = []
-    assets_dir = eval_root / "chenfang_step4_results_assets"
+    assets_dir = eval_root / "step4_results_assets"
     assets_dir.mkdir(parents=True, exist_ok=True)
     for stage in sorted(model.get("stages", []), key=lambda item: item.get("order", 0)):
         if stage.get("stage_id") == "S0_PROFILE":
@@ -70,69 +77,67 @@ def collect_perception(eval_root: Path) -> dict:
                 "image_paths": image_paths,
             })
     items.sort(key=lambda item: item["source_turn_id"])
-    return {"profile": profile, "items": items, "report": report}
+    return {"profile": profile, "items": items, "report": report, "answer_model": model_dir.name}
 
 
 def collect_results(eval_root: Path) -> dict:
     trajectories = []
-    for traj_dir in sorted(
-        p for p in eval_root.iterdir()
-        if p.is_dir() and (
-            not p.name.endswith("_mm")
-            or p.name in ("standard_full_mm", "model_perception_mm")
-        )
-    ):
-        report_path = traj_dir / "report.json"
-        if not report_path.exists():
-            continue
-        report = read_json(report_path)
-        method_reports = {m["method"]: m for m in report.get("methods", [])}
-        rows = []
-        for answers_path in sorted(traj_dir.glob("answers_*.json")):
-            method = answers_path.stem.removeprefix("answers_")
-            answers = read_json(answers_path)
-            method_report = method_reports.get(method, {})
-            per_task = {x["task_id"]: x for x in method_report.get("per_task", [])}
-            detail_by_task = {}
-            for item in method_report.get("tps", {}).get("per_task", []) or []:
-                detail_by_task[item["task_id"]] = item
+    for trajectory_root in sorted(path for path in eval_root.iterdir() if path.is_dir()):
+        for model_root in sorted(path for path in trajectory_root.iterdir() if path.is_dir()):
+            for mode_dir in sorted(path for path in model_root.iterdir() if path.is_dir() and (path / "report.json").exists()):
+                report = read_json(mode_dir / "report.json")
+                method_reports = {m["method"]: m for m in report.get("methods", [])}
+                rows = []
+                for method in sorted(method_reports):
+                    answers_path = model_root / method / mode_dir.name / "answers.json"
+                    if not answers_path.exists():
+                        continue
+                    answers = read_json(answers_path)
+                    method_report = method_reports.get(method, {})
+                    per_task = {x["task_id"]: x for x in method_report.get("per_task", [])}
+                    detail_by_task = {}
+                    for item in method_report.get("tps", {}).get("per_task", []) or []:
+                        detail_by_task[item["task_id"]] = item
 
-            for ans in answers:
-                task_id = ans["task_id"]
-                score = per_task.get(task_id, {})
-                detail = detail_by_task.get(task_id, {})
-                evidence_judgement = {
-                    str(e.get("evidence_id", "")).strip(): e
-                    for e in score.get("evidence", []) or []
-                }
-                selected_evidence = []
-                for ev in ans.get("selected_evidence", []) or []:
-                    ev = dict(ev)
-                    judged = evidence_judgement.get(str(ev.get("evidence_id", "")).strip(), {})
-                    if judged:
-                        ev["covered"] = bool(judged.get("covered"))
-                        ev["coverage_reason"] = judged.get("reason", "")
-                    selected_evidence.append(ev)
+                    for ans in answers:
+                        task_id = ans["task_id"]
+                        score = per_task.get(task_id, {})
+                        detail = detail_by_task.get(task_id, {})
+                        evidence_judgement = {
+                            str(e.get("evidence_id", "")).strip(): e
+                            for e in score.get("evidence", []) or []
+                        }
+                        selected_evidence = []
+                        for ev in ans.get("selected_evidence", []) or []:
+                            ev = dict(ev)
+                            judged = evidence_judgement.get(str(ev.get("evidence_id", "")).strip(), {})
+                            if judged:
+                                ev["covered"] = bool(judged.get("covered"))
+                                ev["coverage_reason"] = judged.get("reason", "")
+                            selected_evidence.append(ev)
 
-                rows.append({
-                    "trajectory": traj_dir.name,
-                    "method": method,
-                    "task_id": task_id,
-                    "task_type": ans.get("task_type", ""),
-                    "ask_after_stage": ans.get("ask_after_stage", ""),
-                    "question": ans.get("question", ""),
-                    "gold_answer": ans.get("gold_answer", ""),
-                    "model_answer": ans.get("model_answer", ""),
-                    "n_images": ans.get("n_images", 0),
-                    "score": score,
-                    "detail": detail,
-                    "selected_evidence": selected_evidence,
+                        rows.append({
+                            "trajectory": trajectory_root.name,
+                            "answer_model": model_root.name,
+                            "mode": mode_dir.name,
+                            "method": method,
+                            "task_id": task_id,
+                            "task_type": ans.get("task_type", ""),
+                            "ask_after_stage": ans.get("ask_after_stage", ""),
+                            "question": ans.get("question", ""),
+                            "gold_answer": ans.get("gold_answer", ""),
+                            "model_answer": ans.get("model_answer", ""),
+                            "memory_context": ans.get("memory_context", ""),
+                            "n_images": ans.get("n_images", 0),
+                            "score": score,
+                            "detail": detail,
+                            "selected_evidence": selected_evidence,
+                        })
+                trajectories.append({
+                    "name": f"{trajectory_root.name}/{model_root.name}/{mode_dir.name}",
+                    "report": report,
+                    "rows": rows,
                 })
-        trajectories.append({
-            "name": traj_dir.name,
-            "report": report,
-            "rows": rows,
-        })
     return {"trajectories": trajectories, "perception": collect_perception(eval_root)}
 
 
@@ -219,7 +224,7 @@ select,input { width:100%; padding:9px 10px; border:1px solid var(--line); borde
   </nav>
   <section id="perception-panel" class="tab-panel active">
     <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">患者 Profile</h2><div id="profile" class="profile-list"></div></section>
-    <section class="panel"><h2 style="margin:0 0 8px;font-size:18px;">模型感知轨迹</h2><div class="small">展示模型基于患者 profile 与各阶段图片生成的感知回答；问题保留原始轨迹文本。请将本 HTML 与同目录下的 `chenfang_step4_results_assets` 文件夹一起发送给牙医，以确保图片可以正常显示。</div></section>
+    <section class="panel"><h2 style="margin:0 0 8px;font-size:18px;">模型感知轨迹</h2><div class="small">展示模型基于患者 profile 与各阶段图片生成的感知回答；问题保留原始轨迹文本。请将本 HTML 与同目录下的 `step4_results_assets` 文件夹一起发送给牙医，以确保图片可以正常显示。</div></section>
     <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">感知评估指标</h2><div id="perception-summary" class="summary-grid"></div><div style="height:12px"></div><div id="perception-metrics"></div></section>
     <section class="panel"><div id="perception-count" class="small"></div><div id="perception-cards"></div></section>
   </section>

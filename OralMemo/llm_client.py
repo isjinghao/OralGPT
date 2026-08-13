@@ -12,12 +12,34 @@ from batch_utils import log
 
 class ChatClient:
     def __init__(self, api_key: str, base_url: str, model: str, log_prefix: str = "[llm]"):
-        self.client = OpenAI(api_key=api_key, base_url=base_url.rstrip("/") + "/")
+        self.base_url = base_url.rstrip("/")
+        self.client = OpenAI(api_key=api_key, base_url=self.base_url + "/")
         self.model = model
         self.log_prefix = log_prefix
 
     def log(self, scope: str, message: str) -> None:
         log(f"{self.log_prefix}[{scope}] {message}")
+
+    @staticmethod
+    def _content_text(content) -> str:
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            parts: list[str] = []
+            for item in content:
+                if isinstance(item, str):
+                    text = item
+                elif isinstance(item, dict):
+                    text = item.get("text") or item.get("content") or ""
+                else:
+                    text = getattr(item, "text", None) or getattr(item, "content", None) or str(item)
+                text = str(text)
+                if text:
+                    parts.append(text)
+            return "".join(parts)
+        if content is None:
+            return ""
+        return str(content)
 
     @staticmethod
     def _messages(prompt: str, images: list[str] | None, system_prompt: str | None) -> list[dict]:
@@ -50,7 +72,7 @@ class ChatClient:
                     max_tokens=max_tokens,
                     timeout=timeout,
                 )
-                return response.choices[0].message.content or ""
+                return self._content_text(response.choices[0].message.content)
             except RateLimitError as exc:
                 if attempt >= 3:
                     self.log("llm/error", "RateLimitError after 4 attempts")

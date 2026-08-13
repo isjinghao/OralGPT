@@ -18,10 +18,23 @@ class CachedLLM:
         self.cache_dir = cache_dir
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.calls = 0
-        self.hits = 0
+
+    def _load_cache(self, path: Path) -> dict | None:
+        if not path.exists():
+            return None
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            return None
+
+    def _write_cache(self, path: Path, payload: dict) -> None:
+        tmp_path = path.with_suffix(path.suffix + ".tmp")
+        tmp_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp_path.replace(path)
 
     def complete(self, prompt: str, cache_key: str, max_tokens: int = 8000,
-                 temperature: float = 0.0, images: list[str] | None = None) -> dict:
+                 temperature: float = 0.0, images: list[str] | None = None,
+                 timeout: int = 900) -> dict:
         path = self.cache_dir / f"{cache_key}.json"
         cache_input = {
             "type": "json",
@@ -31,23 +44,19 @@ class CachedLLM:
             "max_tokens": max_tokens,
             "images": images or [],
         }
-        cached = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+        cached = self._load_cache(path)
         if cached and cached.get("input") == cache_input:
-            self.hits += 1
-            self.client.log("step4/cache", f"cache_hit key={cache_key}")
             return cached["result"]
         result = self.client.complete_json(
-            prompt, temperature=temperature, max_tokens=max_tokens, images=images
+            prompt, temperature=temperature, max_tokens=max_tokens, images=images, timeout=timeout
         )
-        path.write_text(
-            json.dumps({"input": cache_input, "result": result}, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
+        self._write_cache(path, {"input": cache_input, "result": result})
         self.calls += 1
         return result
 
     def complete_text(self, prompt: str, cache_key: str, max_tokens: int = 8000,
-                      temperature: float = 0.0, images: list[str] | None = None) -> str:
+                      temperature: float = 0.0, images: list[str] | None = None,
+                      timeout: int = 900) -> str:
         path = self.cache_dir / f"{cache_key}.json"
         cache_input = {
             "type": "text",
@@ -57,19 +66,13 @@ class CachedLLM:
             "max_tokens": max_tokens,
             "images": images or [],
         }
-        cached = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+        cached = self._load_cache(path)
         if cached and cached.get("input") == cache_input:
-            self.hits += 1
-            self.client.log("step4/cache", f"cache_hit key={cache_key}")
             return cached["answer"]
         answer = self.client.complete_text(
-            prompt, temperature=temperature, max_tokens=max_tokens, images=images
+            prompt, temperature=temperature, max_tokens=max_tokens, images=images, timeout=timeout
         )
-        path.write_text(
-            json.dumps({"input": cache_input, "answer": answer}, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
-        self.calls += 1
+        self._write_cache(path, {"input": cache_input, "answer": answer})
         return answer
 
 
@@ -97,16 +100,17 @@ def answer_question(method: MemoryMethod, task: dict, llm: CachedLLM, image_root
 
     method.multimodal=True 且提供 image_root 时, 会把记忆中的图片以 image_url 分块附带给大模型。
     """
+    memory_context = method.context(task["question"]) or "(empty)"
     prompt = render(
         "answer",
-        memory=method.context(task["question"]) or "(empty)",
+        memory=memory_context,
         question=task["question"],
     )
     images: list[str] | None = None
     if method.multimodal and image_root is not None:
         images = gather_image_urls(method, image_root) or None
 
-    answer = llm.complete_text(prompt, cache_key=f"answer_{task['task_id']}", max_tokens=16000, images=images)
+    answer = llm.complete_text(prompt, cache_key=f"answer_{task['task_id']}", max_tokens=16000, images=images, timeout=900)
     return {
         "task_id": task["task_id"],
         "task_type": task["task_type"],
@@ -114,6 +118,7 @@ def answer_question(method: MemoryMethod, task: dict, llm: CachedLLM, image_root
         "question": task["question"],
         "gold_answer": task.get("gold_answer", ""),
         "model_answer": answer,
+        "memory_context": memory_context,
         "selected_evidence": task.get("selected_evidence", []),
         "n_images": len(images) if images else 0,
     }

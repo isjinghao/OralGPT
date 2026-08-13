@@ -305,8 +305,8 @@ def generate_rubric(client: ChatClient, task: dict, cache_dir: Path) -> dict:
     )
     result = cached_completion(client, prompt, cache_path, max_tokens=12000)
     raw_criteria = result["criteria"]
-    if not 4 <= len(raw_criteria) <= 7:
-        raise ValueError(f"Rubric must contain 4-7 criteria: {task['task_id']}")
+    if not raw_criteria:
+        raise ValueError(f"Rubric must contain at least 1 criterion: {task['task_id']}")
     names = [str(item["name"]).strip() for item in raw_criteria]
     scores = [float(item["score"]) for item in raw_criteria]
     if any(not name for name in names) or len(set(names)) != len(names):

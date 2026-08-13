@@ -29,7 +29,6 @@ def step2_completed(out: Path) -> bool:
             out / "evidence" / "evidence.json",
             out / "graph" / "evidence_graph.json",
             out / "graph" / "evidence_graph.html",
-            out / "graph" / "evidence_graph.png",
         )
     )
 
@@ -65,8 +64,13 @@ def run_step2(out: Path, patient_id: str, settings) -> None:
     write_json(graph_dir / "evidence_graph.json", graph)
     html_path = graph_dir / "evidence_graph.html"
     render_html(graph, evidence["evidence"], standard["stages"], html_path)
-    render_png(html_path, graph_dir / "evidence_graph.png")
-    log(f"{prefix}[step2/graph] completed edges={len(graph['edges'])}")
+    try:
+        render_png(html_path, graph_dir / "evidence_graph.png")
+        artifacts = "json,html,png"
+    except Exception as exc:
+        log(f"{prefix}[step2/graph] png skipped: {type(exc).__name__}: {exc}")
+        artifacts = "json,html"
+    log(f"{prefix}[step2/graph] completed edges={len(graph['edges'])} artifacts={artifacts}")
 
 
 def parse_args() -> argparse.Namespace:

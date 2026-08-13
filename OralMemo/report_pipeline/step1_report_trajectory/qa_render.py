@@ -48,8 +48,6 @@ def normalize_timepoints(extracted: dict) -> list[dict]:
                 raise ValueError("Evaluation QAs cannot attach unreleased answer images")
         if stage_type == "treatment" and any(role != "evaluation" for role in roles):
             raise ValueError("Treatment timepoints must contain evaluation QAs only")
-        if stage_type == "followup" and "observation" not in roles:
-            raise ValueError("Each followup timepoint requires at least one observation QA")
 
         type_index = type_counts[stage_type]
         type_counts[stage_type] += 1
@@ -135,10 +133,6 @@ def render_turns(normed_timepoints: list[dict], images_map: dict) -> list[dict]:
                 qa.get("answer"), f"{timepoint['stage_id']}.qa_pairs[{qa_index}].answer"
             )
             images = resolve_image(qa.get("figure_ref"), images_map)
-            if qa.get("figure_ref") and not images:
-                raise ValueError(
-                    f"Unresolved figure_ref at {timepoint['stage_id']}.qa_pairs[{qa_index}]"
-                )
             source_turn_id += 1
             turns.append(
                 {

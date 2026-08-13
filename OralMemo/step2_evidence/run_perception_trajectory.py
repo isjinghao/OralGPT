@@ -1,20 +1,22 @@
-"""基于患者 profile 与阶段图片生成模型感知轨迹。"""
+"""Generate model-perception trajectories for one or more patients."""
 from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import json
 import mimetypes
 from pathlib import Path
 
 import yaml
 
+from batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
 from config import get_settings
 from llm_client import ChatClient
 from step1_patient_trajectory.perception_evaluation import PerceptionEvaluator
 
 
-PROMPTS_DIR = Path(__file__).with_name("prompts")
+PROMPTS_DIR = Path(__file__).resolve().parent.parent / "step1_patient_trajectory" / "prompts"
 DIRECT_CONTEXT_STAGE_IDS = {"S0_PROFILE", "S5_TMJ"}
 
 
@@ -48,12 +50,9 @@ def resolve_image_path(root: Path, image_path: str) -> Path:
 def image_urls(root: Path, image_paths: list[str]) -> list[str]:
     urls: list[str] = []
     for image_path in image_paths:
-        path = resolve_image_path(root, image_path)
-        url = encode_image(path)
+        url = encode_image(resolve_image_path(root, image_path))
         if url:
             urls.append(url)
-        else:
-            print(f"[warning] image not found: {path}", flush=True)
     return urls
 
 
@@ -84,24 +83,47 @@ def format_text_memory(memory: list[dict]) -> str:
 
 
 def initial_profile_records(stages: list[dict]) -> list[dict]:
-    """收集首个图片问题之前的文本记录，作为后续每轮感知都可见的 profile。"""
     records: list[dict] = []
     for stage in stages:
         for qa in stage.get("qa_pairs", []):
-            images = qa.get("image_paths", []) or []
-            if images:
+            if qa.get("image_paths"):
                 return records
-            records.append({
-                "stage_id": stage["stage_id"],
-                "source_turn_id": qa["source_turn_id"],
-                "question": qa.get("human", ""),
-                "answer": (qa.get("assistant") or "").strip(),
-            })
+            records.append(
+                {
+                    "stage_id": stage["stage_id"],
+                    "source_turn_id": qa["source_turn_id"],
+                    "question": qa.get("human", ""),
+                    "answer": (qa.get("assistant") or "").strip(),
+                }
+            )
     return records
 
 
-def cache_path(cache_dir: Path, stage_id: str, source_turn_id: int) -> Path:
-    return cache_dir / f"perception_{stage_id}_{source_turn_id}.json"
+def cache_path(
+    cache_dir: Path,
+    model: str,
+    base_url: str,
+    stage_id: str,
+    source_turn_id: int,
+    question: str,
+    system_prompt: str,
+    prompt: str,
+    image_paths: list[str],
+) -> Path:
+    payload = "\n".join(
+        [
+            model,
+            base_url,
+            stage_id,
+            str(source_turn_id),
+            question,
+            system_prompt,
+            prompt,
+            ",".join(image_paths),
+        ]
+    )
+    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+    return cache_dir / f"perception_{stage_id}_{source_turn_id}_{digest}.json"
 
 
 def generate_answer(
@@ -125,44 +147,35 @@ def generate_answer(
         modality=", ".join(stage.get("modality", [])) or "unknown",
         question=question,
     )
-    cache_input = {
-        "model": client.model,
-        "system_prompt": system_prompt,
-        "prompt": prompt,
-        "image_paths": qa.get("image_paths", []) or [],
-        "max_tokens": 16000,
-    }
-    path = cache_path(cache_dir, stage["stage_id"], int(qa.get("source_turn_id", 0)))
+    path = cache_path(
+        cache_dir,
+        client.model,
+        client.base_url,
+        stage["stage_id"],
+        int(qa.get("source_turn_id", 0)),
+        question,
+        system_prompt,
+        prompt,
+        qa.get("image_paths", []) or [],
+    )
     if path.exists() and not force:
-        cached = read_json(path)
-        if cached.get("input") == cache_input:
-            return str(cached["answer"]).strip()
+        return read_json(path)["answer"]
 
     urls = image_urls(image_root, qa.get("image_paths", []) or [])
     if not urls:
-        raise FileNotFoundError(
-            f"No readable images for {stage['stage_id']} source_turn_id={qa.get('source_turn_id')}"
-        )
+        raise FileNotFoundError(f"No readable images for {stage['stage_id']} source_turn_id={qa.get('source_turn_id')}")
+
     answer = client.complete_text(
         prompt,
         temperature=0.0,
-        max_tokens=16000,
+        max_tokens=1024,
         images=urls,
+        timeout=900,
         system_prompt=system_prompt,
     ).strip()
     if not answer:
-        raise RuntimeError(
-            f"Empty model answer for {stage['stage_id']} source_turn_id={qa.get('source_turn_id')}"
-        )
-    write_json(
-        path,
-        {
-            "input": cache_input,
-            "answer": answer,
-            "stage_id": stage["stage_id"],
-            "source_turn_id": qa.get("source_turn_id"),
-        },
-    )
+        raise RuntimeError(f"Empty model answer for {stage['stage_id']} source_turn_id={qa.get('source_turn_id')}")
+    write_json(path, {"answer": answer})
     return answer
 
 
@@ -177,9 +190,7 @@ def generate_trajectory(
     stages = sorted(standard.get("stages", []), key=lambda item: item.get("order", 0))
     profile_records = initial_profile_records(stages)
     profile = format_profile(profile_records)
-    profile_keys = {
-        (item["stage_id"], int(item["source_turn_id"])) for item in profile_records
-    }
+    profile_keys = {(item["stage_id"], int(item["source_turn_id"])) for item in profile_records}
     text_memory: list[dict] = []
     memory: list[dict] = []
     generated_stages: list[dict] = []
@@ -191,10 +202,10 @@ def generate_trajectory(
             if qa["role"] == "evaluation":
                 qa_pairs.append(dict(qa))
                 continue
+
             images = qa.get("image_paths", []) or []
             key = (stage["stage_id"], int(qa.get("source_turn_id", 0)))
             if stage["stage_id"] in DIRECT_CONTEXT_STAGE_IDS or not images:
-                # profile、TMJ/ECT 和无图文本直接保留标准答案，作为后续文本上下文。
                 copied = dict(qa)
                 if stage["stage_id"] in DIRECT_CONTEXT_STAGE_IDS:
                     copied["human"] = clean_question(copied["human"])
@@ -212,13 +223,16 @@ def generate_trajectory(
                     )
                 continue
 
-            print(
-                f"[perception] {stage['stage_id']} source_turn_id={qa.get('source_turn_id')}",
-                flush=True,
-            )
             answer = generate_answer(
-                client, profile, text_memory, memory, stage, qa,
-                image_root, cache_dir, force,
+                client,
+                profile,
+                text_memory,
+                memory,
+                stage,
+                qa,
+                image_root,
+                cache_dir,
+                force,
             )
             qa_pairs.append({**qa, "assistant": answer})
             if evaluator is not None:
@@ -235,45 +249,53 @@ def generate_trajectory(
         generated_stages.append(generated)
 
     result = {
-        "trajectory_id": f"{standard['patient_id']}__model_perception",
+        "trajectory_id": f"{standard['patient_id']}__model_perception_trajectory",
         "patient_id": standard["patient_id"],
+        "trajectory_type": "model_perception_trajectory",
+        "stages": generated_stages,
     }
     for key in ("patient_name", "group"):
         if key in standard:
             result[key] = standard[key]
-    result.update({"trajectory_type": "model_perception", "stages": generated_stages})
     return result
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Generate a model-perception trajectory from profile and images")
-    parser.add_argument("--role", choices=("benchmark", "answer", "verifier"), default="answer")
-    parser.add_argument("--standard", type=Path, default=None, help="Path to standard_trajectory.json")
-    parser.add_argument("--output", type=Path, default=None, help="Output model perception trajectory path")
-    parser.add_argument("--cache-dir", type=Path, default=None)
-    parser.add_argument("--evidence", type=Path, default=None, help="Evidence JSON for perception scoring")
-    parser.add_argument("--report", type=Path, default=None, help="Perception evaluation report path")
-    parser.add_argument("--force", action="store_true", help="Ignore perception answer cache")
-    return parser.parse_args()
+def run_patient(item: dict, settings, model: str | None, base_url: str | None, force: bool) -> str:
+    patient_id = item["id"]
+    case_root = patient_output_root(settings.bench_root, patient_id)
+    standard_path = case_root / "trajectories" / "standard_trajectory.json"
+    evidence_path = case_root / "evidence" / "evidence.json"
 
+    answer_cfg = settings.llm_for("answer")
+    model_name = model or answer_cfg.model
+    model_base_url = base_url or answer_cfg.base_url
+    model_dir = model_name
+    output_path = case_root / "trajectories" / "model_perception_trajectory" / model_dir / "model_perception_trajectory.json"
+    cache_dir = case_root / "cache" / "stage1_perception" / model_dir
+    report_path = case_root / "trajectories" / "model_perception_trajectory" / model_dir / "perception_report.json"
 
-def main() -> None:
-    args = parse_args()
-    settings = get_settings()
-    standard_path = args.standard or settings.output_root / "trajectories" / "standard_trajectory.json"
-    case_root = standard_path.parent.parent
-    output_path = args.output or case_root / "trajectories" / "model_perception_trajectory.json"
-    cache_dir = args.cache_dir or case_root / "cache" / "stage1_perception"
-    evidence_path = args.evidence or case_root / "evidence" / "evidence.json"
-    report_path = args.report or case_root / "evaluation" / "perception_report.json"
-    cfg = settings.llm_for(args.role)
+    if not standard_path.is_file():
+        raise FileNotFoundError(f"Standard trajectory does not exist: {standard_path}")
+    if not evidence_path.is_file():
+        raise FileNotFoundError(f"Evidence does not exist: {evidence_path}")
+    if not force and output_path.is_file() and report_path.is_file():
+        log(f"[perception][{patient_id}][resume] model={model_name} outputs found; skipped")
+        return "skipped"
+
     verifier_cfg = settings.llm_for("verifier")
-    client = ChatClient(api_key=cfg.api_key, base_url=cfg.base_url, model=cfg.model)
+    client = ChatClient(
+        api_key=answer_cfg.api_key,
+        base_url=model_base_url,
+        model=model_name,
+        log_prefix=f"[perception][{patient_id}][{model_name}]",
+    )
     verifier = ChatClient(
         api_key=verifier_cfg.api_key,
         base_url=verifier_cfg.base_url,
         model=verifier_cfg.model,
+        log_prefix=f"[perception-verifier][{patient_id}]",
     )
+
     standard = read_json(standard_path)
     evidence = read_json(evidence_path)
     evaluator = PerceptionEvaluator(
@@ -288,12 +310,32 @@ def main() -> None:
         client=client,
         image_root=settings.bench_root,
         cache_dir=cache_dir,
-        force=args.force,
+        force=force,
         evaluator=evaluator,
     )
     write_json(output_path, result)
-    print(f"[perception] trajectory written to: {output_path}", flush=True)
+    log(f"[perception][{patient_id}][done] model={model_name} output={output_path}")
+    return "completed"
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Generate model-perception trajectories")
+    add_batch_arguments(parser)
+    parser.add_argument("--model", default=None, help="Override ANSWER_OPENAI_MODEL for this run")
+    parser.add_argument("--base-url", default=None, help="Override ANSWER_OPENAI_BASE_URL for this run")
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    settings = get_settings()
+    patients = selected_patients(settings.dataset_json, args.all, args.limit)
+
+    def worker(item: dict) -> str:
+        return run_patient(item, settings, args.model, args.base_url, args.force)
+
+    return run_patient_batch(patients, args.num_workers, "perception", worker)
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

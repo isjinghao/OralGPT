@@ -6,6 +6,27 @@ from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, for
 from step4_evaluation.templating import render
 
 
+def _to_text(value) -> str:
+    if isinstance(value, str):
+        return value.strip()
+    if isinstance(value, list):
+        parts: list[str] = []
+        for item in value:
+            if isinstance(item, str):
+                text = item
+            elif isinstance(item, dict):
+                text = item.get("text") or item.get("content") or item.get("memory") or ""
+            else:
+                text = getattr(item, "text", None) or getattr(item, "content", None) or getattr(item, "memory", None) or str(item)
+            text = str(text).strip()
+            if text:
+                parts.append(text)
+        return "\n".join(parts).strip()
+    if value is None:
+        return ""
+    return str(value).strip()
+
+
 class SummaryMemory(MemoryMethod):
     """记忆基线: 增量把每阶段融入一份紧凑结构化记忆。"""
 
@@ -38,7 +59,9 @@ class SummaryMemory(MemoryMethod):
             new_stage=self._pending,
         )
         data = llm.complete(prompt, cache_key=cache_key, max_tokens=16000)
-        self._summary = (data.get("memory") or self._summary).strip()
+        memory = _to_text(data.get("memory"))
+        if memory:
+            self._summary = memory
         self._pending = ""
 
     def context(self, query: str | None = None) -> str:

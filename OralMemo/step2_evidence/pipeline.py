@@ -34,8 +34,9 @@ def process_patient(item: dict, settings: Settings, client: ChatClient) -> None:
     write_json(out / "trajectories" / "standard_trajectory.json", standard)
     variants = build_missing_modality_variants(standard)
     for variant in variants:
-        write_json(out / "variants" / f"{variant['trajectory_type']}.json", variant)
-    write_json(out / "variants" / "long_noisy.json", build_long_noisy_variant(standard))
+        trajectory_type = variant["trajectory_type"]
+        write_json(out / "trajectories" / trajectory_type / f"{trajectory_type}.json", variant)
+    write_json(out / "trajectories" / "long_noisy" / "long_noisy.json", build_long_noisy_variant(standard))
     log(f"[benchmark][{patient_id}][step1/done] stages={len(standard['stages'])} variants={len(variants) + 1}")
 
     log(f"[benchmark][{patient_id}][step2/evidence] started")
@@ -61,10 +62,15 @@ def process_patient(item: dict, settings: Settings, client: ChatClient) -> None:
     write_json(graph_dir / "evidence_graph.json", graph)
     html_path = graph_dir / "evidence_graph.html"
     render_html(graph, evidence["evidence"], standard["stages"], html_path)
-    render_png(html_path, graph_dir / "evidence_graph.png")
+    try:
+        render_png(html_path, graph_dir / "evidence_graph.png")
+        artifacts = "json,html,png"
+    except Exception as exc:
+        log(f"[benchmark][{patient_id}][step2/graph] png skipped: {type(exc).__name__}: {exc}")
+        artifacts = "json,html"
     log(
         f"[benchmark][{patient_id}][step2/graph] completed edges={len(graph['edges'])} "
-        "artifacts=json,html,png"
+        f"artifacts={artifacts}"
     )
 
 

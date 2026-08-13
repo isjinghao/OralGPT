@@ -23,9 +23,9 @@ def _stage_input(stage: dict) -> dict:
 
 
 def build_standard_trajectory(patient_stages: dict) -> dict:
-    # 按阶段顺序生成 standard_full 轨迹
+    # 按阶段顺序生成 standard_trajectory 轨迹
     trajectory = {
-        "trajectory_id": f"{patient_stages['patient_id']}__standard_full",
+        "trajectory_id": f"{patient_stages['patient_id']}__standard_trajectory",
         "patient_id": patient_stages["patient_id"],
     }
     for key in ("patient_name", "group"):
@@ -33,7 +33,7 @@ def build_standard_trajectory(patient_stages: dict) -> dict:
             trajectory[key] = patient_stages[key]
     trajectory.update(
         {
-            "trajectory_type": "standard_full",
+            "trajectory_type": "standard_trajectory",
             "stages": [_stage_input(stage) for stage in patient_stages["stages"]],
         }
     )

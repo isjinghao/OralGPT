@@ -181,7 +181,68 @@ bash scripts/run_step4.sh --all --num-workers 3 \
   --multimodal
 ```
 
-`model_perception` 要求病人目录中已存在 `trajectories/model_perception_trajectory.json`。其他轨迹名从 `variants/<name>.json` 读取。`report.json` 和 `report.txt` 记录本次命令指定的方法；需要对比多个 memo 方法时，请在同一次命令中全部传给 `--methods`。
+`model_perception` 必须先按被测模型生成对应轨迹；轨迹路径为 `trajectories/model_perception_trajectory/<answer_model>/model_perception_trajectory.json`。其他轨迹名从 `trajectories/<name>/<name>.json` 读取。一次命令中的多个 memo 方法会写入同一个模型目录下的独立方法目录。
+
+### 三个本地 VLM 的评测流程
+
+服务器已提供三个 OpenAI-compatible 本地 VLM 服务：
+
+| 模型 | 服务脚本 | 默认地址 | API model id |
+| --- | --- | --- | --- |
+| LLaVA-Med-7B | `/root/autodl-tmp/serve/start_llava_med_api.sh` | `http://127.0.0.1:8001/v1` | `llava-med-7b` |
+| MedGemma | `/root/autodl-tmp/serve/start_medgemma_api.sh` | `http://127.0.0.1:8002/v1` | `medgemma` |
+| OralGPT-Omni-7B | `/root/autodl-tmp/serve/start_oralgpt_omni_api.sh` | `http://127.0.0.1:8003/v1` | `oralgpt-omni-7b` |
+
+三个模型都使用同一套 `step4_evaluation`、同一 verifier、同一轨迹和同一 memo 方法；每次只改变 `--answer-base-url` 和 `--answer-model`。先启动需要评测的模型服务：
+
+```bash
+source /root/miniconda3/etc/profile.d/conda.sh
+conda activate cmfbench
+bash /root/autodl-tmp/serve/start_llava_med_api.sh
+# 或：bash /root/autodl-tmp/serve/start_medgemma_api.sh
+# 或：bash /root/autodl-tmp/serve/start_oralgpt_omni_api.sh
+```
+
+先用一个病人做连通性检查：
+
+```bash
+curl http://127.0.0.1:8001/health
+curl http://127.0.0.1:8001/v1/models
+```
+
+模型感知轨迹也必须用同一个被测模型生成。下面以 LLaVA-Med 为例；另外两个模型只替换地址和 model id：
+
+```bash
+bash scripts/run_perception_trajectory.sh --limit 4 --num-workers 1 \
+  --model llava-med-7b --base-url http://127.0.0.1:8001/v1
+```
+
+批量生成前 4 个病人的模型感知轨迹：
+
+```bash
+bash scripts/run_perception_trajectory.sh --limit 4 --num-workers 1 \
+  --model llava-med-7b --base-url http://127.0.0.1:8001/v1
+```
+
+然后运行标准轨迹和模型感知轨迹：
+
+```bash
+bash scripts/run_step4.sh \
+  --limit 4 --num-workers 1 \
+  --trajectories standard_trajectory,model_perception_trajectory \
+  --methods full_context_memory,summary_memory \
+  --answer-model llava-med-7b \
+  --answer-base-url http://127.0.0.1:8001/v1
+```
+
+MedGemma 和 OralGPT-Omni 分别使用：
+
+```bash
+bash scripts/run_step4.sh --limit 4 --num-workers 1 --trajectories standard_trajectory,model_perception_trajectory --methods full_context_memory,summary_memory --answer-model medgemma --answer-base-url http://127.0.0.1:8002/v1
+bash scripts/run_step4.sh --limit 4 --num-workers 1 --trajectories standard_trajectory,model_perception_trajectory --methods full_context_memory,summary_memory --answer-model oralgpt-omni-7b --answer-base-url http://127.0.0.1:8003/v1
+```
+
+建议先以 `--num-workers 1` 做单模型冒烟测试；本地 VLM 服务内部有单请求生成锁，多病人并发只会增加显存/队列压力。
 
 ### 产物
 
@@ -190,7 +251,7 @@ bash scripts/run_step4.sh --all --num-workers 3 \
 | Step1 | `trajectories/standard_trajectory.json`、`variants/*.json` |
 | Step2 | `evidence/evidence.json`、`graph/evidence_graph.json`、`graph/evidence_graph.html`、`graph/evidence_graph.png`、`cache/...` |
 | Step3 | `tasks/all_tasks.json`、按任务类型分组的 JSON、`rubrics/treatment_rubrics.json`、`cache/step3/...` |
-| Step4 | `evaluation/<轨迹>[_mm]/answers_<方法>.json`、`report.json`、`report.txt`、`cache/step4/...` |
+| Step4 | `evaluation/<轨迹>/<answer_model>/<方法>/<text|multimodal>/answers.json`；同模型多方法汇总在 `evaluation/<轨迹>/<answer_model>/<text|multimodal>/report.json/report.txt`；缓存对应位于 `cache/step4/<轨迹>/<answer_model>/...` |
 
 ---
 
@@ -254,6 +315,8 @@ bash scripts/run_step4.sh --all --num-workers 3 --multimodal
 | `--methods` | `full_context_memory` | 逗号分隔的记忆方法 |
 | `--multimodal` | 关闭 | 开启多模态图片输入 |
 | `--force` | 关闭 | 忽略病人级完成判断，继续复用细粒度缓存 |
+| `--answer-model` | `.env` 的 `ANSWER_OPENAI_MODEL` | 覆盖本次被测回答模型名，并用于结果目录隔离 |
+| `--answer-base-url` | `.env` 的 `ANSWER_OPENAI_BASE_URL` | 覆盖本次被测模型的 OpenAI-compatible 地址 |
 
 ### 记忆方法（`step4_evaluation/memory/`）
 
@@ -276,12 +339,31 @@ bash scripts/run_step4.sh --all --num-workers 3 --multimodal
 
 
 
-### 产物（`outputs/.../evaluation/<轨迹>[_mm]/`）
+### 产物（`outputs/.../evaluation/<轨迹>/<answer_model>/`）
 
-- `answers_<方法>.json`：各方法逐任务的作答记录（含 `n_images`）
-- `report.json` / `report.txt`：多方法对比报告（结构化 + 控制台表格）
+- `<方法>/<text|multimodal>/answers.json`：该模型、轨迹和 memo 方法的逐任务作答记录
+- `<text|multimodal>/report.json` / `report.txt`：同一模型下的多方法对比报告
+- `report.json` 同时记录 `answer_model`、`answer_base_url`、`verifier_model`、`verifier_base_url` 和 `memory_methods`
 
-> mem0 的向量库持久化在 `cache/step4/<轨迹>[_mm]/mem0_memory/vector_store/`，由方法自身经 `setup()` 配置；嵌入模型由 `.env` 的 `EMBEDDING_MODEL`（默认 `text-embedding-3-small`）指定。embedding key/url 优先使用 `EMBEDDING_OPENAI_*`，否则回退到通用 `OPENAI_*`；若未配置通用 key，必须配置 `EMBEDDING_OPENAI_API_KEY`。
+> mem0 的向量库持久化在 `cache/step4/<轨迹>/<answer_model>/mem0_memory/<text|multimodal>/vector_store/`，由方法自身经 `setup()` 配置；嵌入模型由 `.env` 的 `EMBEDDING_MODEL`（默认 `text-embedding-3-small`）指定。embedding key/url 优先使用 `EMBEDDING_OPENAI_*`，否则回退到通用 `OPENAI_*`；若未配置通用 key，必须配置 `EMBEDDING_OPENAI_API_KEY`。
+
+## 实验设计与归因
+
+评测结果按“轨迹 × 被测回答模型 × memo 方法 × 输入模式”比较。verifier/judge、benchmark 任务、rubric、随机种子和 generation 参数固定，只改变正在研究的因素。
+
+感知误差：在同一个 `answer_model` 和 memo 方法下比较 `standard` 与 `model_perception`。两者的差值表示感知误差传播到记忆和后续任务后的影响；同时报告 `trajectories/model_perception_trajectory/<answer_model>/perception_report.json` 的 precision、recall、F1 和 hallucination control。
+
+memo/检索误差：只比较不同 memo 方法能回答端到端效果，但不能单独证明下降来自检索，因为方法同时改变了记忆表示、更新/压缩和上下文长度。建议固定 `answer_model`，同时报告 `full_context_memory`、`summary_memory`、`mem0_memory`，并审计每道题 `answers.json` 里的 `memory_context` 与 `selected_evidence`：
+
+```text
+retrieval loss 上界 = score(full_context) - score(actual_memo)
+```
+
+这项只能称为记忆/检索瓶颈的上界估计。若 selected evidence 没出现在 `memory_context`，属于可解释的检索/记忆覆盖失败；若已出现但答案仍错，才进入推理错误候选。
+
+推理误差：增加 oracle-context 条件，把该题 `selected_evidence` 对应的 gold facts 或人工核验后的完整相关证据直接注入 answer model，不经过感知、压缩和检索。固定同一个 answer model 比较 `oracle-context` 与实际 memo：oracle-context 仍答错的部分是回答模型的推理/表达失败；oracle-context 正确而实际 memo 错的部分属于记忆/检索链路损失。oracle 结果是诊断上界，不替代主结果。
+
+当前轨迹变体可支持：`standard` vs `model_perception`（感知传播）、单缺失 vs 双缺失模态（模态协同）、`long_noisy`（抗噪和幻觉）、text vs multimodal（视觉输入收益）、不同历史长度/阶段位置（长上下文退化和 recency bias），以及 full-context/summary/mem0 的交叉比较。报告时按 overall、任务类型、模态和轨迹严重度分层，并按病人报告均值、标准差和 bootstrap 置信区间；单病人或极少任务不应写成稳定统计结论。
 
 ---
 
@@ -347,9 +429,9 @@ bash scripts/run_step4_report.sh --limit 4 --num-workers 4
 也可以直接运行 Python 入口：
 
 ```bash
-python -m report_pipeline.run_step0_step1_report --all --num-workers 1
-python -m report_pipeline.run_step2_step3_report --all --num-workers 1
-python -m report_pipeline.run_step4_report --all --num-workers 1 --methods full_context_memory
+bash scripts/run_step0_step1_report.sh --all --num-workers 1
+bash scripts/run_step2_step3_report.sh --all --num-workers 1
+bash scripts/run_step4_report.sh --all --num-workers 1 --methods full_context_memory
 ```
 
 通用参数与病人侧一致：
@@ -372,4 +454,4 @@ Step0-1 额外支持 `--max-iters` 和 `--model`；Step4 额外支持 `--methods
 | `trajectories/standard_trajectory.json`、`dataset_entry.json` | Step1 标准轨迹和 SFT 条目 |
 | `evidence/evidence.json`、`graph/` | Step2 证据及证据图 |
 | `tasks/`、`rubrics/` | Step3 benchmark 任务和评分 rubric |
-| `evaluation/standard_full[_mm]/` | Step4 文本或多模态评估结果 |
+| `evaluation/standard_trajectory/<answer_model>/<text|multimodal>/` | Step4 文本或多模态评估结果；各 memo 方法的答案位于同模型目录下的方法子目录 |

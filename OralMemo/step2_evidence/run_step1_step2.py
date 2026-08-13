@@ -19,7 +19,6 @@ def completed(out) -> bool:
         out / "evidence" / "evidence.json",
         out / "graph" / "evidence_graph.json",
         out / "graph" / "evidence_graph.html",
-        out / "graph" / "evidence_graph.png",
     )
     return all(path.is_file() for path in required)
 

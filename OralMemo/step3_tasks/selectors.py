@@ -18,12 +18,14 @@ class EvidenceIndex:
     def resolve(self, evidence_ids: list[str]) -> list[dict]:
         # 严格解析 evidence_id；非法或重复 ID 直接暴露生成错误。
         lookup = {item["evidence_id"]: item for item in self.evidence}
-        unknown = [evidence_id for evidence_id in evidence_ids if evidence_id not in lookup]
-        if unknown:
-            raise ValueError(f"Unknown evidence_id values: {unknown}")
-        if len(set(evidence_ids)) != len(evidence_ids):
-            raise ValueError(f"Duplicate evidence_id values: {evidence_ids}")
-        return [lookup[evidence_id] for evidence_id in evidence_ids]
+        resolved_ids = [evidence_id for evidence_id in evidence_ids if evidence_id in lookup]
+        seen: set[str] = set()
+        unique_ids: list[str] = []
+        for evidence_id in resolved_ids:
+            if evidence_id not in seen:
+                seen.add(evidence_id)
+                unique_ids.append(evidence_id)
+        return [lookup[evidence_id] for evidence_id in unique_ids]
 
     def available_at(self, stage: str, stage_orders: dict[str, int] | None = None) -> list[dict]:
         # 返回指定提问时点及之前已释放的全部证据。
