@@ -12,12 +12,12 @@ task_types:
       must identify that earlier context and use at least two timepoints. Do not
       turn recall into a new integrated interpretation, state update, or outcome summary.
 
-  - task_type: cross_modal_reasoning
+  - task_type: cross_temporal_reasoning
     count: 2
     instruction: >-
-      Integrate complementary evidence across different modalities, clinically
-      distinct sources, or timepoints to derive one supported interpretation;
-      each selected item must materially contribute rather than merely repeat another.
+      Integrate complementary evidence from at least two different timepoints to derive
+      one supported longitudinal interpretation; each selected item must materially
+      contribute, and different sources or modalities at one timepoint are insufficient.
 
   - task_type: memory_update_conflict_correction
     count: 2

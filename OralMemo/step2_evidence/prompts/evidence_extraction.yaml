@@ -5,6 +5,8 @@ template: |
 
   Rules:
   1. Extract only facts explicitly stated in this source QA pair; do not infer diagnosis or treatment.
+     Prioritize explicitly stated diagnoses, classifications, stages, laterality, and negative conclusions,
+     and never omit an explicit diagnosis.
   2. Split compound statements into minimal atomic facts and preserve numbers, units, tooth numbers,
      laterality, and negation.
   3. Set modality from the source stage. For profile/history stages use TEXT_QA; never use DP for

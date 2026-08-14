@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -69,7 +70,8 @@ def extract_stage_evidence(
             source_turn_id = item.get("source_turn_id") or turn["source_turn_id"]
             normalized = item.get("normalized") or {}
             field = normalized.get("field") or item.get("fact_type", "fact")
-            key = f"{stage['stage_id']}_{source_turn_id}_{field}".lower()
+            raw_key = f"{stage['stage_id']}_{source_turn_id}_{field}".lower()
+            key = re.sub(r"[^a-z0-9]+", "_", raw_key).strip("_")
             used_counts[key] += 1
             evidence_id = f"{patient_id}_{key}_{used_counts[key]:02d}".replace("__", "_")
             evidence.append(

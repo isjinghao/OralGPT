@@ -9,8 +9,9 @@ from llm_client import ChatClient
 from step1_patient_trajectory.dataset import build_source_turns
 from step1_patient_trajectory.stages import build_patient_stages
 from step1_patient_trajectory.trajectories import (
-    build_long_noisy_variant,
+    NOISE_VARIANTS,
     build_missing_modality_variants,
+    build_noisy_variant,
     build_standard_trajectory,
 )
 from step2_evidence.evidence import extract_all_evidence
@@ -36,8 +37,13 @@ def process_patient(item: dict, settings: Settings, client: ChatClient, stage_wo
     for variant in variants:
         trajectory_type = variant["trajectory_type"]
         write_json(out / "trajectories" / trajectory_type / f"{trajectory_type}.json", variant)
-    write_json(out / "trajectories" / "long_noisy" / "long_noisy.json", build_long_noisy_variant(standard))
-    log(f"[benchmark][{patient_id}][step1/done] stages={len(standard['stages'])} variants={len(variants) + 1}")
+    for trajectory_type, noise_count in NOISE_VARIANTS:
+        noisy = build_noisy_variant(standard, trajectory_type, noise_count)
+        write_json(out / "trajectories" / trajectory_type / f"{trajectory_type}.json", noisy)
+    log(
+        f"[benchmark][{patient_id}][step1/done] stages={len(standard['stages'])} "
+        f"variants={len(variants) + len(NOISE_VARIANTS)}"
+    )
 
     log(f"[benchmark][{patient_id}][step2/evidence] started")
     evidence = extract_all_evidence(

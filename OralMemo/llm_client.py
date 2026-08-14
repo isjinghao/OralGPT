@@ -109,7 +109,16 @@ class ChatClient:
                       images: list[str] | None = None, timeout: int = 300,
                       system_prompt: str | None = None) -> dict:
         content = self._complete(prompt, temperature, max_tokens, images, timeout, system_prompt)
-        return parse_json_object(content)
+        try:
+            return parse_json_object(content)
+        except (json.JSONDecodeError, TypeError, ValueError) as exc:
+            self.log("llm/retry", f"Invalid JSON; requesting one repair: {exc}")
+            repair_prompt = (
+                "Return only a valid JSON object that preserves the information in the original response.\n"
+                f"Parsing error: {exc}\n\nOriginal response:\n{content}"
+            )
+            repaired = self._complete(repair_prompt, 0.0, max_tokens, None, timeout, system_prompt)
+            return parse_json_object(repaired)
 
     def complete_text(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
                       images: list[str] | None = None, timeout: int = 300,

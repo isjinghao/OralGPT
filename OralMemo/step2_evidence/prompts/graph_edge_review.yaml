@@ -7,14 +7,16 @@ template: |
   - reject: the facts are unrelated, incompatible, or connected only by a broad category or simple coexistence.
 
   Preserve entity, anatomical level, scope, direction, polarity, and uncertainty. Prefer context_consistency
-  when a broad finding is related to, but does not specifically support, a localized finding. Accept
-  same-attribute measurement links when a later observation confirms, quantifies, or updates the earlier
-  value, unless their entity or scope conflicts.
+  when a broad finding is related to, but does not specifically support, a localized finding. For the same
+  attribute, entity, and scope, set relation to exactly one of: confirms for the same finding; remeasures for
+  a repeated observation whose different value does not establish change; refines for compatible added
+  precision; conflicts for comparable disagreement; or updates_clinical_state only for a supported real
+  later change. Do not infer an update merely because one source appears later.
 
   Return strict JSON only:
   {
     "clinical_support": [
-      {"source": "<node_id>", "target": "<node_id>", "reason": "..."}
+      {"source": "<node_id>", "target": "<node_id>", "relation": "<optional relation>", "reason": "..."}
     ],
     "context_consistency": [
       {"source": "<node_id>", "target": "<node_id>", "reason": "..."}

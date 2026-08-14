@@ -17,7 +17,11 @@ class EvidenceIndex:
 
     def resolve(self, evidence_ids: list[str]) -> list[dict]:
         lookup = {item["evidence_id"]: item for item in self.evidence}
-        return [lookup[evidence_id] for evidence_id in dict.fromkeys(evidence_ids) if evidence_id in lookup]
+        unique_ids = list(dict.fromkeys(evidence_ids))
+        unknown = [evidence_id for evidence_id in unique_ids if evidence_id not in lookup]
+        if unknown:
+            raise ValueError(f"Unknown evidence IDs: {unknown}")
+        return [lookup[evidence_id] for evidence_id in unique_ids]
 
     def available_at(self, stage: str, stage_orders: dict[str, int] | None = None) -> list[dict]:
         # 返回指定提问时点及之前已释放的全部证据。

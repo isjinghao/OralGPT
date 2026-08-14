@@ -12,7 +12,7 @@ from config import get_settings
 from llm_client import ChatClient
 from step4_evaluation.evaluator import CachedLLM, run_streaming
 from step4_evaluation.memory import available_methods, build_methods
-from step4_evaluation.report import format_console, score_method
+from step4_evaluation.report import format_csv, score_method
 
 
 def read_json(path: Path):
@@ -212,7 +212,8 @@ def evaluate_trajectory(
     }
     report_dir = eval_root / mode
     write_json(report_dir / "report.json", report)
-    (report_dir / "report.txt").write_text(format_console(report), encoding="utf-8")
+    (report_dir / "report.csv").write_text(format_csv(report), encoding="utf-8")
+    (report_dir / "report.txt").unlink(missing_ok=True)
     for method_report in report["methods"]:
         log(
             f"{prefix}[step4/result] trajectory={trajectory_type} method={method_report['method']} "
@@ -239,7 +240,7 @@ def trajectory_completed(
     eval_root, _ = evaluation_roots(out, trajectory_type, answer_model)
     mode = "multimodal" if multimodal else "text"
     report_path = eval_root / mode / "report.json"
-    if not report_path.is_file() or not (eval_root / mode / "report.txt").is_file():
+    if not report_path.is_file() or not (eval_root / mode / "report.csv").is_file():
         return False
     method_reports = read_json(report_path).get("methods", [])
     report_methods = {item["method"] for item in method_reports}

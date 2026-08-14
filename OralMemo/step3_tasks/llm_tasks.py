@@ -152,33 +152,58 @@ def evidence_payload(evidence: list[dict]) -> list[dict]:
     ]
 
 
-def validate_task_plan(
+def validate_task_plans(
     client: ChatClient,
-    task: dict,
-    available_evidence: list[dict],
+    tasks: list[dict],
+    all_evidence: list[dict],
+    stage_orders: dict[str, int],
     cache_dir: Path,
     prompt_dir: Path,
-) -> dict:
-    cache_path = cache_dir / "task_plan_validation" / f"{task['task_id']}.json"
+    batch_id: str,
+) -> dict[str, dict]:
     template = load_template(prompt_dir, "task_plan_validation.yaml")
-    plan = {
-        "task_id": task["task_id"],
-        "task_type": task["task_type"],
-        "ask_after_stage": task["ask_after_stage"],
-        "gold_answer": task["gold_answer"],
-        "selected_evidence": task["selected_evidence"],
-        "all_available_evidence": evidence_payload(available_evidence),
+    available_ids = {
+        stage: [
+            item["evidence_id"] for item in all_evidence
+            if stage_orders[item["introduced_stage"]] <= order
+        ]
+        for stage, order in stage_orders.items()
+    }
+    payload = {
+        "stage_order": stage_orders,
+        "evidence_catalog": evidence_payload(all_evidence),
+        "available_evidence_ids_by_stage": available_ids,
+        "candidates": [
+            {
+                "task_id": task["task_id"],
+                "task_type": task["task_type"],
+                "ask_after_stage": task["ask_after_stage"],
+                "gold_answer": task["gold_answer"],
+                "selected_evidence": task["selected_evidence"],
+            }
+            for task in tasks
+        ],
     }
     result = cached_completion(
         client,
-        template.substitute(plan_json=json.dumps(plan, ensure_ascii=False, indent=2)),
-        cache_path,
+        template.substitute(plan_json=json.dumps(payload, ensure_ascii=False, indent=2)),
+        cache_dir / "task_plan_validation_batch" / f"{batch_id}.json",
         max_tokens=8000,
     )
+    reviews = {item["task_id"]: item for item in result["results"]}
+    missing = [task["task_id"] for task in tasks if task["task_id"] not in reviews]
+    if missing:
+        raise ValueError(f"Task-plan validation omitted candidates: {missing}")
     return {
-        "accepted": result["accepted"],
-        "feedback": str(result.get("feedback", "")),
-        "issues": result.get("issues", []) or [],
+        task_id: {
+            "accepted": bool(review["accepted"]),
+            "repairable": bool(review.get("repairable", False)),
+            "feedback": str(review.get("feedback", "")),
+            "issues": review.get("issues", []) or [],
+            "fixed_required_evidence_ids": review.get("fixed_required_evidence_ids"),
+            "fixed_gold_answer": review.get("fixed_gold_answer"),
+        }
+        for task_id, review in reviews.items()
     }
 
 

@@ -45,10 +45,12 @@ def extract_with_feedback(
     images_map: dict,
     max_iters: int,
     patient_id: str,
-) -> tuple[dict, list[dict]]:
+    history_path: Path | None = None,
+) -> tuple[dict, list[dict], bool]:
     history: list[dict] = []
     feedback: list[dict] = []
     timeline: dict = {}
+    seen_timelines: list[dict] = []
     prefix = f"[benchmark][{patient_id}]"
 
     for iteration in range(1, max_iters + 1):
@@ -90,18 +92,20 @@ def extract_with_feedback(
                 "verification": verification,
             }
         )
+        if history_path:
+            write_json(history_path, history)
         log(
             f"{prefix}[step0/verify] passed={verification['passed']} "
             f"issues={len(verification['issues'])} high={n_high} actionable={len(feedback)}"
         )
         if verification["passed"]:
+            return timeline, history, True
+        if timeline in seen_timelines:
+            log(f"{prefix}[step0/verify] repeated timeline detected; stopping repair")
             break
+        seen_timelines.append(timeline)
 
-    if feedback:
-        raise ValueError(
-            f"Timeline verification failed after {max_iters} iterations with {len(feedback)} actionable issues"
-        )
-    return timeline, history
+    return timeline, history, False
 
 
 def run_report(report: dict, settings, args: argparse.Namespace) -> None:
@@ -123,9 +127,11 @@ def run_report(report: dict, settings, args: argparse.Namespace) -> None:
         summary = extract_pdf(pdf_path, raw_dir, images_dir, rel_base=ROOT)
         images_map = summary["images_map"]
         write_json(raw_dir / "captions.json", images_map)
+        write_json(raw_dir / "unmapped_images.json", summary["unmapped_images"])
         log(
             f"{prefix}[step0/ingest] pages={summary['n_pages']} images={summary['n_images_kept']} "
-            f"tables={summary['n_tables']} captions={len(images_map)}"
+            f"tables={summary['n_tables']} captions={len(images_map)} "
+            f"unmapped={len(summary['unmapped_images'])}"
         )
     else:
         log(f"{prefix}[step0/ingest] completed outputs found; skipped")
@@ -134,7 +140,10 @@ def run_report(report: dict, settings, args: argparse.Namespace) -> None:
     reuse_timeline = not args.force and timeline_path.is_file() and verification_path.is_file()
     if reuse_timeline:
         timeline = json.loads(timeline_path.read_text(encoding="utf-8"))
+        verification_history = json.loads(verification_path.read_text(encoding="utf-8"))
         try:
+            if not verification_history or not verification_history[-1]["passed"]:
+                raise ValueError("cached verification did not pass")
             render_turns(normalize_timepoints(timeline), images_map)
         except (KeyError, TypeError, ValueError) as exc:
             log(f"{prefix}[step0/timeline] cached timeline invalid; regenerating: {exc}")
@@ -143,11 +152,12 @@ def run_report(report: dict, settings, args: argparse.Namespace) -> None:
     if reuse_timeline:
         log(f"{prefix}[step0/timeline] completed valid outputs found; skipped")
     else:
+        timeline_path.unlink(missing_ok=True)
         captions = [
             {"figure": figure, "caption": entry.get("caption", "")}
             for figure, entry in images_map.items()
         ]
-        timeline, verification_history = extract_with_feedback(
+        timeline, verification_history, passed = extract_with_feedback(
             build_client(settings, "benchmark", patient_id, args.model),
             build_client(settings, "verifier", patient_id),
             raw_dir,
@@ -155,9 +165,15 @@ def run_report(report: dict, settings, args: argparse.Namespace) -> None:
             images_map,
             args.max_iters,
             patient_id,
+            verification_path,
         )
-        write_json(timeline_path, timeline)
         write_json(verification_path, verification_history)
+        if not passed:
+            raise ValueError(
+                f"Timeline verification failed after {args.max_iters} iterations "
+                f"with {verification_history[-1]['n_actionable']} actionable issues"
+            )
+        write_json(timeline_path, timeline)
 
     if reuse_timeline and trajectory_path.is_file() and dataset_path.is_file():
         log(f"{prefix}[step1/trajectory] completed outputs found; skipped")

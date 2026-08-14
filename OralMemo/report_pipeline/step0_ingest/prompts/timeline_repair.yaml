@@ -7,7 +7,7 @@ template: |
 
   Follow the same timeline rules as the original extraction:
   - use only source-supported facts and preserve values, negations, anatomy, dates, and uncertainty;
-  - reconcile t_months with all explicit dates, elapsed-time statements, and total follow-up anchors; treat durations as local or overlapping unless explicitly sequential;
+  - use the earliest reliably anchored event as t_months=0, merging undated prior history into that first anchored presentation without assigning it the date rather than creating an artificial undated origin; keep the timepoints array in clinical order; use a non-negative integer t_months only when an explicit date or anchored date/duration chain supports elapsed months from the origin, otherwise use null when only relative order is known; never invent absolute months from treatment-cycle counts or disconnected relative phrases; prioritize exact calendar dates and date chains, then exact elapsed durations, while treating approximate total-follow-up phrases such as "about", "over", or "long-term" only as supporting context; if the source anchors remain incompatible, keep the value supported by the highest-priority anchor rather than cycling between values; treat durations as local or overlapping unless explicitly sequential;
   - keep stages ordered perception -> treatment -> followup; treatment answers exclude later follow-up facts;
   - every followup contains at least one observation before any evaluation;
   - image QAs cover only visible findings; panels from different dates belong to their own timepoints; evaluation QAs have figure_ref=null;

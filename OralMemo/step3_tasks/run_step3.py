@@ -15,9 +15,14 @@ from step3_tasks.llm_tasks import (
     load_normal_task_plan,
     plan_task_candidates,
     select_evaluation_evidence,
-    validate_task_plan,
+    validate_task_plans,
 )
-from step3_tasks.selectors import EvidenceIndex, assemble_evaluation_task, assemble_normal_task
+from step3_tasks.selectors import (
+    EvidenceIndex,
+    assemble_evaluation_task,
+    assemble_normal_task,
+    evidence_ref,
+)
 
 
 def read_json(path: Path) -> dict:
@@ -34,6 +39,39 @@ def _review_feedback(validation: dict) -> str:
     for issue in validation.get("issues", []) or []:
         parts.append(str(issue.get("problem", issue) if isinstance(issue, dict) else issue).strip())
     return "; ".join(part for part in parts if part) or "Candidate was rejected by the reviewer"
+
+
+def _preflight_task_plan(task: dict, available_evidence: list[dict]) -> str | None:
+    selected = task["selected_evidence"]
+    if not selected:
+        return "The candidate selected no evidence"
+    available_ids = {item["evidence_id"] for item in available_evidence}
+    future_ids = [item["evidence_id"] for item in selected if item["evidence_id"] not in available_ids]
+    if future_ids:
+        return f"The candidate uses unavailable evidence: {future_ids}"
+
+    stages = {item["stage"] for item in selected}
+    modalities = {modality for item in selected for modality in item.get("modality", [])}
+    if task["task_type"] == "cross_modal_reasoning" and len(stages) < 2 and len(modalities) < 2:
+        return "cross_modal_reasoning requires distinct evidence sources or modalities"
+    if task["task_type"] == "cross_temporal_reasoning" and len(stages) < 2:
+        return "cross_temporal_reasoning requires evidence from different timepoints"
+    if task["task_type"] == "memory_update_conflict_correction" and len(stages) < 2:
+        return "memory_update_conflict_correction requires evidence from different stages"
+    return None
+
+
+def _apply_plan_repair(task: dict, validation: dict, index: EvidenceIndex) -> dict | None:
+    evidence_ids = validation.get("fixed_required_evidence_ids")
+    answer = validation.get("fixed_gold_answer")
+    if evidence_ids is None and not answer:
+        return None
+    repaired = dict(task)
+    if evidence_ids is not None:
+        repaired["selected_evidence"] = [evidence_ref(item) for item in index.resolve(evidence_ids)]
+    if answer:
+        repaired["gold_answer"] = str(answer).strip()
+    return repaired
 
 
 def build_normal_tasks(
@@ -65,15 +103,53 @@ def build_normal_tasks(
                 client, patient_stages, index, cache_dir, prompt_dir,
                 entry, missing, attempt, feedback,
             )
+            specs: list[tuple[dict, list[dict]]] = []
             for item in candidates[:missing]:
                 counters[task_type] = counters.get(task_type, 0) + 1
                 task_id = f"{task_type}_{counters[task_type]:03d}"
-                spec = assemble_normal_task(patient_id, task_id, item, index)
+                if item.get("task_type") != task_type:
+                    feedback.append(f"Candidate returned wrong task_type: {item.get('task_type')}")
+                    continue
+                if item.get("ask_after_stage") not in stage_orders:
+                    feedback.append(f"Candidate returned unknown stage: {item.get('ask_after_stage')}")
+                    continue
+                try:
+                    spec = assemble_normal_task(patient_id, task_id, item, index)
+                except ValueError as exc:
+                    feedback.append(str(exc))
+                    continue
                 available_evidence = index.available_at(spec["ask_after_stage"], stage_orders)
-                validation = validate_task_plan(
-                    verifier_client, spec, available_evidence, cache_dir, prompt_dir
-                )
-                if not validation["accepted"]:
+                problem = _preflight_task_plan(spec, available_evidence)
+                if problem:
+                    feedback.append(problem)
+                    continue
+                specs.append((spec, available_evidence))
+
+            if not specs:
+                continue
+            reviews = validate_task_plans(
+                verifier_client,
+                [spec for spec, _ in specs],
+                index.evidence,
+                stage_orders,
+                cache_dir,
+                prompt_dir,
+                f"{task_type}_a{attempt}",
+            )
+            for spec, available_evidence in specs:
+                validation = reviews[spec["task_id"]]
+                if not validation["accepted"] and validation["repairable"]:
+                    try:
+                        repaired = _apply_plan_repair(spec, validation, index)
+                    except ValueError as exc:
+                        repaired = None
+                        validation["feedback"] = str(exc)
+                    if repaired and not _preflight_task_plan(repaired, available_evidence):
+                        spec = repaired
+                    else:
+                        feedback.append(_review_feedback(validation))
+                        continue
+                elif not validation["accepted"]:
                     feedback.append(_review_feedback(validation))
                     continue
 
@@ -205,6 +281,9 @@ def run_patient(
     for task in tasks:
         groups.setdefault(task["task_type"], []).append(task)
     tasks_dir = out / "tasks"
+    tasks_dir.mkdir(parents=True, exist_ok=True)
+    for path in tasks_dir.glob("*.json"):
+        path.unlink()
     write_json(tasks_dir / "all_tasks.json", {"patient_id": patient_id, "tasks": tasks})
     for group_name, items in groups.items():
         write_json(tasks_dir / f"{group_name}.json", {"patient_id": patient_id, "tasks": items})

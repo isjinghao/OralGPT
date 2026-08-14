@@ -92,11 +92,11 @@ def build_structured_candidates(nodes: list[dict]) -> list[dict]:
                     "source": early["evidence_id"],
                     "target": later["evidence_id"],
                     "type": "measurement_link",
-                    "relation": "confirms" if confirms else "updates",
+                    "relation": "confirms" if confirms else "remeasures",
                     "reason": (
                         "Repeated observation confirms the same clinical attribute."
                         if confirms
-                        else "Later observation updates the same clinical attribute."
+                        else "A later observation remeasures the same clinical attribute; the differing value alone does not prove a clinical update."
                     ),
                 }
             )
@@ -156,6 +156,9 @@ def _valid_pairs(items: list[dict], nodes: dict[str, dict], limit: int) -> list[
             continue
         seen.add(key)
         candidate = {"source": source, "target": target, "reason": reason}
+        relation = item.get("relation")
+        if relation in {"confirms", "remeasures", "refines", "conflicts", "updates_clinical_state"}:
+            candidate["relation"] = relation
         if item.get("type") == "measurement_link":
             candidate.update(type="measurement_link", relation=item["relation"])
         valid.append(candidate)
@@ -193,7 +196,11 @@ def _review_edges(
     for item in clinical:
         proposed = candidate_by_key[(item["source"], item["target"])]
         if proposed.get("type") == "measurement_link":
-            accepted.append({**item, "type": "measurement_link", "relation": proposed["relation"]})
+            accepted.append({
+                **item,
+                "type": "measurement_link",
+                "relation": item.get("relation", proposed["relation"]),
+            })
         else:
             accepted.append({**item, "type": "clinical_support", "relation": "supports"})
     accepted.extend(
@@ -304,7 +311,7 @@ def build_evidence_graph(
         prefix,
         structured_candidates,
     )
-    edges = dedupe_edges(deterministic_edges + reviewed_edges, node_by_id)
+    edges = dedupe_edges(reviewed_edges + deterministic_edges, node_by_id)
     return {
         "patient_id": evidence_data["patient_id"],
         "edges": edges,

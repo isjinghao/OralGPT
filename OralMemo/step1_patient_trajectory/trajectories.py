@@ -77,40 +77,42 @@ def build_missing_modality_variants(standard: dict) -> list[dict]:
     return variants
 
 
-def build_long_noisy_variant(
+NOISE_VARIANTS = (
+    ("short_noisy", 3),
+    ("medium_noisy", 6),
+    ("long_noisy", 9),
+)
+
+
+def build_noisy_variant(
     standard: dict,
-    noise_count: int = 8,
+    trajectory_type: str,
+    noise_count: int,
     seed: int = 42,
 ) -> dict:
-    # 生成噪声变体 (分类噪声池、采样)
     stages = copy.deepcopy(standard["stages"])
     pool = json.loads(Path(__file__).with_name("noise_pool.json").read_text(encoding="utf-8"))
     rng = random.Random(seed)
+    chosen = rng.sample(pool, len(pool))[:noise_count]
 
-    k = max(0, min(noise_count, len(pool)))
-    chosen = rng.sample(pool, k) if k else []
-
-    populated = [i for i, s in enumerate(stages) if s["qa_pairs"]]
-    target_pool = populated or list(range(len(stages)))
-
+    target_pool = [
+        i for i, stage in enumerate(stages)
+        if stage["stage_type"] == "perception" and stage["qa_pairs"]
+    ]
     fallback_order = list(target_pool)
     rng.shuffle(fallback_order)
     fb_ptr = 0
 
     for noise in chosen:
         target = None
-        # 有模态的噪声尽量放到对应阶段
         modality = noise.get("modality")
         if modality:
             modal_targets = [i for i in target_pool if modality in stages[i]["modality"]]
             if modal_targets:
                 target = modal_targets[rng.randrange(len(modal_targets))]
-        # 没有模态或没有对应阶段的噪声随机放到一个阶段
-        if target is None and fallback_order:
+        if target is None:
             target = fallback_order[fb_ptr % len(fallback_order)]
             fb_ptr += 1
-        if target is None:
-            continue
         stages[target]["qa_pairs"].append(
             {
                 "source_turn_id": noise["id"],
@@ -123,9 +125,9 @@ def build_long_noisy_variant(
         )
 
     return {
-        "trajectory_id": f"{standard['patient_id']}__long_noisy",
+        "trajectory_id": f"{standard['patient_id']}__{trajectory_type}",
         "patient_id": standard["patient_id"],
-        "trajectory_type": "long_noisy",
-        "noise_count": k,
+        "trajectory_type": trajectory_type,
+        "noise_count": len(chosen),
         "stages": stages,
     }

@@ -19,6 +19,7 @@ OUTPUT_ROOT = ROOT / "outputs" / "report"
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Evaluate generated report benchmarks")
     add_batch_arguments(parser)
+    parser.add_argument("--trajectories", type=parse_csv, default=["standard_trajectory"])
     parser.add_argument("--methods", type=parse_csv, default=["full_context_memory"])
     parser.add_argument("--multimodal", action="store_true")
     parser.add_argument("--answer-model", default=None, help="Override ANSWER_OPENAI_MODEL for this run")
@@ -46,12 +47,15 @@ def main() -> int:
     def worker(report: dict) -> str:
         patient_id = report["id"]
         out = OUTPUT_ROOT / report["name"]
-        if not args.force and trajectory_completed(
-            out,
-            "standard_trajectory",
-            args.methods,
-            args.multimodal,
-            answer_model,
+        if not args.force and all(
+            trajectory_completed(
+                out,
+                trajectory,
+                args.methods,
+                args.multimodal,
+                answer_model,
+            )
+            for trajectory in args.trajectories
         ):
             log(f"[evaluation][{patient_id}][step4/resume] completed outputs found; skipped")
             return "skipped"
@@ -59,7 +63,7 @@ def main() -> int:
             out,
             patient_id,
             settings,
-            ["standard_trajectory"],
+            args.trajectories,
             args.methods,
             args.multimodal,
             answer_model=answer_model,

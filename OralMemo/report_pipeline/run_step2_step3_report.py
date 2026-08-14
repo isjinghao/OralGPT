@@ -22,6 +22,12 @@ PROMPT_DIR = ROOT / "report_pipeline" / "prompts"
 EVIDENCE_PROMPT = PROMPT_DIR / "evidence_extraction.yaml"
 
 
+def step01_completed(out: Path) -> bool:
+    return (out / "timeline.extracted.json").is_file() and (
+        out / "trajectories" / "standard_trajectory.json"
+    ).is_file()
+
+
 def step2_completed(out: Path) -> bool:
     return all(
         path.is_file()
@@ -90,6 +96,9 @@ def main() -> int:
     def worker(report: dict) -> str:
         patient_id = report["id"]
         out = OUTPUT_ROOT / report["name"]
+        if not step01_completed(out):
+            log(f"[benchmark][{patient_id}][step2-step3] skipped: Step0–Step1 incomplete")
+            return "skipped"
         if not args.force and step2_completed(out) and step3_completed(out):
             log(f"[benchmark][{patient_id}][step2-step3/resume] completed outputs found; skipped")
             return "skipped"

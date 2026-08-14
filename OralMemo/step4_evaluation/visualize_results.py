@@ -78,6 +78,36 @@ def collect_perception(eval_root: Path, answer_model: str) -> dict:
     return {"profile": profile, "items": items, "report": report, "answer_model": model_dir.name}
 
 
+def collect_timeline(eval_root: Path) -> list[dict]:
+    trajectory_path = eval_root.parent / "trajectories" / "standard_trajectory.json"
+    if not trajectory_path.exists():
+        return []
+    trajectory = read_json(trajectory_path)
+    stages = []
+    for stage in sorted(trajectory.get("stages", []), key=lambda item: item.get("order", 0)):
+        qa_pairs = []
+        for qa in stage.get("qa_pairs", []):
+            images = []
+            for image_path in qa.get("image_paths", []) or []:
+                absolute = BENCH_ROOT / image_path
+                if absolute.is_file():
+                    images.append(Path(os.path.relpath(absolute, eval_root)).as_posix())
+            qa_pairs.append({
+                "question": qa.get("human", ""),
+                "answer": qa.get("assistant", ""),
+                "role": qa.get("role", ""),
+                "image_paths": images,
+            })
+        stages.append({
+            "stage_id": stage.get("stage_id", ""),
+            "stage_type": stage.get("stage_type", ""),
+            "modality": stage.get("modality", []),
+            "timepoint": stage.get("timepoint", {}),
+            "qa_pairs": qa_pairs,
+        })
+    return stages
+
+
 def collect_results(eval_root: Path) -> dict:
     trajectories = []
     answer_models = set()
@@ -147,7 +177,12 @@ def collect_results(eval_root: Path) -> dict:
                     "rows": rows,
                 })
     perceptions = {model: collect_perception(eval_root, model) for model in sorted(answer_models)}
-    return {"patient_id": patient_id, "trajectories": trajectories, "perceptions": perceptions}
+    return {
+        "patient_id": patient_id,
+        "trajectories": trajectories,
+        "perceptions": perceptions,
+        "timeline": collect_timeline(eval_root),
+    }
 
 
 HTML_TEMPLATE = r'''<!doctype html>
@@ -221,13 +256,24 @@ select,input { width:100%; padding:9px 10px; border:1px solid var(--line); borde
 .image-item img { display:block; width:100%; height:180px; object-fit:contain; background:#f8fafc; border-radius:7px; }
 .image-item figcaption { margin-top:5px; color:var(--muted); font-size:11px; word-break:break-all; }
 .image-missing { min-height:100px; display:flex; align-items:center; justify-content:center; padding:16px; border:1px dashed #f59e0b; border-radius:8px; background:#fffbeb; color:#92400e; font-size:12px; text-align:center; }
+.timeline { border-left:3px solid #93c5fd; margin-left:10px; padding-left:20px; }
+.timeline-event { position:relative; margin-bottom:14px; }
+.timeline-event::before { content:''; position:absolute; left:-29px; top:18px; width:13px; height:13px; border-radius:50%; background:#2563eb; border:3px solid #fff; box-shadow:0 0 0 2px #2563eb; }
+.timeline-event.treatment::before { background:var(--purple); box-shadow:0 0 0 2px var(--purple); }
+.timeline-event.followup::before { background:var(--green); box-shadow:0 0 0 2px var(--green); }
+.timeline-event.perception { border-color:#bfdbfe; }
+.timeline-event.treatment { border-color:#ddd6fe; }
+.timeline-event.followup { border-color:#bbf7d0; }
+.timeline-event summary { cursor:pointer; font-weight:650; padding:13px 14px; }
+.timeline-event .event-body { border-top:1px solid var(--line); padding:14px; }
+.timeline-qa { border:1px solid var(--line); border-radius:10px; padding:12px; margin-top:10px; background:#fcfcfd; }
 @media (max-width:900px){ .controls,.two-col{grid-template-columns:1fr;} .card-head{display:block;} .perception-head{display:block;} }
 </style>
 </head>
 <body>
 <header>
   <h1 id="page-title">Step4 评测结果</h1>
-  <a class="back-link" href="../../four_patient_summary.html">← 返回四病例汇总</a>
+  <a class="back-link" href="../../four_report_summary.html">← 返回四报告汇总</a>
   <a class="back-link" href="../graph/evidence_graph.html">查看交互式证据图</a>
 </header>
 <div class="container">
@@ -237,28 +283,35 @@ select,input { width:100%; padding:9px 10px; border:1px solid var(--line); borde
     <div class="metric-card"><h3>memory method</h3><div id="meta-memory-method"></div></div>
   </section>
   <nav class="tabs" aria-label="评测阶段">
-    <button class="tab active" data-panel="perception-panel">感知</button>
+    <button class="tab active" data-panel="timeline-panel">抽取时间轴</button>
+    <button class="tab" data-panel="perception-panel">感知</button>
     <button class="tab" data-panel="treatment-panel">治疗</button>
     <button class="tab" data-panel="followup-panel">随访</button>
   </nav>
-  <section id="perception-panel" class="tab-panel active">
-    <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">患者 Profile</h2><div id="profile" class="profile-list"></div></section>
+  <section class="panel controls">
+    <div><label>轨迹</label><select id="traj"></select></div>
+    <div><label>记忆方法</label><select id="method"></select></div>
+    <div><label>搜索（问题 / 回答 / 证据）</label><input id="search" placeholder="输入关键词..." /></div>
+  </section>
+  <section id="timeline-panel" class="tab-panel active">
+    <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">报告抽取时间轴</h2><div id="timeline" class="timeline"></div></section>
+  </section>
+  <section id="perception-panel" class="tab-panel">
+    __PROFILE_SECTION__
     <section class="panel"><h2 style="margin:0 0 8px;font-size:18px;">模型感知轨迹</h2></section>
     <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">感知评估指标</h2><div id="perception-summary" class="summary-grid"></div><div style="height:12px"></div><div id="perception-metrics"></div></section>
-    <section class="panel"><div id="perception-count" class="small"></div><div id="perception-cards"></div></section>
+    <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">感知逐题结果</h2><div id="perception-count" class="small"></div><div id="perception-cards"></div></section>
+    <section class="panel"><h2 style="margin:0 0 8px;font-size:18px;">感知测评</h2></section>
+    <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">感知测评指标</h2><div id="benchmark-perception-summary" class="summary-grid"></div></section>
+    <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">感知测评逐题结果</h2><div id="benchmark-perception-count" class="small"></div><div id="benchmark-perception-cards"></div></section>
   </section>
   <section id="treatment-panel" class="tab-panel">
-    <section class="panel controls">
-      <div><label>轨迹</label><select id="traj"></select></div>
-      <div><label>记忆方法</label><select id="method"></select></div>
-      <div><label>问题类型</label><select id="type"></select></div>
-      <div><label>搜索（问题 / 回答 / 证据）</label><input id="search" placeholder="输入关键词..." /></div>
-    </section>
-    <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">总体指标</h2><div id="summary" class="summary-grid"></div></section>
-    <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">治疗 / Benchmark 逐题结果</h2><div id="count" class="small"></div><div id="cards"></div></section>
+    <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">治疗指标</h2><div id="treatment-summary" class="summary-grid"></div></section>
+    <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">治疗逐题结果</h2><div id="treatment-count" class="small"></div><div id="treatment-cards"></div></section>
   </section>
   <section id="followup-panel" class="tab-panel">
-    <section class="panel"><h2 style="margin:0 0 8px;font-size:18px;">随访</h2><div class="empty">暂时没有随访内容</div></section>
+    <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">随访指标</h2><div id="followup-summary" class="summary-grid"></div></section>
+    <section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">随访逐题结果</h2><div id="followup-count" class="small"></div><div id="followup-cards"></div></section>
   </section>
 </div>
 <script>
@@ -270,7 +323,7 @@ const ratio = (a,b) => `${a ?? 0}/${b ?? 0}`;
 const TRAJECTORY_LABELS = {
   standard_full:'standard_trajectory', standard:'standard_trajectory', standard_trajectory:'standard_trajectory',
   model_perception:'model_perception_trajectory', model_perception_trajectory:'model_perception_trajectory',
-  long_noisy:'long_noisy', long_noisy_trajectory:'long_noisy',
+  short_noisy:'short_noisy', medium_noisy:'medium_noisy', long_noisy:'long_noisy',
   no_dp:'no_dp', no_dp_trajectory:'no_dp',
   no_xr_ct:'no_xr_ct', no_xr_ct_trajectory:'no_xr_ct'
 };
@@ -279,6 +332,7 @@ const TASK_TYPE_LABELS = {
   modality_perception:'模态感知任务',
   longitudinal_evidence_recall:'纵向证据任务',
   cross_modal_reasoning:'跨模态推理任务',
+  cross_temporal_reasoning:'跨时间推理任务',
   memory_update_conflict_correction:'记忆更新/冲突纠正任务',
   treatment:'治疗任务',
   followup:'随访任务'
@@ -359,10 +413,23 @@ function renderPerception(){
   const t = currentTraj();
   const perception = DATA.perceptions[t.answer_model] || {profile: [], items: [], report: {}};
   const items = perception.items || [];
-  renderProfile(perception.profile || []);
+  if($('profile')) renderProfile(perception.profile || []);
   renderPerceptionMetrics(perception.report || {});
   $('perception-count').textContent = `共 ${items.length} 个感知问题（按 source turn 顺序）`;
   $('perception-cards').innerHTML = items.length ? items.map(perceptionCardHtml).join('') : '<div class="empty">没有找到模型感知轨迹</div>';
+}
+function timelineImages(paths){
+  return paths.length ? `<div class="image-grid">${paths.map(path => `<figure class="image-item"><a href="${esc(path)}" target="_blank"><img src="${esc(path)}" loading="lazy" /></a></figure>`).join('')}</div>` : '';
+}
+function renderTimeline(){
+  const stages = DATA.timeline || [];
+  $('timeline').innerHTML = stages.length ? stages.map((stage, index) => {
+    const tp = stage.timepoint || {};
+    const title = `${String(index + 1).padStart(2,'0')} · ${tp.date_text || stage.stage_id}${Number.isFinite(tp.t_months) ? ` · ${tp.t_months} months` : ''}`;
+    const qas = (stage.qa_pairs || []).map(qa => `<div class="timeline-qa"><div class="card-meta">${pill(qa.role || 'QA','amber')}${pill((qa.image_paths || []).length ? 'FIGURE_QA' : 'TEXT_QA','blue')}</div><div class="text"><b>Q:</b> ${esc(cleanDisplayQuestion(qa.question))}</div><div class="text" style="margin-top:8px"><b>A:</b> ${esc(qa.answer)}</div>${timelineImages(qa.image_paths || [])}</div>`).join('');
+    const stageColor = stage.stage_type === 'treatment' ? 'purple' : stage.stage_type === 'followup' ? 'green' : 'blue';
+    return `<details class="card timeline-event ${esc(stage.stage_type)}" ${index === 0 ? 'open' : ''}><summary>${esc(title)} <span class="card-meta">${pill(stage.stage_type,stageColor)}${(stage.modality || []).map(m => pill(m,'blue')).join('')}</span></summary><div class="event-body">${qas}</div></details>`;
+  }).join('') : '<div class="empty">没有抽取时间轴</div>';
 }
 function setPanel(panelId){
   document.querySelectorAll('.tab').forEach(tab => tab.classList.toggle('active', tab.dataset.panel === panelId));
@@ -375,56 +442,62 @@ function renderConfiguration(){
   $('meta-memory-method').textContent = $('method').value === '__all__' ? 'all' : $('method').value;
 }
 function init(){
-  document.title = `${DATA.patient_id} Step4 评测结果`;
+  document.title = `${DATA.patient_id} 评测结果`;
   $('page-title').textContent = document.title;
   $('traj').innerHTML = DATA.trajectories.map(t=>`<option value="${esc(t.name)}">${esc(trajectoryOptionLabel(t))}</option>`).join('');
   updateFilters();
   document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => setPanel(tab.dataset.panel)));
-  ['traj','method','type','search'].forEach(id => $(id).addEventListener(id==='traj'?'change':'input', () => {
-    if(id==='traj') { updateFilters(); renderPerception(); }
+  ['traj','method','search'].forEach(id => $(id).addEventListener(id==='traj'?'change':'input', () => {
+    if(id==='traj') updateFilters();
     renderConfiguration();
     render();
   }));
   renderConfiguration();
+  renderTimeline();
   renderPerception();
   render();
 }
 function updateFilters(){
   const t = currentTraj();
   fillSelect($('method'), uniq(t.rows.map(r=>r.method)), '全部方法', methodLabel);
-  fillSelect($('type'), uniq(t.rows.map(r=>r.task_type)), '全部类型', taskTypeLabel);
-}
-function renderSummary(){
-  const t = currentTraj();
-  const methods = t.report.methods || [];
-  $('summary').innerHTML = methods.map(m => {
-    const acc = m.acc?.overall || {};
-    const ers = m.ers?.overall || {};
-    const treatment = m.tps?.overall_percent;
-    const followup = m.followup?.overall_percent;
-    return `<div class="metric-card">
-      <h3>${esc(methodLabel(m.method))}</h3>
-      ${statLine('准确率（ACC）', `${pct(acc.score)} (${ratio(acc.correct, acc.total)})`)}
-      ${statLine('证据召回分数（ERS）', `${pct(ers.score)} (${ratio(ers.covered, ers.total)})`)}
-      ${statLine('治疗分', pct(treatment))}
-      ${statLine('随访分', pct(followup))}
-    </div>`;
-  }).join('');
 }
 function filteredRows(){
   const t = currentTraj();
   const method = $('method').value;
-  const type = $('type').value;
   const q = $('search').value.trim().toLowerCase();
   return t.rows.filter(r => {
     if(method !== '__all__' && r.method !== method) return false;
-    if(type !== '__all__' && r.task_type !== type) return false;
     if(q){
       const hay = [r.task_id,r.question,r.gold_answer,r.model_answer, ...(r.selected_evidence||[]).map(e=>`${e.evidence_id} ${e.fact_text}`)].join(' ').toLowerCase();
       if(!hay.includes(q)) return false;
     }
     return true;
   });
+}
+function rowsForGroup(group){
+  return filteredRows().filter(r => group === 'perception'
+    ? !['treatment','followup'].includes(r.task_type)
+    : r.task_type === group);
+}
+function groupMetrics(rows, group){
+  const covered = rows.reduce((n,r)=>n+(r.score?.covered_evidence_count||0),0);
+  const totalEvidence = rows.reduce((n,r)=>n+(r.score?.total_evidence_count||0),0);
+  const ers = totalEvidence ? covered / totalEvidence * 100 : undefined;
+  if(group === 'perception'){
+    const judged = rows.filter(r=>String(r.score?.metric||'').includes('ACC'));
+    const correct = judged.filter(r=>r.score?.correct).length;
+    return [['准确率（ACC）', judged.length ? correct/judged.length*100 : undefined, `${correct}/${judged.length}`],['证据召回分数（ERS）',ers,`${covered}/${totalEvidence}`]];
+  }
+  const values = rows.map(r=>r.detail?.percent ?? r.score?.percent).filter(v=>typeof v==='number');
+  const rubric = values.length ? values.reduce((a,b)=>a+b,0)/values.length : undefined;
+  return [[group==='treatment'?'治疗分':'随访分',rubric,`${values.length} 题`],['证据召回分数（ERS）',ers,`${covered}/${totalEvidence}`]];
+}
+function renderGroup(group, target=group){
+  const rows = rowsForGroup(group);
+  const summary = groupMetrics(rows,group);
+  $(`${target}-summary`).innerHTML = summary.map(([label,value,detail])=>`<div class="metric-card"><h3>${esc(label)}</h3><div class="value" style="font-size:24px;font-weight:700">${pct(value)}</div><div class="small">${esc(detail)}</div></div>`).join('');
+  $(`${target}-count`).textContent = `当前显示 ${rows.length} 条任务记录`;
+  $(`${target}-cards`).innerHTML = rows.length ? rows.map(cardHtml).join('') : '<div class="empty">没有匹配结果</div>';
 }
 function scorePills(r){
   const s = r.score || {};
@@ -531,10 +604,9 @@ function cardHtml(r){
   </article>`;
 }
 function render(){
-  renderSummary();
-  const rows = filteredRows();
-  $('count').textContent = `当前显示 ${rows.length} 条 记忆方法-任务 记录`;
-  $('cards').innerHTML = rows.length ? rows.map(cardHtml).join('') : '<div class="empty">没有匹配结果</div>';
+  renderGroup('perception','benchmark-perception');
+  renderGroup('treatment');
+  renderGroup('followup');
 }
 init();
 </script>
@@ -551,7 +623,12 @@ def main() -> None:
 
     data = collect_results(args.eval_root)
     output = args.output or (args.eval_root / f"{args.eval_root.parent.name.lower()}_step4_results.html")
-    html = HTML_TEMPLATE.replace("__DATA__", json.dumps(data, ensure_ascii=False))
+    profile_section = "" if args.eval_root.parent.parent.name == "report" else (
+        '<section class="panel"><h2 style="margin:0 0 12px;font-size:18px;">患者 Profile</h2>'
+        '<div id="profile" class="profile-list"></div></section>'
+    )
+    html = HTML_TEMPLATE.replace("__PROFILE_SECTION__", profile_section)
+    html = html.replace("__DATA__", json.dumps(data, ensure_ascii=False))
     output.write_text(html, encoding="utf-8")
     patient_id = f"{args.eval_root.parent.parent.name}__{args.eval_root.parent.name}"
     print(f"[evaluation][{patient_id}][step4/html] written path={output}", flush=True)

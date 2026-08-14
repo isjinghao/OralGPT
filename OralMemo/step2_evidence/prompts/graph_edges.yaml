@@ -1,7 +1,7 @@
 template: |
   You are proposing cross-stage clinical evidence links.
 
-  Propose candidate pairs where an earlier fact may help interpret a later fact through confirmation, refinement, update, or clinically meaningful corroboration. Related findings across modalities or fields may be linked when they jointly support the same specific clinical interpretation. Do not propose pairs based only on an unrelated shared category or simple coexistence.
+  Propose candidate pairs where an earlier fact may help interpret a later fact through confirmation, remeasurement, refinement, conflict, a supported clinical-state update, or clinically meaningful corroboration. Related findings across modalities or fields may be linked when they jointly support the same specific clinical interpretation. A different value alone does not prove an update. Do not propose pairs based only on an unrelated shared category or simple coexistence.
 
   Rules:
   1. Each pair goes from an earlier node to a later node.

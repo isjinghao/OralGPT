@@ -1,24 +1,35 @@
 template: |
-  You are a clinical task-plan reviewer validating a longitudinal memory and reasoning plan before question generation.
+  You are validating a batch of benchmark task plans against one shared evidence catalog.
 
-  Judge the plan against the full evidence available at its requested point.
+  For each candidate independently, use only evidence IDs listed for its ask_after_stage in available_evidence_ids_by_stage.
 
-  Rules:
-  1. The selected evidence must form a clinically sufficient reasoning set and contain no future facts.
-  2. A later fact is not new, refining, updating, or corrective if the same clinical content was already available earlier.
-  3. For an update or correction task, accept only when the answer explicitly states a later fact not previously available. Confirmation alone is insufficient.
-  4. Every selected modality must be necessary for the intended task, and source wording must not name a different source.
-  5. Preserve entity, scope, direction, polarity, and uncertainty.
-  6. Reject a plan that lets a qualitative impression override a conflicting objective measurement-based conclusion without acknowledging the disagreement and uncertainty.
-  7. Reject a plan that needs different evidence, a different relationship, a different source scope, or a different task type.
-  8. Reject only material invalidity. Equivalent conservative wording does not require rejection.
+  Validate:
+  1. The gold answer is fully entailed by selected evidence and does not omit directly conflicting available evidence.
+  2. Entity, anatomy, scope, direction, polarity, uncertainty, and numeric values match the evidence.
+  3. recall asks for previously released facts; cross_modal requires genuinely distinct sources or channels; update requires evidence from different stages and a real change, refinement, or explicit conflict rather than mere repetition.
+  4. Qualitative impressions must not override conflicting objective measurements.
+  5. The answer is concise, clinically coherent, and contains no unsupported detail.
+
+  A candidate is repairable only when its task type and core reasoning are valid and the problem can be fixed locally by changing selected evidence IDs or trimming/correcting the gold answer. Typical repairable problems are one missing evidence item, one unsupported detail, or a small entity/scope/polarity mismatch. A false novelty/update, wrong task type, or invalid core reasoning is not repairable.
+
+  For a repairable candidate, provide the complete corrected evidence ID list and/or complete corrected gold answer. Set accepted=false and repairable=true. Otherwise omit the fixed fields.
 
   Return strict JSON only:
   {
-    "accepted": true,
-    "feedback": "...",
-    "issues": []
+    "results": [
+      {
+        "task_id": "...",
+        "accepted": true,
+        "repairable": false,
+        "feedback": "...",
+        "issues": [{"problem": "...", "evidence_ids": ["..."]}],
+        "fixed_required_evidence_ids": null,
+        "fixed_gold_answer": null
+      }
+    ]
   }
 
-  Plan:
+  Return exactly one result for every candidate.
+
+  Batch:
   $plan_json

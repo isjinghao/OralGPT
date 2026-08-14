@@ -1,6 +1,8 @@
 """Step5 报告: 汇总 ACC / ERS、治疗与随访评分，并对比不同记忆方法。"""
 from __future__ import annotations
 
+import csv
+import io
 from concurrent.futures import ThreadPoolExecutor
 from threading import Semaphore
 
@@ -13,6 +15,7 @@ BASE_TYPES = {
     "modality_perception",
     "longitudinal_evidence_recall",
     "cross_modal_reasoning",
+    "cross_temporal_reasoning",
     "memory_update_conflict_correction",
 }
 
@@ -241,82 +244,65 @@ def build_report(
     return {"methods": methods}
 
 
-def _fmt_pct(v) -> str:
-    return f"{v:6.2f}%" if isinstance(v, (int, float)) else "   n/a"
+def _fmt_pct(value) -> str:
+    return f"{value:.2f}%" if isinstance(value, (int, float)) else "n/a"
 
 
-def format_console(report: dict) -> str:
-    # 将报告渲染为便于阅读的对比表格文本
+def format_csv(report: dict) -> str:
+    """将各记忆方法的汇总统计渲染为 CSV。"""
     methods = report["methods"]
-    names = [m["method"] for m in methods]
-    col = 16
-    lines: list[str] = []
+    rows: list[list[str]] = [["Metric", *(method["method"] for method in methods)]]
 
-    def row(label: str, values: list[str]) -> str:
-        return f"{label:<34}" + "".join(f"{v:>{col}}" for v in values)
+    rows.append([
+        "ACC overall",
+        *(f"{method['acc']['overall']['score']:.1f}% "
+          f"({method['acc']['overall']['correct']}/{method['acc']['overall']['total']})"
+          for method in methods),
+    ])
 
-    lines.append("=" * (34 + col * len(names)))
-    lines.append(row("Metric \\ Method", names))
-    lines.append("-" * (34 + col * len(names)))
+    all_acc_types = sorted({task_type for method in methods for task_type in method["acc"]["by_task_type"]})
+    for task_type in all_acc_types:
+        values = []
+        for method in methods:
+            cell = method["acc"]["by_task_type"].get(task_type)
+            values.append(f"{cell['score']:.1f}% ({cell['correct']}/{cell['total']})" if cell else "-")
+        rows.append([f"ACC[{task_type}]", *values])
 
-    # 总体 ACC
-    lines.append(row("ACC overall", [
-        f"{m['acc']['overall']['score']:.1f}% ({m['acc']['overall']['correct']}/{m['acc']['overall']['total']})"
-        for m in methods
-    ]))
+    all_acc_modalities = sorted({modality for method in methods for modality in method["acc"]["by_modality"]})
+    for modality in all_acc_modalities:
+        values = []
+        for method in methods:
+            cell = method["acc"]["by_modality"].get(modality)
+            values.append(f"{cell['score']:.1f}% ({cell['correct']}/{cell['total']})" if cell else "-")
+        rows.append([f"ACC-modality[{modality}]", *values])
 
-    # 分任务类型 ACC
-    all_acc_types = sorted({t for m in methods for t in m["acc"]["by_task_type"]})
-    for t in all_acc_types:
-        vals = []
-        for m in methods:
-            cell = m["acc"]["by_task_type"].get(t)
-            vals.append(f"{cell['score']:.1f}% ({cell['correct']}/{cell['total']})" if cell else "-")
-        lines.append(row(f"  ACC[{t}]", vals))
+    rows.append([
+        "ERS overall",
+        *(f"{method['ers']['overall']['score']:.1f}% "
+          f"({method['ers']['overall']['covered']}/{method['ers']['overall']['total']})"
+          for method in methods),
+    ])
 
-    # 分模态 ACC
-    all_acc_mods = sorted({m0 for m in methods for m0 in m["acc"]["by_modality"]})
-    for mod in all_acc_mods:
-        vals = []
-        for m in methods:
-            cell = m["acc"]["by_modality"].get(mod)
-            vals.append(f"{cell['score']:.1f}% ({cell['correct']}/{cell['total']})" if cell else "-")
-        lines.append(row(f"  ACC-modality[{mod}]", vals))
+    all_ers_types = sorted({task_type for method in methods for task_type in method["ers"]["by_task_type"]})
+    for task_type in all_ers_types:
+        values = []
+        for method in methods:
+            cell = method["ers"]["by_task_type"].get(task_type)
+            values.append(f"{cell['score']:.1f}% ({cell['covered']}/{cell['total']})" if cell else "-")
+        rows.append([f"ERS[{task_type}]", *values])
 
-    lines.append("-" * (34 + col * len(names)))
+    all_ers_modalities = sorted({modality for method in methods for modality in method["ers"]["by_modality"]})
+    for modality in all_ers_modalities:
+        values = []
+        for method in methods:
+            cell = method["ers"]["by_modality"].get(modality)
+            values.append(f"{cell['score']:.1f}% ({cell['covered']}/{cell['total']})" if cell else "-")
+        rows.append([f"ERS-modality[{modality}]", *values])
 
-    # 总体 ERS(selected_evidence 覆盖率)
-    lines.append(row("ERS overall", [
-        f"{m['ers']['overall']['score']:.1f}% ({m['ers']['overall']['covered']}/{m['ers']['overall']['total']})"
-        for m in methods
-    ]))
+    rows.append(["Treatment score", *(_fmt_pct(method.get("tps", {}).get("overall_percent")) for method in methods)])
+    rows.append(["Follow-up score", *(_fmt_pct(method.get("followup", {}).get("overall_percent")) for method in methods)])
+    rows.append(["Failed scoring tasks", *(str(len(method.get("failed_tasks", []))) for method in methods)])
 
-    # 分任务类型 ERS
-    all_ers_types = sorted({t for m in methods for t in m["ers"]["by_task_type"]})
-    for t in all_ers_types:
-        vals = []
-        for m in methods:
-            cell = m["ers"]["by_task_type"].get(t)
-            vals.append(f"{cell['score']:.1f}% ({cell['covered']}/{cell['total']})" if cell else "-")
-        lines.append(row(f"  ERS[{t}]", vals))
-
-    # 分模态 ERS
-    all_ers_mods = sorted({m0 for m in methods for m0 in m["ers"]["by_modality"]})
-    for mod in all_ers_mods:
-        vals = []
-        for m in methods:
-            cell = m["ers"]["by_modality"].get(mod)
-            vals.append(f"{cell['score']:.1f}% ({cell['covered']}/{cell['total']})" if cell else "-")
-        lines.append(row(f"  ERS-modality[{mod}]", vals))
-
-    lines.append("-" * (34 + col * len(names)))
-
-    # TPS 与随访推理
-    lines.append(row("Treatment score", [
-        _fmt_pct(m.get("tps", {}).get("overall_percent")) for m in methods]))
-    lines.append(row("Follow-up score", [
-        _fmt_pct(m.get("followup", {}).get("overall_percent")) for m in methods]))
-    lines.append(row("Failed scoring tasks", [
-        str(len(m.get("failed_tasks", []))) for m in methods]))
-    lines.append("=" * (34 + col * len(names)))
-    return "\n".join(lines)
+    output = io.StringIO(newline="")
+    csv.writer(output, lineterminator="\n").writerows(rows)
+    return output.getvalue()

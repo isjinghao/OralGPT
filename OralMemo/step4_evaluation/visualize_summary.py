@@ -71,7 +71,6 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:11px 9px;
 <main>
 <section class="panel"><h2>四病例平均分</h2><div id="cards" class="cards"></div></section>
 <section class="panel"><h2>逐病例结果</h2><div class="hint">点击病人姓名进入该病人的综合页面，可查看感知问题、标准参考、模型感知答案，以及标准轨迹和模型感知轨迹的完整逐题评估。</div><div class="table-wrap"><table id="results"></table></div></section>
-<section class="panel hint"><b>指标说明：</b>感知 Precision / Recall / F1 / 幻觉控制来自 perception_report；ACC、ERS 和治疗分（TPS）来自对应轨迹的 full_context_memory 方法。所有百分数均为四病例算术平均或单病例结果。</section>
 </main><script>
 const DATA=__DATA__; const pct=v=>typeof v==='number'?(v*100).toFixed(1)+'%':'n/a'; const score=v=>typeof v==='number'?v.toFixed(1)+'%':'n/a';
 const p=DATA.averages.perception,s=DATA.averages.evaluations.standard_trajectory,m=DATA.averages.evaluations.model_perception_trajectory;

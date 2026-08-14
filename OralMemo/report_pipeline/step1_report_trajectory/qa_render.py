@@ -54,8 +54,12 @@ def normalize_timepoints(extracted: dict) -> list[dict]:
         type_index = type_counts[stage_type]
         type_counts[stage_type] += 1
         t_months = timepoint.get("t_months")
-        if isinstance(t_months, bool) or not isinstance(t_months, int):
-            raise ValueError(f"t_months must be an integer at timepoint {order}: {t_months!r}")
+        if t_months is not None and (
+            isinstance(t_months, bool) or not isinstance(t_months, int) or t_months < 0
+        ):
+            raise ValueError(
+                f"t_months must be a non-negative integer or null at timepoint {order}: {t_months!r}"
+            )
         modality = timepoint.get("modality")
         if not isinstance(modality, list) or not modality:
             raise ValueError(f"modality must be a non-empty list at timepoint {order}")

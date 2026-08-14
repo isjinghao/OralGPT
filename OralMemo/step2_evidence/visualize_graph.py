@@ -294,7 +294,7 @@ def render_html(
 <body>
   <div class="toolbar">
     <div class="title">{html.escape(graph['patient_id'])}</div>
-    <a href="../evaluation/{patient_slug}_results.html">← 返回病人结果</a>
+    <a href="../evaluation/{patient_slug}_results.html">← 返回评测结果</a>
     <div class="summary">{len(nodes)} evidence · {len(edge_list)} edges · {len(ordered_stages)} timepoints</div>
     <input id="search" type="search" placeholder="Search evidence or timepoint" />
     <label><input id="edges" type="checkbox" checked /> Show edges</label>

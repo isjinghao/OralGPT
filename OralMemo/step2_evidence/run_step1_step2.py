@@ -17,6 +17,9 @@ def parse_args() -> argparse.Namespace:
 def completed(out) -> bool:
     required = (
         out / "trajectories" / "standard_trajectory.json",
+        out / "trajectories" / "short_noisy" / "short_noisy.json",
+        out / "trajectories" / "medium_noisy" / "medium_noisy.json",
+        out / "trajectories" / "long_noisy" / "long_noisy.json",
         out / "evidence" / "evidence.json",
         out / "graph" / "evidence_graph.json",
         out / "graph" / "evidence_graph.html",

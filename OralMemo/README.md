@@ -24,6 +24,7 @@ OralMemo/
 │   ├── run_perception_trajectory.sh
 │   ├── run_step0_step1_report.sh
 │   ├── run_step2_step3_report.sh
+│   ├── run_perception_trajectory_report.sh
 │   └── run_step4_report.sh
 ├── reports/                          # 报告下载、统计脚本及本地 PDF/图表
 ├── oralgpt_cmf_llamafactory_sft_dataset.json   # 原始患者数据集（SFT 格式）
@@ -33,8 +34,8 @@ OralMemo/
 ├── step1_patient_trajectory/         # Step1：阶段切分与轨迹生成
 │   ├── dataset.py                    #   加载患者、拆分问答轮次、对齐图片
 │   ├── stages.py                     #   按临床释放顺序切分阶段、划分 held-out
-│   ├── trajectories.py               #   标准轨迹 + 缺失模态变体 + 长噪声变体
-│   └── noise_pool.json               #   冻结的长噪声池（按 patient_id 确定性采样）
+│   ├── trajectories.py               #   标准轨迹 + 缺失模态变体 + 三档噪声变体
+│   └── noise_pool.json               #   冻结噪声池（固定种子确定性采样）
 │
 ├── step2_evidence/                   # Step2：原子证据与证据图
 │   ├── pipeline.py                   #   单病人核心流程（轨迹、证据、证据图）
@@ -260,7 +261,7 @@ bash scripts/run_step4.sh --limit 4 --num-workers 1 --trajectories standard_traj
 | Step1 | `trajectories/standard_trajectory.json`、`trajectories/<变体名>/<变体名>.json` |
 | Step2 | `evidence/evidence.json`、`graph/evidence_graph.json`、`graph/evidence_graph.html`、`graph/evidence_graph.png`、`cache/...` |
 | Step3 | `tasks/all_tasks.json`、按任务类型分组的 JSON、`rubrics/treatment_rubrics.json`、`cache/step3/...` |
-| Step4 | 每个方法的 `evaluation/<轨迹>/<answer_model>/<方法>/<text|multimodal>/answers.json` 和 `report.json`；多方法汇总位于 `evaluation/<轨迹>/<answer_model>/<text|multimodal>/report.json`、`report.txt`；缓存位于 `cache/step4/<轨迹>/<answer_model>/...` |
+| Step4 | 每个方法的 `evaluation/<轨迹>/<answer_model>/<方法>/<text|multimodal>/answers.json` 和 `report.json`；多方法汇总位于 `evaluation/<轨迹>/<answer_model>/<text|multimodal>/report.json`、`report.csv`；缓存位于 `cache/step4/<轨迹>/<answer_model>/...` |
 
 ---
 
@@ -308,7 +309,7 @@ bash scripts/run_step4.sh --limit 4 --num-workers 1 \
 
 # 指定轨迹变体和多种记忆方法
 bash scripts/run_step4.sh --all --num-workers 1 \
-  --trajectories long_noisy,no_ct \
+  --trajectories short_noisy,medium_noisy,long_noisy,no_ct \
   --methods single_stage_memory,summary_memory,mem0_memory \
   --answer-workers 2 --score-workers 1 --method-workers 1
 
@@ -362,7 +363,7 @@ bash scripts/run_step4.sh --all --num-workers 1 --multimodal \
 
 - `<方法>/<text|multimodal>/answers.json`：该模型、轨迹和 memory method 的逐任务作答记录
 - `<方法>/<text|multimodal>/report.json`：单个 method 的评分检查点，用于中断续跑
-- `<text|multimodal>/report.json` / `report.txt`：同一模型下的多方法对比报告
+- `<text|multimodal>/report.json` / `report.csv`：同一模型下的多方法对比报告
 - `report.json` 同时记录 `answer_model`、`answer_base_url`、`verifier_model`、`verifier_base_url` 和 `memory_methods`
 
 > mem0 的向量库持久化在 `cache/step4/<轨迹>/<answer_model>/mem0_memory/<text|multimodal>/vector_store/`，由方法自身经 `setup()` 配置；嵌入模型由 `.env` 的 `EMBEDDING_MODEL`（默认 `text-embedding-3-small`）指定。embedding key/url 优先使用 `EMBEDDING_OPENAI_*`，否则回退到通用 `OPENAI_*`；若未配置通用 key，必须配置 `EMBEDDING_OPENAI_API_KEY`。
@@ -383,7 +384,7 @@ retrieval loss 上界 = score(full_context) - score(actual_memo)
 
 推理误差：增加 oracle-context 条件，把该题 `selected_evidence` 对应的 gold facts 或人工核验后的完整相关证据直接注入 answer model，不经过感知、压缩和检索。固定同一个 answer model 比较 `oracle-context` 与实际 memo：oracle-context 仍答错的部分是回答模型的推理/表达失败；oracle-context 正确而实际 memo 错的部分属于记忆/检索链路损失。oracle 结果是诊断上界，不替代主结果。
 
-当前轨迹变体可支持：`standard` vs `model_perception`（感知传播）、单缺失 vs 双缺失模态（模态协同）、`long_noisy`（抗噪和幻觉）、text vs multimodal（视觉输入收益）、不同历史长度/阶段位置（长上下文退化和 recency bias），以及 full-context/summary/mem0 的交叉比较。报告时按 overall、任务类型、模态和轨迹严重度分层，并按病人报告均值、标准差和 bootstrap 置信区间；单病人或极少任务不应写成稳定统计结论。
+当前轨迹变体可支持：`standard` vs `model_perception`（感知传播）、单缺失 vs 双缺失模态（模态协同）、`short_noisy` / `medium_noisy` / `long_noisy`（分别注入 3 / 6 / 9 条感知阶段噪声，用于抗噪和幻觉测试）、text vs multimodal（视觉输入收益）、不同历史长度/阶段位置（长上下文退化和 recency bias），以及 full-context/summary/mem0 的交叉比较。报告时按 overall、任务类型、模态和轨迹严重度分层，并按病人报告均值、标准差和 bootstrap 置信区间；单病人或极少任务不应写成稳定统计结论。
 
 ## 六、Report 长程病例流水线（`report_pipeline/`）
 
@@ -419,7 +420,8 @@ PDF ─MinerU─► 全文/表格/图片 ─►  抽取模型 extract_timeline �
 ```
 report_pipeline/
 ├── step0_ingest/                      # PDF 摄取、时间线抽取与校验
-├── step1_report_trajectory/           # 报告时间点阶段化与标准轨迹
+├── step1_report_trajectory/           # 报告时间点阶段化、标准轨迹与模型感知轨迹
+│   └── run_perception_trajectory.py   # 仅重新感知图片 observation QA
 ├── run_step0_step1_report.py          # PDF -> 标准轨迹
 ├── run_step2_step3_report.py          # 标准轨迹 -> evidence/tasks/rubrics
 └── run_step4_report.py                # 独立评估已生成的 benchmark
@@ -434,6 +436,9 @@ bash scripts/run_step0_step1_report.sh --all --num-workers 2
 bash scripts/run_step2_step3_report.sh --all --num-workers 2 \
   --stage-workers 2 --task-workers 4
 
+# 用 .env 中的 ANSWER 模型生成模型感知轨迹；报告级并行数为 4
+bash scripts/run_perception_trajectory_report.sh --all --num-workers 4
+
 bash scripts/run_step4_report.sh --all --num-workers 1 \
   --methods full_context_memory \
   --answer-workers 2 --score-workers 1 --method-workers 1
@@ -444,9 +449,26 @@ bash scripts/run_step0_step1_report.sh --limit 1 --num-workers 1
 bash scripts/run_step2_step3_report.sh --limit 1 --num-workers 1 \
   --stage-workers 2 --task-workers 4
 
+bash scripts/run_perception_trajectory_report.sh --limit 1 --num-workers 1
+
 bash scripts/run_step4_report.sh --limit 1 --num-workers 1 \
   --methods full_context_memory \
   --answer-workers 1 --score-workers 1 --method-workers 1
+```
+
+Report 模型感知只重新回答带 `image_paths` 的 observation QA；无图 observation 和所有 evaluation QA 原样复制。单篇 Report 内按时间顺序串行处理，以便后续图片 QA 只能使用此前已经释放的文本 observation 和模型图片 observation；`--num-workers` 并行处理不同 Report。也可以覆盖 `.env` 中的 Answer 服务：
+
+```bash
+bash scripts/run_perception_trajectory_report.sh --limit 4 --num-workers 4 \
+  --model gpt-5 --base-url https://api.openai.com/v1
+```
+
+输出路径与病人侧一致：
+
+```text
+outputs/report/<PDF stem>/trajectories/model_perception_trajectory/<answer_model>/
+├── model_perception_trajectory.json
+└── perception_report.json
 ```
 
 通用参数与病人侧一致：
@@ -462,6 +484,7 @@ bash scripts/run_step4_report.sh --limit 1 --num-workers 1 \
 
 - Step0/1：`--max-iters`、`--model`；单篇报告内部的摄取、抽取/校验反馈循环和轨迹生成保持串行。
 - Step2/3：`--stage-workers` 默认 `2`，`--task-workers` 默认 `4`。
+- 模型感知轨迹：`--model`、`--base-url` 可覆盖 `.env` 的 `ANSWER_OPENAI_MODEL` 和 `ANSWER_OPENAI_BASE_URL`；同一 Report 内图片 QA 保持串行。
 - Step4：`--methods`、`--multimodal`、`--answer-model`、`--answer-base-url`、`--answer-workers`、`--score-workers`、`--method-workers`。
 
 Step0 摄取、时间线抽取和 Step1 轨迹分别检查已有产物并自动续跑。Step4 支持 method 级答案和评分续跑。三个 report 脚本会自动激活 `cmfbench`，并将额外命令行参数传给对应 Python 入口。
@@ -473,6 +496,7 @@ Step0 摄取、时间线抽取和 Step1 轨迹分别检查已有产物并自动�
 | `raw/`、`images/` | Step0 的 PDF 解析结果与图片 |
 | `timeline.extracted.json`、`verification_report.json` | 时间线抽取和校验记录 |
 | `trajectories/standard_trajectory.json`、`dataset_entry.json` | Step1 标准轨迹和 SFT 条目 |
+| `trajectories/model_perception_trajectory/<answer_model>/` | 模型感知轨迹及图片 QA 的 `perception_report.json` |
 | `evidence/evidence.json`、`graph/` | Step2 证据及证据图 |
 | `tasks/`、`rubrics/` | Step3 benchmark 任务和评分 rubric |
 | `evaluation/standard_trajectory/<answer_model>/` | Step4 评估根目录；各方法的答案和评分位于 `<方法>/<text|multimodal>/`，多方法汇总位于 `<text|multimodal>/` |
