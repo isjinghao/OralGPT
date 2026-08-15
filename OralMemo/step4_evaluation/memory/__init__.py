@@ -5,21 +5,30 @@
 - full_context_memory.py  全上下文基线 FullContextMemory
 - summary_memory.py       记忆基线 SummaryMemory
 - mem0_memory.py          基于 mem0 的检索式记忆 Mem0Memory
+- vector_memory.py        原始阶段向量检索 VectorMemory
+- langmem_memory.py       LangMem 长期记忆 LangMemMemory
+- graphiti_memory.py      Graphiti 时序图记忆 GraphitiMemory
 """
 from __future__ import annotations
 
 from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
 from step4_evaluation.memory.full_context_memory import FullContextMemory
+from step4_evaluation.memory.graphiti_memory import GraphitiMemory
+from step4_evaluation.memory.langmem_memory import LangMemMemory
 from step4_evaluation.memory.mem0_memory import Mem0Memory
 from step4_evaluation.memory.single_stage_memory import SingleStageMemory
 from step4_evaluation.memory.summary_memory import SummaryMemory
+from step4_evaluation.memory.vector_memory import VectorMemory
 
 # 方法注册表
 _REGISTRY: dict[str, type[MemoryMethod]] = {
     SingleStageMemory.name: SingleStageMemory,   # single_stage_memory
     FullContextMemory.name: FullContextMemory,   # full_context_memory
-    SummaryMemory.name: SummaryMemory,           # summary_memory
-    Mem0Memory.name: Mem0Memory,                 # mem0_memory
+    SummaryMemory.name: SummaryMemory,
+    Mem0Memory.name: Mem0Memory,
+    VectorMemory.name: VectorMemory,
+    LangMemMemory.name: LangMemMemory,
+    GraphitiMemory.name: GraphitiMemory,
 }
 
 # 不指定 --methods 时默认使用完整上下文
@@ -43,6 +52,9 @@ __all__ = [
     "FullContextMemory",
     "SummaryMemory",
     "Mem0Memory",
+    "VectorMemory",
+    "LangMemMemory",
+    "GraphitiMemory",
     "build_methods",
     "available_methods",
     "DEFAULT_METHOD",

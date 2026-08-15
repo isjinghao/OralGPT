@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
 from threading import Semaphore
@@ -74,6 +75,7 @@ def evaluation_roots(out: Path, trajectory_type: str, answer_model: str) -> tupl
 def _score_and_checkpoint(
     method_name: str,
     records: list[dict],
+    memory_metrics: dict,
     rubric_by_task: dict[str, dict],
     verifier_llm: CachedLLM,
     prefix: str,
@@ -90,6 +92,7 @@ def _score_and_checkpoint(
         score_workers,
         score_semaphore,
     )
+    method_report["memory_metrics"] = memory_metrics
     write_json(report_path, method_report)
     return method_report
 
@@ -100,6 +103,7 @@ def evaluate_trajectory(
     rubric_by_task: dict[str, dict],
     answer_client: ChatClient,
     verifier_client: ChatClient,
+    memo_client: ChatClient,
     out: Path,
     methods: list[str],
     multimodal: bool,
@@ -132,40 +136,75 @@ def evaluate_trajectory(
         method_dir = cache_root / method.name / mode
         method_eval_dir = eval_root / method.name / mode
         answers_path = method_eval_dir / "answers.json"
+        metrics_path = method_eval_dir / "memory_metrics.json"
         method_report_path = method_eval_dir / "report.json"
-        answers_rebuilt = not answers_path.is_file() or force
+        cached_records = read_json(answers_path) if answers_path.is_file() and not force else None
+        answers_rebuilt = cached_records is None or (
+            bool(cached_records) and "memory_metrics" not in cached_records[-1]
+        )
         if not answers_rebuilt:
-            records = read_json(answers_path)
+            records = cached_records
+            memory_metrics = records[-1]["memory_metrics"] if records else method.metrics()
+            write_json(metrics_path, memory_metrics)
             log(f"{prefix}[step4/resume] method={method.name} answers=loaded")
         else:
             log(f"{prefix}[step4/method] started name={method.name}")
-            method.setup(method_dir)
-            records = run_streaming(
-                method,
-                trajectory,
-                tasks_by_stage,
-                CachedLLM(answer_client, method_dir / "answer"),
-                image_root,
-                image_cache=image_cache,
-                answer_semaphore=answer_semaphore,
-                answer_workers=answer_workers,
-                log_prefix=prefix,
+            if force and method_dir.exists():
+                shutil.rmtree(method_dir)
+            method_memo_client = ChatClient(
+                memo_client.api_key,
+                memo_client.base_url,
+                memo_client.model,
+                memo_client.log_prefix,
             )
-            write_json(answers_path, records)
+            if metrics_path.is_file() and not force:
+                method.restore_metrics(read_json(metrics_path))
+            namespace = f"{patient_id}:{trajectory['trajectory_id']}:{method.name}:{mode}"
+            setup_succeeded = False
+            try:
+                method.setup(method_dir, namespace)
+                setup_succeeded = True
+                records = run_streaming(
+                    method,
+                    trajectory,
+                    tasks_by_stage,
+                    CachedLLM(answer_client, method_dir / "answer"),
+                    image_root,
+                    image_cache=image_cache,
+                    answer_semaphore=answer_semaphore,
+                    answer_workers=answer_workers,
+                    memory_llm=CachedLLM(method_memo_client, method_dir / "memo"),
+                    log_prefix=prefix,
+                )
+                memory_metrics = method.metrics()
+                for record in records:
+                    record["memory_metrics"] = memory_metrics
+                write_json(answers_path, records)
+            except Exception:
+                if not setup_succeeded:
+                    method.add_metrics(failures=1)
+                raise
+            finally:
+                write_json(metrics_path, method.metrics())
+                try:
+                    method.close()
+                finally:
+                    method_memo_client.close()
             log(f"{prefix}[step4/method] completed name={method.name} answers={len(records)}")
-        return method, method_dir, method_report_path, records, answers_rebuilt
+        return method, method_dir, method_report_path, records, memory_metrics, answers_rebuilt
 
     def score_answered(answered) -> dict:
-        method, method_dir, report_path, records, answers_rebuilt = answered
+        method, method_dir, report_path, records, memory_metrics, answers_rebuilt = answered
         if report_path.is_file() and not force and not answers_rebuilt:
             cached_report = read_json(report_path)
-            if not cached_report.get("failed_tasks"):
+            if not cached_report.get("failed_tasks") and "memory_metrics" in cached_report:
                 log(f"{prefix}[step4/resume] method={method.name} scoring=loaded")
                 return cached_report
             log(f"{prefix}[step4/resume] method={method.name} retry_failed_scoring")
         return _score_and_checkpoint(
             method.name,
             records,
+            memory_metrics,
             rubric_by_task,
             CachedLLM(verifier_client, method_dir / "verifier"),
             prefix,
@@ -208,6 +247,8 @@ def evaluate_trajectory(
         "answer_base_url": answer_client.base_url,
         "verifier_model": verifier_client.model,
         "verifier_base_url": verifier_client.base_url,
+        "memo_model": memo_client.model,
+        "memo_base_url": memo_client.base_url,
         "memory_methods": methods,
     }
     report_dir = eval_root / mode
@@ -244,7 +285,7 @@ def trajectory_completed(
         return False
     method_reports = read_json(report_path).get("methods", [])
     report_methods = {item["method"] for item in method_reports}
-    if any(item.get("failed_tasks") for item in method_reports):
+    if any(item.get("failed_tasks") or "memory_metrics" not in item for item in method_reports):
         return False
     return set(methods) <= report_methods and all(
         (eval_root / method / mode / "answers.json").is_file()
@@ -279,6 +320,7 @@ def run_patient(
         base_url=answer_base_url,
     )
     verifier_client = build_client(settings, "verifier", patient_id)
+    memo_client = build_client(settings, "memo", patient_id)
     image_root = settings.bench_root if multimodal else None
     log(
         f"[evaluation][{patient_id}][step4/start] trajectories={','.join(trajectory_names)} "
@@ -295,6 +337,7 @@ def run_patient(
             rubric_by_task,
             answer_client,
             verifier_client,
+            memo_client,
             out,
             methods,
             multimodal,

@@ -1,0 +1,7 @@
+template: |
+  Maintain longitudinal semantic memory about this patient.
+  Extract only patient-specific clinical facts explicitly supported by the newly released stage, including
+  diagnoses, findings, measurements, treatments, responses, follow-up outcomes, negations, and uncertainty.
+  Preserve dates, temporal order, anatomy, laterality, values, and units. Update or delete older facts only
+  when the new stage explicitly refines, supersedes, or contradicts them. Keep distinct facts separate.
+  Do not store user preferences, response instructions, task-solving strategies, or general medical knowledge.

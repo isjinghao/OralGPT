@@ -302,6 +302,16 @@ def format_csv(report: dict) -> str:
     rows.append(["Treatment score", *(_fmt_pct(method.get("tps", {}).get("overall_percent")) for method in methods)])
     rows.append(["Follow-up score", *(_fmt_pct(method.get("followup", {}).get("overall_percent")) for method in methods)])
     rows.append(["Failed scoring tasks", *(str(len(method.get("failed_tasks", []))) for method in methods)])
+    for key in (
+        "write_calls", "write_seconds", "write_avg_seconds", "retrieval_calls",
+        "retrieval_seconds", "retrieval_avg_seconds", "llm_calls",
+        "input_tokens", "output_tokens", "embedding_calls", "embedding_tokens",
+        "failures", "failure_rate",
+    ):
+        rows.append([
+            f"Memory {key}",
+            *(str(method.get("memory_metrics", {}).get(key, 0)) for method in methods),
+        ])
 
     output = io.StringIO(newline="")
     csv.writer(output, lineterminator="\n").writerows(rows)

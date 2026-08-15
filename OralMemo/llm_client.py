@@ -4,6 +4,7 @@ import json
 import re
 import time
 from datetime import datetime, timezone
+from threading import Lock
 
 from openai import APIConnectionError, APITimeoutError, InternalServerError, OpenAI, RateLimitError
 
@@ -12,13 +13,23 @@ from batch_utils import log
 
 class ChatClient:
     def __init__(self, api_key: str, base_url: str, model: str, log_prefix: str = "[llm]"):
+        self.api_key = api_key
         self.base_url = base_url.rstrip("/")
         self.client = OpenAI(api_key=api_key, base_url=self.base_url + "/")
         self.model = model
         self.log_prefix = log_prefix
+        self._usage = {"calls": 0, "input_tokens": 0, "output_tokens": 0}
+        self._usage_lock = Lock()
 
     def log(self, scope: str, message: str) -> None:
         log(f"{self.log_prefix}[{scope}] {message}")
+
+    def usage_snapshot(self) -> dict[str, int]:
+        with self._usage_lock:
+            return dict(self._usage)
+
+    def close(self) -> None:
+        self.client.close()
 
     @staticmethod
     def _content_text(content, nested: bool = False) -> str:
@@ -79,6 +90,11 @@ class ChatClient:
                     max_tokens=max_tokens,
                     timeout=timeout,
                 )
+                usage = response.usage
+                with self._usage_lock:
+                    self._usage["calls"] += 1
+                    self._usage["input_tokens"] += int(usage.prompt_tokens or 0) if usage else 0
+                    self._usage["output_tokens"] += int(usage.completion_tokens or 0) if usage else 0
                 if not response.choices:
                     raise ValueError("LLM response contains no choices")
                 content = self._content_text(response.choices[0].message.content).strip()

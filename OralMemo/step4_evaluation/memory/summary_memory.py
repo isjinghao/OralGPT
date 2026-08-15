@@ -52,10 +52,20 @@ class SummaryMemory(MemoryMethod):
             existing_memory=self._summary or "(empty)",
             new_stage=self._pending,
         )
-        data = llm.complete(prompt, cache_key=cache_key, max_tokens=4096)
+        before = llm.client.usage_snapshot()
+        try:
+            data = llm.complete(prompt, cache_key=cache_key, max_tokens=4096)
+        finally:
+            after = llm.client.usage_snapshot()
+            self.add_metrics(
+                llm_calls=after["calls"] - before["calls"],
+                input_tokens=after["input_tokens"] - before["input_tokens"],
+                output_tokens=after["output_tokens"] - before["output_tokens"],
+            )
         memory = _to_text(data.get("memory"))
-        if memory:
-            self._summary = memory
+        if not memory:
+            raise ValueError("Summary memory update returned empty memory")
+        self._summary = memory
         self._pending = ""
 
     def context(self, query: str | None = None) -> str:

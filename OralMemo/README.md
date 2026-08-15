@@ -117,10 +117,21 @@ VERIFIER_OPENAI_API_KEY=你的校验模型key
 VERIFIER_OPENAI_BASE_URL=https://api.openai.com/v1
 VERIFIER_OPENAI_MODEL=gpt-4o
 
-# mem0 embedding
+# 记忆构建模型：summary / mem0 / LangMem / Graphiti 共用
+MEMO_OPENAI_API_KEY=你的记忆模型key
+MEMO_OPENAI_BASE_URL=https://api.openai.com/v1
+MEMO_OPENAI_MODEL=gpt-4o-mini
+
+# 检索记忆共用 embedding
 EMBEDDING_OPENAI_API_KEY=你的embedding模型key
 EMBEDDING_OPENAI_BASE_URL=https://api.openai.com/v1
 EMBEDDING_MODEL=text-embedding-3-small
+EMBEDDING_DIM=1536
+
+# Graphiti 使用 Neo4j
+GRAPHITI_NEO4J_URI=bolt://localhost:7687
+GRAPHITI_NEO4J_USER=neo4j
+GRAPHITI_NEO4J_PASSWORD=你的Neo4j密码
 EOF
 ```
 
@@ -344,10 +355,78 @@ bash scripts/run_step4.sh --all --num-workers 1 --multimodal \
 | --- | --- | --- |
 | `single_stage_memory` | `SingleStageMemory` | 单阶段基线：每阶段清空，只保留当前阶段（用于验证"仅当前阶段无法完成跨阶段任务"） |
 | `full_context_memory` | `FullContextMemory` | 全上下文基线：拼接全部历史阶段原文（长上下文） |
-| `summary_memory` | `SummaryMemory` | 记忆基线：LLM 增量把每阶段融入一份紧凑结构化记忆 |
-| `mem0_memory` | `Mem0Memory` | mem0 检索式记忆：抽取事实入向量库、按问题语义检索（需 `pip install mem0ai`） |
+| `summary_memory` | `SummaryMemory` | 使用 Memo LLM 增量把每阶段融入紧凑结构化记忆 |
+| `mem0_memory` | `Mem0Memory` | Mem0 抽取原子事实、更新向量库并检索 top-8 |
+| `vector_memory` | `VectorMemory` | 不调用 Memo LLM，直接嵌入已释放阶段原文并检索 top-8 |
+| `langmem_memory` | `LangMemMemory` | LangMem 提取、更新长期语义记忆并检索 top-8 |
+| `graphiti_memory` | `GraphitiMemory` | Graphiti 增量写入时序知识图谱并混合检索 top-8；需要 Neo4j |
 
-> **扩展新方法**：在 `memory/` 下新建 `<name>.py` 继承 `MemoryMethod`（实现 `reset/observe/context`，需巩固再实现 `update`，需落盘再重写 `setup(workdir)`），并在 `memory/__init__.py` 的 `_REGISTRY` 登记即可被 `--methods` 选中，通用 pipeline 无需改动。
+所有方法共享同一个 answer model；`summary_memory`、`mem0_memory`、`langmem_memory` 和 `graphiti_memory` 的记忆构建使用 `MEMO_OPENAI_*`，四种检索方法共享 `EMBEDDING_OPENAI_*`。每次运行按“病人 × 轨迹 × 方法 × text/multimodal”建立独立 namespace，并在轨迹开始前 `reset()`；阶段按顺序释放后才允许写入记忆。
+
+```bash
+bash scripts/run_step4.sh --all \
+  --methods full_context_memory,summary_memory,vector_memory,mem0_memory,langmem_memory,graphiti_memory
+```
+
+运行 `graphiti_memory` 前需先启动 `.env` 指定的 Neo4j；其他方法不依赖 Neo4j。
+
+#### 启动 Neo4j（Docker）
+
+当前机器尚未安装 `docker` 命令。先在 Windows 安装并启动 Docker Desktop，设置中启用 WSL 2 backend 和当前 WSL 发行版集成；确认 `docker --version` 在 PowerShell 或 WSL 中可用后再执行以下步骤。
+
+首次创建容器时设置密码（至少 8 个字符，下面的 `YourStrongPassword` 需要自行替换）：
+
+```bash
+docker run -d \
+  --name oralmemo-neo4j \
+  --restart unless-stopped \
+  -p 7474:7474 \
+  -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/YourStrongPassword \
+  -v oralmemo_neo4j_data:/data \
+  neo4j:2026.07.1
+```
+
+同步修改 `.env`，密码必须与 `NEO4J_AUTH` 中一致：
+
+```dotenv
+GRAPHITI_NEO4J_URI=bolt://localhost:7687
+GRAPHITI_NEO4J_USER=neo4j
+GRAPHITI_NEO4J_PASSWORD=YourStrongPassword
+```
+
+检查状态和日志：
+
+```bash
+docker ps --filter name=oralmemo-neo4j
+docker logs -f oralmemo-neo4j
+```
+
+日志显示服务启动完成后，可打开 `http://localhost:7474`，使用用户名 `neo4j` 和上述密码登录。也可以直接检查 Bolt 连接：
+
+```bash
+docker exec oralmemo-neo4j cypher-shell \
+  -u neo4j -p YourStrongPassword \
+  "RETURN 1 AS ok;"
+```
+
+日常停止和重新启动不会删除图数据：
+
+```bash
+docker stop oralmemo-neo4j
+docker start oralmemo-neo4j
+```
+
+`NEO4J_AUTH` 只在空数据卷首次初始化时设置密码。如果复用现有 `oralmemo_neo4j_data`，修改启动命令中的密码不会覆盖数据库原密码。需要彻底重建并重新设置密码时，确认不再需要现有图数据后执行：
+
+```bash
+docker rm -f oralmemo-neo4j
+docker volume rm oralmemo_neo4j_data
+```
+
+然后使用新密码重新执行 `docker run`。不要使用 `NEO4J_AUTH=none`，也不要把真实密码提交到 Git。
+
+> **扩展新方法**：在 `memory/` 下新建 `<name>.py` 继承 `MemoryMethod`（实现 `reset/observe/context`，需巩固再实现 `update`，需落盘再重写 `setup(workdir, namespace)`），并在 `memory/__init__.py` 的 `_REGISTRY` 登记即可被 `--methods` 选中。
 
 ### 评分指标（`report.py`）
 
@@ -361,12 +440,14 @@ bash scripts/run_step4.sh --all --num-workers 1 --multimodal \
 
 ### 产物（`outputs/.../evaluation/<轨迹>/<answer_model>/`）
 
-- `<方法>/<text|multimodal>/answers.json`：该模型、轨迹和 memory method 的逐任务作答记录
-- `<方法>/<text|multimodal>/report.json`：单个 method 的评分检查点，用于中断续跑
-- `<text|multimodal>/report.json` / `report.csv`：同一模型下的多方法对比报告
-- `report.json` 同时记录 `answer_model`、`answer_base_url`、`verifier_model`、`verifier_base_url` 和 `memory_methods`
+- `<方法>/<text|multimodal>/answers.json`：逐任务作答、实际 `memory_context` 和最终 `memory_metrics`
+- `<方法>/<text|multimodal>/memory_metrics.json`：独立成本检查点；方法中途失败也保留已发生的调用统计
+- `<方法>/<text|multimodal>/report.json`：单方法评分及 `memory_metrics` 检查点
+- `<text|multimodal>/report.json` / `report.csv`：同一模型下的多方法结果和成本对比
+- 汇总 `report.json` 同时记录 answer、verifier、memo 模型及地址和 `memory_methods`
+- `memory_metrics` 包含写入/检索次数、总检索秒数、Memo LLM 输入/输出 token、embedding 调用/token、失败数和失败率；缓存命中的 Memo 请求不重复计费
 
-> mem0 的向量库持久化在 `cache/step4/<轨迹>/<answer_model>/mem0_memory/<text|multimodal>/vector_store/`，由方法自身经 `setup()` 配置；嵌入模型由 `.env` 的 `EMBEDDING_MODEL`（默认 `text-embedding-3-small`）指定。embedding key/url 优先使用 `EMBEDDING_OPENAI_*`，否则回退到通用 `OPENAI_*`；若未配置通用 key，必须配置 `EMBEDDING_OPENAI_API_KEY`。
+> Mem0 的向量库持久化在方法独立的 `vector_store/`。LangMem 当前使用每条轨迹独立的进程内 Store。Graphiti 使用共享 Neo4j，但通过独立 `group_id` 隔离并在每条轨迹开始前只清理自己的 group。
 
 
 
@@ -374,7 +455,7 @@ bash scripts/run_step4.sh --all --num-workers 1 --multimodal \
 
 感知误差：在同一个 `answer_model` 和 memo 方法下比较 `standard` 与 `model_perception`。两者的差值表示感知误差传播到记忆和后续任务后的影响；同时报告 `trajectories/model_perception_trajectory/<answer_model>/perception_report.json` 的 precision、recall、F1 和 hallucination control。
 
-memo/检索误差：只比较不同 memo 方法能回答端到端效果，但不能单独证明下降来自检索，因为方法同时改变了记忆表示、更新/压缩和上下文长度。建议固定 `answer_model`，同时报告 `full_context_memory`、`summary_memory`、`mem0_memory`，并审计每道题 `answers.json` 里的 `memory_context` 与 `selected_evidence`：
+memo/检索误差：只比较不同 memo 方法能回答端到端效果，但不能单独证明下降来自检索，因为方法同时改变了记忆表示、更新/压缩和上下文长度。建议固定 `answer_model`、Memo LLM、embedding、`top_k=8`，同时报告 `full_context_memory`、`summary_memory`、`vector_memory`、`mem0_memory`、`langmem_memory`、`graphiti_memory`，并结合 `memory_metrics` 审计成本与失败率，再检查每道题 `answers.json` 里的 `memory_context` 与 `selected_evidence`：
 
 ```text
 retrieval loss 上界 = score(full_context) - score(actual_memo)

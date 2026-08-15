@@ -1,6 +1,5 @@
 """Step4 流式评测引擎: 缓存 LLM 封装、按阶段流式读取轨迹并在问题释放时刻提问"""
 from __future__ import annotations
-
 import base64
 import json
 import mimetypes
@@ -115,7 +114,7 @@ def answer_question(
 
     method.multimodal=True 且提供 image_root 时, 会把记忆中的图片以 image_url 分块附带给大模型。
     """
-    memory_context = method.context(task["question"]) or "(empty)"
+    memory_context = method.timed_context(task["question"]) or "(empty)"
     prompt = render(
         "answer",
         memory=memory_context,
@@ -145,7 +144,7 @@ def answer_question(
 def _release_task_answers(
     method: MemoryMethod,
     records: list[dict],
-    llm: CachedLLM,
+    memory_llm: CachedLLM,
     stage_id: str,
     release_treatment_ground_truth: bool,
 ) -> None:
@@ -165,14 +164,18 @@ def _release_task_answers(
         )
     release_stage = {
         "stage_id": f"{stage_id}__evaluation_release",
-        "order": 0,
+        "order": _stage_order(stage_id),
         "stage_type": records[0]["task_type"],
         "modality": ["TEXT_QA"],
         "image_paths": [],
         "qa_pairs": qa_pairs,
     }
-    method.observe(release_stage)
-    method.update(llm, cache_key=f"memupdate_{release_stage['stage_id']}")
+    method.write(
+        release_stage,
+        memory_llm,
+        cache_key=f"memupdate_{release_stage['stage_id']}",
+    )
+
 
 
 def _stage_order(stage_id: str) -> int:
@@ -192,6 +195,7 @@ def run_streaming(
     image_cache: dict[Path, str | None],
     answer_semaphore: Semaphore,
     answer_workers: int = 2,
+    memory_llm: CachedLLM,
     release_treatment_ground_truth: bool = True,
     log_prefix: str | None = None,
 ) -> list[dict]:
@@ -251,25 +255,44 @@ def run_streaming(
             _release_task_answers(
                 method,
                 pending_releases.pop(release_stage),
-                llm,
+                memory_llm,
                 release_stage,
+                release_treatment_ground_truth,
+            )
+
+    def answer_missing_before(order: int) -> None:
+        for missing_stage in missing_task_stages:
+            missing_order = _stage_order(missing_stage)
+            if missing_stage in answered_missing or missing_order >= order:
+                continue
+            release_missing_before(missing_order)
+            _release_task_answers(
+                method,
+                pending_releases.pop(missing_stage, []),
+                memory_llm,
+                missing_stage,
+                release_treatment_ground_truth,
+            )
+            answer_tasks(missing_stage, missing_stage=True)
+            answered_missing.add(missing_stage)
+            _release_task_answers(
+                method,
+                pending_releases.pop(missing_stage, []),
+                memory_llm,
+                missing_stage,
                 release_treatment_ground_truth,
             )
 
     for stage in stages:
         stage_id = stage["stage_id"]
         current_order = _stage_order(stage_id)
-        for missing_stage in missing_task_stages:
-            if missing_stage not in answered_missing and _stage_order(missing_stage) < current_order:
-                answer_tasks(missing_stage, missing_stage=True)
-                answered_missing.add(missing_stage)
+        answer_missing_before(current_order)
         release_missing_before(current_order)
-        method.observe(stage)
-        method.update(llm, cache_key=f"memupdate_{stage_id}")
+        method.write(stage, memory_llm, cache_key=f"memupdate_{stage_id}")
         _release_task_answers(
             method,
             pending_releases.pop(stage_id, []),
-            llm,
+            memory_llm,
             stage_id,
             release_treatment_ground_truth,
         )
@@ -277,14 +300,12 @@ def run_streaming(
         _release_task_answers(
             method,
             pending_releases.pop(stage_id, []),
-            llm,
+            memory_llm,
             stage_id,
             release_treatment_ground_truth,
         )
 
-    for missing_stage in missing_task_stages:
-        if missing_stage not in answered_missing:
-            answer_tasks(missing_stage, missing_stage=True)
+    answer_missing_before(10**9)
     release_missing_before(10**9)
     if pending_releases:
         raise ValueError(f"Unreached evaluation release stages: {sorted(pending_releases)}")

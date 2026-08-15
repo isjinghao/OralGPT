@@ -29,7 +29,7 @@ class ModelConfig:
 
 
 
-ModelRole = Literal["benchmark", "answer", "verifier"]
+ModelRole = Literal["benchmark", "answer", "verifier", "memo"]
 
 
 @dataclass(frozen=True)
@@ -40,6 +40,8 @@ class Settings:
     benchmark_llm: ModelConfig
     answer_llm: ModelConfig
     verifier_llm: ModelConfig
+    memo_llm: ModelConfig
+    embedding_llm: ModelConfig
     graph_max_edges: int
 
     def llm_for(self, role: ModelRole) -> ModelConfig:
@@ -49,6 +51,8 @@ class Settings:
             return self.answer_llm
         if role == "verifier":
             return self.verifier_llm
+        if role == "memo":
+            return self.memo_llm
         raise ValueError(f"Unknown LLM role: {role}")
 
 
@@ -92,5 +96,19 @@ def get_settings() -> Settings:
         benchmark_llm=_model_config("BENCHMARK"),
         answer_llm=_model_config("ANSWER"),
         verifier_llm=_model_config("VERIFIER"),
+        memo_llm=ModelConfig(
+            api_key=_env_first("MEMO_OPENAI_API_KEY"),
+            base_url=_env_first("MEMO_OPENAI_BASE_URL", default="https://api.openai.com/v1"),
+            model=_env_first("MEMO_OPENAI_MODEL", default="gpt-4o-mini"),
+        ),
+        embedding_llm=ModelConfig(
+            api_key=_env_first("EMBEDDING_OPENAI_API_KEY", "OPENAI_API_KEY"),
+            base_url=_env_first(
+                "EMBEDDING_OPENAI_BASE_URL",
+                "OPENAI_BASE_URL",
+                default="https://api.openai.com/v1",
+            ),
+            model=_env_first("EMBEDDING_MODEL", default="text-embedding-3-small"),
+        ),
         graph_max_edges=int(os.environ.get("GRAPH_MAX_EDGES", "40")),
     )

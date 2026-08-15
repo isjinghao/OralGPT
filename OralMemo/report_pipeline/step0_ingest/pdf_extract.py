@@ -59,17 +59,105 @@ def _caption_panel_count(value: str) -> int:
     return max((ord(letter) - ord("a") + 1 for letter in letters), default=1)
 
 
+def _caption_sections(values: list[str]) -> list[tuple[int, str]]:
+    sections = {}
+    prefix = rf"(?:{NORMAL_FIG_PREFIX}|{OCR_FIG_PREFIX}){HSPACE}*\d+"
+    for value in values:
+        text = _plain_caption(value)
+        text = re.sub(rf"(?<=[.!?]){HSPACE}+(?={prefix})", "\n", text, flags=re.IGNORECASE)
+        matches = list(CAP_FIG_RE.finditer(text))
+        for index, match in enumerate(matches):
+            end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+            figure = _figure_number(match)
+            sections[figure] = _more_complete_caption(
+                sections.get(figure, ""), text[match.start():end].strip()
+            )
+    return list(sections.items())
+
+
+def _ordered_visual_blocks(blocks: list[dict]) -> list[dict]:
+    rows: list[list[dict]] = []
+    for block in sorted(blocks, key=lambda item: (item["bbox"][1], item["bbox"][0])):
+        if rows and float(block["bbox"][1]) < max(float(item["bbox"][3]) for item in rows[-1]):
+            rows[-1].append(block)
+        else:
+            rows.append([block])
+    return [block for row in rows for block in sorted(row, key=lambda item: item["bbox"][0])]
+
+
+def _image_split_points(image, parts: int, weights: list[int], vertical: bool) -> list[int]:
+    import numpy as np
+
+    pixels = np.asarray(image.convert("L"), dtype=float)
+    if not vertical:
+        pixels = pixels.T
+    length = pixels.shape[0]
+    if parts < 2:
+        return []
+    edge = np.mean(np.abs(pixels[1:] - pixels[:-1]), axis=1)
+    white = np.mean(pixels[1:] > 245, axis=1)
+    spread = np.std(pixels[1:], axis=1)
+    scores = edge + 30 * white + 20 / (1 + spread)
+    minimum_gap = max(15, int(length * 0.07))
+    candidates = [
+        int(index + 1) for index in np.argsort(scores)[::-1]
+        if minimum_gap <= index + 1 <= length - minimum_gap
+    ]
+    if parts == 2 and candidates:
+        target = length * weights[0] / sum(weights)
+        return [max(candidates, key=lambda point: scores[point - 1] - abs(point - target) * 0.25)]
+
+    selected = []
+    for point in candidates:
+        boundaries = sorted([0, *selected, point, length])
+        if min(right - left for left, right in zip(boundaries, boundaries[1:])) < minimum_gap:
+            continue
+        selected.append(point)
+        if len(selected) == parts - 1:
+            return sorted(selected)
+    cumulative = 0
+    fallback = []
+    for weight in weights[:-1]:
+        cumulative += weight
+        fallback.append(round(length * cumulative / sum(weights)))
+    return fallback
+
+
 def _pdf_page_texts(pdf_path: Path) -> list[str]:
     from pypdf import PdfReader
 
     return [page.extract_text() or "" for page in PdfReader(pdf_path).pages]
 
 
+def _pdf_caption_positions(pdf_path: Path) -> dict[int, list[tuple[int, float, float]]]:
+    from pypdf import PdfReader
+
+    positions = {}
+    for page_index, page in enumerate(PdfReader(pdf_path).pages):
+        width = float(page.mediabox.width)
+        height = float(page.mediabox.height)
+        page_positions = []
+
+        def visit(text, _cm, tm, _font, _size):
+            match = CAP_FIG_RE.match(text.strip())
+            if match:
+                page_positions.append((
+                    _figure_number(match),
+                    float(tm[4]) / width * 1000,
+                    (height - float(tm[5])) / height * 1000,
+                ))
+
+        page.extract_text(visitor_text=visit)
+        if page_positions:
+            positions[page_index] = page_positions
+    return positions
+
+
 def _pdf_caption(text: str, match: re.Match) -> str:
     lines = text[match.start():].splitlines()
     caption = lines[0].strip()
     label_only = match.end() - match.start() == len(caption)
-    for line in lines[1:4]:
+    for line in lines[1:12]:
         line = line.strip()
         if not line or CAP_FIG_RE.match(line) or TABLE_RE.match(line):
             break
@@ -77,7 +165,7 @@ def _pdf_caption(text: str, match: re.Match) -> str:
             break
         caption = f"{caption} {line}"
         label_only = False
-        if len(caption) >= 500:
+        if len(caption) >= 1500:
             break
     return re.sub(r"\s+", " ", caption).strip()
 
@@ -106,11 +194,40 @@ def _more_complete_caption(current: str, pdf_caption: str) -> str:
     return current
 
 
+def _text_tokens(value: str) -> list[str]:
+    value = re.sub(r"(?<=\w)[-‐‑–]\s*\n\s*(?=\w)", "", value)
+    return re.findall(r"[a-z0-9]+", value.casefold())
+
+
+def _has_missing_text_line(pdf_text: str, mineru_text: str) -> bool:
+    mineru_tokens = set(_text_tokens(mineru_text))
+    boilerplate = re.compile(
+        r"page \d|downloaded from|copyright|article in press|creative commons|"
+        r"journal of|volume \d|doi|personal use|published by|licenses?/by",
+        re.IGNORECASE,
+    )
+    for line in pdf_text.splitlines():
+        if boilerplate.search(line) or re.search(r"\bc15\w*\b", line, re.IGNORECASE):
+            continue
+        line_tokens_list = _text_tokens(line)
+        line_tokens = set(line_tokens_list)
+        if not line_tokens:
+            continue
+        one_character_ratio = sum(len(token) == 1 for token in line_tokens_list) / len(line_tokens_list)
+        if one_character_ratio >= 0.25:
+            continue
+        if len(line_tokens) >= 8 and len(line_tokens & mineru_tokens) / len(line_tokens) < 0.7:
+            return True
+    return False
+
+
 def _should_use_pdf_text(pdf_text: str, mineru_text: str) -> bool:
-    pdf_tokens = re.findall(r"[a-z0-9]+", pdf_text.casefold())
-    mineru_tokens = re.findall(r"[a-z0-9]+", mineru_text.casefold())
+    pdf_tokens = _text_tokens(pdf_text)
+    mineru_tokens = _text_tokens(mineru_text)
     if not pdf_tokens or not mineru_tokens:
         return bool(pdf_tokens) and not mineru_tokens
+    if _has_missing_text_line(pdf_text, mineru_text):
+        return True
 
     pdf_counts = Counter(pdf_tokens)
     mineru_counts = Counter(mineru_tokens)
@@ -261,6 +378,7 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
     markdown_table_captions = _markdown_table_captions(auto)
     pdf_page_texts = _pdf_page_texts(pdf_path)
     pdf_captions = _pdf_captions(pdf_page_texts)
+    pdf_caption_positions = _pdf_caption_positions(pdf_path)
     pdf_caption_by_page = {
         page: {figure: caption for figure, caption in captions}
         for page, captions in pdf_captions.items()
@@ -391,11 +509,12 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
 
     visual_pages = {int(block.get("page_idx", 0)) for block in img_blocks}
     for page, captions in pdf_captions.items():
-        if page not in visual_pages:
-            continue
         for figure, caption in captions:
+            if page not in visual_pages and figure not in cap_by_fig:
+                continue
             cap_by_fig[figure] = _more_complete_caption(cap_by_fig.get(figure, ""), caption)
-            figs_by_page.setdefault(page, set()).add(figure)
+            if page in visual_pages:
+                figs_by_page.setdefault(page, set()).add(figure)
 
     kept = 0
     path_by_block: dict[int, str] = {}
@@ -409,14 +528,250 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
         path_by_block[id(block)] = (images_dir / filename).relative_to(rel_base).as_posix()
         kept += 1
 
-    blocks_by_fig: dict[int, list[dict]] = {}
-    assigned_blocks: set[int] = set()
+    split_paths_by_fig: dict[int, list[str]] = {}
+    preassigned_blocks_by_fig: dict[int, list[dict]] = {}
+    preassigned_blocks: set[int] = set()
+
+    def split_block(block: dict, figures: list[int]) -> bool:
+        from PIL import Image
+
+        source = images_dir / Path(path_by_block[id(block)]).name
+        positions = {
+            figure: (x, y)
+            for figure, x, y in pdf_caption_positions.get(int(block.get("page_idx", 0)), [])
+            if figure in figures
+        }
+        vertical = True
+        if len(positions) == len(figures):
+            xs = [positions[figure][0] for figure in figures]
+            ys = [positions[figure][1] for figure in figures]
+            vertical = max(ys) - min(ys) >= max(xs) - min(xs)
+        weights = [_caption_panel_count(cap_by_fig.get(figure, "")) for figure in figures]
+        total = sum(weights)
+        if total <= 0:
+            return False
+        with Image.open(source) as original:
+            image = original.convert("RGB") if source.suffix.casefold() in (".jpg", ".jpeg") else original.copy()
+            length = image.height if vertical else image.width
+            if length < len(figures) * 20:
+                return False
+            boundaries = [0, *_image_split_points(image, len(figures), weights, vertical), length]
+            targets = []
+            for figure, start, end in zip(figures, boundaries, boundaries[1:]):
+                box = (0, start, image.width, end) if vertical else (start, 0, end, image.height)
+                target = source.with_name(f"{source.stem}_fig{figure:02d}{source.suffix}")
+                image.crop(box).save(target)
+                targets.append((figure, target.relative_to(rel_base).as_posix()))
+        source.unlink()
+        for figure, target in targets:
+            split_paths_by_fig[figure] = [target]
+            preassigned_blocks_by_fig[figure] = []
+        preassigned_blocks.add(id(block))
+        return True
+
+    explicitly_anchored = {
+        figure: block
+        for block in img_blocks
+        for figure in figs_by_block.get(id(block), set())
+        if len(figs_by_block.get(id(block), set())) == 1 and id(block) in path_by_block
+    }
+    for page, positions in pdf_caption_positions.items():
+        page_blocks = [
+            block for block in img_blocks
+            if int(block.get("page_idx", 0)) == page
+            and id(block) in path_by_block
+            and len(block.get("bbox") or []) >= 4
+        ]
+        previous_blocks = _ordered_visual_blocks([
+            block for block in img_blocks
+            if int(block.get("page_idx", 0)) == page - 1
+            and id(block) in path_by_block
+            and not figs_by_block.get(id(block))
+            and len(block.get("bbox") or []) >= 4
+        ])
+        if not page_blocks or not previous_blocks:
+            continue
+        first_top = min(float(block["bbox"][1]) for block in page_blocks)
+        last_bottom = max(float(block["bbox"][3]) for block in page_blocks)
+        leading = [figure for figure, _x, y in positions if y < first_top]
+        trailing = [figure for figure, _x, y in positions if y > last_bottom]
+        if len(leading) != 1 or not trailing or leading[0] in explicitly_anchored:
+            continue
+        figure = leading[0]
+        block = previous_blocks[-1]
+        preassigned_blocks_by_fig[figure] = [block]
+        preassigned_blocks.add(id(block))
+
+    for page in visual_pages:
+        page_blocks = _ordered_visual_blocks([
+            block for block in img_blocks
+            if int(block.get("page_idx", 0)) == page
+            and id(block) in path_by_block
+            and len(block.get("bbox") or []) >= 4
+        ])
+        pending = []
+        for block in page_blocks:
+            captions = list(_visual_captions(block))
+            captions.extend(markdown_captions.get(Path(block.get("img_path") or "").name, []))
+            sections = [
+                section for section in _caption_sections(captions)
+                if (
+                    section[0] not in explicitly_anchored
+                    or id(explicitly_anchored[section[0]]) == id(block)
+                )
+                and section[0] not in preassigned_blocks_by_fig
+            ]
+            figures = [figure for figure, _ in sections]
+            if len(figures) < 2:
+                if figures:
+                    figure = figures[0]
+                    if figure not in explicitly_anchored:
+                        preassigned_blocks_by_fig[figure] = [block]
+                        preassigned_blocks.add(id(block))
+                    pending = []
+                else:
+                    pending.append(block)
+                continue
+            segment = [*pending, block]
+            counts = [_caption_panel_count(cap_by_fig.get(figure, caption)) for figure, caption in sections]
+            assignments = {}
+            index = 0
+            split_figures = []
+            for figure_index, (figure, count) in enumerate(zip(figures, counts)):
+                remaining_figures = len(figures) - figure_index
+                remaining_blocks = len(segment) - index
+                if remaining_figures == 1:
+                    assignments[figure] = segment[index:]
+                    index = len(segment)
+                elif remaining_blocks == 1:
+                    split_figures = figures[figure_index:]
+                    break
+                elif count <= remaining_blocks - 1:
+                    assignments[figure] = segment[index:index + count]
+                    index += count
+                else:
+                    assignments = {}
+                    break
+            if assignments or split_figures:
+                if split_figures and not split_block(segment[-1], split_figures):
+                    pending = segment
+                    continue
+                for figure, blocks in assignments.items():
+                    preassigned_blocks_by_fig[figure] = blocks
+                    preassigned_blocks.update(id(item) for item in blocks)
+                pending = []
+            else:
+                pending = segment
+
+        remaining_figures = sorted(
+            figure for figure in figs_by_page.get(page, set())
+            if figure not in preassigned_blocks_by_fig
+        )
+        remaining_blocks = _ordered_visual_blocks([
+            block for block in page_blocks if id(block) not in preassigned_blocks
+        ])
+        if (
+            len(remaining_figures) == len(remaining_blocks)
+            and remaining_figures
+            and all(_caption_panel_count(cap_by_fig.get(figure, "")) == 1 for figure in remaining_figures)
+        ):
+            for figure, block in zip(remaining_figures, remaining_blocks):
+                preassigned_blocks_by_fig[figure] = [block]
+                preassigned_blocks.add(id(block))
+
+    geometry_blocks_by_fig: dict[int, list[dict]] = {}
+    for page, positions in pdf_caption_positions.items():
+        page_blocks = [
+            block for block in img_blocks
+            if int(block.get("page_idx", 0)) == page
+            and id(block) in path_by_block
+            and id(block) not in preassigned_blocks
+            and len(block.get("bbox") or []) >= 4
+        ]
+        best_by_figure = {}
+        for figure, caption_x, caption_y in positions:
+            candidates = []
+            for block in page_blocks:
+                bbox = block["bbox"]
+                vertical_gap = caption_y - float(bbox[3])
+                if not 0 <= vertical_gap <= 120:
+                    continue
+                horizontal_gap = max(float(bbox[0]) - caption_x, 0, caption_x - float(bbox[2]))
+                candidates.append((vertical_gap + horizontal_gap * 0.25, block))
+            if candidates:
+                score, block = min(candidates, key=lambda item: item[0])
+                if figure not in best_by_figure or score < best_by_figure[figure][0]:
+                    best_by_figure[figure] = (score, block)
+        figures_by_block = {}
+        for figure, (_, block) in best_by_figure.items():
+            figures_by_block.setdefault(id(block), []).append(figure)
+        for figure, (_, block) in best_by_figure.items():
+            if len(figures_by_block[id(block)]) == 1:
+                geometry_blocks_by_fig[figure] = [block]
+
+    blocks_by_fig: dict[int, list[dict]] = {
+        **geometry_blocks_by_fig,
+        **preassigned_blocks_by_fig,
+    }
+    assigned_blocks: set[int] = {
+        *preassigned_blocks,
+        *(id(block) for blocks in blocks_by_fig.values() for block in blocks),
+    }
     for block in img_blocks:
         figures = figs_by_block.get(id(block), set())
-        if len(figures) == 1 and id(block) in path_by_block:
-            figure = next(iter(figures))
+        if len(figures) != 1 or id(block) not in path_by_block:
+            continue
+        figure = next(iter(figures))
+        if figure in blocks_by_fig or id(block) in assigned_blocks:
+            continue
+        blocks_by_fig[figure] = [block]
+        assigned_blocks.add(id(block))
+
+    for block in img_blocks:
+        block_id = id(block)
+        bbox = block.get("bbox") or []
+        if block_id in assigned_blocks or block_id not in path_by_block or len(bbox) < 4:
+            continue
+        candidates = []
+        for figure, anchors in geometry_blocks_by_fig.items():
+            for anchor in anchors:
+                if int(anchor.get("page_idx", 0)) != int(block.get("page_idx", 0)):
+                    continue
+                anchor_bbox = anchor.get("bbox") or []
+                if len(anchor_bbox) < 4:
+                    continue
+                height = min(float(bbox[3]) - float(bbox[1]), float(anchor_bbox[3]) - float(anchor_bbox[1]))
+                width = min(float(bbox[2]) - float(bbox[0]), float(anchor_bbox[2]) - float(anchor_bbox[0]))
+                y_overlap = max(0, min(float(bbox[3]), float(anchor_bbox[3])) - max(float(bbox[1]), float(anchor_bbox[1])))
+                horizontal_gap = max(0, max(float(bbox[0]), float(anchor_bbox[0])) - min(float(bbox[2]), float(anchor_bbox[2])))
+                if y_overlap / height >= 0.8 and horizontal_gap <= width * 0.25:
+                    candidates.append(figure)
+        if len(set(candidates)) == 1:
+            figure = candidates[0]
+            blocks_by_fig[figure].append(block)
+            assigned_blocks.add(block_id)
+
+    for block in img_blocks:
+        block_id = id(block)
+        bbox = block.get("bbox") or []
+        if block_id in assigned_blocks or block_id not in path_by_block or len(bbox) < 4:
+            continue
+        width = float(bbox[2]) - float(bbox[0])
+        height = float(bbox[3]) - float(bbox[1])
+        if width * height < 5000:
+            continue
+        candidates = []
+        for figure, caption_x, caption_y in pdf_caption_positions.get(int(block.get("page_idx", 0)), []):
+            vertical_gap = caption_y - float(bbox[3])
+            if not 0 <= vertical_gap <= 350:
+                continue
+            horizontal_gap = max(float(bbox[0]) - caption_x, 0, caption_x - float(bbox[2]))
+            candidates.append((vertical_gap + horizontal_gap * 0.5, figure))
+        candidates.sort()
+        if candidates and (len(candidates) == 1 or candidates[0][0] != candidates[1][0]):
+            figure = candidates[0][1]
             blocks_by_fig.setdefault(figure, []).append(block)
-            assigned_blocks.add(id(block))
+            assigned_blocks.add(block_id)
 
     for page in visual_pages:
         page_blocks = sorted(
@@ -648,7 +1003,9 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
 
     images_map = {
         f"Figure {figure}": {
-            "images": [path_by_block[id(block)] for block in blocks],
+            "images": split_paths_by_fig.get(
+                figure, [path_by_block[id(block)] for block in blocks]
+            ),
             "caption": cap_by_fig.get(figure, ""),
         }
         for figure, blocks in sorted(blocks_by_fig.items())

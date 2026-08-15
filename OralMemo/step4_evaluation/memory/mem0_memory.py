@@ -12,9 +12,46 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-
+from mem0.embeddings.openai import OpenAIEmbedding
 
 from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
+
+
+class _TrackedEmbedding(OpenAIEmbedding):
+    def __init__(self, memory, config) -> None:
+        self.memory = memory
+        super().__init__(config)
+
+    def embed(self, text, memory_action=None):
+        text = text.replace("\n", " ")
+        kwargs = {"input": [text], "model": self.config.model, "encoding_format": "float"}
+        if self._pass_dimensions_to_api:
+            kwargs["dimensions"] = self.config.embedding_dims
+        response = self.client.embeddings.create(**kwargs)
+        self.memory.add_metrics(
+            embedding_calls=1,
+            embedding_tokens=int(response.usage.prompt_tokens or 0),
+        )
+        return response.data[0].embedding
+
+    def embed_batch(self, texts, memory_action="add"):
+        embeddings = []
+        texts = [text.replace("\n", " ") for text in texts]
+        for start in range(0, len(texts), 100):
+            kwargs = {
+                "input": texts[start:start + 100],
+                "model": self.config.model,
+                "encoding_format": "float",
+            }
+            if self._pass_dimensions_to_api:
+                kwargs["dimensions"] = self.config.embedding_dims
+            response = self.client.embeddings.create(**kwargs)
+            self.memory.add_metrics(
+                embedding_calls=1,
+                embedding_tokens=int(response.usage.prompt_tokens or 0),
+            )
+            embeddings.extend(item.embedding for item in sorted(response.data, key=lambda item: item.index))
+        return embeddings
 
 
 class Mem0Memory(MemoryMethod):
@@ -42,29 +79,31 @@ class Mem0Memory(MemoryMethod):
         self._images: list[str] = []
         self._memory = None
 
-    def setup(self, workdir) -> None:
-        # 未显式指定 storage_dir 时, 用上层分配的专属工作目录做向量库持久化(按方法/轨迹隔离)
-        if self.storage_dir is None and workdir is not None:
-            self.storage_dir = Path(workdir) / "vector_store"
+    def setup(self, workdir, namespace: str = "") -> None:
+        super().setup(workdir, namespace)
+        self.user_id = namespace
+        if self.storage_dir is None:
+            self.storage_dir = self.workdir / "vector_store"
 
     # mem0 接入
     def _client(self):
         if self._memory is None:
             from mem0 import Memory
             self._memory = Memory.from_config(self._config_override or self._default_config())
+            self._memory.embedding_model = _TrackedEmbedding(
+                self,
+                self._memory.embedding_model.config,
+            )
         return self._memory
 
 
 
     def _default_config(self) -> dict:
-        # mem0 内部 LLM 默认跟随 ANSWER_*（回答阶段）配置，未配置时回退到 OPENAI_*。
-        llm_api_key = os.environ.get("ANSWER_OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY", "")
-        llm_base_url = os.environ.get("ANSWER_OPENAI_BASE_URL") or os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
-        llm_model = os.environ.get("ANSWER_OPENAI_MODEL") or os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-
-        # embedding 可单独配置，未配置时回退到通用 OPENAI_*。
-        embedding_api_key = os.environ.get("EMBEDDING_OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY", "")
-        embedding_base_url = os.environ.get("EMBEDDING_OPENAI_BASE_URL") or os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        llm_api_key = os.environ["MEMO_OPENAI_API_KEY"]
+        llm_base_url = os.environ.get("MEMO_OPENAI_BASE_URL", "https://api.openai.com/v1")
+        llm_model = os.environ.get("MEMO_OPENAI_MODEL", "gpt-4o-mini")
+        embedding_api_key = os.environ["EMBEDDING_OPENAI_API_KEY"]
+        embedding_base_url = os.environ.get("EMBEDDING_OPENAI_BASE_URL", "https://api.openai.com/v1")
 
         config: dict = {
             "llm": {
@@ -74,6 +113,7 @@ class Mem0Memory(MemoryMethod):
                     "api_key": llm_api_key,
                     "openai_base_url": llm_base_url,
                     "temperature": 0.0,
+                    "response_callback": self._record_llm_response,
                 },
             },
             "embedder": {
@@ -82,6 +122,7 @@ class Mem0Memory(MemoryMethod):
                     "model": self.embedding_model,
                     "api_key": embedding_api_key,
                     "openai_base_url": embedding_base_url,
+                    "embedding_dims": int(os.environ.get("EMBEDDING_DIM", "1536")),
                 },
             },
         }
@@ -89,12 +130,19 @@ class Mem0Memory(MemoryMethod):
             config["vector_store"] = {
                 "provider": "qdrant",
                 "config": {
-                    "collection_name": f"oralmem_{self.user_id}",
+                    "collection_name": "oralmem",
                     "path": str(self.storage_dir),
                 },
             }
         return config
 
+    def _record_llm_response(self, _llm, response, _params) -> None:
+        usage = response.usage
+        self.add_metrics(
+            llm_calls=1,
+            input_tokens=int(usage.prompt_tokens or 0) if usage else 0,
+            output_tokens=int(usage.completion_tokens or 0) if usage else 0,
+        )
 
     def reset(self) -> None:
         self._pending = ""
@@ -132,3 +180,10 @@ class Mem0Memory(MemoryMethod):
 
     def images(self) -> list[str]:
         return list(self._images)
+
+    def close(self) -> None:
+        if self._memory is None:
+            return
+        self._memory.close()
+        self._memory.vector_store.client.close()
+        self._memory._telemetry_vector_store.client.close()
