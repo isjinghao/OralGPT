@@ -10,6 +10,7 @@ openpyxl
 mem0ai==2.0.12
 langmem==0.0.30
 langchain-openai==1.5.1
+typing_extensions
 graphiti-core==0.29.3
 mineru[core]
 pypdf==6.14.2

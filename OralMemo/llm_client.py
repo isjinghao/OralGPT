@@ -127,7 +127,7 @@ class ChatClient:
         content = self._complete(prompt, temperature, max_tokens, images, timeout, system_prompt)
         try:
             return parse_json_object(content)
-        except (json.JSONDecodeError, TypeError, ValueError) as exc:
+        except (TypeError, ValueError) as exc:
             self.log("llm/retry", f"Invalid JSON; requesting one repair: {exc}")
             repair_prompt = (
                 "Return only a valid JSON object that preserves the information in the original response.\n"
@@ -139,7 +139,7 @@ class ChatClient:
     def complete_text(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
                       images: list[str] | None = None, timeout: int = 300,
                       system_prompt: str | None = None) -> str:
-        return self._complete(prompt, temperature, max_tokens, images, timeout, system_prompt).strip()
+        return self._complete(prompt, temperature, max_tokens, images, timeout, system_prompt)
 
 
 def reset_wait_seconds(text: str) -> int:
@@ -166,7 +166,7 @@ def parse_json_object(text: str) -> dict:
     text = text.strip()
     fence = chr(96) * 3
     if text.startswith(fence):
-        text = re.sub(r"^" + re.escape(fence) + r"(?:json)?", "", text).strip()
+        text = text.removeprefix(fence).removeprefix("json").strip()
         if text.endswith(fence):
             text = text[:-3].strip()
     try:

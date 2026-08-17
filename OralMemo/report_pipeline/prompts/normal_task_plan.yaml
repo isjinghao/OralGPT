@@ -1,12 +1,14 @@
 task_types:
   - task_type: modality_perception
     count: 3
+    constraints: {exact_stages: 1}
     instruction: >-
       Read a finding directly reported by one source at one timepoint; required
       evidence should come from a single timepoint.
 
   - task_type: longitudinal_evidence_recall
     count: 2
+    constraints: {min_stages: 2, requires_prior_evidence: true}
     instruction: >-
       Retrieve earlier evidence needed in a later clinical context; the answer
       must identify that earlier context and use at least two timepoints. Do not
@@ -14,6 +16,7 @@ task_types:
 
   - task_type: cross_temporal_reasoning
     count: 2
+    constraints: {min_stages: 2}
     instruction: >-
       Integrate complementary evidence from at least two different timepoints to derive
       one supported longitudinal interpretation; each selected item must materially
@@ -21,6 +24,7 @@ task_types:
 
   - task_type: memory_update_conflict_correction
     count: 2
+    constraints: {min_stages: 2}
     instruction: >-
       Explain how later evidence adds to or revises the stored clinical state;
       required evidence should span at least two timepoints. The answer must

@@ -2,6 +2,14 @@ from __future__ import annotations
 
 import json
 import os
+import typing
+
+from typing_extensions import NotRequired, Required
+
+if not hasattr(typing, "NotRequired"):
+    typing.NotRequired = NotRequired
+if not hasattr(typing, "Required"):
+    typing.Required = Required
 
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.embeddings import Embeddings

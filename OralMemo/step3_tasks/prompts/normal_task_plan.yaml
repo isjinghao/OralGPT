@@ -8,6 +8,7 @@ task_types:
   # 单阶段/单模态可直接观察到的发现
   - task_type: modality_perception
     count: 3
+    constraints: {exact_stages: 1}
     instruction: >-
       Read findings that are directly visible within a single stage/modality;
       required evidence should come from one stage.
@@ -15,6 +16,7 @@ task_types:
   # 在后续阶段推理时回忆更早阶段引入的证据(答案需点明更早的来源/阶段)
   - task_type: longitudinal_evidence_recall
     count: 2
+    constraints: {min_stages: 2, requires_prior_evidence: true}
     instruction: >-
       Recall evidence introduced in an earlier stage while reasoning at a later
       stage; the answer must name the earlier clinical source/stage; required
@@ -23,6 +25,7 @@ task_types:
   # 整合多阶段/多模态证据推断骨性、不对称或功能模式
   - task_type: cross_modal_reasoning
     count: 2
+    constraints: {min_stages: 2}
     instruction: >-
       Integrate evidence from multiple stages/modalities to infer a skeletal,
       asymmetry, or functional pattern; required evidence should span at least
@@ -31,6 +34,7 @@ task_types:
   # 解释后续阶段证据如何确认、细化或纠正更早阶段的印象
   - task_type: memory_update_conflict_correction
     count: 2
+    constraints: {min_stages: 2}
     instruction: >-
       Explain how later-stage evidence adds a clinically relevant fact or resolves
       an earlier impression; required evidence should span at least two stages.

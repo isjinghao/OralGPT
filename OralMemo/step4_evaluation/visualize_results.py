@@ -24,7 +24,6 @@ def collect_perception(eval_root: Path, answer_model: str) -> dict:
         return {"profile": [], "items": [], "report": {}, "answer_model": answer_model}
 
     model = read_json(model_path)
-    trajectory_dir = eval_root.parent / "trajectories"
     standard = read_json(standard_path) if standard_path.exists() else {"stages": []}
     report = read_json(report_path) if report_path.exists() else {}
     evaluated_keys = {
@@ -319,7 +318,6 @@ const DATA = __DATA__;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct = (v) => (typeof v === 'number' ? v.toFixed(1) + '%' : 'n/a');
-const ratio = (a,b) => `${a ?? 0}/${b ?? 0}`;
 const TRAJECTORY_LABELS = {
   standard_full:'standard_trajectory', standard:'standard_trajectory', standard_trajectory:'standard_trajectory',
   model_perception:'model_perception_trajectory', model_perception_trajectory:'model_perception_trajectory',

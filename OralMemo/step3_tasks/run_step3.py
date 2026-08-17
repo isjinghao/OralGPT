@@ -15,13 +15,11 @@ from step3_tasks.llm_tasks import (
     load_normal_task_plan,
     plan_task_candidates,
     select_evaluation_evidence,
-    validate_task_plans,
 )
 from step3_tasks.selectors import (
     EvidenceIndex,
     assemble_evaluation_task,
     assemble_normal_task,
-    evidence_ref,
 )
 
 
@@ -41,37 +39,35 @@ def _review_feedback(validation: dict) -> str:
     return "; ".join(part for part in parts if part) or "Candidate was rejected by the reviewer"
 
 
-def _preflight_task_plan(task: dict, available_evidence: list[dict]) -> str | None:
+def _preflight_task_plan(
+    task: dict,
+    available_evidence: list[dict],
+    stage_orders: dict[str, int],
+    constraints: dict,
+) -> str | None:
     selected = task["selected_evidence"]
     if not selected:
-        return "The candidate selected no evidence"
+        return "no evidence selected"
+
     available_ids = {item["evidence_id"] for item in available_evidence}
-    future_ids = [item["evidence_id"] for item in selected if item["evidence_id"] not in available_ids]
-    if future_ids:
-        return f"The candidate uses unavailable evidence: {future_ids}"
+    unavailable = [item["evidence_id"] for item in selected if item["evidence_id"] not in available_ids]
+    if unavailable:
+        return f"unavailable evidence: {unavailable}"
+    if not str(task.get("gold_answer", "")).strip():
+        return "gold_answer is empty"
 
     stages = {item["stage"] for item in selected}
-    modalities = {modality for item in selected for modality in item.get("modality", [])}
-    if task["task_type"] == "cross_modal_reasoning" and len(stages) < 2 and len(modalities) < 2:
-        return "cross_modal_reasoning requires distinct evidence sources or modalities"
-    if task["task_type"] == "cross_temporal_reasoning" and len(stages) < 2:
-        return "cross_temporal_reasoning requires evidence from different timepoints"
-    if task["task_type"] == "memory_update_conflict_correction" and len(stages) < 2:
-        return "memory_update_conflict_correction requires evidence from different stages"
+    exact_stages = constraints.get("exact_stages")
+    min_stages = constraints.get("min_stages")
+    if exact_stages is not None and len(stages) != exact_stages:
+        return f"needs exactly {exact_stages} stage(s), got {len(stages)}"
+    if min_stages is not None and len(stages) < min_stages:
+        return f"needs at least {min_stages} stages, got {len(stages)}"
+    if constraints.get("requires_prior_evidence") and not any(
+        stage_orders[stage] < stage_orders[task["ask_after_stage"]] for stage in stages
+    ):
+        return "needs evidence earlier than ask_after_stage"
     return None
-
-
-def _apply_plan_repair(task: dict, validation: dict, index: EvidenceIndex) -> dict | None:
-    evidence_ids = validation.get("fixed_required_evidence_ids")
-    answer = validation.get("fixed_gold_answer")
-    if evidence_ids is None and not answer:
-        return None
-    repaired = dict(task)
-    if evidence_ids is not None:
-        repaired["selected_evidence"] = [evidence_ref(item) for item in index.resolve(evidence_ids)]
-    if answer:
-        repaired["gold_answer"] = str(answer).strip()
-    return repaired
 
 
 def build_normal_tasks(
@@ -87,7 +83,6 @@ def build_normal_tasks(
     prefix = f"[benchmark][{patient_id}]"
     log(f"{prefix}[step3/planning] started")
     stage_orders = {stage["stage_id"]: int(stage["order"]) for stage in patient_stages["stages"]}
-    counters: dict[str, int] = {}
     tasks: list[dict] = []
 
     for entry in load_normal_task_plan(prompt_dir):
@@ -103,73 +98,49 @@ def build_normal_tasks(
                 client, patient_stages, index, cache_dir, prompt_dir,
                 entry, missing, attempt, feedback,
             )
-            specs: list[tuple[dict, list[dict]]] = []
-            for item in candidates[:missing]:
-                counters[task_type] = counters.get(task_type, 0) + 1
-                task_id = f"{task_type}_{counters[task_type]:03d}"
+            current_feedback: list[str] = []
+            for candidate_no, item in enumerate(candidates[:missing], start=1):
                 if item.get("task_type") != task_type:
-                    feedback.append(f"Candidate returned wrong task_type: {item.get('task_type')}")
+                    current_feedback.append(f"wrong task_type: {item.get('task_type')}")
                     continue
                 if item.get("ask_after_stage") not in stage_orders:
-                    feedback.append(f"Candidate returned unknown stage: {item.get('ask_after_stage')}")
+                    current_feedback.append(f"unknown stage: {item.get('ask_after_stage')}")
                     continue
+                candidate_id = f"{task_type}_a{attempt}_{candidate_no:03d}"
                 try:
-                    spec = assemble_normal_task(patient_id, task_id, item, index)
+                    spec = assemble_normal_task(patient_id, candidate_id, item, index)
                 except ValueError as exc:
-                    feedback.append(str(exc))
+                    current_feedback.append(str(exc))
                     continue
-                available_evidence = index.available_at(spec["ask_after_stage"], stage_orders)
-                problem = _preflight_task_plan(spec, available_evidence)
+
+                available = index.available_at(spec["ask_after_stage"], stage_orders)
+                problem = _preflight_task_plan(spec, available, stage_orders, entry["constraints"])
                 if problem:
-                    feedback.append(problem)
+                    current_feedback.append(problem)
                     continue
-                specs.append((spec, available_evidence))
-
-            if not specs:
-                continue
-            reviews = validate_task_plans(
-                verifier_client,
-                [spec for spec, _ in specs],
-                index.evidence,
-                stage_orders,
-                cache_dir,
-                prompt_dir,
-                f"{task_type}_a{attempt}",
-            )
-            for spec, available_evidence in specs:
-                validation = reviews[spec["task_id"]]
-                if not validation["accepted"] and validation["repairable"]:
-                    try:
-                        repaired = _apply_plan_repair(spec, validation, index)
-                    except ValueError as exc:
-                        repaired = None
-                        validation["feedback"] = str(exc)
-                    if repaired and not _preflight_task_plan(repaired, available_evidence):
-                        spec = repaired
-                    else:
-                        feedback.append(_review_feedback(validation))
-                        continue
-                elif not validation["accepted"]:
-                    feedback.append(_review_feedback(validation))
-                    continue
-
+                related = index.related_evidence(
+                    [evidence["evidence_id"] for evidence in spec["selected_evidence"]],
+                    available,
+                )
                 task = finalize_task(
                     client,
                     spec,
-                    available_evidence,
+                    related,
                     cache_dir,
                     verifier_client=verifier_client,
                     log_prefix=prefix,
                     prompt_dir=prompt_dir,
                 )
                 if task["validation"].get("accepted"):
+                    task["task_id"] = f"{task_type}_{len(accepted) + 1:03d}"
                     accepted.append(task)
                 else:
-                    feedback.append(_review_feedback(task["validation"]))
+                    current_feedback.append(_review_feedback(task["validation"]))
+            feedback = list(dict.fromkeys(current_feedback))
 
+        if len(accepted) != target:
+            raise RuntimeError(f"{task_type}: generated {len(accepted)}/{target} tasks")
         tasks.extend(accepted)
-        if len(accepted) < target:
-            log(f"{prefix}[step3/planning] type={task_type} accepted={len(accepted)}/{target}")
 
     log(f"{prefix}[step3/planning] completed accepted={len(tasks)}")
     return tasks

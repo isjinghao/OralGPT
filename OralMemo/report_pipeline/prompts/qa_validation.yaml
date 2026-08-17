@@ -6,7 +6,7 @@ template: |
   Validation criteria:
   1. The question must be natural, non-leaking, answerable at the requested timepoint, and matched to its task type.
   2. Every gold-answer claim must be supported by selected evidence; remove unsupported detail.
-  3. Use all available evidence to check temporal consistency. Later evidence is not new, refining, updating, or corrective when the same content was already available.
+  3. Use related_evidence (direct graph neighbors or facts about the same clinical field/site) to check temporal consistency. Later evidence is not new, refining, updating, or corrective when the same content was already available.
   4. Preserve entity, anatomical site, timing, certainty, scope, numbers, and polarity. Comparative, response, or causal claims require relational support.
   5. An update or correction must compare earlier information with a later fact that was not previously available; confirmation alone is insufficient.
   6. Modality must match the evidence source channel: TEXT_QA or FIGURE_QA. Source wording may name the actual examination or figure type stated in the evidence.
@@ -15,6 +15,7 @@ template: |
 
   Repair-first policy:
   - If only unsupported extra detail is present, accept and return a concise fixed_answer containing supported content only.
+  - If the answer is supported but only implies a conclusion explicitly requested by the question, accept and return a fixed_answer that states it directly.
   - If the question leaks the answer, exposes an internal id, or names the wrong source, accept and return a fixed_question.
   - Reject only when the task is unanswerable at that timepoint, has the wrong task type, or its core answer is unsupported or contradictory.
 

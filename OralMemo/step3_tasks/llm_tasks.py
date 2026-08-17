@@ -13,6 +13,7 @@ from step3_tasks.selectors import (
     EvidenceIndex,
     edges_text,
     evidence_catalog,
+    evidence_ref,
     human_stage_label,
     question_evidence_text,
     stages_summary,
@@ -136,86 +137,17 @@ def generate_question(
 
 
 def evidence_payload(evidence: list[dict]) -> list[dict]:
-    return [
-        {
-            "evidence_id": item["evidence_id"],
-            "stage": item["introduced_stage"],
-            "modality": item.get("modality", []),
-            "fact_text": item["fact_text"],
-            "field": item.get("normalized", {}).get("field"),
-            "value": item.get("normalized", {}).get("value"),
-            "unit": item.get("normalized", {}).get("unit"),
-            "tooth": item.get("normalized", {}).get("tooth"),
-            "side": item.get("normalized", {}).get("side"),
-        }
-        for item in evidence
-    ]
-
-
-def validate_task_plans(
-    client: ChatClient,
-    tasks: list[dict],
-    all_evidence: list[dict],
-    stage_orders: dict[str, int],
-    cache_dir: Path,
-    prompt_dir: Path,
-    batch_id: str,
-) -> dict[str, dict]:
-    template = load_template(prompt_dir, "task_plan_validation.yaml")
-    available_ids = {
-        stage: [
-            item["evidence_id"] for item in all_evidence
-            if stage_orders[item["introduced_stage"]] <= order
-        ]
-        for stage, order in stage_orders.items()
-    }
-    payload = {
-        "stage_order": stage_orders,
-        "evidence_catalog": evidence_payload(all_evidence),
-        "available_evidence_ids_by_stage": available_ids,
-        "candidates": [
-            {
-                "task_id": task["task_id"],
-                "task_type": task["task_type"],
-                "ask_after_stage": task["ask_after_stage"],
-                "gold_answer": task["gold_answer"],
-                "selected_evidence": task["selected_evidence"],
-            }
-            for task in tasks
-        ],
-    }
-    result = cached_completion(
-        client,
-        template.substitute(plan_json=json.dumps(payload, ensure_ascii=False, indent=2)),
-        cache_dir / "task_plan_validation_batch" / f"{batch_id}.json",
-        max_tokens=8000,
-    )
-    reviews = {item["task_id"]: item for item in result["results"]}
-    missing = [task["task_id"] for task in tasks if task["task_id"] not in reviews]
-    if missing:
-        raise ValueError(f"Task-plan validation omitted candidates: {missing}")
-    return {
-        task_id: {
-            "accepted": bool(review["accepted"]),
-            "repairable": bool(review.get("repairable", False)),
-            "feedback": str(review.get("feedback", "")),
-            "issues": review.get("issues", []) or [],
-            "fixed_required_evidence_ids": review.get("fixed_required_evidence_ids"),
-            "fixed_gold_answer": review.get("fixed_gold_answer"),
-        }
-        for task_id, review in reviews.items()
-    }
+    return [evidence_ref(item) for item in evidence]
 
 
 def validate_task(
     client: ChatClient,
     task: dict,
-    available_evidence: list[dict],
+    related_evidence: list[dict],
     cache_dir: Path,
     prompt_dir: Path,
     attempt: int = 1,
 ) -> dict:
-    # 同时基于所选证据和提问时点前的完整证据校验任务。
     cache_path = cache_dir / "qa_validation" / f"{task['task_id']}_a{attempt}.json"
     template = load_template(prompt_dir, "qa_validation.yaml")
     task_for_prompt = {
@@ -224,12 +156,11 @@ def validate_task(
         "ask_after_stage": task["ask_after_stage"],
         "question": task["question"],
         "gold_answer": task["gold_answer"],
-        "required_evidence_ids": [item["evidence_id"] for item in task["selected_evidence"]],
         "selected_evidence": task["selected_evidence"],
-        "all_available_evidence": evidence_payload(available_evidence),
+        "related_evidence": evidence_payload(related_evidence),
     }
     prompt = template.substitute(task_json=json.dumps(task_for_prompt, ensure_ascii=False, indent=2))
-    result = cached_completion(client, prompt, cache_path, max_tokens=8000)
+    result = cached_completion(client, prompt, cache_path, max_tokens=2000)
     return {
         "accepted": result["accepted"],
         "feedback": str(result.get("feedback", "")),
@@ -242,7 +173,7 @@ def validate_task(
 def finalize_task(
     client: ChatClient,
     spec: dict,
-    available_evidence: list[dict],
+    related_evidence: list[dict],
     cache_dir: Path,
     verifier_client: ChatClient,
     log_prefix: str,
@@ -268,11 +199,11 @@ def finalize_task(
         task["question"] = candidate["question"]
         task["gold_answer"] = current_gold
 
-        # (2) 使用所选证据与完整可用历史验证问题和答案
+        # (2) 使用所选证据与直接相关历史验证问题和答案
         validation = validate_task(
             verifier_client,
             task,
-            available_evidence,
+            related_evidence,
             cache_dir,
             prompt_dir,
             attempt=it,
@@ -281,19 +212,14 @@ def finalize_task(
             f"{log_prefix}[step3/validation] task={spec['task_id']} "
             f"attempt={it}/{max_iters} accepted={validation.get('accepted')}"
         )
-        if validation.get("accepted"):
-            # 校验通过时也应用其给出的修正(如修剪后的金标准/问题)
-            if validation.get("fixed_answer"):
-                current_gold = validation["fixed_answer"]
-            if validation.get("fixed_question"):
-                task["question"] = validation["fixed_question"]
-            break
-
-        # (3) 未通过: 应用可用的修正并把反馈交回下一轮重新生成/复验
         if validation.get("fixed_answer"):
             current_gold = validation["fixed_answer"]
         if validation.get("fixed_question"):
             task["question"] = validation["fixed_question"]
+        if validation.get("accepted"):
+            break
+
+        # (3) 未通过: 把反馈交回下一轮重新生成/复验
         feedback = validation
 
     task["gold_answer"] = current_gold

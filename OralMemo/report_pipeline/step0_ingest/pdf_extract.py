@@ -532,7 +532,12 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
     preassigned_blocks_by_fig: dict[int, list[dict]] = {}
     preassigned_blocks: set[int] = set()
 
-    def split_block(block: dict, figures: list[int]) -> bool:
+    def split_block(
+        block: dict,
+        figures: list[int],
+        ratios: list[float] | None = None,
+        split_vertical: bool | None = None,
+    ) -> bool:
         from PIL import Image
 
         source = images_dir / Path(path_by_block[id(block)]).name
@@ -541,8 +546,8 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
             for figure, x, y in pdf_caption_positions.get(int(block.get("page_idx", 0)), [])
             if figure in figures
         }
-        vertical = True
-        if len(positions) == len(figures):
+        vertical = True if split_vertical is None else split_vertical
+        if split_vertical is None and len(positions) == len(figures):
             xs = [positions[figure][0] for figure in figures]
             ys = [positions[figure][1] for figure in figures]
             vertical = max(ys) - min(ys) >= max(xs) - min(xs)
@@ -555,7 +560,16 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
             length = image.height if vertical else image.width
             if length < len(figures) * 20:
                 return False
-            boundaries = [0, *_image_split_points(image, len(figures), weights, vertical), length]
+            points = (
+                [round(length * ratio) for ratio in ratios]
+                if ratios is not None
+                else _image_split_points(image, len(figures), weights, vertical)
+            )
+            if len(points) != len(figures) - 1 or any(
+                right - left < 20 for left, right in zip([0, *points], [*points, length])
+            ):
+                return False
+            boundaries = [0, *points, length]
             targets = []
             for figure, start, end in zip(figures, boundaries, boundaries[1:]):
                 box = (0, start, image.width, end) if vertical else (start, 0, end, image.height)
@@ -568,6 +582,26 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
             preassigned_blocks_by_fig[figure] = []
         preassigned_blocks.add(id(block))
         return True
+
+    def caption_block_score(block: dict, caption_x: float, caption_y: float) -> float | None:
+        bbox = block["bbox"]
+        vertical_gap = caption_y - float(bbox[3])
+        horizontal_gap = max(float(bbox[0]) - caption_x, 0, caption_x - float(bbox[2]))
+        if 0 <= vertical_gap <= 120:
+            return vertical_gap + horizontal_gap * 0.25
+        side_gap = min(abs(caption_x - float(bbox[0])), abs(caption_x - float(bbox[2])))
+        if (
+            float(bbox[1]) - 30 <= caption_y <= float(bbox[3]) + 30
+            and side_gap <= 200
+            and not float(bbox[0]) < caption_x < float(bbox[2])
+        ):
+            return side_gap + 30
+        if (
+            float(bbox[0]) <= caption_x <= float(bbox[2])
+            and float(bbox[1]) <= caption_y <= float(bbox[3])
+        ):
+            return 1_000 + float(bbox[3]) - caption_y
+        return None
 
     explicitly_anchored = {
         figure: block
@@ -601,6 +635,72 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
         block = previous_blocks[-1]
         preassigned_blocks_by_fig[figure] = [block]
         preassigned_blocks.add(id(block))
+
+    for page, positions in pdf_caption_positions.items():
+        page_blocks = [
+            block for block in img_blocks
+            if int(block.get("page_idx", 0)) == page
+            and id(block) in path_by_block
+            and id(block) not in preassigned_blocks
+            and len(block.get("bbox") or []) >= 4
+        ]
+        best_by_figure = {}
+        for figure, caption_x, caption_y in positions:
+            if figure in preassigned_blocks_by_fig:
+                continue
+            candidates = [
+                (score, block)
+                for block in page_blocks
+                if (score := caption_block_score(block, caption_x, caption_y)) is not None
+            ]
+            if candidates:
+                best_by_figure[figure] = min(candidates, key=lambda item: item[0])
+        figures_by_block = {}
+        for figure, (_, block) in best_by_figure.items():
+            figures_by_block.setdefault(id(block), []).append(figure)
+        for block_id, figures in figures_by_block.items():
+            if len(figures) < 2 or len(page_blocks) != 1:
+                continue
+            block = next(block for block in page_blocks if id(block) == block_id)
+            bbox = block["bbox"]
+            points = {
+                figure: (x, y)
+                for figure, x, y in positions
+                if figure in figures
+            }
+            if len(points) != len(figures):
+                continue
+            xs = [points[figure][0] for figure in figures]
+            ys = [points[figure][1] for figure in figures]
+            vertical = max(ys) - min(ys) >= max(xs) - min(xs)
+            ordered = sorted(figures, key=lambda figure: points[figure][1 if vertical else 0])
+            ratios = None
+            if vertical and all(
+                float(bbox[0]) <= points[figure][0] <= float(bbox[2])
+                for figure in ordered
+            ):
+                ratios = [
+                    (points[figure][1] - float(bbox[1])) / (float(bbox[3]) - float(bbox[1]))
+                    for figure in ordered[:-1]
+                ]
+            elif not vertical and all(
+                float(bbox[1]) <= points[figure][1] <= float(bbox[3])
+                for figure in ordered
+            ):
+                ratios = [
+                    (
+                        (points[left][0] + points[right][0]) / 2 - float(bbox[0])
+                    ) / (float(bbox[2]) - float(bbox[0]))
+                    for left, right in zip(ordered, ordered[1:])
+                ]
+            if ratios is None or all(0 < ratio < 1 for ratio in ratios):
+                split_block(block, ordered, ratios, vertical)
+        for figure, (_, block) in best_by_figure.items():
+            if id(block) in preassigned_blocks:
+                continue
+            if len(figures_by_block[id(block)]) == 1:
+                preassigned_blocks_by_fig[figure] = [block]
+                preassigned_blocks.add(id(block))
 
     for page in visual_pages:
         page_blocks = _ordered_visual_blocks([
@@ -692,12 +792,9 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
         for figure, caption_x, caption_y in positions:
             candidates = []
             for block in page_blocks:
-                bbox = block["bbox"]
-                vertical_gap = caption_y - float(bbox[3])
-                if not 0 <= vertical_gap <= 120:
-                    continue
-                horizontal_gap = max(float(bbox[0]) - caption_x, 0, caption_x - float(bbox[2]))
-                candidates.append((vertical_gap + horizontal_gap * 0.25, block))
+                score = caption_block_score(block, caption_x, caption_y)
+                if score is not None:
+                    candidates.append((score, block))
             if candidates:
                 score, block = min(candidates, key=lambda item: item[0])
                 if figure not in best_by_figure or score < best_by_figure[figure][0]:
@@ -943,40 +1040,50 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
             assigned_blocks.update(id(block) for block in unassigned)
             continue
 
-        assigned_on_page = [block for block in blocks if id(block) in assigned_blocks]
-        for block in unassigned:
-            bbox = block["bbox"]
-            candidates = []
-            for assigned in assigned_on_page:
-                assigned_bbox = assigned["bbox"]
-                width = min(bbox[2] - bbox[0], assigned_bbox[2] - assigned_bbox[0])
-                height = min(bbox[3] - bbox[1], assigned_bbox[3] - assigned_bbox[1])
-                x_overlap = max(0, min(bbox[2], assigned_bbox[2]) - max(bbox[0], assigned_bbox[0]))
-                y_overlap = max(0, min(bbox[3], assigned_bbox[3]) - max(bbox[1], assigned_bbox[1]))
-                vertical_gap = max(0, max(bbox[1], assigned_bbox[1]) - min(bbox[3], assigned_bbox[3]))
-                horizontal_gap = max(0, max(bbox[0], assigned_bbox[0]) - min(bbox[2], assigned_bbox[2]))
-                vertical_neighbor = x_overlap / width >= 0.8 and vertical_gap <= height * 0.25
-                horizontal_neighbor = y_overlap / height >= 0.8 and horizontal_gap <= width * 0.25
-                if not vertical_neighbor and not horizontal_neighbor:
-                    continue
-                gap = min(
-                    vertical_gap if vertical_neighbor else float("inf"),
-                    horizontal_gap if horizontal_neighbor else float("inf"),
-                )
-                figures = [
-                    figure for figure, figure_blocks in blocks_by_fig.items()
-                    if any(id(assigned) == id(item) for item in figure_blocks)
-                ]
-                if len(figures) == 1:
-                    candidates.append((gap, figures[0]))
-            best_by_figure = {}
-            for gap, figure in candidates:
-                best_by_figure[figure] = min(gap, best_by_figure.get(figure, gap))
-            candidates = sorted((gap, figure) for figure, gap in best_by_figure.items())
-            if candidates and (len(candidates) == 1 or candidates[0][0] != candidates[1][0]):
-                figure = candidates[0][1]
-                blocks_by_fig[figure].append(block)
-                assigned_blocks.add(id(block))
+        pending = list(unassigned)
+        while pending:
+            assigned_on_page = [block for block in blocks if id(block) in assigned_blocks]
+            remaining = []
+            added = False
+            for block in pending:
+                bbox = block["bbox"]
+                candidates = []
+                for assigned in assigned_on_page:
+                    assigned_bbox = assigned["bbox"]
+                    width = min(bbox[2] - bbox[0], assigned_bbox[2] - assigned_bbox[0])
+                    height = min(bbox[3] - bbox[1], assigned_bbox[3] - assigned_bbox[1])
+                    x_overlap = max(0, min(bbox[2], assigned_bbox[2]) - max(bbox[0], assigned_bbox[0]))
+                    y_overlap = max(0, min(bbox[3], assigned_bbox[3]) - max(bbox[1], assigned_bbox[1]))
+                    vertical_gap = max(0, max(bbox[1], assigned_bbox[1]) - min(bbox[3], assigned_bbox[3]))
+                    horizontal_gap = max(0, max(bbox[0], assigned_bbox[0]) - min(bbox[2], assigned_bbox[2]))
+                    vertical_neighbor = x_overlap / width >= 0.8 and vertical_gap <= height * 0.25
+                    horizontal_neighbor = y_overlap / height >= 0.8 and horizontal_gap <= width * 0.25
+                    if not vertical_neighbor and not horizontal_neighbor:
+                        continue
+                    gap = min(
+                        vertical_gap if vertical_neighbor else float("inf"),
+                        horizontal_gap if horizontal_neighbor else float("inf"),
+                    )
+                    figures = [
+                        figure for figure, figure_blocks in blocks_by_fig.items()
+                        if any(id(assigned) == id(item) for item in figure_blocks)
+                    ]
+                    if len(figures) == 1:
+                        candidates.append((gap, figures[0]))
+                best_by_figure = {}
+                for gap, figure in candidates:
+                    best_by_figure[figure] = min(gap, best_by_figure.get(figure, gap))
+                candidates = sorted((gap, figure) for figure, gap in best_by_figure.items())
+                if candidates and (len(candidates) == 1 or candidates[0][0] != candidates[1][0]):
+                    figure = candidates[0][1]
+                    blocks_by_fig[figure].append(block)
+                    assigned_blocks.add(id(block))
+                    added = True
+                else:
+                    remaining.append(block)
+            if not added:
+                break
+            pending = remaining
 
     for page in visual_pages:
         figures = sorted(figure for figure in figs_by_page.get(page, set()) if figure not in blocks_by_fig)
@@ -1001,6 +1108,33 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
                 blocks_by_fig[figure] = row
                 assigned_blocks.update(id(block) for block in row)
 
+    for block in img_blocks:
+        owners = [
+            figure for figure, blocks in blocks_by_fig.items()
+            if any(id(item) == id(block) for item in blocks)
+        ]
+        if len(owners) < 2 or len(block.get("bbox") or []) < 4:
+            continue
+        scores = []
+        for figure in owners:
+            figure_scores = [
+                score
+                for candidate, x, y in pdf_caption_positions.get(int(block.get("page_idx", 0)), [])
+                if candidate == figure
+                and (score := caption_block_score(block, x, y)) is not None
+            ]
+            if figure_scores:
+                scores.append((min(figure_scores), figure))
+        scores.sort()
+        if not scores or (len(scores) > 1 and scores[0][0] == scores[1][0]):
+            continue
+        owner = scores[0][1]
+        for figure in owners:
+            if figure != owner:
+                blocks_by_fig[figure] = [
+                    item for item in blocks_by_fig[figure] if id(item) != id(block)
+                ]
+
     images_map = {
         f"Figure {figure}": {
             "images": split_paths_by_fig.get(
@@ -1010,11 +1144,21 @@ def extract_pdf(pdf_path: Path, out_dir: Path, images_dir: Path, rel_base: Path)
         }
         for figure, blocks in sorted(blocks_by_fig.items())
     }
-    unmapped_images = [
-        path_by_block[id(block)]
-        for block in img_blocks
-        if id(block) in path_by_block and id(block) not in assigned_blocks
-    ]
+    mapped_paths = {
+        path for item in images_map.values() for path in item["images"]
+    }
+    unmapped_images = list(dict.fromkeys([
+        *(
+            path_by_block[id(block)]
+            for block in img_blocks
+            if id(block) in path_by_block and id(block) not in assigned_blocks
+        ),
+        *(
+            path.relative_to(rel_base).as_posix()
+            for path in sorted(images_dir.glob("*"))
+            if path.relative_to(rel_base).as_posix() not in mapped_paths
+        ),
+    ]))
 
     # 清理 MinerU 中间产物(已提取所需内容)
     shutil.rmtree(out_dir / "_mineru", ignore_errors=True)

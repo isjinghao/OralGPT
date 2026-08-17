@@ -21,7 +21,6 @@ import json
 import requests
 import xml.etree.ElementTree as ET
 from typing import List, Dict, Any
-from requests.exceptions import JSONDecodeError as RequestsJSONDecodeError
 
 EUTILS_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 DB = "pubmed"
@@ -156,7 +155,7 @@ def _safe_json_from_response(resp: requests.Response) -> Dict[str, Any]:
         if isinstance(parsed, dict):
             return parsed
         raise ValueError("NCBI response JSON is not an object.")
-    except (RequestsJSONDecodeError, ValueError):
+    except ValueError:
         text = resp.text or ""
         # Some upstream responses contain raw control chars; strip them and retry.
         cleaned = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", "", text)
@@ -211,7 +210,6 @@ def esearch(
 
     # Use POST to avoid 414 URI Too Long for large boolean queries.
     resp = _ncbi_post_with_retry(url, data=params, timeout=30)
-    resp.raise_for_status()
     return _safe_json_from_response(resp).get("esearchresult", {})
 
 
@@ -268,7 +266,6 @@ def esearch_all_pmids(
             params["api_key"] = api_key
         # Use POST to avoid 414 URI Too Long for large boolean queries.
         resp = _ncbi_post_with_retry(url, data=params, timeout=30)
-        resp.raise_for_status()
         data = _safe_json_from_response(resp).get("esearchresult", {})
         pmids.extend(data.get("idlist", []))
         retstart += batch_retmax
@@ -346,7 +343,6 @@ def _esearch_ids_for_term(
         if api_key:
             params["api_key"] = api_key
         resp = _ncbi_post_with_retry(url, data=params, timeout=30)
-        resp.raise_for_status()
         data = _safe_json_from_response(resp).get("esearchresult", {})
         pmids.extend(data.get("idlist", []))
         retstart += batch_retmax
@@ -431,7 +427,6 @@ def esummary(
             params["api_key"] = api_key
 
         resp = _ncbi_post_with_retry(url, data=params, timeout=60)
-        resp.raise_for_status()
         data = _safe_json_from_response(resp)
         header = data.get("header", header)
         result = data.get("result", {})
@@ -473,7 +468,6 @@ def efetch_abstract_first_sentences(
         if api_key:
             params["api_key"] = api_key
         resp = _ncbi_post_with_retry(url, data=params, timeout=60)
-        resp.raise_for_status()
 
         root = ET.fromstring(resp.text)
         for article in root.findall(".//PubmedArticle"):
@@ -518,7 +512,6 @@ def efetch_full_articles(
         if api_key:
             params["api_key"] = api_key
         resp = _ncbi_post_with_retry(url, data=params, timeout=60)
-        resp.raise_for_status()
 
         root = ET.fromstring(resp.text)
         for article in root.findall(".//PubmedArticle"):
@@ -583,8 +576,7 @@ def probe_max_rate_no_key(
             while time.monotonic() < deadline:
                 t0 = time.monotonic()
                 params = {"db": DB, "term": term, "retmode": "json", "retmax": 1, "retstart": 0, "sort": "relevance"}
-                resp = _ncbi_get_with_retry(url, params=params, timeout=30)
-                resp.raise_for_status()
+                _ncbi_get_with_retry(url, params=params, timeout=30)
                 ok += 1
                 dt = time.monotonic() - t0
                 sleep_left = interval - dt

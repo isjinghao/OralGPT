@@ -40,6 +40,32 @@ class EvidenceIndex:
         limit = order_of[stage]
         return [item for item in self.evidence if order_of[item["introduced_stage"]] <= limit]
 
+    def related_evidence(self, selected_ids: list[str], available: list[dict]) -> list[dict]:
+        selected = set(selected_ids)
+        available_ids = {item["evidence_id"] for item in available}
+        related: set[str] = set()
+        for edge in self.graph["edges"]:
+            source, target = edge["source"], edge["target"]
+            if source in selected and target in available_ids:
+                related.add(target)
+            if target in selected and source in available_ids:
+                related.add(source)
+
+        anchors = self.resolve(selected_ids)
+        for item in available:
+            normalized = item.get("normalized", {})
+            for anchor in anchors:
+                anchor_normalized = anchor.get("normalized", {})
+                same_field = normalized.get("field") and normalized.get("field") == anchor_normalized.get("field")
+                same_tooth = normalized.get("tooth") and normalized.get("tooth") == anchor_normalized.get("tooth")
+                same_side = normalized.get("side") and normalized.get("side") == anchor_normalized.get("side")
+                same_dimension = item.get("clinical_dimension") == anchor.get("clinical_dimension")
+                if same_field or same_tooth or (same_side and same_dimension):
+                    related.add(item["evidence_id"])
+                    break
+
+        return [item for item in available if item["evidence_id"] in related - selected]
+
 def evidence_ref(item: dict) -> dict:
     # 生成证据引用视图
     normalized = item.get("normalized", {})
