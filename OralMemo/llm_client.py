@@ -102,8 +102,12 @@ class ChatClient:
                     if attempt >= 3:
                         self.log("llm/error", "Empty message.content after 4 attempts")
                         raise ValueError("LLM response message.content is empty")
-                    self.log("llm/retry", f"Empty message.content; next_attempt={attempt + 2}/4")
-                    time.sleep(5)
+                    wait_seconds = 2 ** (attempt + 1)
+                    self.log(
+                        "llm/retry",
+                        f"Empty message.content; wait={wait_seconds}s next_attempt={attempt + 2}/4",
+                    )
+                    time.sleep(wait_seconds)
                     continue
                 return content
             except RateLimitError as exc:
