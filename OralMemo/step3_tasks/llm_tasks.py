@@ -133,7 +133,24 @@ def generate_question(
         ]),
         feedback_block=question_feedback_block(feedback),
     )
-    return cached_completion(client, prompt, cache_path, max_tokens=8000)
+    result = cached_completion(client, prompt, cache_path, max_tokens=8000)
+    if isinstance(result.get("question"), str) and result["question"].strip():
+        return result
+
+    repair_prompt = (
+        f"{prompt}\n\nYour previous JSON omitted a non-empty 'question'. "
+        "Return only {\"question\": \"...\"}.\n\nPrevious JSON:\n"
+        f"{json.dumps(result, ensure_ascii=False)}"
+    )
+    result = cached_completion(
+        client,
+        repair_prompt,
+        cache_path.with_stem(f"{cache_path.stem}_repair"),
+        max_tokens=2000,
+    )
+    if not isinstance(result.get("question"), str) or not result["question"].strip():
+        raise ValueError("question_generation returned no non-empty 'question' after schema repair")
+    return result
 
 
 def evidence_payload(evidence: list[dict]) -> list[dict]:
@@ -246,7 +263,30 @@ def select_evaluation_evidence(
         edges_text=edges_text(index),
     )
     result = cached_completion(client, prompt, cache_path, max_tokens=12000)
-    return result["required_evidence_ids"]
+    evidence_ids = result.get("required_evidence_ids")
+    try:
+        if not isinstance(evidence_ids, list) or not evidence_ids:
+            raise ValueError("required_evidence_ids must be a non-empty list")
+        index.resolve(evidence_ids)
+        return list(dict.fromkeys(evidence_ids))
+    except (TypeError, ValueError) as exc:
+        repair_prompt = (
+            f"{prompt}\n\nThe previous JSON was invalid: {exc}. "
+            "Return only exact ids copied from the catalog in "
+            "{\"required_evidence_ids\": [\"...\"]}.\n\nPrevious JSON:\n"
+            f"{json.dumps(result, ensure_ascii=False)}"
+        )
+        repaired = cached_completion(
+            client,
+            repair_prompt,
+            cache_path.with_stem(f"{cache_path.stem}_repair"),
+            max_tokens=2000,
+        )
+        evidence_ids = repaired.get("required_evidence_ids")
+        if not isinstance(evidence_ids, list) or not evidence_ids:
+            raise ValueError("evidence selection repair returned no evidence IDs")
+        index.resolve(evidence_ids)
+        return list(dict.fromkeys(evidence_ids))
 
 
 def generate_rubric(
