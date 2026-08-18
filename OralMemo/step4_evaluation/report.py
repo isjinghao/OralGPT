@@ -6,7 +6,7 @@ import io
 from concurrent.futures import ThreadPoolExecutor
 from threading import Semaphore
 
-from batch_utils import log
+from utils.batch_utils import log
 from step4_evaluation.evaluator import CachedLLM
 from step4_evaluation.scoring import judge_base, judge_evidence, judge_rubric
 
@@ -225,23 +225,6 @@ def score_method(
         "per_task": per_task,
     }
 
-
-def build_report(
-    records_by_method: dict[str, list[dict]],
-    rubric_by_task: dict[str, dict],
-    llm_by_method: dict[str, CachedLLM],
-    log_prefix: str = "[evaluation][unknown]",
-) -> dict:
-    """对每个记忆方法评分，汇总为总报告。"""
-    score_workers = 4
-    semaphore = Semaphore(score_workers)
-    methods = [
-        score_method(
-            name, recs, rubric_by_task, llm_by_method[name], log_prefix, score_workers, semaphore
-        )
-        for name, recs in records_by_method.items()
-    ]
-    return {"methods": methods}
 
 
 def _fmt_pct(value) -> str:

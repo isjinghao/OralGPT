@@ -7,11 +7,9 @@ import os
 import shutil
 from pathlib import Path
 
+from utils.json_utils import read_json
+
 BENCH_ROOT = Path(__file__).resolve().parent.parent
-
-
-def read_json(path: Path):
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def collect_perception(eval_root: Path, answer_model: str) -> dict:

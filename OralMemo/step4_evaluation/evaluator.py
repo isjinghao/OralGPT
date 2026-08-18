@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from threading import Semaphore
 
-from batch_utils import log
+from utils.batch_utils import log
 from step4_evaluation.memory import MemoryMethod
 from step4_evaluation.templating import render
 
@@ -18,7 +18,6 @@ class CachedLLM:
         self.client = client
         self.cache_dir = cache_dir
         self.cache_dir.mkdir(parents=True, exist_ok=True)
-        self.calls = 0
 
     def _load_cache(self, path: Path) -> dict | None:
         if not path.exists():
@@ -52,7 +51,6 @@ class CachedLLM:
             prompt, temperature=temperature, max_tokens=max_tokens, images=images, timeout=timeout
         )
         self._write_cache(path, {"input": cache_input, "result": result})
-        self.calls += 1
         return result
 
     def complete_text(self, prompt: str, cache_key: str, max_tokens: int = 4096,

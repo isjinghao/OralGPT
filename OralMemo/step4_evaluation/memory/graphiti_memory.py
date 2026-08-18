@@ -14,6 +14,7 @@ from graphiti_core.llm_client.openai_client import OpenAIClient
 from graphiti_core.nodes import EpisodeType
 from graphiti_core.utils.maintenance.graph_data_operations import clear_data
 
+from config import memo_api_key
 from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
 
 
@@ -109,7 +110,7 @@ class GraphitiMemory(MemoryMethod):
         self._group_id = re.sub(r"[^A-Za-z0-9_-]", "_", namespace)
         self._async_loop = _AsyncLoop()
         llm_config = LLMConfig(
-            api_key=os.environ["MEMO_OPENAI_API_KEY"],
+            api_key=memo_api_key(),
             base_url=os.environ.get("MEMO_OPENAI_BASE_URL", "https://api.openai.com/v1"),
             model=os.environ.get("MEMO_OPENAI_MODEL", "gpt-4o-mini"),
             temperature=0,

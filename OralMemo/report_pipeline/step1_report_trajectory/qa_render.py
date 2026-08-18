@@ -1,8 +1,89 @@
 from __future__ import annotations
 
+import re
+
 STAGE_TYPES = ("perception", "treatment", "followup")
 STAGE_RANK = {name: rank for rank, name in enumerate(STAGE_TYPES)}
 QA_ROLES = {"observation", "evaluation"}
+
+
+def _modalities(qa_pairs: list[dict]) -> list[str]:
+    return [
+        modality for modality, present in (
+            ("TEXT_QA", any(not qa.get("figure_ref") for qa in qa_pairs)),
+            ("FIGURE_QA", any(qa.get("figure_ref") for qa in qa_pairs)),
+        ) if present
+    ]
+
+
+_DATED_PANEL = re.compile(
+    r"(?:^|[.;])\s*[A-Z]\s+[^.;]*\b(?:\d+\s*(?:days?|weeks?|months?|years?)\b|age\s+\d+|\d+\s+years?\s+old)",
+    re.IGNORECASE,
+)
+
+
+def _unsafe_figure_refs(images_map: dict | None) -> set[str]:
+    """Find whole-image figures whose dated panels cannot be released separately."""
+    if not images_map:
+        return set()
+    return {
+        figure_ref
+        for figure_ref, entry in images_map.items()
+        if isinstance(entry, dict) and len(_DATED_PANEL.findall(str(entry.get("caption") or ""))) > 1
+    }
+
+
+def _order_anchored_timepoints(timepoints: list[dict]) -> None:
+    """Sort only contiguous, same-stage timepoints that both have integer anchors."""
+    start = 0
+    while start < len(timepoints):
+        stage = timepoints[start].get("stage_type")
+        end = start
+        while (
+            end < len(timepoints)
+            and timepoints[end].get("stage_type") == stage
+            and isinstance(timepoints[end].get("t_months"), int)
+            and not isinstance(timepoints[end].get("t_months"), bool)
+        ):
+            end += 1
+        timepoints[start:end] = sorted(timepoints[start:end], key=lambda item: item["t_months"])
+        start = end if end > start else start + 1
+
+
+def sanitize_timeline(extracted: dict, images_map: dict | None = None) -> dict:
+    """Resolve structural timeline and unsplittable Figure issues before LLM review."""
+    timeline = dict(extracted)
+    unsafe_figures = _unsafe_figure_refs(images_map)
+    timepoints = []
+    for raw_timepoint in extracted["timepoints"]:
+        timepoint = dict(raw_timepoint)
+        seen: dict[str, dict] = {}
+        qa_pairs = []
+        for raw_qa in timepoint["qa_pairs"]:
+            qa = dict(raw_qa)
+            figure_ref = str(qa.get("figure_ref") or "").strip()
+            if figure_ref in unsafe_figures:
+                continue
+            qa["figure_ref"] = figure_ref or None
+            if figure_ref and figure_ref in seen:
+                previous = seen[figure_ref]
+                answer = str(qa.get("answer") or "").strip()
+                if answer and answer not in str(previous.get("answer") or ""):
+                    previous["question"] = f"What visible findings are shown in {figure_ref} at this timepoint?"
+                    previous["answer"] = f"{str(previous.get('answer') or '').strip()} {answer}".strip()
+                continue
+            if figure_ref:
+                seen[figure_ref] = qa
+            qa_pairs.append(qa)
+        if not qa_pairs:
+            continue
+        qa_pairs.sort(key=lambda qa: qa.get("role") == "evaluation")
+        timepoint["qa_pairs"] = qa_pairs
+        timepoint["modality"] = _modalities(qa_pairs)
+        timepoints.append(timepoint)
+    _order_anchored_timepoints(timepoints)
+    timeline["timepoints"] = timepoints
+    return timeline
 
 
 def normalize_timepoints(extracted: dict) -> list[dict]:
@@ -61,8 +142,11 @@ def normalize_timepoints(extracted: dict) -> list[dict]:
                 f"t_months must be a non-negative integer or null at timepoint {order}: {t_months!r}"
             )
         modality = timepoint.get("modality")
-        if not isinstance(modality, list) or not modality:
-            raise ValueError(f"modality must be a non-empty list at timepoint {order}")
+        expected_modality = _modalities(qa_pairs)
+        if modality != expected_modality:
+            raise ValueError(
+                f"modality mismatch at timepoint {order}: expected {expected_modality}, got {modality}"
+            )
 
         timepoint["order"] = order
         timepoint["stage_id"] = f"T{order}_{stage_type}_{type_index:02d}"

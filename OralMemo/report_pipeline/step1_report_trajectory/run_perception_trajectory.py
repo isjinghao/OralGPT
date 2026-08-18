@@ -4,16 +4,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
 from config import get_settings
 from llm_client import ChatClient
 from step1_patient_trajectory.perception_evaluation import PerceptionEvaluator
-from step2_evidence.run_perception_trajectory import (
-    format_profile,
-    generate_answer,
-    read_json,
-    write_json,
-)
+from step2_evidence.run_perception_trajectory import format_profile, generate_answer
+from utils.batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
+from utils.json_utils import read_json, write_json
 
 ROOT = Path(__file__).resolve().parents[2]
 PDF_DIR = ROOT / "reports" / "pdf"

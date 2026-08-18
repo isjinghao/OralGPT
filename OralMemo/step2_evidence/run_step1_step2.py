@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import argparse
 
-from batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
 from config import get_settings
+from utils.batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
 from step2_evidence.pipeline import build_client, process_patient
 
 

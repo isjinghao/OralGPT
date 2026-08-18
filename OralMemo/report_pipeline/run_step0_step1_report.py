@@ -6,13 +6,14 @@ import argparse
 import json
 from pathlib import Path
 
-from batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
 from config import get_settings
+from utils.batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
+from utils.json_utils import write_json
 from llm_client import ChatClient
 from report_pipeline.step0_ingest.pdf_extract import extract_pdf
 from report_pipeline.step0_ingest.timeline_llm import extract_timeline, repair_timeline
 from report_pipeline.step0_ingest.verify_llm import verify_timeline
-from report_pipeline.step1_report_trajectory.qa_render import normalize_timepoints, render_turns
+from report_pipeline.step1_report_trajectory.qa_render import normalize_timepoints, render_turns, sanitize_timeline
 from report_pipeline.step1_report_trajectory.report_dataset import build_report_dataset_entry
 from report_pipeline.step1_report_trajectory.report_stages import build_report_stages
 from step1_patient_trajectory.trajectories import build_standard_trajectory
@@ -20,11 +21,6 @@ from step1_patient_trajectory.trajectories import build_standard_trajectory
 ROOT = Path(__file__).resolve().parents[1]
 PDF_DIR = ROOT / "reports" / "pdf"
 OUTPUT_ROOT = ROOT / "outputs" / "report"
-
-
-def write_json(path: Path, data) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def build_client(settings, role: str, patient_id: str, model: str | None = None) -> ChatClient:
@@ -49,6 +45,7 @@ def extract_with_feedback(
 ) -> tuple[dict, list[dict], bool]:
     history: list[dict] = []
     feedback: list[dict] = []
+    previous_issues: list[dict] = []
     timeline: dict = {}
     seen_timelines: list[dict] = []
     prefix = f"[benchmark][{patient_id}]"
@@ -61,25 +58,32 @@ def extract_with_feedback(
             log(f"{prefix}[step0/repair] iteration={iteration}/{max_iters}")
             timeline = repair_timeline(extract_client, raw_dir, figures, timeline, feedback)
 
+        timeline = sanitize_timeline(timeline, images_map)
         log(f"{prefix}[step0/verify] iteration={iteration}/{max_iters}")
-        verification = verify_timeline(verifier_client, raw_dir, timeline, figures)
         try:
             render_turns(normalize_timepoints(timeline), images_map)
         except (KeyError, TypeError, ValueError) as exc:
-            verification["issues"].append(
-                {
+            verification = {
+                "passed": False,
+                "issues": [{
                     "severity": "high",
                     "location": "timeline structure",
                     "problem": str(exc),
                     "source_evidence": "",
-                    "suggested_fix": "Revise the affected timepoint so it satisfies the required stage and QA structure.",
-                }
-            )
+                    "suggested_fix": (
+                        "Repair the implicated timepoint and any later stage boundary together; "
+                        "once followup starts, later interventions remain followup."
+                    ),
+                }],
+            }
+        else:
+            verification = verify_timeline(verifier_client, raw_dir, timeline, figures, previous_issues)
 
         feedback = [
             issue for issue in verification["issues"]
             if issue["severity"] in {"high", "medium"}
         ]
+        previous_issues.extend(feedback)
         verification["passed"] = not feedback
         n_high = sum(issue["severity"] == "high" for issue in feedback)
         history.append(
@@ -144,6 +148,7 @@ def run_report(report: dict, settings, args: argparse.Namespace) -> None:
         try:
             if not verification_history or not verification_history[-1]["passed"]:
                 raise ValueError("cached verification did not pass")
+            timeline = sanitize_timeline(timeline, images_map)
             render_turns(normalize_timepoints(timeline), images_map)
         except (KeyError, TypeError, ValueError) as exc:
             log(f"{prefix}[step0/timeline] cached timeline invalid; regenerating: {exc}")

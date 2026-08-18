@@ -6,12 +6,10 @@ import json
 from pathlib import Path
 from statistics import mean
 
+from utils.json_utils import read_json
+
 ROOT = Path(__file__).resolve().parents[1]
 TRAJECTORIES = ["standard_trajectory", "model_perception_trajectory"]
-
-
-def read_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def read_method(report_root: Path, report: str, trajectory: str, model: str, method: str) -> dict:

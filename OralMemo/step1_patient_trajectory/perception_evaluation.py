@@ -6,18 +6,10 @@ from pathlib import Path
 
 import yaml
 
+from utils.json_utils import read_json, write_json
 from llm_client import ChatClient
 
 PROMPTS_DIR = Path(__file__).with_name("prompts")
-
-
-def read_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
-def write_json(path: Path, data: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def load_verifier_prompt() -> str:

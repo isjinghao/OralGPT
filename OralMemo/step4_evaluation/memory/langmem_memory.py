@@ -18,6 +18,7 @@ from langgraph.store.memory import InMemoryStore
 from langmem import create_memory_store_manager
 from openai import OpenAI
 
+from config import memo_api_key
 from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
 from step4_evaluation.templating import render
 
@@ -76,7 +77,7 @@ class LangMemMemory(MemoryMethod):
     def _build(self) -> None:
         callback = _UsageCallback(self)
         model = ChatOpenAI(
-            api_key=os.environ["MEMO_OPENAI_API_KEY"],
+            api_key=memo_api_key(),
             base_url=os.environ.get("MEMO_OPENAI_BASE_URL", "https://api.openai.com/v1"),
             model=os.environ.get("MEMO_OPENAI_MODEL", "gpt-4o-mini"),
             temperature=0,

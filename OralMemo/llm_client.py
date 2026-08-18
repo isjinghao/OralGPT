@@ -8,7 +8,7 @@ from threading import Lock
 
 from openai import APIConnectionError, APITimeoutError, InternalServerError, OpenAI, RateLimitError
 
-from batch_utils import log
+from utils.batch_utils import log
 
 
 class ChatClient:

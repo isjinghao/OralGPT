@@ -16,7 +16,7 @@ OralMemo/
 ├── __init__.py                       # 包说明
 ├── config.py                         # 配置：路径 + .env / OpenAI 设置
 ├── llm_client.py                     # OpenAI 兼容客户端（限流重试 + JSON 解析）
-├── batch_utils.py                    # 多病人选择、输出路径与并行执行
+├── utils/                            # 共享批处理与 JSON 工具
 ├── scripts/                          # WSL 批量运行入口（自动激活 cmfbench）
 │   ├── run_step1_step2.sh
 │   ├── run_step3.sh
@@ -117,7 +117,7 @@ VERIFIER_OPENAI_API_KEY=你的校验模型key
 VERIFIER_OPENAI_BASE_URL=https://api.openai.com/v1
 VERIFIER_OPENAI_MODEL=gpt-4o
 
-# 记忆构建模型：summary / mem0 / LangMem / Graphiti 共用
+# 可选：记忆构建模型；未设置时回退到 OPENAI_*
 MEMO_OPENAI_API_KEY=你的记忆模型key
 MEMO_OPENAI_BASE_URL=https://api.openai.com/v1
 MEMO_OPENAI_MODEL=gpt-4o-mini

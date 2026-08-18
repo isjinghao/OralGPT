@@ -1,28 +1,19 @@
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import shutil
 from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
 from threading import Semaphore
 
-from batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
 from config import get_settings
+from utils.batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
+from utils.json_utils import read_json, write_json
 from llm_client import ChatClient
 from step4_evaluation.evaluator import CachedLLM, run_streaming
 from step4_evaluation.memory import available_methods, build_methods
 from step4_evaluation.report import format_csv, score_method
-
-
-def read_json(path: Path):
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
-def write_json(path: Path, data) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def group_tasks_by_stage(tasks: list[dict]) -> dict[str, list[dict]]:

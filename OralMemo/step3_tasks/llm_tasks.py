@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
 from string import Template
 
 import yaml
 
-from batch_utils import log
+from utils.batch_utils import log
 from llm_client import ChatClient
 from step3_tasks.selectors import (
     EvidenceIndex,
@@ -40,15 +41,23 @@ def _write_json(path: Path, payload: dict) -> None:
     tmp_path.replace(path)
 
 
-def cached_completion(client: ChatClient, prompt: str, cache_path: Path, max_tokens: int) -> dict:
+def cached_completion(
+    client: ChatClient,
+    prompt: str,
+    cache_path: Path,
+    max_tokens: int,
+    valid: Callable[[dict], bool] | None = None,
+) -> dict:
     cache_input = {"model": client.model, "prompt": prompt, "max_tokens": max_tokens}
     if cache_path.exists():
         cached = json.loads(cache_path.read_text(encoding="utf-8"))
-        if cached.get("input") == cache_input:
+        result = cached.get("result")
+        if cached.get("input") == cache_input and isinstance(result, dict) and (valid is None or valid(result)):
             client.log("step3/cache", f"cache_hit file={cache_path.name}")
-            return cached["result"]
+            return result
     result = client.complete_json(prompt, max_tokens=max_tokens)
-    _write_json(cache_path, {"input": cache_input, "result": result})
+    if valid is None or valid(result):
+        _write_json(cache_path, {"input": cache_input, "result": result})
     return result
 
 
@@ -133,8 +142,11 @@ def generate_question(
         ]),
         feedback_block=question_feedback_block(feedback),
     )
-    result = cached_completion(client, prompt, cache_path, max_tokens=8000)
-    if isinstance(result.get("question"), str) and result["question"].strip():
+    def valid(value: dict) -> bool:
+        return isinstance(value.get("question"), str) and bool(value["question"].strip())
+
+    result = cached_completion(client, prompt, cache_path, max_tokens=8000, valid=valid)
+    if valid(result):
         return result
 
     repair_prompt = (
@@ -147,8 +159,9 @@ def generate_question(
         repair_prompt,
         cache_path.with_stem(f"{cache_path.stem}_repair"),
         max_tokens=2000,
+        valid=valid,
     )
-    if not isinstance(result.get("question"), str) or not result["question"].strip():
+    if not valid(result):
         raise ValueError("question_generation returned no non-empty 'question' after schema repair")
     return result
 
@@ -213,7 +226,10 @@ def finalize_task(
             attempt=it,
             gold_answer=current_gold,
         )
-        task["question"] = candidate["question"]
+        question = candidate.get("question")
+        if not isinstance(question, str) or not question.strip():
+            raise ValueError("question_generation returned no non-empty 'question'")
+        task["question"] = question
         task["gold_answer"] = current_gold
 
         # (2) 使用所选证据与直接相关历史验证问题和答案
@@ -262,12 +278,18 @@ def select_evaluation_evidence(
         evidence_text=evidence_catalog(index),
         edges_text=edges_text(index),
     )
-    result = cached_completion(client, prompt, cache_path, max_tokens=12000)
+    def valid(result: dict) -> bool:
+        evidence_ids = result.get("required_evidence_ids")
+        try:
+            return isinstance(evidence_ids, list) and bool(evidence_ids) and bool(index.resolve(evidence_ids))
+        except (TypeError, ValueError):
+            return False
+
+    result = cached_completion(client, prompt, cache_path, max_tokens=12000, valid=valid)
     evidence_ids = result.get("required_evidence_ids")
     try:
-        if not isinstance(evidence_ids, list) or not evidence_ids:
-            raise ValueError("required_evidence_ids must be a non-empty list")
-        index.resolve(evidence_ids)
+        if not valid(result):
+            raise ValueError("required_evidence_ids must be a non-empty list from the catalog")
         return list(dict.fromkeys(evidence_ids))
     except (TypeError, ValueError) as exc:
         repair_prompt = (
@@ -281,12 +303,11 @@ def select_evaluation_evidence(
             repair_prompt,
             cache_path.with_stem(f"{cache_path.stem}_repair"),
             max_tokens=2000,
+            valid=valid,
         )
-        evidence_ids = repaired.get("required_evidence_ids")
-        if not isinstance(evidence_ids, list) or not evidence_ids:
-            raise ValueError("evidence selection repair returned no evidence IDs")
-        index.resolve(evidence_ids)
-        return list(dict.fromkeys(evidence_ids))
+        if not valid(repaired):
+            raise ValueError("evidence selection repair returned invalid evidence IDs")
+        return list(dict.fromkeys(repaired["required_evidence_ids"]))
 
 
 def generate_rubric(

@@ -9,7 +9,7 @@ from string import Template
 
 import yaml
 
-from batch_utils import log
+from utils.batch_utils import log
 from llm_client import ChatClient
 
 

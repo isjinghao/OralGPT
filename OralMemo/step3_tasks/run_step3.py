@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import argparse
-import json
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
 from config import get_settings
+from utils.batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
+from utils.json_utils import read_json, write_json
 from llm_client import ChatClient
 from step3_tasks.llm_tasks import (
     PROMPT_DIR,
@@ -21,15 +21,6 @@ from step3_tasks.selectors import (
     assemble_evaluation_task,
     assemble_normal_task,
 )
-
-
-def read_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
-def write_json(path: Path, data: dict | list) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def _review_feedback(validation: dict) -> str:
@@ -180,9 +171,16 @@ def build_evaluation_tasks(
 
     def build(job: tuple[str, str, dict, EvidenceIndex]) -> dict:
         task_id, task_type, turn, available_index = job
-        evidence_ids = select_evaluation_evidence(
-            client, task_id, turn["human"], turn["assistant"], available_index, cache_dir, prompt_dir
-        )
+        for attempt in range(2):
+            try:
+                evidence_ids = select_evaluation_evidence(
+                    client, task_id, turn["human"], turn["assistant"], available_index, cache_dir, prompt_dir
+                )
+                break
+            except ValueError:
+                if attempt:
+                    raise
+                log(f"{prefix}[step3/evaluation-task] task={task_id} retrying invalid evidence IDs")
         task = assemble_evaluation_task(
             patient_id=patient_id,
             task_id=task_id,

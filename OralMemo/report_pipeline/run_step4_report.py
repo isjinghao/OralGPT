@@ -6,8 +6,8 @@ import argparse
 import os
 from pathlib import Path
 
-from batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
 from config import get_settings
+from utils.batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
 from step4_evaluation.memory import available_methods
 from step4_evaluation.run_step4 import parse_csv, run_patient, trajectory_completed
 

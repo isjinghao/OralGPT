@@ -41,7 +41,6 @@ class Settings:
     answer_llm: ModelConfig
     verifier_llm: ModelConfig
     memo_llm: ModelConfig
-    embedding_llm: ModelConfig
     graph_max_edges: int
 
     def llm_for(self, role: ModelRole) -> ModelConfig:
@@ -64,6 +63,10 @@ def _env_first(*names: str, default: str | None = None) -> str:
     if default is not None:
         return default
     raise KeyError(names[0])
+
+
+def memo_api_key() -> str:
+    return _env_first("MEMO_OPENAI_API_KEY", "OPENAI_API_KEY")
 
 
 def _model_config(prefix: str) -> ModelConfig:
@@ -97,18 +100,9 @@ def get_settings() -> Settings:
         answer_llm=_model_config("ANSWER"),
         verifier_llm=_model_config("VERIFIER"),
         memo_llm=ModelConfig(
-            api_key=_env_first("MEMO_OPENAI_API_KEY"),
-            base_url=_env_first("MEMO_OPENAI_BASE_URL", default="https://api.openai.com/v1"),
-            model=_env_first("MEMO_OPENAI_MODEL", default="gpt-4o-mini"),
-        ),
-        embedding_llm=ModelConfig(
-            api_key=_env_first("EMBEDDING_OPENAI_API_KEY", "OPENAI_API_KEY"),
-            base_url=_env_first(
-                "EMBEDDING_OPENAI_BASE_URL",
-                "OPENAI_BASE_URL",
-                default="https://api.openai.com/v1",
-            ),
-            model=_env_first("EMBEDDING_MODEL", default="text-embedding-3-small"),
+            api_key=memo_api_key(),
+            base_url=_env_first("MEMO_OPENAI_BASE_URL", "OPENAI_BASE_URL", default="https://api.openai.com/v1"),
+            model=_env_first("MEMO_OPENAI_MODEL", "OPENAI_MODEL", default="gpt-4o-mini"),
         ),
         graph_max_edges=int(os.environ.get("GRAPH_MAX_EDGES", "40")),
     )

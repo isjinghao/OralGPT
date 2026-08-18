@@ -4,14 +4,14 @@ from __future__ import annotations
 import argparse
 import base64
 import hashlib
-import json
 import mimetypes
 from pathlib import Path
 
 import yaml
 
-from batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
 from config import get_settings
+from utils.batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
+from utils.json_utils import read_json, write_json
 from llm_client import ChatClient
 from step1_patient_trajectory.perception_evaluation import PerceptionEvaluator
 
@@ -23,15 +23,6 @@ DIRECT_CONTEXT_STAGE_IDS = {"S0_PROFILE", "S5_TMJ"}
 def load_prompt(filename: str, key: str) -> str:
     data = yaml.safe_load((PROMPTS_DIR / filename).read_text(encoding="utf-8"))
     return data[key]
-
-
-def read_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
-def write_json(path: Path, data: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def encode_image(path: Path) -> str | None:

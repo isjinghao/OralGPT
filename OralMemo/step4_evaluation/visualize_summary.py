@@ -6,13 +6,10 @@ import json
 from pathlib import Path
 from statistics import mean
 
+from utils.json_utils import read_json
 
 PATIENTS = ["CHENFANG", "CHENFENGQI", "CHENGYAO", "CHENJINGYUAN"]
 TRAJECTORIES = ["standard_trajectory", "model_perception_trajectory"]
-
-
-def read_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def method_report(patient_root: Path, trajectory: str, model: str, method: str) -> dict:

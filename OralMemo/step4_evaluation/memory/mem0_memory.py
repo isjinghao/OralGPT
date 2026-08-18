@@ -14,6 +14,7 @@ from pathlib import Path
 
 from mem0.embeddings.openai import OpenAIEmbedding
 
+from config import memo_api_key
 from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
 
 
@@ -99,7 +100,7 @@ class Mem0Memory(MemoryMethod):
 
 
     def _default_config(self) -> dict:
-        llm_api_key = os.environ["MEMO_OPENAI_API_KEY"]
+        llm_api_key = memo_api_key()
         llm_base_url = os.environ.get("MEMO_OPENAI_BASE_URL", "https://api.openai.com/v1")
         llm_model = os.environ.get("MEMO_OPENAI_MODEL", "gpt-4o-mini")
         embedding_api_key = os.environ["EMBEDDING_OPENAI_API_KEY"]

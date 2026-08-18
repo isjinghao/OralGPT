@@ -6,6 +6,7 @@ from pathlib import Path
 from string import Template
 
 import yaml
+from openai import InternalServerError
 
 from report_pipeline.step0_ingest.pdf_extract import read_fulltext
 
@@ -72,15 +73,31 @@ def feedback_block(issues: list[dict] | None) -> str:
     return "\n".join(lines)
 
 
-def extract_timeline(client, raw_dir: Path, figures: list[dict]) -> dict:
-    # 首轮从源文本中提取完整时间线。
-    fulltext, tables_text = load_source_text(raw_dir)
-    prompt = tpl("timeline_extraction").substitute(
+def _extraction_prompt(fulltext: str, tables_text: str, figures: list[dict]) -> str:
+    return tpl("timeline_extraction").substitute(
         figures_block=figures_block(figures),
         tables_text=tables_text,
         fulltext=fulltext,
     )
-    return client.complete_json(prompt, temperature=0.0, max_tokens=16000)
+
+
+def extract_timeline(client, raw_dir: Path, figures: list[dict]) -> dict:
+    # 首轮从源文本中提取完整时间线；服务连续 500 时仅重试一次紧凑来源。
+    fulltext, tables_text = load_source_text(raw_dir)
+    try:
+        return client.complete_json(
+            _extraction_prompt(fulltext, tables_text, figures),
+            temperature=0.0,
+            max_tokens=16000,
+        )
+    except InternalServerError:
+        client.log("step0/extract", "retrying once with compact source after InternalServerError")
+        fulltext, tables_text = load_source_text(raw_dir, max_chars=12000, max_table_chars=3000)
+        return client.complete_json(
+            _extraction_prompt(fulltext, tables_text, figures),
+            temperature=0.0,
+            max_tokens=8000,
+        )
 
 
 def repair_timeline(
@@ -103,7 +120,7 @@ def repair_timeline(
         tables_text=tables_text,
         fulltext=fulltext,
     )
-    result = client.complete_json(prompt, temperature=0.0, max_tokens=16000)
+    result = client.complete_json(prompt, temperature=0.0, max_tokens=8000)
     repaired = {"timepoints": list(timeline["timepoints"])}
     for patch in sorted(result["repairs"], key=lambda item: item["start_index"], reverse=True):
         repaired["timepoints"][patch["start_index"]:patch["end_index"] + 1] = patch["replacement_timepoints"]

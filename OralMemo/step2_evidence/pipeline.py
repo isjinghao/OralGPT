@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
-from batch_utils import log, patient_output_root
 from config import Settings
+from utils.batch_utils import log, patient_output_root
+from utils.json_utils import write_json
 from llm_client import ChatClient
 from step1_patient_trajectory.dataset import build_source_turns
 from step1_patient_trajectory.stages import build_patient_stages
@@ -19,9 +19,44 @@ from step2_evidence.graph import build_evidence_graph
 from step2_evidence.visualize_graph import render_html, render_png
 
 
-def write_json(path: Path, data: dict | list) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+def run_evidence_and_graph(
+    standard: dict,
+    out: Path,
+    settings: Settings,
+    client: ChatClient,
+    *,
+    log_prefix: str,
+    stage_workers: int = 2,
+    prompt_path: Path | None = None,
+) -> None:
+    log(f"{log_prefix}[step2/evidence] started")
+    extract_kwargs = {"cache_dir": out / "cache", "log_prefix": log_prefix, "stage_workers": stage_workers}
+    if prompt_path is not None:
+        extract_kwargs["prompt_path"] = prompt_path
+    evidence = extract_all_evidence(client, standard, **extract_kwargs)
+    evidence_path = out / "evidence" / "evidence.json"
+    write_json(evidence_path, evidence)
+    log(f"{log_prefix}[step2/evidence] completed count={len(evidence['evidence'])}")
+
+    log(f"{log_prefix}[step2/graph] started")
+    graph = build_evidence_graph(
+        evidence_path,
+        client=client,
+        cache_dir=out / "cache",
+        max_edges=settings.graph_max_edges,
+        log_prefix=log_prefix,
+    )
+    graph_dir = out / "graph"
+    write_json(graph_dir / "evidence_graph.json", graph)
+    html_path = graph_dir / "evidence_graph.html"
+    render_html(graph, evidence["evidence"], standard["stages"], html_path)
+    try:
+        render_png(html_path, graph_dir / "evidence_graph.png")
+        artifacts = "json,html,png"
+    except Exception as exc:
+        log(f"{log_prefix}[step2/graph] png skipped: {type(exc).__name__}: {exc}")
+        artifacts = "json,html"
+    log(f"{log_prefix}[step2/graph] completed edges={len(graph['edges'])} artifacts={artifacts}")
 
 
 def process_patient(item: dict, settings: Settings, client: ChatClient, stage_workers: int = 2) -> None:
@@ -45,39 +80,13 @@ def process_patient(item: dict, settings: Settings, client: ChatClient, stage_wo
         f"variants={len(variants) + len(NOISE_VARIANTS)}"
     )
 
-    log(f"[benchmark][{patient_id}][step2/evidence] started")
-    evidence = extract_all_evidence(
-        client,
+    run_evidence_and_graph(
         standard,
-        cache_dir=out / "cache",
+        out,
+        settings,
+        client,
         log_prefix=f"[benchmark][{patient_id}]",
         stage_workers=stage_workers,
-    )
-    evidence_path = out / "evidence" / "evidence.json"
-    write_json(evidence_path, evidence)
-    log(f"[benchmark][{patient_id}][step2/evidence] completed count={len(evidence['evidence'])}")
-
-    log(f"[benchmark][{patient_id}][step2/graph] started")
-    graph = build_evidence_graph(
-        evidence_path,
-        client=client,
-        cache_dir=out / "cache",
-        max_edges=settings.graph_max_edges,
-        log_prefix=f"[benchmark][{patient_id}]",
-    )
-    graph_dir = out / "graph"
-    write_json(graph_dir / "evidence_graph.json", graph)
-    html_path = graph_dir / "evidence_graph.html"
-    render_html(graph, evidence["evidence"], standard["stages"], html_path)
-    try:
-        render_png(html_path, graph_dir / "evidence_graph.png")
-        artifacts = "json,html,png"
-    except Exception as exc:
-        log(f"[benchmark][{patient_id}][step2/graph] png skipped: {type(exc).__name__}: {exc}")
-        artifacts = "json,html"
-    log(
-        f"[benchmark][{patient_id}][step2/graph] completed edges={len(graph['edges'])} "
-        f"artifacts={artifacts}"
     )
 
 
