@@ -7,7 +7,7 @@ from pathlib import Path
 from config import get_settings
 from utils.batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
 from utils.json_utils import read_json, write_json
-from llm_client import ChatClient
+from llm_client import ChatClient, build_client
 from step3_tasks.llm_tasks import (
     PROMPT_DIR,
     finalize_task,
@@ -199,15 +199,6 @@ def build_evaluation_tasks(
         return list(executor.map(build, jobs))
 
 
-def build_client(settings, role: str, patient_id: str) -> ChatClient:
-    cfg = settings.llm_for(role)
-    return ChatClient(
-        api_key=cfg.api_key,
-        base_url=cfg.base_url,
-        model=cfg.model,
-        log_prefix=f"[benchmark][{patient_id}]",
-    )
-
 
 def run_patient(
     out: Path,
@@ -222,8 +213,8 @@ def run_patient(
     evidence_graph = read_json(out / "graph" / "evidence_graph.json")
     index = EvidenceIndex(evidence=evidence_data["evidence"], graph=evidence_graph)
     cache_dir = out / "cache" / "step3"
-    client = build_client(settings, "benchmark", patient_id)
-    verifier_client = build_client(settings, "verifier", patient_id)
+    client = build_client(settings, "benchmark", patient_id, log_prefix="[benchmark]")
+    verifier_client = build_client(settings, "verifier", patient_id, log_prefix="[benchmark]")
 
     log(f"{prefix}[step3/start] evidence={len(evidence_data['evidence'])}")
     tasks = build_normal_tasks(

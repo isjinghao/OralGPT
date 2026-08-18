@@ -9,6 +9,7 @@ from string import Template
 import yaml
 
 from utils.batch_utils import log
+from utils.json_utils import write_json_atomic
 from llm_client import ChatClient
 from step3_tasks.selectors import (
     EvidenceIndex,
@@ -34,13 +35,6 @@ def load_normal_task_plan(prompt_dir: Path) -> list[dict]:
     return config["task_types"]
 
 
-def _write_json(path: Path, payload: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp_path = path.with_suffix(path.suffix + ".tmp")
-    tmp_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    tmp_path.replace(path)
-
-
 def cached_completion(
     client: ChatClient,
     prompt: str,
@@ -57,7 +51,7 @@ def cached_completion(
             return result
     result = client.complete_json(prompt, max_tokens=max_tokens)
     if valid is None or valid(result):
-        _write_json(cache_path, {"input": cache_input, "result": result})
+        write_json_atomic(cache_path, {"input": cache_input, "result": result})
     return result
 
 

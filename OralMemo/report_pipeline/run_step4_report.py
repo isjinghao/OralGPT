@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import argparse
-import os
 from pathlib import Path
 
 from config import get_settings
 from utils.batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
 from step4_evaluation.memory import available_methods
-from step4_evaluation.run_step4 import parse_csv, run_patient, trajectory_completed
+from step4_evaluation.run_step4 import apply_answer_overrides, parse_csv, run_patient, trajectory_completed
 
 ROOT = Path(__file__).resolve().parents[1]
 PDF_DIR = ROOT / "reports" / "pdf"
@@ -32,10 +31,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    if args.answer_model:
-        os.environ["ANSWER_OPENAI_MODEL"] = args.answer_model
-    if args.answer_base_url:
-        os.environ["ANSWER_OPENAI_BASE_URL"] = args.answer_base_url
+    apply_answer_overrides(args)
     unknown_methods = sorted(set(args.methods) - set(available_methods()))
     if unknown_methods:
         raise ValueError(f"Unknown memory methods: {unknown_methods}")

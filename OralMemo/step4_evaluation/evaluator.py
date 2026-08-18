@@ -1,14 +1,14 @@
 """Step4 流式评测引擎: 缓存 LLM 封装、按阶段流式读取轨迹并在问题释放时刻提问"""
 from __future__ import annotations
-import base64
 import json
-import mimetypes
 import re
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from threading import Semaphore
 
 from utils.batch_utils import log
+from utils.image_utils import image_data_url
+from utils.json_utils import write_json_atomic
 from step4_evaluation.memory import MemoryMethod
 from step4_evaluation.templating import render
 
@@ -26,11 +26,6 @@ class CachedLLM:
             return json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             return None
-
-    def _write_cache(self, path: Path, payload: dict) -> None:
-        tmp_path = path.with_suffix(path.suffix + ".tmp")
-        tmp_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-        tmp_path.replace(path)
 
     def complete(self, prompt: str, cache_key: str, max_tokens: int = 4096,
                  temperature: float = 0.0, images: list[str] | None = None,
@@ -50,7 +45,7 @@ class CachedLLM:
         result = self.client.complete_json(
             prompt, temperature=temperature, max_tokens=max_tokens, images=images, timeout=timeout
         )
-        self._write_cache(path, {"input": cache_input, "result": result})
+        write_json_atomic(path, {"input": cache_input, "result": result})
         return result
 
     def complete_text(self, prompt: str, cache_key: str, max_tokens: int = 4096,
@@ -71,17 +66,8 @@ class CachedLLM:
         answer = self.client.complete_text(
             prompt, temperature=temperature, max_tokens=max_tokens, images=images, timeout=timeout
         )
-        self._write_cache(path, {"input": cache_input, "answer": answer})
+        write_json_atomic(path, {"input": cache_input, "answer": answer})
         return answer
-
-
-def encode_image(path: Path) -> str | None:
-    # 把本地图片读为 data URL(base64); 文件不存在时返回 None
-    if not path.exists() or not path.is_file():
-        return None
-    mime = mimetypes.guess_type(path.name)[0] or "image/png"
-    encoded = base64.b64encode(path.read_bytes()).decode("ascii")
-    return f"data:{mime};base64,{encoded}"
 
 
 def gather_image_urls(
@@ -94,7 +80,7 @@ def gather_image_urls(
     for rel in method.images():
         path = image_root / rel
         if path not in image_cache:
-            image_cache[path] = encode_image(path)
+            image_cache[path] = image_data_url(path)
         url = image_cache[path]
         if url:
             urls.append(url)

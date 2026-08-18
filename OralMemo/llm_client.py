@@ -146,6 +146,11 @@ class ChatClient:
         return self._complete(prompt, temperature, max_tokens, images, timeout, system_prompt)
 
 
+def build_client(settings, role: str, patient_id: str, *, log_prefix: str, model: str | None = None, base_url: str | None = None) -> ChatClient:
+    cfg = settings.llm_for(role)
+    return ChatClient(cfg.api_key, base_url or cfg.base_url, model or cfg.model, f"{log_prefix}[{patient_id}]")
+
+
 def reset_wait_seconds(text: str) -> int:
     # 计算限流后的等待秒数
     match = re.search(r"Limit resets at: (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) UTC", text)

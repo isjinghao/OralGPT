@@ -10,7 +10,7 @@ from threading import Semaphore
 from config import get_settings
 from utils.batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
 from utils.json_utils import read_json, write_json
-from llm_client import ChatClient
+from llm_client import ChatClient, build_client
 from step4_evaluation.evaluator import CachedLLM, run_streaming
 from step4_evaluation.memory import available_methods, build_methods
 from step4_evaluation.report import format_csv, score_method
@@ -37,22 +37,6 @@ def resolve_trajectory_path(out: Path, name: str, answer_model: str | None = Non
         return out / "trajectories" / "model_perception_trajectory" / answer_model / "model_perception_trajectory.json"
     return out / "trajectories" / name / f"{name}.json"
 
-
-def build_client(
-    settings,
-    role: str,
-    patient_id: str,
-    *,
-    model: str | None = None,
-    base_url: str | None = None,
-) -> ChatClient:
-    cfg = settings.llm_for(role)
-    return ChatClient(
-        api_key=cfg.api_key,
-        base_url=base_url or cfg.base_url,
-        model=model or cfg.model,
-        log_prefix=f"[evaluation][{patient_id}]",
-    )
 
 
 def evaluation_roots(out: Path, trajectory_type: str, answer_model: str) -> tuple[Path, Path]:
@@ -307,11 +291,12 @@ def run_patient(
         settings,
         "answer",
         patient_id,
+        log_prefix="[evaluation]",
         model=answer_model,
         base_url=answer_base_url,
     )
-    verifier_client = build_client(settings, "verifier", patient_id)
-    memo_client = build_client(settings, "memo", patient_id)
+    verifier_client = build_client(settings, "verifier", patient_id, log_prefix="[evaluation]")
+    memo_client = build_client(settings, "memo", patient_id, log_prefix="[evaluation]")
     image_root = settings.bench_root if multimodal else None
     log(
         f"[evaluation][{patient_id}][step4/start] trajectories={','.join(trajectory_names)} "

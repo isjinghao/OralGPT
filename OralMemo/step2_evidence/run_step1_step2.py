@@ -4,7 +4,8 @@ import argparse
 
 from config import get_settings
 from utils.batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
-from step2_evidence.pipeline import build_client, process_patient
+from llm_client import build_client
+from step2_evidence.pipeline import process_patient
 
 
 def parse_args() -> argparse.Namespace:
@@ -38,7 +39,7 @@ def main() -> int:
         if not args.force and completed(out):
             log(f"[benchmark][{patient_id}][step1-step2/resume] completed outputs found; skipped")
             return "skipped"
-        client = build_client(settings, patient_id)
+        client = build_client(settings, "benchmark", patient_id, log_prefix="[benchmark]")
         process_patient(item, settings, client, args.stage_workers)
         return "completed"
 

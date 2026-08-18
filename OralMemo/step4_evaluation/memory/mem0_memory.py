@@ -10,7 +10,6 @@ mem0(https://github.com/mem0ai/mem0) 是面向 LLM 应用的记忆层: 从输入
 """
 from __future__ import annotations
 import os
-from pathlib import Path
 
 from mem0.embeddings.openai import OpenAIEmbedding
 

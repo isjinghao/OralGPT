@@ -8,7 +8,8 @@ from pathlib import Path
 from config import get_settings
 from utils.batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
 from utils.json_utils import read_json
-from step2_evidence.pipeline import build_client, run_evidence_and_graph
+from llm_client import build_client
+from step2_evidence.pipeline import run_evidence_and_graph
 from step3_tasks.run_step3 import completed as step3_completed
 from step3_tasks.run_step3 import run_patient as run_step3
 
@@ -42,7 +43,7 @@ def run_step2(out: Path, patient_id: str, settings, stage_workers: int = 2) -> N
         standard,
         out,
         settings,
-        build_client(settings, patient_id),
+        build_client(settings, "benchmark", patient_id, log_prefix="[benchmark]"),
         log_prefix=f"[benchmark][{patient_id}]",
         prompt_path=EVIDENCE_PROMPT,
         stage_workers=stage_workers,

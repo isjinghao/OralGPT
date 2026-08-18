@@ -89,12 +89,3 @@ def process_patient(item: dict, settings: Settings, client: ChatClient, stage_wo
         stage_workers=stage_workers,
     )
 
-
-def build_client(settings: Settings, patient_id: str) -> ChatClient:
-    cfg = settings.llm_for("benchmark")
-    return ChatClient(
-        api_key=cfg.api_key,
-        base_url=cfg.base_url,
-        model=cfg.model,
-        log_prefix=f"[benchmark][{patient_id}]",
-    )

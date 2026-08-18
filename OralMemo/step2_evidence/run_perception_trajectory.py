@@ -2,15 +2,14 @@
 from __future__ import annotations
 
 import argparse
-import base64
 import hashlib
-import mimetypes
 from pathlib import Path
 
 import yaml
 
 from config import get_settings
 from utils.batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients
+from utils.image_utils import image_data_url
 from utils.json_utils import read_json, write_json
 from llm_client import ChatClient
 from step1_patient_trajectory.perception_evaluation import PerceptionEvaluator
@@ -25,14 +24,6 @@ def load_prompt(filename: str, key: str) -> str:
     return data[key]
 
 
-def encode_image(path: Path) -> str | None:
-    if not path.is_file():
-        return None
-    mime = mimetypes.guess_type(path.name)[0] or "image/png"
-    encoded = base64.b64encode(path.read_bytes()).decode("ascii")
-    return f"data:{mime};base64,{encoded}"
-
-
 def resolve_image_path(root: Path, image_path: str) -> Path:
     path = Path(image_path)
     return path if path.is_absolute() else root / path
@@ -41,7 +32,7 @@ def resolve_image_path(root: Path, image_path: str) -> Path:
 def image_urls(root: Path, image_paths: list[str]) -> list[str]:
     urls: list[str] = []
     for image_path in image_paths:
-        url = encode_image(resolve_image_path(root, image_path))
+        url = image_data_url(resolve_image_path(root, image_path))
         if url:
             urls.append(url)
     return urls
