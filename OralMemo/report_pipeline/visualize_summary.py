@@ -13,7 +13,7 @@ TRAJECTORIES = ["standard_trajectory", "model_perception_trajectory"]
 
 
 def read_method(report_root: Path, report: str, trajectory: str, model: str, method: str) -> dict:
-    data = read_json(report_root / report / "evaluation" / trajectory / model / "text" / "report.json")
+    data = read_json(report_root / report / "evaluation" / trajectory / model / "report.json")
     return next(item for item in data["methods"] if item["method"] == method)
 
 
@@ -63,7 +63,7 @@ main{max-width:1400px;margin:auto;padding:24px 28px 44px}.panel{background:var(-
 table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:11px 9px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}th{background:#f8fafc;color:#475467}.group{background:#eef4ff;font-weight:700}.report-link{color:var(--blue);font-weight:700;text-decoration:none}.report-link:hover{text-decoration:underline}.hint{font-size:13px;color:var(--muted);line-height:1.7}.formula{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:2px 6px}
 @media(max-width:1200px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:900px){main{padding:16px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.table-wrap{overflow:auto}}
 </style></head><body>
-<header><h1>OralMemo 四 Report 结果汇总</h1><div class="sub">模型：__MODEL__ · 记忆方法：full_context_memory · 评估模式：text</div></header>
+<header><h1>OralMemo 四 Report 结果汇总</h1><div class="sub">模型：__MODEL__ · 记忆方法：full_context_memory</div></header>
 <main>
 <section class="panel"><h2>四 Report 平均分</h2><div id="cards" class="cards"></div></section>
 <section class="panel"><h2>逐 Report 结果</h2><div class="hint">点击 Report 名称进入详情页，可查看模型感知问题、标准参考与模型感知答案，并切换标准轨迹和模型感知轨迹查看治疗、随访及完整逐题评估。</div><div class="table-wrap"><table id="results"></table></div></section>

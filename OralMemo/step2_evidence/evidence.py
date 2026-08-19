@@ -142,7 +142,7 @@ def extract_all_evidence(
 
     with ThreadPoolExecutor(max_workers=stage_workers) as executor:
         evidence_by_stage = executor.map(extract, enumerate(stages, start=1))
-        all_evidence = [slim_evidence(item) for evidence in evidence_by_stage for item in evidence]
+        all_evidence = [item for evidence in evidence_by_stage for item in evidence]
     return {
         "patient_id": patient_stages["patient_id"],
         "evidence": all_evidence,

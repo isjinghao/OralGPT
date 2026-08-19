@@ -84,7 +84,6 @@ def initial_profile_records(stages: list[dict]) -> list[dict]:
 def cache_path(
     cache_dir: Path,
     model: str,
-    base_url: str,
     stage_id: str,
     source_turn_id: int,
     question: str,
@@ -95,7 +94,6 @@ def cache_path(
     payload = "\n".join(
         [
             model,
-            base_url,
             stage_id,
             str(source_turn_id),
             question,
@@ -132,7 +130,6 @@ def generate_answer(
     path = cache_path(
         cache_dir,
         client.model,
-        client.base_url,
         stage["stage_id"],
         int(qa.get("source_turn_id", 0)),
         question,
@@ -251,10 +248,9 @@ def run_patient(item: dict, settings, model: str | None, base_url: str | None, f
     answer_cfg = settings.llm_for("answer")
     model_name = model or answer_cfg.model
     model_base_url = base_url or answer_cfg.base_url
-    model_dir = model_name
-    output_path = case_root / "trajectories" / "model_perception_trajectory" / model_dir / "model_perception_trajectory.json"
-    cache_dir = case_root / "cache" / "stage1_perception" / model_dir
-    report_path = case_root / "trajectories" / "model_perception_trajectory" / model_dir / "perception_report.json"
+    output_path = case_root / "trajectories" / "model_perception_trajectory" / model_name / "model_perception_trajectory.json"
+    cache_dir = case_root / "cache" / "stage1_perception" / model_name
+    report_path = case_root / "trajectories" / "model_perception_trajectory" / model_name / "perception_report.json"
 
     if not standard_path.is_file():
         raise FileNotFoundError(f"Standard trajectory does not exist: {standard_path}")
@@ -265,37 +261,38 @@ def run_patient(item: dict, settings, model: str | None, base_url: str | None, f
         return "skipped"
 
     verifier_cfg = settings.llm_for("verifier")
-    client = ChatClient(
-        api_key=answer_cfg.api_key,
-        base_url=model_base_url,
-        model=model_name,
-        log_prefix=f"[perception][{patient_id}][{model_name}]",
-    )
-    verifier = ChatClient(
-        api_key=verifier_cfg.api_key,
-        base_url=verifier_cfg.base_url,
-        model=verifier_cfg.model,
-        log_prefix=f"[perception-verifier][{patient_id}]",
-    )
-
-    standard = read_json(standard_path)
-    evidence = read_json(evidence_path)
-    evaluator = PerceptionEvaluator(
-        verifier=verifier,
-        standard=standard,
-        evidence=evidence,
-        cache_dir=cache_dir / "verifier",
-        report_path=report_path,
-    )
-    result = generate_trajectory(
-        standard=standard,
-        client=client,
-        image_root=settings.bench_root,
-        cache_dir=cache_dir,
-        force=force,
-        evaluator=evaluator,
-    )
-    write_json(output_path, result)
+    with (
+        ChatClient(
+            api_key=answer_cfg.api_key,
+            base_url=model_base_url,
+            model=model_name,
+            log_prefix=f"[perception][{patient_id}][{model_name}]",
+        ) as client,
+        ChatClient(
+            api_key=verifier_cfg.api_key,
+            base_url=verifier_cfg.base_url,
+            model=verifier_cfg.model,
+            log_prefix=f"[perception-verifier][{patient_id}]",
+        ) as verifier,
+    ):
+        standard = read_json(standard_path)
+        evidence = read_json(evidence_path)
+        evaluator = PerceptionEvaluator(
+            verifier=verifier,
+            standard=standard,
+            evidence=evidence,
+            cache_dir=cache_dir / "verifier",
+            report_path=report_path,
+        )
+        result = generate_trajectory(
+            standard=standard,
+            client=client,
+            image_root=settings.bench_root,
+            cache_dir=cache_dir,
+            force=force,
+            evaluator=evaluator,
+        )
+        write_json(output_path, result)
     log(f"[perception][{patient_id}][done] model={model_name} output={output_path}")
     return "completed"
 

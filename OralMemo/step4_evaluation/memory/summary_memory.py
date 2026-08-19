@@ -2,7 +2,7 @@
 """
 from __future__ import annotations
 
-from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
+from step4_evaluation.memory.base import MemoryMethod, format_stage_input
 from step4_evaluation.templating import render
 
 
@@ -26,23 +26,17 @@ class SummaryMemory(MemoryMethod):
 
     name = "summary_memory"
 
-    def __init__(self, multimodal: bool = False) -> None:
-        super().__init__(multimodal)
+    def __init__(self) -> None:
+        super().__init__()
         self._summary = ""
         self._pending = ""
-        self._images: list[str] = []
 
     def reset(self) -> None:
         self._summary = ""
         self._pending = ""
-        self._images = []
 
     def observe(self, stage: dict) -> None:
         self._pending = format_stage_input(stage)
-        # 图片路径独立累积, 不经 LLM 文本巩固而丢失
-        for path in collect_stage_images(stage):
-            if path not in self._images:
-                self._images.append(path)
 
     def update(self, llm, cache_key: str) -> None:
         if not self._pending:
@@ -70,6 +64,3 @@ class SummaryMemory(MemoryMethod):
 
     def context(self, query: str | None = None) -> str:
         return self._summary
-
-    def images(self) -> list[str]:
-        return list(self._images)

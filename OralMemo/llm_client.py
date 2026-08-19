@@ -31,6 +31,12 @@ class ChatClient:
     def close(self) -> None:
         self.client.close()
 
+    def __enter__(self) -> ChatClient:
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        self.close()
+
     @staticmethod
     def _content_text(content, nested: bool = False) -> str:
         if content is None:

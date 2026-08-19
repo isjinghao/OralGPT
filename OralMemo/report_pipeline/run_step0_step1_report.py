@@ -10,6 +10,7 @@ from config import get_settings
 from utils.batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
 from utils.json_utils import write_json
 from llm_client import ChatClient, build_client
+from report_pipeline.paths import REPORT_OUTPUT_ROOT as OUTPUT_ROOT, REPORT_PDF_DIR as PDF_DIR, REPORT_ROOT as ROOT
 from report_pipeline.step0_ingest.pdf_extract import extract_pdf
 from report_pipeline.step0_ingest.timeline_llm import extract_timeline, repair_timeline
 from report_pipeline.step0_ingest.verify_llm import verify_timeline
@@ -17,12 +18,6 @@ from report_pipeline.step1_report_trajectory.qa_render import normalize_timepoin
 from report_pipeline.step1_report_trajectory.report_dataset import build_report_dataset_entry
 from report_pipeline.step1_report_trajectory.report_stages import build_report_stages
 from step1_patient_trajectory.trajectories import build_standard_trajectory
-
-ROOT = Path(__file__).resolve().parents[1]
-PDF_DIR = ROOT / "reports" / "pdf"
-OUTPUT_ROOT = ROOT / "outputs" / "report"
-
-
 
 def extract_with_feedback(
     extract_client: ChatClient,
@@ -153,16 +148,20 @@ def run_report(report: dict, settings, args: argparse.Namespace) -> None:
             {"figure": figure, "caption": entry.get("caption", "")}
             for figure, entry in images_map.items()
         ]
-        timeline, verification_history, passed = extract_with_feedback(
-            build_client(settings, "benchmark", patient_id, log_prefix="[benchmark]", model=args.model),
-            build_client(settings, "verifier", patient_id, log_prefix="[benchmark]"),
-            raw_dir,
-            captions,
-            images_map,
-            args.max_iters,
-            patient_id,
-            verification_path,
-        )
+        with (
+            build_client(settings, "benchmark", patient_id, log_prefix="[benchmark]", model=args.model) as extract_client,
+            build_client(settings, "verifier", patient_id, log_prefix="[benchmark]") as verifier_client,
+        ):
+            timeline, verification_history, passed = extract_with_feedback(
+                extract_client,
+                verifier_client,
+                raw_dir,
+                captions,
+                images_map,
+                args.max_iters,
+                patient_id,
+                verification_path,
+            )
         write_json(verification_path, verification_history)
         if not passed:
             raise ValueError(

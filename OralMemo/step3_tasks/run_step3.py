@@ -213,42 +213,43 @@ def run_patient(
     evidence_graph = read_json(out / "graph" / "evidence_graph.json")
     index = EvidenceIndex(evidence=evidence_data["evidence"], graph=evidence_graph)
     cache_dir = out / "cache" / "step3"
-    client = build_client(settings, "benchmark", patient_id, log_prefix="[benchmark]")
-    verifier_client = build_client(settings, "verifier", patient_id, log_prefix="[benchmark]")
+    with (
+        build_client(settings, "benchmark", patient_id, log_prefix="[benchmark]") as client,
+        build_client(settings, "verifier", patient_id, log_prefix="[benchmark]") as verifier_client,
+    ):
+        log(f"{prefix}[step3/start] evidence={len(evidence_data['evidence'])}")
+        tasks = build_normal_tasks(
+            client,
+            standard,
+            index,
+            cache_dir,
+            verifier_client,
+            prompt_dir,
+        )
+        tasks.extend(build_evaluation_tasks(client, standard, index, cache_dir, prompt_dir, task_workers))
 
-    log(f"{prefix}[step3/start] evidence={len(evidence_data['evidence'])}")
-    tasks = build_normal_tasks(
-        client,
-        standard,
-        index,
-        cache_dir,
-        verifier_client,
-        prompt_dir,
-    )
-    tasks.extend(build_evaluation_tasks(client, standard, index, cache_dir, prompt_dir, task_workers))
+        rubric_tasks = [task for task in tasks if task["task_type"] in {"treatment", "followup"}]
 
-    rubric_tasks = [task for task in tasks if task["task_type"] in {"treatment", "followup"}]
+        def build_rubric(item: tuple[int, dict]) -> dict:
+            index_number, task = item
+            log(f"{prefix}[step3/rubric] task={index_number}/{len(rubric_tasks)} id={task['task_id']}")
+            return generate_rubric(client, task, cache_dir, prompt_dir)
 
-    def build_rubric(item: tuple[int, dict]) -> dict:
-        index_number, task = item
-        log(f"{prefix}[step3/rubric] task={index_number}/{len(rubric_tasks)} id={task['task_id']}")
-        return generate_rubric(client, task, cache_dir, prompt_dir)
+        with ThreadPoolExecutor(max_workers=task_workers) as executor:
+            treatment_rubrics = list(executor.map(build_rubric, enumerate(rubric_tasks, start=1)))
 
-    with ThreadPoolExecutor(max_workers=task_workers) as executor:
-        treatment_rubrics = list(executor.map(build_rubric, enumerate(rubric_tasks, start=1)))
-
-    groups: dict[str, list[dict]] = {}
-    for task in tasks:
-        groups.setdefault(task["task_type"], []).append(task)
-    tasks_dir = out / "tasks"
-    tasks_dir.mkdir(parents=True, exist_ok=True)
-    for path in tasks_dir.glob("*.json"):
-        path.unlink()
-    write_json(tasks_dir / "all_tasks.json", {"patient_id": patient_id, "tasks": tasks})
-    for group_name, items in groups.items():
-        write_json(tasks_dir / f"{group_name}.json", {"patient_id": patient_id, "tasks": items})
-    write_json(out / "rubrics" / "treatment_rubrics.json", treatment_rubrics)
-    log(f"{prefix}[step3/done] tasks={len(tasks)} rubrics={len(treatment_rubrics)} groups={len(groups)}")
+        groups: dict[str, list[dict]] = {}
+        for task in tasks:
+            groups.setdefault(task["task_type"], []).append(task)
+        tasks_dir = out / "tasks"
+        tasks_dir.mkdir(parents=True, exist_ok=True)
+        for path in tasks_dir.glob("*.json"):
+            path.unlink()
+        write_json(tasks_dir / "all_tasks.json", {"patient_id": patient_id, "tasks": tasks})
+        for group_name, items in groups.items():
+            write_json(tasks_dir / f"{group_name}.json", {"patient_id": patient_id, "tasks": items})
+        write_json(out / "rubrics" / "treatment_rubrics.json", treatment_rubrics)
+        log(f"{prefix}[step3/done] tasks={len(tasks)} rubrics={len(treatment_rubrics)} groups={len(groups)}")
 
 
 def parse_args() -> argparse.Namespace:

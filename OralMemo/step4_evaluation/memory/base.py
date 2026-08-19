@@ -9,16 +9,10 @@ import time
 from pathlib import Path
 from threading import Lock
 
-
-def collect_stage_images(stage: dict) -> list[str]:
-    #返回阶段级图片路径。
-    return [path for path in (stage.get("image_paths", []) or []) if path]
-
 def format_stage_input(stage: dict) -> str:
     # 把一个阶段的结构化数据格式化为可读文本块
     modality = ", ".join(stage.get("modality", [])) or "none"
-    image_paths = collect_stage_images(stage)
-    lines = [f"[Stage {stage['stage_id']} | modality: {modality} | images: {len(image_paths)}]"]
+    lines = [f"[Stage {stage['stage_id']} | modality: {modality}]"]
     for qa in stage["qa_pairs"]:
         role = qa["role"]
         if role == "evaluation":
@@ -39,8 +33,7 @@ class MemoryMethod(ABC):
 
     name: str = "base"
 
-    def __init__(self, multimodal: bool = False) -> None:
-        self.multimodal = multimodal
+    def __init__(self) -> None:
         self.workdir: Path | None = None
         self.namespace = ""
         self._metrics_lock = Lock()
@@ -102,13 +95,6 @@ class MemoryMethod(ABC):
 
         query - 检索式记忆(如 mem0)据此做相关性检索; 非检索方法可忽略。
         """
-
-    def images(self) -> list[str]:
-        """返回当前记忆中(有序去重的)图片路径; 纯文本方法返回空列表。
-
-        多模态评测时, 上层会据此把图片转成 image_url 分块附加给大模型
-        """
-        return []
 
     def timed_context(self, query: str | None = None) -> str:
         started = time.perf_counter()

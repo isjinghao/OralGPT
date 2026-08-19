@@ -39,8 +39,8 @@ def main() -> int:
         if not args.force and completed(out):
             log(f"[benchmark][{patient_id}][step1-step2/resume] completed outputs found; skipped")
             return "skipped"
-        client = build_client(settings, "benchmark", patient_id, log_prefix="[benchmark]")
-        process_patient(item, settings, client, args.stage_workers)
+        with build_client(settings, "benchmark", patient_id, log_prefix="[benchmark]") as client:
+            process_patient(item, settings, client, args.stage_workers)
         return "completed"
 
     return run_patient_batch(patients, args.num_workers, "benchmark", run_patient)

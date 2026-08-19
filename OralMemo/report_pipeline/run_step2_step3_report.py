@@ -9,13 +9,11 @@ from config import get_settings
 from utils.batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
 from utils.json_utils import read_json
 from llm_client import build_client
+from report_pipeline.paths import REPORT_OUTPUT_ROOT as OUTPUT_ROOT, REPORT_PDF_DIR as PDF_DIR, REPORT_ROOT as ROOT
 from step2_evidence.pipeline import run_evidence_and_graph
 from step3_tasks.run_step3 import completed as step3_completed
 from step3_tasks.run_step3 import run_patient as run_step3
 
-ROOT = Path(__file__).resolve().parents[1]
-PDF_DIR = ROOT / "reports" / "pdf"
-OUTPUT_ROOT = ROOT / "outputs" / "report"
 PROMPT_DIR = ROOT / "report_pipeline" / "prompts"
 EVIDENCE_PROMPT = PROMPT_DIR / "evidence_extraction.yaml"
 
@@ -39,15 +37,16 @@ def step2_completed(out: Path) -> bool:
 
 def run_step2(out: Path, patient_id: str, settings, stage_workers: int = 2) -> None:
     standard = read_json(out / "trajectories" / "standard_trajectory.json")
-    run_evidence_and_graph(
-        standard,
-        out,
-        settings,
-        build_client(settings, "benchmark", patient_id, log_prefix="[benchmark]"),
-        log_prefix=f"[benchmark][{patient_id}]",
-        prompt_path=EVIDENCE_PROMPT,
-        stage_workers=stage_workers,
-    )
+    with build_client(settings, "benchmark", patient_id, log_prefix="[benchmark]") as client:
+        run_evidence_and_graph(
+            standard,
+            out,
+            settings,
+            client,
+            log_prefix=f"[benchmark][{patient_id}]",
+            prompt_path=EVIDENCE_PROMPT,
+            stage_workers=stage_workers,
+        )
 
 
 def parse_args() -> argparse.Namespace:

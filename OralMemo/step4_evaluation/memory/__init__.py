@@ -1,6 +1,6 @@
 """memory 包: 统一管理各种记忆方法
 
-- base.py                 公共基类 MemoryMethod 与共享工具 format_stage_input / collect_stage_images
+- base.py                 公共基类 MemoryMethod 与共享工具 format_stage_input
 - single_stage_memory.py  单阶段基线 SingleStageMemory
 - full_context_memory.py  全上下文基线 FullContextMemory
 - summary_memory.py       记忆基线 SummaryMemory
@@ -11,7 +11,7 @@
 """
 from __future__ import annotations
 
-from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
+from step4_evaluation.memory.base import MemoryMethod, format_stage_input
 from step4_evaluation.memory.full_context_memory import FullContextMemory
 from step4_evaluation.memory.graphiti_memory import GraphitiMemory
 from step4_evaluation.memory.langmem_memory import LangMemMemory
@@ -39,15 +39,14 @@ def available_methods() -> list[str]:
     return list(_REGISTRY)
 
 
-def build_methods(names: list[str] | None = None, multimodal: bool = False) -> list[MemoryMethod]:
+def build_methods(names: list[str] | None = None) -> list[MemoryMethod]:
     selected = names or [DEFAULT_METHOD]
-    return [_REGISTRY[name](multimodal=multimodal) for name in selected]
+    return [_REGISTRY[name]() for name in selected]
 
 
 __all__ = [
     "MemoryMethod",
     "format_stage_input",
-    "collect_stage_images",
     "SingleStageMemory",
     "FullContextMemory",
     "SummaryMemory",

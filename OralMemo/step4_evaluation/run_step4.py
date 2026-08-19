@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import os
 import shutil
 from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
@@ -33,17 +32,15 @@ def resolve_trajectory_path(out: Path, name: str, answer_model: str | None = Non
         return out / "trajectories" / "standard_trajectory.json"
     if name == "model_perception_trajectory":
         if not answer_model:
-            raise ValueError("answer_model is required for model_perception_trajectory trajectory")
-        return out / "trajectories" / "model_perception_trajectory" / answer_model / "model_perception_trajectory.json"
+            raise ValueError("answer model is required for model_perception_trajectory")
+        return out / "trajectories" / name / answer_model / f"{name}.json"
     return out / "trajectories" / name / f"{name}.json"
 
 
-
 def evaluation_roots(out: Path, trajectory_type: str, answer_model: str) -> tuple[Path, Path]:
-    """Return model-isolated result and cache roots for one trajectory."""
-    model_dir = answer_model
-    base = out / "evaluation" / trajectory_type / model_dir
-    cache = out / "cache" / "step4" / trajectory_type / model_dir
+    """Return result and cache roots for one answer model."""
+    base = out / "evaluation" / trajectory_type / answer_model
+    cache = out / "cache" / "step4" / trajectory_type / answer_model
     return base, cache
 
 
@@ -81,8 +78,6 @@ def evaluate_trajectory(
     memo_client: ChatClient,
     out: Path,
     methods: list[str],
-    multimodal: bool,
-    image_root: Path | None,
     *,
     force: bool = False,
     answer_workers: int = 2,
@@ -92,35 +87,30 @@ def evaluate_trajectory(
     patient_id = trajectory["patient_id"]
     prefix = f"[evaluation][{patient_id}]"
     trajectory_type = trajectory["trajectory_type"]
-    mode = "multimodal" if multimodal else "text"
     present_stages = {stage["stage_id"] for stage in trajectory["stages"]}
     missing = sorted(stage_id for stage_id in tasks_by_stage if stage_id not in present_stages)
     log(
-        f"{prefix}[step4/trajectory] started type={trajectory_type} mode={mode} "
+        f"{prefix}[step4/trajectory] started type={trajectory_type} "
         f"stages={len(trajectory['stages'])} missing_task_stages={len(missing)}"
     )
 
     eval_root, cache_root = evaluation_roots(out, trajectory_type, answer_client.model)
-    shared_image_cache: dict[Path, str | None] = {}
     answer_semaphore = Semaphore(answer_workers)
     score_semaphore = Semaphore(score_workers)
     method_reports: dict[str, dict] = {}
-    method_objects = build_methods(names=methods, multimodal=multimodal)
+    method_objects = build_methods(names=methods)
 
-    def answer_method(method, image_cache: dict[Path, str | None]):
-        method_dir = cache_root / method.name / mode
-        method_eval_dir = eval_root / method.name / mode
+    def answer_method(method):
+        method_dir = cache_root / method.name
+        method_eval_dir = eval_root / method.name
         answers_path = method_eval_dir / "answers.json"
         metrics_path = method_eval_dir / "memory_metrics.json"
         method_report_path = method_eval_dir / "report.json"
         cached_records = read_json(answers_path) if answers_path.is_file() and not force else None
-        answers_rebuilt = cached_records is None or (
-            bool(cached_records) and "memory_metrics" not in cached_records[-1]
-        )
+        answers_rebuilt = cached_records is None or not metrics_path.is_file()
         if not answers_rebuilt:
             records = cached_records
-            memory_metrics = records[-1]["memory_metrics"] if records else method.metrics()
-            write_json(metrics_path, memory_metrics)
+            memory_metrics = read_json(metrics_path)
             log(f"{prefix}[step4/resume] method={method.name} answers=loaded")
         else:
             log(f"{prefix}[step4/method] started name={method.name}")
@@ -134,7 +124,7 @@ def evaluate_trajectory(
             )
             if metrics_path.is_file() and not force:
                 method.restore_metrics(read_json(metrics_path))
-            namespace = f"{patient_id}:{trajectory['trajectory_id']}:{method.name}:{mode}"
+            namespace = f"{patient_id}:{trajectory['trajectory_id']}:{method.name}"
             setup_succeeded = False
             try:
                 method.setup(method_dir, namespace)
@@ -144,16 +134,12 @@ def evaluate_trajectory(
                     trajectory,
                     tasks_by_stage,
                     CachedLLM(answer_client, method_dir / "answer"),
-                    image_root,
-                    image_cache=image_cache,
                     answer_semaphore=answer_semaphore,
                     answer_workers=answer_workers,
                     memory_llm=CachedLLM(method_memo_client, method_dir / "memo"),
                     log_prefix=prefix,
                 )
                 memory_metrics = method.metrics()
-                for record in records:
-                    record["memory_metrics"] = memory_metrics
                 write_json(answers_path, records)
             except Exception:
                 if not setup_succeeded:
@@ -190,7 +176,7 @@ def evaluate_trajectory(
 
     if method_workers > 1:
         def evaluate_method(method) -> dict:
-            return score_answered(answer_method(method, {}))
+            return score_answered(answer_method(method))
 
         with ThreadPoolExecutor(max_workers=method_workers) as executor:
             reports = executor.map(evaluate_method, method_objects)
@@ -201,7 +187,7 @@ def evaluate_trajectory(
         score_executor = ThreadPoolExecutor(max_workers=1) if use_pipeline else None
         try:
             for method in method_objects:
-                answered = answer_method(method, shared_image_cache)
+                answered = answer_method(method)
                 if score_executor is None:
                     method_reports[method.name] = score_answered(answered)
                 else:
@@ -216,7 +202,6 @@ def evaluate_trajectory(
         "methods": [method_reports[name] for name in methods],
         "trajectory_id": trajectory["trajectory_id"],
         "trajectory_type": trajectory_type,
-        "mode": mode,
         "patient_id": patient_id,
         "answer_model": answer_client.model,
         "answer_base_url": answer_client.base_url,
@@ -226,10 +211,9 @@ def evaluate_trajectory(
         "memo_base_url": memo_client.base_url,
         "memory_methods": methods,
     }
-    report_dir = eval_root / mode
-    write_json(report_dir / "report.json", report)
-    (report_dir / "report.csv").write_text(format_csv(report), encoding="utf-8")
-    (report_dir / "report.txt").unlink(missing_ok=True)
+    write_json(eval_root / "report.json", report)
+    (eval_root / "report.csv").write_text(format_csv(report), encoding="utf-8")
+    (eval_root / "report.txt").unlink(missing_ok=True)
     for method_report in report["methods"]:
         log(
             f"{prefix}[step4/result] trajectory={trajectory_type} method={method_report['method']} "
@@ -238,7 +222,7 @@ def evaluate_trajectory(
             f"treatment={method_report['tps']['overall_percent']} "
             f"failed_tasks={len(method_report.get('failed_tasks', []))}"
         )
-    log(f"{prefix}[step4/trajectory] completed type={trajectory_type} mode={mode}")
+    log(f"{prefix}[step4/trajectory] completed type={trajectory_type}")
     return report
 
 
@@ -246,7 +230,6 @@ def trajectory_completed(
     out: Path,
     trajectory_name: str,
     methods: list[str],
-    multimodal: bool,
     answer_model: str,
 ) -> bool:
     trajectory_path = resolve_trajectory_path(out, trajectory_name, answer_model)
@@ -254,17 +237,16 @@ def trajectory_completed(
         return False
     trajectory_type = read_json(trajectory_path)["trajectory_type"]
     eval_root, _ = evaluation_roots(out, trajectory_type, answer_model)
-    mode = "multimodal" if multimodal else "text"
-    report_path = eval_root / mode / "report.json"
-    if not report_path.is_file() or not (eval_root / mode / "report.csv").is_file():
+    report_path = eval_root / "report.json"
+    if not report_path.is_file() or not (eval_root / "report.csv").is_file():
         return False
     method_reports = read_json(report_path).get("methods", [])
     report_methods = {item["method"] for item in method_reports}
     if any(item.get("failed_tasks") or "memory_metrics" not in item for item in method_reports):
         return False
     return set(methods) <= report_methods and all(
-        (eval_root / method / mode / "answers.json").is_file()
-        and (eval_root / method / mode / "report.json").is_file()
+        (eval_root / method / "answers.json").is_file()
+        and (eval_root / method / "report.json").is_file()
         for method in methods
     )
 
@@ -275,7 +257,6 @@ def run_patient(
     settings,
     trajectory_names: list[str],
     methods: list[str],
-    multimodal: bool,
     *,
     answer_model: str,
     answer_base_url: str | None = None,
@@ -287,46 +268,45 @@ def run_patient(
     tasks = read_json(out / "tasks" / "all_tasks.json")["tasks"]
     tasks_by_stage = group_tasks_by_stage(tasks)
     rubric_by_task = load_rubric_index(out)
-    answer_client = build_client(
-        settings,
-        "answer",
-        patient_id,
-        log_prefix="[evaluation]",
-        model=answer_model,
-        base_url=answer_base_url,
-    )
-    verifier_client = build_client(settings, "verifier", patient_id, log_prefix="[evaluation]")
-    memo_client = build_client(settings, "memo", patient_id, log_prefix="[evaluation]")
-    image_root = settings.bench_root if multimodal else None
-    log(
-        f"[evaluation][{patient_id}][step4/start] trajectories={','.join(trajectory_names)} "
-        f"methods={','.join(methods)} multimodal={multimodal} tasks={len(tasks)}"
-    )
-    failed_tasks = 0
-    for trajectory_name in trajectory_names:
-        trajectory_path = resolve_trajectory_path(out, trajectory_name, answer_client.model)
-        if not trajectory_path.is_file():
-            raise FileNotFoundError(f"Required trajectory does not exist: {trajectory_path}")
-        report = evaluate_trajectory(
-            read_json(trajectory_path),
-            tasks_by_stage,
-            rubric_by_task,
-            answer_client,
-            verifier_client,
-            memo_client,
-            out,
-            methods,
-            multimodal,
-            image_root,
-            force=force,
-            answer_workers=answer_workers,
-            score_workers=score_workers,
-            method_workers=method_workers,
+    with (
+        build_client(
+            settings,
+            "answer",
+            patient_id,
+            log_prefix="[evaluation]",
+            model=answer_model,
+            base_url=answer_base_url,
+        ) as answer_client,
+        build_client(settings, "verifier", patient_id, log_prefix="[evaluation]") as verifier_client,
+        build_client(settings, "memo", patient_id, log_prefix="[evaluation]") as memo_client,
+    ):
+        log(
+            f"[evaluation][{patient_id}][step4/start] trajectories={','.join(trajectory_names)} "
+            f"methods={','.join(methods)} tasks={len(tasks)}"
         )
-        failed_tasks += sum(len(item.get("failed_tasks", [])) for item in report["methods"])
-    if failed_tasks:
-        raise RuntimeError(f"{failed_tasks} scoring tasks failed; rerun the same command to retry them")
-    log(f"[evaluation][{patient_id}][step4/done] trajectories={len(trajectory_names)}")
+        failed_tasks = 0
+        for trajectory_name in trajectory_names:
+            trajectory_path = resolve_trajectory_path(out, trajectory_name, answer_client.model)
+            if not trajectory_path.is_file():
+                raise FileNotFoundError(f"Required trajectory does not exist: {trajectory_path}")
+            report = evaluate_trajectory(
+                read_json(trajectory_path),
+                tasks_by_stage,
+                rubric_by_task,
+                answer_client,
+                verifier_client,
+                memo_client,
+                out,
+                methods,
+                force=force,
+                answer_workers=answer_workers,
+                score_workers=score_workers,
+                method_workers=method_workers,
+            )
+            failed_tasks += sum(len(item.get("failed_tasks", [])) for item in report["methods"])
+        if failed_tasks:
+            raise RuntimeError(f"{failed_tasks} scoring tasks failed; rerun the same command to retry them")
+        log(f"[evaluation][{patient_id}][step4/done] trajectories={len(trajectory_names)}")
 
 
 def parse_csv(value: str) -> list[str]:
@@ -341,7 +321,6 @@ def parse_args() -> argparse.Namespace:
     add_batch_arguments(parser)
     parser.add_argument("--trajectories", type=parse_csv, default=["standard_trajectory"])
     parser.add_argument("--methods", type=parse_csv, default=["full_context_memory"])
-    parser.add_argument("--multimodal", action="store_true")
     parser.add_argument("--answer-model", default=None, help="Override ANSWER_OPENAI_MODEL for this run")
     parser.add_argument("--answer-base-url", default=None, help="Override ANSWER_OPENAI_BASE_URL for this run")
     parser.add_argument("--answer-workers", type=int, choices=(1, 2), default=2)
@@ -350,16 +329,8 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def apply_answer_overrides(args: argparse.Namespace) -> None:
-    if args.answer_model:
-        os.environ["ANSWER_OPENAI_MODEL"] = args.answer_model
-    if args.answer_base_url:
-        os.environ["ANSWER_OPENAI_BASE_URL"] = args.answer_base_url
-
-
 def main() -> int:
     args = parse_args()
-    apply_answer_overrides(args)
     unknown_methods = sorted(set(args.methods) - set(available_methods()))
     if unknown_methods:
         raise ValueError(f"Unknown memory methods: {unknown_methods}")
@@ -375,7 +346,6 @@ def main() -> int:
                 out,
                 name,
                 args.methods,
-                args.multimodal,
                 answer_model,
             )
             for name in args.trajectories
@@ -388,7 +358,6 @@ def main() -> int:
             settings,
             args.trajectories,
             args.methods,
-            args.multimodal,
             answer_model=answer_model,
             answer_base_url=args.answer_base_url,
             force=args.force,

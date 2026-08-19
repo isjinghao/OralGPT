@@ -6,15 +6,11 @@ from pathlib import Path
 
 from config import get_settings
 from llm_client import ChatClient
+from report_pipeline.paths import REPORT_OUTPUT_ROOT as OUTPUT_ROOT, REPORT_PDF_DIR as PDF_DIR
 from step1_patient_trajectory.perception_evaluation import PerceptionEvaluator
 from step2_evidence.run_perception_trajectory import format_profile, generate_answer
 from utils.batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
 from utils.json_utils import read_json, write_json
-
-ROOT = Path(__file__).resolve().parents[2]
-PDF_DIR = ROOT / "reports" / "pdf"
-OUTPUT_ROOT = ROOT / "outputs" / "report"
-
 
 def observation_record(stage: dict, qa: dict, answer: str) -> dict:
     return {
@@ -99,33 +95,36 @@ def run_report(report: dict, settings, model: str | None, base_url: str | None, 
     standard = read_json(standard_path)
     evidence = read_json(evidence_path)
     verifier_cfg = settings.llm_for("verifier")
-    client = ChatClient(
-        api_key=answer_cfg.api_key,
-        base_url=model_base_url,
-        model=model_name,
-        log_prefix=f"[report-perception][{patient_id}][{model_name}]",
-    )
-    evaluator = PerceptionEvaluator(
-        verifier=ChatClient(
+    with (
+        ChatClient(
+            api_key=answer_cfg.api_key,
+            base_url=model_base_url,
+            model=model_name,
+            log_prefix=f"[report-perception][{patient_id}][{model_name}]",
+        ) as client,
+        ChatClient(
             api_key=verifier_cfg.api_key,
             base_url=verifier_cfg.base_url,
             model=verifier_cfg.model,
             log_prefix=f"[report-perception-verifier][{patient_id}]",
-        ),
-        standard=standard,
-        evidence=evidence,
-        cache_dir=cache_dir / "verifier",
-        report_path=report_path,
-    )
-    result = generate_trajectory(
-        standard=standard,
-        client=client,
-        image_root=settings.bench_root,
-        cache_dir=cache_dir,
-        force=force,
-        evaluator=evaluator,
-    )
-    write_json(output_path, result)
+        ) as verifier,
+    ):
+        evaluator = PerceptionEvaluator(
+            verifier=verifier,
+            standard=standard,
+            evidence=evidence,
+            cache_dir=cache_dir / "verifier",
+            report_path=report_path,
+        )
+        result = generate_trajectory(
+            standard=standard,
+            client=client,
+            image_root=settings.bench_root,
+            cache_dir=cache_dir,
+            force=force,
+            evaluator=evaluator,
+        )
+        write_json(output_path, result)
     log(f"[report-perception][{patient_id}][done] model={model_name} output={output_path}")
     return "completed"
 

@@ -7,20 +7,15 @@ from pathlib import Path
 
 from config import get_settings
 from utils.batch_utils import add_batch_arguments, log, run_patient_batch, selected_reports
+from report_pipeline.paths import REPORT_OUTPUT_ROOT as OUTPUT_ROOT, REPORT_PDF_DIR as PDF_DIR
 from step4_evaluation.memory import available_methods
-from step4_evaluation.run_step4 import apply_answer_overrides, parse_csv, run_patient, trajectory_completed
-
-ROOT = Path(__file__).resolve().parents[1]
-PDF_DIR = ROOT / "reports" / "pdf"
-OUTPUT_ROOT = ROOT / "outputs" / "report"
-
+from step4_evaluation.run_step4 import parse_csv, run_patient, trajectory_completed
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Evaluate generated report benchmarks")
     add_batch_arguments(parser)
     parser.add_argument("--trajectories", type=parse_csv, default=["standard_trajectory"])
     parser.add_argument("--methods", type=parse_csv, default=["full_context_memory"])
-    parser.add_argument("--multimodal", action="store_true")
     parser.add_argument("--answer-model", default=None, help="Override ANSWER_OPENAI_MODEL for this run")
     parser.add_argument("--answer-base-url", default=None, help="Override ANSWER_OPENAI_BASE_URL for this run")
     parser.add_argument("--answer-workers", type=int, choices=(1, 2), default=2)
@@ -31,7 +26,6 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    apply_answer_overrides(args)
     unknown_methods = sorted(set(args.methods) - set(available_methods()))
     if unknown_methods:
         raise ValueError(f"Unknown memory methods: {unknown_methods}")
@@ -48,7 +42,6 @@ def main() -> int:
                 out,
                 trajectory,
                 args.methods,
-                args.multimodal,
                 answer_model,
             )
             for trajectory in args.trajectories
@@ -61,7 +54,6 @@ def main() -> int:
             settings,
             args.trajectories,
             args.methods,
-            args.multimodal,
             answer_model=answer_model,
             answer_base_url=args.answer_base_url,
             force=args.force,

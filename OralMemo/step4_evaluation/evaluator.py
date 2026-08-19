@@ -7,7 +7,6 @@ from pathlib import Path
 from threading import Semaphore
 
 from utils.batch_utils import log
-from utils.image_utils import image_data_url
 from utils.json_utils import write_json_atomic
 from step4_evaluation.memory import MemoryMethod
 from step4_evaluation.templating import render
@@ -28,8 +27,7 @@ class CachedLLM:
             return None
 
     def complete(self, prompt: str, cache_key: str, max_tokens: int = 4096,
-                 temperature: float = 0.0, images: list[str] | None = None,
-                 timeout: int = 300) -> dict:
+                 temperature: float = 0.0, timeout: int = 300) -> dict:
         path = self.cache_dir / f"{cache_key}.json"
         cache_input = {
             "type": "json",
@@ -37,20 +35,18 @@ class CachedLLM:
             "prompt": prompt,
             "temperature": temperature,
             "max_tokens": max_tokens,
-            "images": images or [],
         }
         cached = self._load_cache(path)
         if cached and cached.get("input") == cache_input:
             return cached["result"]
         result = self.client.complete_json(
-            prompt, temperature=temperature, max_tokens=max_tokens, images=images, timeout=timeout
+            prompt, temperature=temperature, max_tokens=max_tokens, timeout=timeout
         )
         write_json_atomic(path, {"input": cache_input, "result": result})
         return result
 
     def complete_text(self, prompt: str, cache_key: str, max_tokens: int = 4096,
-                      temperature: float = 0.0, images: list[str] | None = None,
-                      timeout: int = 300) -> str:
+                      temperature: float = 0.0, timeout: int = 300) -> str:
         path = self.cache_dir / f"{cache_key}.json"
         cache_input = {
             "type": "text",
@@ -58,60 +54,28 @@ class CachedLLM:
             "prompt": prompt,
             "temperature": temperature,
             "max_tokens": max_tokens,
-            "images": images or [],
         }
         cached = self._load_cache(path)
         if cached and cached.get("input") == cache_input:
             return cached["answer"]
         answer = self.client.complete_text(
-            prompt, temperature=temperature, max_tokens=max_tokens, images=images, timeout=timeout
+            prompt, temperature=temperature, max_tokens=max_tokens, timeout=timeout
         )
         write_json_atomic(path, {"input": cache_input, "answer": answer})
         return answer
 
 
-def gather_image_urls(
-    method: MemoryMethod,
-    image_root: Path,
-    image_cache: dict[Path, str | None],
-) -> list[str]:
-    # 同一轨迹内跨问题、跨记忆方法复用图片 data URL，避免重复读取和编码。
-    urls: list[str] = []
-    for rel in method.images():
-        path = image_root / rel
-        if path not in image_cache:
-            image_cache[path] = image_data_url(path)
-        url = image_cache[path]
-        if url:
-            urls.append(url)
-    return urls
 
-
-def answer_question(
-    method: MemoryMethod,
-    task: dict,
-    llm: CachedLLM,
-    image_root: Path | None,
-    image_cache: dict[Path, str | None],
-) -> dict:
-    """基于记忆方法当前上下文回答一个任务的问题, 返回作答记录。
-
-    method.multimodal=True 且提供 image_root 时, 会把记忆中的图片以 image_url 分块附带给大模型。
-    """
+def answer_question(method: MemoryMethod, task: dict, llm: CachedLLM) -> dict:
+    """基于记忆方法当前上下文回答一个任务的问题，返回作答记录。"""
     memory_context = method.timed_context(task["question"]) or "(empty)"
     prompt = render(
         "answer",
         memory=memory_context,
         question=task["question"],
     )
-    images: list[str] | None = None
-    if method.multimodal and image_root is not None:
-        images = gather_image_urls(method, image_root, image_cache) or None
-
     max_tokens = 4096 if task["task_type"] == "treatment" else 2048
-    answer = llm.complete_text(
-        prompt, cache_key=f"answer_{task['task_id']}", max_tokens=max_tokens, images=images
-    )
+    answer = llm.complete_text(prompt, cache_key=f"answer_{task['task_id']}", max_tokens=max_tokens)
     return {
         "task_id": task["task_id"],
         "task_type": task["task_type"],
@@ -121,7 +85,6 @@ def answer_question(
         "model_answer": answer,
         "memory_context": memory_context,
         "selected_evidence": task.get("selected_evidence", []),
-        "n_images": len(images) if images else 0,
     }
 
 
@@ -174,9 +137,7 @@ def run_streaming(
     trajectory: dict,
     tasks_by_stage: dict[str, list[dict]],
     llm: CachedLLM,
-    image_root: Path | None,
     *,
-    image_cache: dict[Path, str | None],
     answer_semaphore: Semaphore,
     answer_workers: int = 2,
     memory_llm: CachedLLM,
@@ -191,7 +152,6 @@ def run_streaming(
       trajectory     - 单条轨迹(含 stages)
       tasks_by_stage - 按 ask_after_stage 分组的任务
       llm            - 缓存 LLM
-      image_root     - 图片相对路径的根目录(多模态时用于定位并编码图片)
     输出: list[dict] - 每个任务的作答记录。
     """
     method.reset()
@@ -216,7 +176,7 @@ def run_streaming(
                 f"stage={stage_id}{detail}"
             )
             with answer_semaphore:
-                return answer_question(method, task, llm, image_root, image_cache)
+                return answer_question(method, task, llm)
 
         with ThreadPoolExecutor(max_workers=answer_workers) as executor:
             stage_records = list(executor.map(answer, tasks))

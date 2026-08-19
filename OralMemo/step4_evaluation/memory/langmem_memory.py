@@ -19,7 +19,7 @@ from langmem import create_memory_store_manager
 from openai import OpenAI
 
 from config import memo_api_key
-from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
+from step4_evaluation.memory.base import MemoryMethod, format_stage_input
 from step4_evaluation.templating import render
 
 
@@ -65,11 +65,10 @@ class _TrackedEmbeddings(Embeddings):
 class LangMemMemory(MemoryMethod):
     name = "langmem_memory"
 
-    def __init__(self, multimodal: bool = False, top_k: int = 8) -> None:
-        super().__init__(multimodal)
+    def __init__(self, top_k: int = 8) -> None:
+        super().__init__()
         self.top_k = top_k
         self._pending = ""
-        self._images: list[str] = []
         self._store = None
         self._manager = None
         self._embeddings = None
@@ -95,7 +94,6 @@ class LangMemMemory(MemoryMethod):
 
     def reset(self) -> None:
         self._pending = ""
-        self._images = []
         self._store = None
         self._manager = None
         self._embeddings = None
@@ -103,9 +101,6 @@ class LangMemMemory(MemoryMethod):
 
     def observe(self, stage: dict) -> None:
         self._pending = format_stage_input(stage)
-        for path in collect_stage_images(stage):
-            if path not in self._images:
-                self._images.append(path)
 
     def update(self, llm, cache_key: str) -> None:
         if not self._pending:
@@ -122,9 +117,6 @@ class LangMemMemory(MemoryMethod):
                 value = value.model_dump()
             lines.append(f"- {json.dumps(value, ensure_ascii=False, default=str)}")
         return "\n".join(lines)
-
-    def images(self) -> list[str]:
-        return list(self._images)
 
     def close(self) -> None:
         if self._embeddings is not None:

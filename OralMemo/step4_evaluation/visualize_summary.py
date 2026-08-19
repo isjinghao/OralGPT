@@ -13,7 +13,7 @@ TRAJECTORIES = ["standard_trajectory", "model_perception_trajectory"]
 
 
 def method_report(patient_root: Path, trajectory: str, model: str, method: str) -> dict:
-    report = read_json(patient_root / "evaluation" / trajectory / model / "text" / "report.json")
+    report = read_json(patient_root / "evaluation" / trajectory / model / "report.json")
     return next(item for item in report["methods"] if item["method"] == method)
 
 
@@ -64,7 +64,7 @@ main{max-width:1400px;margin:auto;padding:24px 28px 44px}.panel{background:var(-
 table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:11px 9px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}th{background:#f8fafc;color:#475467}.group{background:#eef4ff;font-weight:700}.patient-link{color:var(--blue);font-weight:700;text-decoration:none}.patient-link:hover{text-decoration:underline}.hint{font-size:13px;color:var(--muted);line-height:1.6}.ok{color:#15803d}
 @media(max-width:1100px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:900px){main{padding:16px}.table-wrap{overflow:auto}}
 </style></head><body>
-<header><h1>OralMemo 四病例结果汇总</h1><div class="sub">模型：__MODEL__ · 记忆方法：full_context_memory · 评估模式：text</div></header>
+<header><h1>OralMemo 四病例结果汇总</h1><div class="sub">模型：__MODEL__ · 记忆方法：full_context_memory</div></header>
 <main>
 <section class="panel"><h2>四病例平均分</h2><div id="cards" class="cards"></div></section>
 <section class="panel"><h2>逐病例结果</h2><div class="hint">点击病人姓名进入该病人的综合页面，可查看感知问题、标准参考、模型感知答案，以及标准轨迹和模型感知轨迹的完整逐题评估。</div><div class="table-wrap"><table id="results"></table></div></section>

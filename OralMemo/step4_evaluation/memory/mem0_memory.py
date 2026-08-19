@@ -14,7 +14,7 @@ import os
 from mem0.embeddings.openai import OpenAIEmbedding
 
 from config import memo_api_key
-from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
+from step4_evaluation.memory.base import MemoryMethod, format_stage_input
 
 
 class _TrackedEmbedding(OpenAIEmbedding):
@@ -61,7 +61,6 @@ class Mem0Memory(MemoryMethod):
 
     def __init__(
         self,
-        multimodal: bool = False,
         *,
         user_id: str = "patient",
         storage_dir=None,
@@ -69,14 +68,13 @@ class Mem0Memory(MemoryMethod):
         embedding_model: str | None = None,
         config: dict | None = None,
     ) -> None:
-        super().__init__(multimodal)
+        super().__init__()
         self.user_id = user_id
         self.storage_dir = storage_dir
         self.search_limit = search_limit
         self.embedding_model = embedding_model or os.environ.get("EMBEDDING_MODEL", "text-embedding-3-small")
         self._config_override = config
         self._pending = ""
-        self._images: list[str] = []
         self._memory = None
 
     def setup(self, workdir, namespace: str = "") -> None:
@@ -146,15 +144,11 @@ class Mem0Memory(MemoryMethod):
 
     def reset(self) -> None:
         self._pending = ""
-        self._images = []
         self._client().delete_all(user_id=self.user_id)
 
 
     def observe(self, stage: dict) -> None:
         self._pending = format_stage_input(stage)
-        for path in collect_stage_images(stage):
-            if path not in self._images:
-                self._images.append(path)
 
     def update(self, llm, cache_key: str) -> None:
         # mem0 使用自带 LLM 完成事实抽取与写入决策, 传入的 llm 不使用
@@ -177,9 +171,6 @@ class Mem0Memory(MemoryMethod):
             if text:
                 lines.append(f"- {text}")
         return "\n".join(lines)
-
-    def images(self) -> list[str]:
-        return list(self._images)
 
     def close(self) -> None:
         if self._memory is None:

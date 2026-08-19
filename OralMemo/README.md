@@ -186,17 +186,12 @@ bash scripts/run_step4.sh --limit 4 --num-workers 1 \
   --answer-workers 2 --score-workers 1 --method-workers 1
 ```
 
-指定多条轨迹、多个 memory method 或多模态模式：
+指定多条轨迹和多个 memory method：
 
 ```bash
 bash scripts/run_step4.sh --all --num-workers 1 \
   --trajectories standard_trajectory,model_perception_trajectory \
   --methods single_stage_memory,full_context_memory,summary_memory \
-  --answer-workers 2 --score-workers 1 --method-workers 1
-
-bash scripts/run_step4.sh --all --num-workers 1 --multimodal \
-  --trajectories standard_trajectory,model_perception_trajectory \
-  --methods full_context_memory,summary_memory \
   --answer-workers 2 --score-workers 1 --method-workers 1
 ```
 
@@ -286,7 +281,7 @@ MedGemma 与 OralGPT-Omni 的参数：
 | Step1 | `trajectories/standard_trajectory.json`、`trajectories/<变体名>/<变体名>.json` |
 | Step2 | `evidence/evidence.json`、`graph/evidence_graph.json`、`graph/evidence_graph.html`、`graph/evidence_graph.png`、`cache/...` |
 | Step3 | `tasks/all_tasks.json`、按任务类型分组的 JSON、`rubrics/treatment_rubrics.json`、`cache/step3/...` |
-| Step4 | 每个方法的 `evaluation/<轨迹>/<answer_model>/<方法>/<text|multimodal>/answers.json` 和 `report.json`；多方法汇总位于 `evaluation/<轨迹>/<answer_model>/<text|multimodal>/report.json`、`report.csv`；缓存位于 `cache/step4/<轨迹>/<answer_model>/...` |
+| Step4 | 每个方法的 `evaluation/<轨迹>/<answer_model>/<方法>/answers.json` 和 `report.json`；多方法汇总位于 `evaluation/<轨迹>/<answer_model>/report.json`、`report.csv`；缓存位于 `cache/step4/<轨迹>/<answer_model>/...` |
 
 ---
 
@@ -308,10 +303,6 @@ bash scripts/run_step4.sh --all --num-workers 1 \
   --trajectories short_noisy,medium_noisy,long_noisy,no_ct \
   --methods single_stage_memory,summary_memory,mem0_memory \
   --answer-workers 2 --score-workers 1 --method-workers 1
-
-# 多模态输入
-bash scripts/run_step4.sh --all --num-workers 1 --multimodal \
-  --answer-workers 2 --score-workers 1 --method-workers 1
 ```
 
 ### 命令行参数
@@ -322,7 +313,6 @@ bash scripts/run_step4.sh --all --num-workers 1 --multimodal \
 | `--num-workers` | `1` | 并行处理的病人数 |
 | `--trajectories` | `standard_trajectory` | 逗号分隔的完整轨迹名；模型感知轨迹使用 `model_perception_trajectory` |
 | `--methods` | `full_context_memory` | 逗号分隔的记忆方法 |
-| `--multimodal` | 关闭 | 开启多模态图片输入 |
 | `--answer-workers` | `2` | 同一轨迹内并行回答数，只允许 `1` 或 `2`；跨 method 共享此上限 |
 | `--score-workers` | `1` | verifier 并行评分数，允许 `1`–`4`；跨 method 共享此上限。默认单路评分以获得最高稳定性 |
 | `--method-workers` | `1` | 并行 memory method 数；仅多 GPU 或多服务实例时建议大于 `1` |
@@ -346,7 +336,7 @@ bash scripts/run_step4.sh --all --num-workers 1 --multimodal \
 | `langmem_memory` | `LangMemMemory` | LangMem 提取、更新长期语义记忆并检索 top-8 |
 | `graphiti_memory` | `GraphitiMemory` | Graphiti 增量写入时序知识图谱并混合检索 top-8；需要 Neo4j |
 
-所有方法共享同一个 answer model；`summary_memory`、`mem0_memory`、`langmem_memory` 和 `graphiti_memory` 的记忆构建使用 `MEMO_OPENAI_*`，四种检索方法共享 `EMBEDDING_OPENAI_*`。每次运行按“病人 × 轨迹 × 方法 × text/multimodal”建立独立 namespace，并在轨迹开始前 `reset()`；阶段按顺序释放后才允许写入记忆。
+所有方法共享同一个 answer model；`summary_memory`、`mem0_memory`、`langmem_memory` 和 `graphiti_memory` 的记忆构建使用 `MEMO_OPENAI_*`，四种检索方法共享 `EMBEDDING_OPENAI_*`。每次运行按“病人 × 轨迹 × 方法”建立独立 namespace，并在轨迹开始前 `reset()`；阶段按顺序释放后才允许写入记忆。
 
 ```bash
 bash scripts/run_step4.sh --all \
@@ -475,10 +465,10 @@ Neo4j 启动完成后可访问 `http://127.0.0.1:7474`，使用用户名 `neo4j`
 
 ### 产物（`outputs/.../evaluation/<轨迹>/<answer_model>/`）
 
-- `<方法>/<text|multimodal>/answers.json`：逐任务作答、实际 `memory_context` 和最终 `memory_metrics`
-- `<方法>/<text|multimodal>/memory_metrics.json`：独立成本检查点；方法中途失败也保留已发生的调用统计
-- `<方法>/<text|multimodal>/report.json`：单方法评分及 `memory_metrics` 检查点
-- `<text|multimodal>/report.json` / `report.csv`：同一模型下的多方法结果和成本对比
+- `<方法>/answers.json`：逐任务作答和实际 `memory_context`
+- `<方法>/memory_metrics.json`：独立成本检查点；方法中途失败也保留已发生的调用统计
+- `<方法>/report.json`：单方法评分及 `memory_metrics` 检查点
+- `report.json` / `report.csv`：同一模型下的多方法结果和成本对比
 - 汇总 `report.json` 同时记录 answer、verifier、memo 模型及地址和 `memory_methods`
 - `memory_metrics` 包含写入/检索次数、总检索秒数、Memo LLM 输入/输出 token、embedding 调用/token、失败数和失败率；缓存命中的 Memo 请求不重复计费
 
@@ -584,7 +574,7 @@ outputs/report/<PDF stem>/trajectories/model_perception_trajectory/<answer_model
 - Step0/1：`--max-iters`、`--model`；单篇报告内部的摄取、抽取/校验反馈循环和轨迹生成保持串行。
 - Step2/3：`--stage-workers` 默认 `2`，`--task-workers` 默认 `4`。
 - 模型感知轨迹：`--model`、`--base-url` 可覆盖 `.env` 的 `ANSWER_OPENAI_MODEL` 和 `ANSWER_OPENAI_BASE_URL`；同一 Report 内图片 QA 保持串行。
-- Step4：`--methods`、`--multimodal`、`--answer-model`、`--answer-base-url`、`--answer-workers`、`--score-workers`、`--method-workers`。
+- Step4：`--methods`、`--answer-model`、`--answer-base-url`、`--answer-workers`、`--score-workers`、`--method-workers`。
 
 Step0 摄取、时间线抽取和 Step1 轨迹分别检查已有产物并自动续跑。Step4 支持 method 级答案和评分续跑。三个 report 脚本会自动激活 `cmfbench`，并将额外命令行参数传给对应 Python 入口。
 
@@ -598,4 +588,4 @@ Step0 摄取、时间线抽取和 Step1 轨迹分别检查已有产物并自动�
 | `trajectories/model_perception_trajectory/<answer_model>/` | 模型感知轨迹及图片 QA 的 `perception_report.json` |
 | `evidence/evidence.json`、`graph/` | Step2 证据及证据图 |
 | `tasks/`、`rubrics/` | Step3 benchmark 任务和评分 rubric |
-| `evaluation/standard_trajectory/<answer_model>/` | Step4 评估根目录；各方法的答案和评分位于 `<方法>/<text|multimodal>/`，多方法汇总位于 `<text|multimodal>/` |
+| `evaluation/standard_trajectory/<answer_model>/` | Step4 评估根目录；各方法的答案和评分位于 `<方法>/`，多方法汇总直接位于该目录 |

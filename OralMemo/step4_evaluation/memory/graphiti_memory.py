@@ -15,7 +15,7 @@ from graphiti_core.nodes import EpisodeType
 from graphiti_core.utils.maintenance.graph_data_operations import clear_data
 
 from config import memo_api_key
-from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
+from step4_evaluation.memory.base import MemoryMethod, format_stage_input
 
 
 class _AsyncLoop:
@@ -94,13 +94,12 @@ class _TrackedEmbedder(OpenAIEmbedder):
 class GraphitiMemory(MemoryMethod):
     name = "graphiti_memory"
 
-    def __init__(self, multimodal: bool = False, top_k: int = 8) -> None:
-        super().__init__(multimodal)
+    def __init__(self, top_k: int = 8) -> None:
+        super().__init__()
         self.top_k = top_k
         self._pending = ""
         self._pending_stage = ""
         self._pending_order = 0
-        self._images: list[str] = []
         self._graphiti = None
         self._async_loop = None
         self._group_id = ""
@@ -137,16 +136,12 @@ class GraphitiMemory(MemoryMethod):
 
     def reset(self) -> None:
         self._pending = ""
-        self._images = []
         self._async_loop.run(clear_data(self._graphiti.driver, group_ids=[self._group_id]))
 
     def observe(self, stage: dict) -> None:
         self._pending = format_stage_input(stage)
         self._pending_stage = stage["stage_id"]
         self._pending_order = int(stage["order"])
-        for path in collect_stage_images(stage):
-            if path not in self._images:
-                self._images.append(path)
 
     def update(self, llm, cache_key: str) -> None:
         if not self._pending:
@@ -170,9 +165,6 @@ class GraphitiMemory(MemoryMethod):
             num_results=self.top_k,
         ))
         return "\n".join(f"- {edge.fact}" for edge in edges if edge.fact)
-
-    def images(self) -> list[str]:
-        return list(self._images)
 
     def close(self) -> None:
         if self._graphiti is not None:

@@ -2,7 +2,7 @@
 """
 from __future__ import annotations
 
-from step4_evaluation.memory.base import MemoryMethod, collect_stage_images, format_stage_input
+from step4_evaluation.memory.base import MemoryMethod, format_stage_input
 
 
 class SingleStageMemory(MemoryMethod):
@@ -10,22 +10,16 @@ class SingleStageMemory(MemoryMethod):
 
     name = "single_stage_memory"
 
-    def __init__(self, multimodal: bool = False) -> None:
-        super().__init__(multimodal)
+    def __init__(self) -> None:
+        super().__init__()
         self._buffer = ""
-        self._images: list[str] = []
 
     def reset(self) -> None:
         self._buffer = ""
-        self._images = []
 
     def observe(self, stage: dict) -> None:
         # 直接替换, 等价于每阶段 memory.clear()
         self._buffer = format_stage_input(stage)
-        self._images = collect_stage_images(stage)
 
     def context(self, query: str | None = None) -> str:
         return self._buffer
-
-    def images(self) -> list[str]:
-        return list(self._images)

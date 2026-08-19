@@ -435,16 +435,14 @@ def main() -> None:
     base = settings.output_root
     evidence_json = base / "evidence" / "evidence.json"
     cfg = settings.llm_for("benchmark")
-    client = ChatClient(
-        api_key=cfg.api_key,
-        base_url=cfg.base_url,
-        model=cfg.model,
-    )
-    evidence = json.loads(evidence_json.read_text(encoding="utf-8"))["evidence"]
-    standard = json.loads(
-        (base / "trajectories" / "standard_trajectory.json").read_text(encoding="utf-8")
-    )
-    graph = build_evidence_graph(evidence_json, client=client, cache_dir=base / "cache", max_edges=settings.graph_max_edges)
+    with ChatClient(api_key=cfg.api_key, base_url=cfg.base_url, model=cfg.model) as client:
+        evidence = json.loads(evidence_json.read_text(encoding="utf-8"))["evidence"]
+        standard = json.loads(
+            (base / "trajectories" / "standard_trajectory.json").read_text(encoding="utf-8")
+        )
+        graph = build_evidence_graph(
+            evidence_json, client=client, cache_dir=base / "cache", max_edges=settings.graph_max_edges
+        )
     graph_path = base / "graph" / "evidence_graph.json"
     html_path = base / "graph" / "evidence_graph.html"
     png_path = base / "graph" / "evidence_graph.png"

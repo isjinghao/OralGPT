@@ -107,73 +107,69 @@ def collect_timeline(eval_root: Path) -> list[dict]:
 
 def collect_results(eval_root: Path) -> dict:
     trajectories = []
-    answer_models = set()
     patient_id = eval_root.parent.name
     for trajectory_root in sorted(path for path in eval_root.iterdir() if path.is_dir()):
         for model_root in sorted(path for path in trajectory_root.iterdir() if path.is_dir()):
-            for mode_dir in sorted(path for path in model_root.iterdir() if path.is_dir() and (path / "report.json").exists()):
-                report = read_json(mode_dir / "report.json")
-                answer_model = report.get("answer_model", model_root.name)
-                mode = report.get("mode", mode_dir.name)
-                trajectory_type = report.get("trajectory_type", trajectory_root.name)
-                answer_models.add(answer_model)
-                patient_id = report.get("patient_id", patient_id)
-                method_reports = {m["method"]: m for m in report.get("methods", [])}
-                rows = []
-                for method in sorted(method_reports):
-                    answers_path = model_root / method / mode_dir.name / "answers.json"
-                    if not answers_path.exists():
-                        continue
-                    answers = read_json(answers_path)
-                    method_report = method_reports.get(method, {})
-                    per_task = {x["task_id"]: x for x in method_report.get("per_task", [])}
-                    detail_by_task = {}
-                    for item in method_report.get("tps", {}).get("per_task", []) or []:
-                        detail_by_task[item["task_id"]] = item
-
-                    for ans in answers:
-                        task_id = ans["task_id"]
-                        score = per_task.get(task_id, {})
-                        detail = detail_by_task.get(task_id, {})
-                        evidence_judgement = {
-                            str(e.get("evidence_id", "")).strip(): e
-                            for e in score.get("evidence", []) or []
-                        }
-                        selected_evidence = []
-                        for ev in ans.get("selected_evidence", []) or []:
-                            ev = dict(ev)
-                            judged = evidence_judgement.get(str(ev.get("evidence_id", "")).strip(), {})
-                            if judged:
-                                ev["covered"] = bool(judged.get("covered"))
-                                ev["coverage_reason"] = judged.get("reason", "")
-                            selected_evidence.append(ev)
-
-                        rows.append({
-                            "trajectory": trajectory_type,
-                            "answer_model": answer_model,
-                            "mode": mode,
-                            "method": method,
-                            "task_id": task_id,
-                            "task_type": ans.get("task_type", ""),
-                            "ask_after_stage": ans.get("ask_after_stage", ""),
-                            "question": ans.get("question", ""),
-                            "gold_answer": ans.get("gold_answer", ""),
-                            "model_answer": ans.get("model_answer", ""),
-                            "memory_context": ans.get("memory_context", ""),
-                            "n_images": ans.get("n_images", 0),
-                            "score": score,
-                            "detail": detail,
-                            "selected_evidence": selected_evidence,
-                        })
-                trajectories.append({
-                    "name": f"{trajectory_type}/{answer_model}/{mode}",
-                    "trajectory_type": trajectory_type,
-                    "answer_model": answer_model,
-                    "mode": mode,
-                    "report": report,
-                    "rows": rows,
-                })
-    perceptions = {model: collect_perception(eval_root, model) for model in sorted(answer_models)}
+            report_path = model_root / "report.json"
+            if not report_path.exists():
+                continue
+            report = read_json(report_path)
+            answer_model = report.get("answer_model", model_root.name)
+            trajectory_type = report.get("trajectory_type", trajectory_root.name)
+            patient_id = report.get("patient_id", patient_id)
+            method_reports = {m["method"]: m for m in report.get("methods", [])}
+            rows = []
+            for method in sorted(method_reports):
+                answers_path = model_root / method / "answers.json"
+                if not answers_path.exists():
+                    continue
+                answers = read_json(answers_path)
+                method_report = method_reports[method]
+                per_task = {x["task_id"]: x for x in method_report.get("per_task", [])}
+                detail_by_task = {
+                    item["task_id"]: item
+                    for item in method_report.get("tps", {}).get("per_task", []) or []
+                }
+                for ans in answers:
+                    task_id = ans["task_id"]
+                    score = per_task.get(task_id, {})
+                    evidence_judgement = {
+                        str(e.get("evidence_id", "")).strip(): e
+                        for e in score.get("evidence", []) or []
+                    }
+                    selected_evidence = []
+                    for ev in ans.get("selected_evidence", []) or []:
+                        ev = dict(ev)
+                        if judged := evidence_judgement.get(str(ev.get("evidence_id", "")).strip()):
+                            ev["covered"] = bool(judged.get("covered"))
+                            ev["coverage_reason"] = judged.get("reason", "")
+                        selected_evidence.append(ev)
+                    rows.append({
+                        "trajectory": trajectory_type,
+                        "answer_model": answer_model,
+                        "method": method,
+                        "task_id": task_id,
+                        "task_type": ans.get("task_type", ""),
+                        "ask_after_stage": ans.get("ask_after_stage", ""),
+                        "question": ans.get("question", ""),
+                        "gold_answer": ans.get("gold_answer", ""),
+                        "model_answer": ans.get("model_answer", ""),
+                        "memory_context": ans.get("memory_context", ""),
+                        "score": score,
+                        "detail": detail_by_task.get(task_id, {}),
+                        "selected_evidence": selected_evidence,
+                    })
+            trajectories.append({
+                "name": f"{trajectory_type}/{answer_model}",
+                "trajectory_type": trajectory_type,
+                "answer_model": answer_model,
+                "report": report,
+                "rows": rows,
+            })
+    perceptions = {
+        trajectory["answer_model"]: collect_perception(eval_root, trajectory["answer_model"])
+        for trajectory in trajectories
+    }
     return {
         "patient_id": patient_id,
         "trajectories": trajectories,
@@ -276,7 +272,6 @@ select,input { width:100%; padding:9px 10px; border:1px solid var(--line); borde
 <div class="container">
   <section class="panel summary-grid">
     <div class="metric-card"><h3>answer model</h3><div id="meta-answer-model"></div></div>
-    <div class="metric-card"><h3>mode</h3><div id="meta-mode"></div></div>
     <div class="metric-card"><h3>memory method</h3><div id="meta-memory-method"></div></div>
   </section>
   <nav class="tabs" aria-label="评测阶段">
@@ -344,7 +339,7 @@ function taskTypeLabel(v){ return mapLabel(TASK_TYPE_LABELS, v); }
 function stageLabel(v){ return mapLabel(STAGE_LABELS, v); }
 
 function currentTraj(){ return DATA.trajectories.find(t => t.name === $('traj').value) || DATA.trajectories[0]; }
-function trajectoryOptionLabel(t){ return `${trajLabel(t.trajectory_type)} · ${t.answer_model} · ${t.mode}`; }
+function trajectoryOptionLabel(t){ return `${trajLabel(t.trajectory_type)} · ${t.answer_model}`; }
 function uniq(arr){ return [...new Set(arr)].filter(Boolean).sort(); }
 function fillSelect(sel, values, allLabel, labelFn=(v)=>v){ sel.innerHTML = `<option value="__all__">${allLabel}</option>` + values.map(v=>`<option value="${esc(v)}">${esc(labelFn(v))}</option>`).join(''); }
 function pill(text, cls=''){ return `<span class="pill ${cls}">${esc(text)}</span>`; }
@@ -434,7 +429,6 @@ function setPanel(panelId){
 function renderConfiguration(){
   const t = currentTraj();
   $('meta-answer-model').textContent = t.answer_model;
-  $('meta-mode').textContent = t.mode;
   $('meta-memory-method').textContent = $('method').value === '__all__' ? 'all' : $('method').value;
 }
 function init(){
@@ -501,7 +495,6 @@ function scorePills(r){
   let out = [
     pill(trajLabel(r.trajectory),'blue'),
     pill(`answer model: ${r.answer_model}`),
-    pill(`mode: ${r.mode}`,'blue'),
     pill(`memory method: ${r.method}`,'purple'),
     pill(taskTypeLabel(r.task_type)),
     pill(stageLabel(r.ask_after_stage || 'END'),'amber')
@@ -515,7 +508,6 @@ function scorePills(r){
       out.push(pill(`证据召回分数（ERS）${s.covered_evidence_count ?? 0}/${s.total_evidence_count ?? 0}`, 'blue'));
     }
   }
-  if(r.n_images) out.push(pill(`图片 ${r.n_images}`,'blue'));
   return out.join('');
 }
 function scoreSummaryHtml(r){
