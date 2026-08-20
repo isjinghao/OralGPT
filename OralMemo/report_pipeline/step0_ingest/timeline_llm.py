@@ -89,6 +89,7 @@ def extract_timeline(client, raw_dir: Path, figures: list[dict]) -> dict:
             _extraction_prompt(fulltext, tables_text, figures),
             temperature=0.0,
             max_tokens=16000,
+            required_keys=("timepoints",),
         )
     except InternalServerError:
         client.log("step0/extract", "retrying once with compact source after InternalServerError")
@@ -97,6 +98,7 @@ def extract_timeline(client, raw_dir: Path, figures: list[dict]) -> dict:
             _extraction_prompt(fulltext, tables_text, figures),
             temperature=0.0,
             max_tokens=8000,
+            required_keys=("timepoints",),
         )
 
 
@@ -120,7 +122,7 @@ def repair_timeline(
         tables_text=tables_text,
         fulltext=fulltext,
     )
-    result = client.complete_json(prompt, temperature=0.0, max_tokens=8000)
+    result = client.complete_json(prompt, temperature=0.0, max_tokens=8000, required_keys=("repairs",))
     repaired = {"timepoints": list(timeline["timepoints"])}
     for patch in sorted(result["repairs"], key=lambda item: item["start_index"], reverse=True):
         repaired["timepoints"][patch["start_index"]:patch["end_index"] + 1] = patch["replacement_timepoints"]

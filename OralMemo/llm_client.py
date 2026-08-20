@@ -133,18 +133,19 @@ class ChatClient:
 
     def complete_json(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
                       images: list[str] | None = None, timeout: int = 300,
-                      system_prompt: str | None = None) -> dict:
+                      system_prompt: str | None = None, required_keys: tuple[str, ...] = ()) -> dict:
         content = self._complete(prompt, temperature, max_tokens, images, timeout, system_prompt)
         try:
-            return parse_json_object(content)
+            return parse_required_json(content, required_keys)
         except (TypeError, ValueError) as exc:
             self.log("llm/retry", f"Invalid JSON; requesting one repair: {exc}")
+            required = f" Required top-level keys: {', '.join(required_keys)}." if required_keys else ""
             repair_prompt = (
-                "Return only a valid JSON object that preserves the information in the original response.\n"
-                f"Parsing error: {exc}\n\nOriginal response:\n{content}"
+                "Return only a valid JSON object that preserves the information in the original response."
+                f"{required}\nParsing error: {exc}\n\nOriginal response:\n{content}"
             )
             repaired = self._complete(repair_prompt, 0.0, max_tokens, None, timeout, system_prompt)
-            return parse_json_object(repaired)
+            return parse_required_json(repaired, required_keys)
 
     def complete_text(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
                       images: list[str] | None = None, timeout: int = 300,
@@ -194,4 +195,12 @@ def parse_json_object(text: str) -> dict:
         result = json.loads(text[start:end + 1], object_pairs_hook=_clean_object_pairs)
     if not isinstance(result, dict):
         raise TypeError(f"Expected top-level JSON object, got {type(result).__name__}")
+    return result
+
+
+def parse_required_json(text: str, required_keys: tuple[str, ...]) -> dict:
+    result = parse_json_object(text)
+    missing = [key for key in required_keys if key not in result]
+    if missing:
+        raise ValueError(f"Missing required top-level keys: {', '.join(missing)}")
     return result
