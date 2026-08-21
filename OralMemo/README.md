@@ -23,7 +23,8 @@ OralMemo/
 │   ├── run_step4.sh
 │   ├── run_perception_trajectory.sh
 │   ├── run_step0_step1_report.sh
-│   ├── run_step2_step3_report.sh
+│   ├── run_step2_report.sh
+│   ├── run_step3_report.sh
 │   ├── run_perception_trajectory_report.sh
 │   └── run_step4_report.sh
 ├── reports/                          # 报告下载、统计脚本及本地 PDF/图表
@@ -512,7 +513,8 @@ report_pipeline/
 ├── step1_report_trajectory/           # 报告时间点阶段化、标准轨迹与模型感知轨迹
 │   └── run_perception_trajectory.py   # 仅重新感知图片 observation QA
 ├── run_step0_step1_report.py          # PDF -> 标准轨迹
-├── run_step2_step3_report.py          # 标准轨迹 -> evidence/tasks/rubrics
+├── run_step2_report.py                # 标准轨迹 -> evidence/graph
+├── run_step3_report.py                # evidence/graph -> tasks/rubrics
 └── run_step4_report.py                # 独立评估已生成的 benchmark
 ```
 
@@ -522,8 +524,9 @@ report_pipeline/
 # 运行 reports/pdf/ 下全部报告
 bash scripts/run_step0_step1_report.sh --all --num-workers 2
 
-bash scripts/run_step2_step3_report.sh --all --num-workers 2 \
-  --stage-workers 2 --task-workers 4
+# Step2 全部完成后再运行 Step3，避免复杂 Step3 阻塞后续报告的证据图生成
+bash scripts/run_step2_report.sh --all --num-workers 2 --stage-workers 2
+bash scripts/run_step3_report.sh --all --num-workers 2 --task-workers 4
 
 # 用 .env 中的 ANSWER 模型生成模型感知轨迹；报告级并行数为 4
 bash scripts/run_perception_trajectory_report.sh --all --num-workers 4
@@ -535,8 +538,8 @@ bash scripts/run_step4_report.sh --all --num-workers 1 \
 # 先用一篇报告做测试
 bash scripts/run_step0_step1_report.sh --limit 1 --num-workers 1
 
-bash scripts/run_step2_step3_report.sh --limit 1 --num-workers 1 \
-  --stage-workers 2 --task-workers 4
+bash scripts/run_step2_report.sh --limit 1 --num-workers 1 --stage-workers 2
+bash scripts/run_step3_report.sh --limit 1 --num-workers 1 --task-workers 4
 
 bash scripts/run_perception_trajectory_report.sh --limit 1 --num-workers 1
 
@@ -572,7 +575,7 @@ outputs/report/<PDF stem>/trajectories/model_perception_trajectory/<answer_model
 额外参数：
 
 - Step0/1：`--max-iters`、`--model`；单篇报告内部的摄取、抽取/校验反馈循环和轨迹生成保持串行。
-- Step2/3：`--stage-workers` 默认 `2`，`--task-workers` 默认 `4`。
+- Step2：`--stage-workers` 默认 `2`；Step3：`--task-workers` 默认 `4`。先完成全部 Step2，再单独运行 Step3，可避免慢速任务规划阻塞后续报告的证据图生成。
 - 模型感知轨迹：`--model`、`--base-url` 可覆盖 `.env` 的 `ANSWER_OPENAI_MODEL` 和 `ANSWER_OPENAI_BASE_URL`；同一 Report 内图片 QA 保持串行。
 - Step4：`--methods`、`--answer-model`、`--answer-base-url`、`--answer-workers`、`--score-workers`、`--method-workers`。
 
