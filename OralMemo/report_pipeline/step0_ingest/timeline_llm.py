@@ -81,6 +81,30 @@ def _extraction_prompt(fulltext: str, tables_text: str, figures: list[dict]) -> 
     )
 
 
+def validate_timepoints(timepoints: object) -> None:
+    if not isinstance(timepoints, list) or not all(isinstance(item, dict) for item in timepoints):
+        raise ValueError("timepoints must be a list of objects")
+    if any(not isinstance(item.get("qa_pairs"), list) or not all(isinstance(qa, dict) for qa in item["qa_pairs"]) for item in timepoints):
+        raise ValueError("each timepoint must contain qa_pairs as a list of objects")
+
+
+def validate_timeline(result: dict) -> None:
+    validate_timepoints(result["timepoints"])
+
+
+def validate_repairs(result: dict) -> None:
+    repairs = result["repairs"]
+    if not isinstance(repairs, list) or not all(isinstance(item, dict) for item in repairs):
+        raise ValueError("repairs must be a list of objects")
+    for repair in repairs:
+        if not isinstance(repair.get("start_index"), int) or not isinstance(repair.get("end_index"), int):
+            raise ValueError("each repair needs integer start_index and end_index")
+        try:
+            validate_timepoints(repair["replacement_timepoints"])
+        except KeyError:
+            raise ValueError("each repair needs replacement_timepoints") from None
+
+
 def extract_timeline(client, raw_dir: Path, figures: list[dict]) -> dict:
     # 首轮从源文本中提取完整时间线；服务连续 500 时仅重试一次紧凑来源。
     fulltext, tables_text = load_source_text(raw_dir)
@@ -90,6 +114,7 @@ def extract_timeline(client, raw_dir: Path, figures: list[dict]) -> dict:
             temperature=0.0,
             max_tokens=16000,
             required_keys=("timepoints",),
+            validator=validate_timeline,
         )
     except InternalServerError:
         client.log("step0/extract", "retrying once with compact source after InternalServerError")
@@ -99,6 +124,7 @@ def extract_timeline(client, raw_dir: Path, figures: list[dict]) -> dict:
             temperature=0.0,
             max_tokens=8000,
             required_keys=("timepoints",),
+            validator=validate_timeline,
         )
 
 
@@ -122,7 +148,13 @@ def repair_timeline(
         tables_text=tables_text,
         fulltext=fulltext,
     )
-    result = client.complete_json(prompt, temperature=0.0, max_tokens=8000, required_keys=("repairs",))
+    result = client.complete_json(
+        prompt,
+        temperature=0.0,
+        max_tokens=8000,
+        required_keys=("repairs",),
+        validator=validate_repairs,
+    )
     repaired = {"timepoints": list(timeline["timepoints"])}
     for patch in sorted(result["repairs"], key=lambda item: item["start_index"], reverse=True):
         repaired["timepoints"][patch["start_index"]:patch["end_index"] + 1] = patch["replacement_timepoints"]

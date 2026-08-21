@@ -41,18 +41,43 @@ def cached_completion(
     cache_path: Path,
     max_tokens: int,
     valid: Callable[[dict], bool] | None = None,
+    required_keys: tuple[str, ...] = (),
+    validator: Callable[[dict], None] | None = None,
 ) -> dict:
+    def cache_valid(result: dict) -> bool:
+        if any(key not in result for key in required_keys) or (valid is not None and not valid(result)):
+            return False
+        try:
+            if validator:
+                validator(result)
+        except (TypeError, ValueError):
+            return False
+        return True
+
     cache_input = {"model": client.model, "prompt": prompt, "max_tokens": max_tokens}
     if cache_path.exists():
         cached = json.loads(cache_path.read_text(encoding="utf-8"))
         result = cached.get("result")
-        if cached.get("input") == cache_input and isinstance(result, dict) and (valid is None or valid(result)):
+        if cached.get("input") == cache_input and isinstance(result, dict) and cache_valid(result):
             client.log("step3/cache", f"cache_hit file={cache_path.name}")
             return result
-    result = client.complete_json(prompt, max_tokens=max_tokens)
-    if valid is None or valid(result):
+    result = client.complete_json(
+        prompt,
+        max_tokens=max_tokens,
+        required_keys=required_keys,
+        validator=validator,
+    )
+    if cache_valid(result):
         write_json_atomic(cache_path, {"input": cache_input, "result": result})
     return result
+
+
+def require_object_list(result: dict, key: str, fields: tuple[str, ...] = ()) -> None:
+    value = result[key]
+    if not isinstance(value, list) or not all(isinstance(item, dict) for item in value):
+        raise ValueError(f"{key} must be a list of objects")
+    if any(any(field not in item for field in fields) for item in value):
+        raise ValueError(f"each {key} item must contain: {', '.join(fields)}")
 
 
 def plan_task_candidates(
@@ -84,7 +109,14 @@ def plan_task_candidates(
         )
     prefix = patient_id.replace("__", "_")
     cache_path = cache_dir / "task_planning" / f"{prefix}_{task_type}_a{attempt}.json"
-    result = cached_completion(client, prompt, cache_path, max_tokens=8000)
+    result = cached_completion(
+        client,
+        prompt,
+        cache_path,
+        max_tokens=8000,
+        required_keys=("tasks",),
+        validator=lambda value: require_object_list(value, "tasks"),
+    )
     return result["tasks"]
 
 
@@ -320,7 +352,14 @@ def generate_rubric(
             feedback_block=feedback,
         )
         cache_path = cache_dir / "rubric_generation" / f"{task['task_id']}_a{attempt}.json"
-        result = cached_completion(client, prompt, cache_path, max_tokens=12000)
+        result = cached_completion(
+            client,
+            prompt,
+            cache_path,
+            max_tokens=12000,
+            required_keys=("criteria", "max_score"),
+            validator=lambda value: require_object_list(value, "criteria", ("name", "score")),
+        )
         raw_criteria = result["criteria"]
         total = sum(Decimal(str(item["score"])) for item in raw_criteria)
         if Decimal(str(result["max_score"])) == 100 and total == 100:

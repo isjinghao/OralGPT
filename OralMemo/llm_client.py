@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 import time
+from collections.abc import Callable
 from datetime import datetime, timezone
 from threading import Lock
 
@@ -133,10 +134,11 @@ class ChatClient:
 
     def complete_json(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
                       images: list[str] | None = None, timeout: int = 300,
-                      system_prompt: str | None = None, required_keys: tuple[str, ...] = ()) -> dict:
+                      system_prompt: str | None = None, required_keys: tuple[str, ...] = (),
+                      validator: Callable[[dict], None] | None = None) -> dict:
         content = self._complete(prompt, temperature, max_tokens, images, timeout, system_prompt)
         try:
-            return parse_required_json(content, required_keys)
+            return parse_required_json(content, required_keys, validator)
         except (TypeError, ValueError) as exc:
             self.log("llm/retry", f"Invalid JSON; requesting one repair: {exc}")
             required = f" Required top-level keys: {', '.join(required_keys)}." if required_keys else ""
@@ -145,7 +147,7 @@ class ChatClient:
                 f"{required}\nParsing error: {exc}\n\nOriginal response:\n{content}"
             )
             repaired = self._complete(repair_prompt, 0.0, max_tokens, None, timeout, system_prompt)
-            return parse_required_json(repaired, required_keys)
+            return parse_required_json(repaired, required_keys, validator)
 
     def complete_text(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
                       images: list[str] | None = None, timeout: int = 300,
@@ -198,9 +200,15 @@ def parse_json_object(text: str) -> dict:
     return result
 
 
-def parse_required_json(text: str, required_keys: tuple[str, ...]) -> dict:
+def parse_required_json(
+    text: str,
+    required_keys: tuple[str, ...],
+    validator: Callable[[dict], None] | None = None,
+) -> dict:
     result = parse_json_object(text)
     missing = [key for key in required_keys if key not in result]
     if missing:
         raise ValueError(f"Missing required top-level keys: {', '.join(missing)}")
+    if validator:
+        validator(result)
     return result
