@@ -7,7 +7,7 @@ from collections.abc import Callable
 from datetime import datetime, timezone
 from threading import Lock
 
-from openai import APIConnectionError, APITimeoutError, InternalServerError, OpenAI, RateLimitError
+from openai import APIConnectionError, APITimeoutError, BadRequestError, InternalServerError, OpenAI, RateLimitError
 
 from utils.batch_utils import log
 
@@ -124,6 +124,15 @@ class ChatClient:
                 wait_seconds = reset_wait_seconds(str(exc))
                 self.log("llm/retry", f"RateLimitError; wait={wait_seconds}s next_attempt={attempt + 2}/4")
                 time.sleep(wait_seconds)
+            except BadRequestError as exc:
+                if not is_upstream_request_failed(exc):
+                    raise
+                if attempt >= 3:
+                    self.log("llm/error", "Upstream request failed after 4 attempts")
+                    raise
+                wait_seconds = min(60, 2 ** attempt * 5)
+                self.log("llm/retry", f"Upstream request failed; wait={wait_seconds}s next_attempt={attempt + 2}/4")
+                time.sleep(wait_seconds)
             except (APIConnectionError, APITimeoutError, InternalServerError) as exc:
                 if attempt >= 3:
                     self.log("llm/error", f"{type(exc).__name__} after 4 attempts")
@@ -158,6 +167,10 @@ class ChatClient:
 def build_client(settings, role: str, patient_id: str, *, log_prefix: str, model: str | None = None, base_url: str | None = None) -> ChatClient:
     cfg = settings.llm_for(role)
     return ChatClient(cfg.api_key, base_url or cfg.base_url, model or cfg.model, f"{log_prefix}[{patient_id}]")
+
+
+def is_upstream_request_failed(exc: Exception) -> bool:
+    return "upstream request failed" in str(exc).lower()
 
 
 def reset_wait_seconds(text: str) -> int:

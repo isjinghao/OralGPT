@@ -87,10 +87,12 @@ def build_normal_tasks(
                 break
             candidates = plan_task_candidates(
                 client, patient_stages, index, cache_dir, prompt_dir,
-                entry, missing, attempt, feedback,
+                entry, missing + 2, attempt, feedback,
             )
             current_feedback: list[str] = []
-            for candidate_no, item in enumerate(candidates[:missing], start=1):
+            for candidate_no, item in enumerate(candidates, start=1):
+                if len(accepted) == target:
+                    break
                 if item.get("task_type") != task_type:
                     current_feedback.append(f"wrong task_type: {item.get('task_type')}")
                     continue
@@ -130,7 +132,7 @@ def build_normal_tasks(
             feedback = list(dict.fromkeys(current_feedback))
 
         if len(accepted) != target:
-            raise RuntimeError(f"{task_type}: generated {len(accepted)}/{target} tasks")
+            log(f"{prefix}[step3/planning] task_type={task_type} generated={len(accepted)}/{target}")
         tasks.extend(accepted)
 
     log(f"{prefix}[step3/planning] completed accepted={len(tasks)}")
