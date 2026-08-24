@@ -10,4 +10,4 @@ if ! command -v conda >/dev/null; then
 fi
 eval "$(conda shell.bash hook)"
 conda activate cmfbench
-python -u -m report_pipeline.step1_report_trajectory.run_perception_trajectory "$@"
+python -u -m step2_evidence.evaluate_perception_trajectory "$@"

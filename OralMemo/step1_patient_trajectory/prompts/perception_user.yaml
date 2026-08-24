@@ -5,13 +5,10 @@ user_prompt: |
   Textual clinical records available before the current image question:
   {text_memory}
 
-  Cumulative image observations generated earlier in this trajectory:
-  {memory}
-
   Current stage: {stage_id}
   Modality: {modality}
 
   Answer the following clinical question in its original scope:
   {question}
 
-  The current-stage images are attached. Begin directly with the answer. Base it on the current images and use the profile and cumulative observations only as context.
+  The current-stage images are attached. Begin directly with the answer. Base it on the current images and use the profile and textual clinical records as context.

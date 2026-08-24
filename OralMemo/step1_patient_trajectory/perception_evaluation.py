@@ -79,6 +79,33 @@ def calculate_metrics(verdict: dict, gold_evidence: list[dict]) -> dict:
     }
 
 
+def summarize_records(records: list[dict]) -> dict:
+    total_gold = sum(item["metrics"]["gold_evidence_count"] for item in records)
+    total_predicted = sum(item["metrics"]["predicted_claim_count"] for item in records)
+    total_matched_claims = sum(item["metrics"]["matched_claim_count"] for item in records)
+    total_matched_evidence = sum(item["metrics"]["matched_evidence_count"] for item in records)
+    total_unsupported = sum(
+        item["metrics"]["unsupported_or_contradictory_claim_count"] for item in records
+    )
+    total_hallucinations = sum(item["metrics"]["hallucination_claim_count"] for item in records)
+    precision = metric(total_matched_claims, total_predicted)
+    recall = metric(total_matched_evidence, total_gold)
+    f1 = round(2 * precision * recall / (precision + recall), 4) if precision + recall else 0.0
+    return {
+        "question_count": len(records),
+        "gold_evidence_count": total_gold,
+        "predicted_claim_count": total_predicted,
+        "matched_claim_count": total_matched_claims,
+        "matched_evidence_count": total_matched_evidence,
+        "unsupported_or_contradictory_claim_count": total_unsupported,
+        "hallucination_claim_count": total_hallucinations,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+        "hallucination_control": metric(total_predicted - total_hallucinations, total_predicted),
+    }
+
+
 class PerceptionEvaluator:
     def __init__(
         self,
@@ -99,6 +126,10 @@ class PerceptionEvaluator:
             (stage["stage_id"], int(qa["source_turn_id"])): qa.get("assistant", "")
             for stage in standard.get("stages", [])
             for qa in stage.get("qa_pairs", [])
+        }
+        self.stage_types = {
+            stage["stage_id"]: stage.get("stage_type") or "unknown"
+            for stage in standard.get("stages", [])
         }
 
     def _cache_path(self, stage_id: str, source_turn_id: int) -> Path:
@@ -156,17 +187,11 @@ class PerceptionEvaluator:
         return record
 
     def write_report(self) -> None:
-        total_gold = sum(item["metrics"]["gold_evidence_count"] for item in self.records)
-        total_predicted = sum(item["metrics"]["predicted_claim_count"] for item in self.records)
-        total_matched_claims = sum(item["metrics"]["matched_claim_count"] for item in self.records)
-        total_matched_evidence = sum(item["metrics"]["matched_evidence_count"] for item in self.records)
-        total_unsupported = sum(
-            item["metrics"]["unsupported_or_contradictory_claim_count"] for item in self.records
-        )
-        total_hallucinations = sum(item["metrics"]["hallucination_claim_count"] for item in self.records)
-        precision = metric(total_matched_claims, total_predicted)
-        recall = metric(total_matched_evidence, total_gold)
-        f1 = round(2 * precision * recall / (precision + recall), 4) if precision + recall else 0.0
+        records_by_stage_type: dict[str, list[dict]] = {}
+        for record in self.records:
+            stage_type = self.stage_types.get(record["stage_id"], "unknown")
+            records_by_stage_type.setdefault(stage_type, []).append(record)
+
         report = {
             "patient_id": self.standard["patient_id"],
             "task": "stage1_perception",
@@ -176,18 +201,10 @@ class PerceptionEvaluator:
                 "f1": "harmonic mean of precision and recall",
                 "hallucination_control": "1 - hallucination claims / predicted claims; plausible claims outside the curated evidence are not automatically hallucinations",
             },
-            "overall": {
-                "question_count": len(self.records),
-                "gold_evidence_count": total_gold,
-                "predicted_claim_count": total_predicted,
-                "matched_claim_count": total_matched_claims,
-                "matched_evidence_count": total_matched_evidence,
-                "unsupported_or_contradictory_claim_count": total_unsupported,
-                "hallucination_claim_count": total_hallucinations,
-                "precision": precision,
-                "recall": recall,
-                "f1": f1,
-                "hallucination_control": metric(total_predicted - total_hallucinations, total_predicted),
+            "overall": summarize_records(self.records),
+            "by_stage_type": {
+                stage_type: summarize_records(records)
+                for stage_type, records in sorted(records_by_stage_type.items())
             },
             "per_question": self.records,
         }

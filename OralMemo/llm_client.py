@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from collections.abc import Callable
@@ -88,13 +89,15 @@ class ChatClient:
         system_prompt: str | None,
     ) -> str:
         messages = self._messages(prompt, images, system_prompt)
+        request_max_tokens = max_tokens
+        max_retry_tokens = int(os.environ.get("OPENAI_EMPTY_CONTENT_RETRY_MAX_TOKENS", "8192"))
         for attempt in range(4):
             try:
                 response = self.client.chat.completions.create(
                     model=self.model,
                     messages=messages,
                     temperature=temperature,
-                    max_tokens=max_tokens,
+                    max_tokens=request_max_tokens,
                     timeout=timeout,
                 )
                 usage = response.usage
@@ -104,15 +107,22 @@ class ChatClient:
                     self._usage["output_tokens"] += int(usage.completion_tokens or 0) if usage else 0
                 if not response.choices:
                     raise ValueError("LLM response contains no choices")
-                content = self._content_text(response.choices[0].message.content).strip()
+                choice = response.choices[0]
+                content = self._content_text(choice.message.content).strip()
                 if not content:
                     if attempt >= 3:
                         self.log("llm/error", "Empty message.content after 4 attempts")
                         raise ValueError("LLM response message.content is empty")
+                    finish_reason = getattr(choice, "finish_reason", None)
+                    completion_tokens = int(getattr(usage, "completion_tokens", 0) or 0) if usage else 0
+                    request_max_tokens = min(max(request_max_tokens * 2, 4096), max_retry_tokens)
                     wait_seconds = 2 ** (attempt + 1)
                     self.log(
                         "llm/retry",
-                        f"Empty message.content; wait={wait_seconds}s next_attempt={attempt + 2}/4",
+                        "Empty message.content; "
+                        f"finish_reason={finish_reason} completion_tokens={completion_tokens} "
+                        f"next_max_tokens={request_max_tokens} "
+                        f"wait={wait_seconds}s next_attempt={attempt + 2}/4",
                     )
                     time.sleep(wait_seconds)
                     continue

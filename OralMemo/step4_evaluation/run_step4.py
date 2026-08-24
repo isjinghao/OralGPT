@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import shutil
-from concurrent.futures import Future, ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from threading import Semaphore
 
@@ -79,33 +79,42 @@ def evaluate_trajectory(
     out: Path,
     methods: list[str],
     *,
+    phase: str,
     force: bool = False,
     answer_workers: int = 2,
     score_workers: int = 1,
     method_workers: int = 1,
-) -> dict:
+) -> dict | None:
+    if phase not in {"answers", "scoring"}:
+        raise ValueError(f"Unsupported step4 phase: {phase}")
+
     patient_id = trajectory["patient_id"]
     prefix = f"[evaluation][{patient_id}]"
     trajectory_type = trajectory["trajectory_type"]
     present_stages = {stage["stage_id"] for stage in trajectory["stages"]}
     missing = sorted(stage_id for stage_id in tasks_by_stage if stage_id not in present_stages)
     log(
-        f"{prefix}[step4/trajectory] started type={trajectory_type} "
+        f"{prefix}[step4/trajectory] started type={trajectory_type} phase={phase} "
         f"stages={len(trajectory['stages'])} missing_task_stages={len(missing)}"
     )
 
     eval_root, cache_root = evaluation_roots(out, trajectory_type, answer_client.model)
     answer_semaphore = Semaphore(answer_workers)
     score_semaphore = Semaphore(score_workers)
-    method_reports: dict[str, dict] = {}
     method_objects = build_methods(names=methods)
 
-    def answer_method(method):
+    def method_paths(method):
         method_dir = cache_root / method.name
         method_eval_dir = eval_root / method.name
-        answers_path = method_eval_dir / "answers.json"
-        metrics_path = method_eval_dir / "memory_metrics.json"
-        method_report_path = method_eval_dir / "report.json"
+        return (
+            method_dir,
+            method_eval_dir / "answers.json",
+            method_eval_dir / "memory_metrics.json",
+            method_eval_dir / "report.json",
+        )
+
+    def answer_method(method):
+        method_dir, answers_path, metrics_path, method_report_path = method_paths(method)
         cached_records = read_json(answers_path) if answers_path.is_file() and not force else None
         answers_rebuilt = cached_records is None or not metrics_path.is_file()
         if not answers_rebuilt:
@@ -154,6 +163,17 @@ def evaluate_trajectory(
             log(f"{prefix}[step4/method] completed name={method.name} answers={len(records)}")
         return method, method_dir, method_report_path, records, memory_metrics, answers_rebuilt
 
+    def load_answered(method):
+        method_dir, answers_path, metrics_path, method_report_path = method_paths(method)
+        if not answers_path.is_file():
+            raise FileNotFoundError(f"Missing frozen answers for scoring: {answers_path}")
+        if not metrics_path.is_file():
+            raise FileNotFoundError(f"Missing memory metrics for scoring: {metrics_path}")
+        records = read_json(answers_path)
+        memory_metrics = read_json(metrics_path)
+        log(f"{prefix}[step4/resume] method={method.name} answers=loaded_for_scoring")
+        return method, method_dir, method_report_path, records, memory_metrics, False
+
     def score_answered(answered) -> dict:
         method, method_dir, report_path, records, memory_metrics, answers_rebuilt = answered
         if report_path.is_file() and not force and not answers_rebuilt:
@@ -174,30 +194,27 @@ def evaluate_trajectory(
             score_semaphore,
         )
 
-    if method_workers > 1:
-        def evaluate_method(method) -> dict:
-            return score_answered(answer_method(method))
+    def run_answer_phase() -> list[tuple]:
+        if method_workers > 1:
+            with ThreadPoolExecutor(max_workers=method_workers) as executor:
+                return list(executor.map(answer_method, method_objects))
+        return [answer_method(method) for method in method_objects]
 
-        with ThreadPoolExecutor(max_workers=method_workers) as executor:
-            reports = executor.map(evaluate_method, method_objects)
-            method_reports = {method.name: report for method, report in zip(method_objects, reports)}
-    else:
-        score_futures: dict[str, Future] = {}
-        use_pipeline = answer_client.base_url != verifier_client.base_url
-        score_executor = ThreadPoolExecutor(max_workers=1) if use_pipeline else None
-        try:
-            for method in method_objects:
-                answered = answer_method(method)
-                if score_executor is None:
-                    method_reports[method.name] = score_answered(answered)
-                else:
-                    score_futures[method.name] = score_executor.submit(score_answered, answered)
-            for method_name, future in score_futures.items():
-                method_reports[method_name] = future.result()
-        finally:
-            if score_executor is not None:
-                score_executor.shutdown(wait=True)
+    def run_scoring_phase(answered_methods: list[tuple]) -> dict[str, dict]:
+        if method_workers > 1:
+            with ThreadPoolExecutor(max_workers=method_workers) as executor:
+                reports = list(executor.map(score_answered, answered_methods))
+        else:
+            reports = [score_answered(answered) for answered in answered_methods]
+        return {answered[0].name: report for answered, report in zip(answered_methods, reports)}
 
+    if phase == "answers":
+        run_answer_phase()
+        log(f"{prefix}[step4/trajectory] completed type={trajectory_type} phase=answers")
+        return None
+
+    answered_methods = [load_answered(method) for method in method_objects]
+    method_reports = run_scoring_phase(answered_methods)
     report = {
         "methods": [method_reports[name] for name in methods],
         "trajectory_id": trajectory["trajectory_id"],
@@ -222,11 +239,28 @@ def evaluate_trajectory(
             f"treatment={method_report['tps']['overall_percent']} "
             f"failed_tasks={len(method_report.get('failed_tasks', []))}"
         )
-    log(f"{prefix}[step4/trajectory] completed type={trajectory_type}")
+    log(f"{prefix}[step4/trajectory] completed type={trajectory_type} phase={phase}")
     return report
 
+def trajectory_answers_completed(
+    out: Path,
+    trajectory_name: str,
+    methods: list[str],
+    answer_model: str,
+) -> bool:
+    trajectory_path = resolve_trajectory_path(out, trajectory_name, answer_model)
+    if not trajectory_path.is_file():
+        return False
+    trajectory_type = read_json(trajectory_path)["trajectory_type"]
+    eval_root, _ = evaluation_roots(out, trajectory_type, answer_model)
+    return all(
+        (eval_root / method / "answers.json").is_file()
+        and (eval_root / method / "memory_metrics.json").is_file()
+        for method in methods
+    )
 
-def trajectory_completed(
+
+def trajectory_scoring_completed(
     out: Path,
     trajectory_name: str,
     methods: list[str],
@@ -251,6 +285,19 @@ def trajectory_completed(
     )
 
 
+def trajectory_completed(
+    out: Path,
+    trajectory_name: str,
+    methods: list[str],
+    answer_model: str,
+    phase: str,
+) -> bool:
+    if phase == "answers":
+        return trajectory_answers_completed(out, trajectory_name, methods, answer_model)
+    if phase == "scoring":
+        return trajectory_scoring_completed(out, trajectory_name, methods, answer_model)
+    raise ValueError(f"Unsupported step4 phase: {phase}")
+
 def run_patient(
     out: Path,
     patient_id: str,
@@ -264,6 +311,7 @@ def run_patient(
     answer_workers: int = 2,
     score_workers: int = 1,
     method_workers: int = 1,
+    phase: str,
 ) -> None:
     tasks = read_json(out / "tasks" / "all_tasks.json")["tasks"]
     tasks_by_stage = group_tasks_by_stage(tasks)
@@ -281,7 +329,7 @@ def run_patient(
         build_client(settings, "memo", patient_id, log_prefix="[evaluation]") as memo_client,
     ):
         log(
-            f"[evaluation][{patient_id}][step4/start] trajectories={','.join(trajectory_names)} "
+            f"[evaluation][{patient_id}][step4/start] phase={phase} trajectories={','.join(trajectory_names)} "
             f"methods={','.join(methods)} tasks={len(tasks)}"
         )
         failed_tasks = 0
@@ -298,12 +346,14 @@ def run_patient(
                 memo_client,
                 out,
                 methods,
+                phase=phase,
                 force=force,
                 answer_workers=answer_workers,
                 score_workers=score_workers,
                 method_workers=method_workers,
             )
-            failed_tasks += sum(len(item.get("failed_tasks", [])) for item in report["methods"])
+            if report is not None:
+                failed_tasks += sum(len(item.get("failed_tasks", [])) for item in report["methods"])
         if failed_tasks:
             raise RuntimeError(f"{failed_tasks} scoring tasks failed; rerun the same command to retry them")
         log(f"[evaluation][{patient_id}][step4/done] trajectories={len(trajectory_names)}")
@@ -326,6 +376,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--answer-workers", type=int, choices=(1, 2), default=2)
     parser.add_argument("--score-workers", type=int, choices=(1, 2, 3, 4), default=1)
     parser.add_argument("--method-workers", type=int, default=1)
+    parser.add_argument("--phase", choices=("answers", "scoring"), required=True)
     return parser.parse_args()
 
 
@@ -347,6 +398,7 @@ def main() -> int:
                 name,
                 args.methods,
                 answer_model,
+                args.phase,
             )
             for name in args.trajectories
         ):
@@ -364,6 +416,7 @@ def main() -> int:
             answer_workers=args.answer_workers,
             score_workers=args.score_workers,
             method_workers=args.method_workers,
+            phase=args.phase,
         )
         return "completed"
 

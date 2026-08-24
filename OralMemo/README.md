@@ -20,13 +20,15 @@ OralMemo/
 ├── scripts/                          # WSL 批量运行入口（自动激活 cmfbench）
 │   ├── run_step1_step2.sh
 │   ├── run_step3.sh
-│   ├── run_step4.sh
+│   ├── run_step4_answers.sh            # 病人 Step4：只生成冻结 answers.json
+│   ├── run_step4_scoring.sh            # 病人 Step4：读取 answers.json 并 verifier 打分
 │   ├── run_perception_trajectory.sh
+│   ├── run_perception_evaluation.sh
 │   ├── run_step0_step1_report.sh
 │   ├── run_step2_report.sh
 │   ├── run_step3_report.sh
-│   ├── run_perception_trajectory_report.sh
-│   └── run_step4_report.sh
+│   ├── run_step4_report_answers.sh     # Report Step4：只生成冻结 answers.json
+│   └── run_step4_report_scoring.sh     # Report Step4：读取 answers.json 并 verifier 打分
 ├── reports/                          # 报告下载、统计脚本及本地 PDF/图表
 ├── oralgpt_cmf_llamafactory_sft_dataset.json   # 原始患者数据集（SFT 格式）
 ├── SH9HCMFdata/                      # 影像与表格原始数据（png/xlsx/jpg）
@@ -180,23 +182,29 @@ bash scripts/run_step3.sh --all --num-workers 2 --task-workers 4
 
 ### 3. 运行 Step4 测评
 
-Step3 完成后执行。默认评估 `standard_trajectory` 和 `full_context_memory`：
+Step3 完成后先生成冻结回答，再用 verifier 单独打分。默认评估 `standard_trajectory` 和 `full_context_memory`：
 
 ```bash
-bash scripts/run_step4.sh --limit 4 --num-workers 1 \
-  --answer-workers 2 --score-workers 1 --method-workers 1
+bash scripts/run_step4_answers.sh --limit 4 --num-workers 1 \
+  --answer-workers 2 --method-workers 1
+bash scripts/run_step4_scoring.sh --limit 4 --num-workers 1 \
+  --score-workers 1 --method-workers 1
 ```
 
 指定多条轨迹和多个 memory method：
 
 ```bash
-bash scripts/run_step4.sh --all --num-workers 1 \
+bash scripts/run_step4_answers.sh --all --num-workers 1 \
   --trajectories standard_trajectory,model_perception_trajectory \
   --methods single_stage_memory,full_context_memory,summary_memory \
-  --answer-workers 2 --score-workers 1 --method-workers 1
+  --answer-workers 2 --method-workers 1
+bash scripts/run_step4_scoring.sh --all --num-workers 1 \
+  --trajectories standard_trajectory,model_perception_trajectory \
+  --methods single_stage_memory,full_context_memory,summary_memory \
+  --score-workers 1 --method-workers 1
 ```
 
-`model_perception_trajectory` 必须先按被测模型生成，路径为 `trajectories/model_perception_trajectory/<answer_model>/model_perception_trajectory.json`。其他轨迹从 `trajectories/<name>/<name>.json` 读取。`--method-workers` 默认 `1`；只有多 GPU 或多服务实例时才建议设置为大于 `1`。Step4 会用共享并发额度限制跨方法的 Answer 总并发和 Verifier 总并发。
+`model_perception_trajectory` 必须先按被测模型生成，路径为 `trajectories/model_perception_trajectory/<answer_model>/model_perception_trajectory.json`。其他轨迹从 `trajectories/<name>/<name>.json` 读取。`--method-workers` 默认 `1`；只有多 GPU 或多服务实例时才建议设置为大于 `1`。Answer 阶段只写 `answers.json` 和 `memory_metrics.json`；Scoring 阶段读取这些冻结回答并写原有 `report.json`、`report.csv`。
 
 ### 完整实验前的服务准备
 
@@ -215,32 +223,31 @@ bash scripts/run_step4.sh --all --num-workers 1 \
 
 ### Autodl 容器：启动本地 VLM
 
-当前 Autodl 容器的服务脚本位于 `/root/autodl-tmp/serve`。三个脚本会自行加载所需环境、后台运行、写入 PID/日志，并等待服务就绪；无需手动 `conda activate`：
+当前 Autodl 容器的服务脚本位于 `/root/autodl-tmp/serve`。本地模型服务脚本会自行加载所需环境、后台运行、写入 PID/日志，并等待服务就绪；无需手动 `conda activate`：
 
 | 模型 | 启动脚本 | 默认地址 | API model id | 实际运行环境 |
 | --- | --- | --- | --- | --- |
-| LLaVA-Med-7B | `start_llava_med_api.sh` | `http://127.0.0.1:8001/v1` | `llava-med-7b` | `cmfbench` |
-| MedGemma | `start_medgemma_api.sh` | `http://127.0.0.1:8002/v1` | `medgemma` | `/root/autodl-tmp/venvs/medgemma` |
-| OralGPT-Omni-7B | `start_oralgpt_omni_api.sh` | `http://127.0.0.1:8003/v1` | `oralgpt-omni-7b` | `/root/autodl-tmp/venvs/oralgpt-llamafactory`（LLaMA-Factory `qwen2_vl` 模板） |
+| MedGemma | `start_medgemma_api.sh` | `http://127.0.0.1:8002/v1` | `medgemma` | `/root/autodl-tmp/venvs/vllm` + vLLM OpenAI server |
+| OralGPT-Omni-7B | `start_oralgpt_omni_api.sh` | `http://127.0.0.1:8003/v1` | `oralgpt-omni-7b` | `/root/autodl-tmp/venvs/vllm` + vLLM OpenAI server |
+
+MedGemma 与 OralGPT-Omni 当前使用 vLLM 后端以支持服务端批处理和并发调度。vLLM 脚本可用环境变量覆盖：`PORT`、`MAX_MODEL_LEN`、`GPU_MEMORY_UTILIZATION`、`MAX_NUM_SEQS`、`MODEL_PATH`、`MODEL_ID`。
 
 按需启动一个或多个模型：
 
 ```bash
-bash /root/autodl-tmp/serve/start_llava_med_api.sh
 bash /root/autodl-tmp/serve/start_medgemma_api.sh
 bash /root/autodl-tmp/serve/start_oralgpt_omni_api.sh
 ```
 
-检查服务。LLaVA-Med 和 MedGemma 提供 `/health`；OralGPT 的官方 LLaMA-Factory API 使用 `/v1/models` 作为就绪检查：
+检查服务。vLLM 服务统一用 `/v1/models` 或 `/health` 检查：
 
 ```bash
-curl http://127.0.0.1:8001/health
-curl http://127.0.0.1:8002/health
+curl http://127.0.0.1:8002/v1/models
 curl http://127.0.0.1:8003/v1/models
 
 # 查看日志
-tail -f /root/autodl-tmp/serve/logs/llava-med-api.log
-# 或 medgemma-api.log / oralgpt-omni-api.log
+tail -f /root/autodl-tmp/serve/logs/medgemma-api.log
+tail -f /root/autodl-tmp/serve/logs/oralgpt-omni-api.log
 ```
 
 停止全部本地模型服务：
@@ -249,29 +256,33 @@ tail -f /root/autodl-tmp/serve/logs/llava-med-api.log
 bash /root/autodl-tmp/serve/stop_model_apis.sh
 ```
 
-三个模型共用一张 GPU 时，建议每个模型先使用 `--num-workers 1 --answer-workers 1 --method-workers 1` 冒烟。不要同时提高病人级、answer 级和 method 级并发；`--score-workers` 访问的是独立的 verifier 服务，多个 Step4 进程共享同一个 verifier 时仍应控制总并发。
+本地模型共用一张 GPU 时，建议每个模型先使用 `--num-workers 1 --question-workers 1 --answer-workers 1 --method-workers 1` 冒烟。不要同时提高病人级、问题级、answer 级和 method 级并发；`--score-workers` 和感知评估访问的是独立的 verifier 服务，多个进程共享同一个 verifier 时仍应控制总并发。
 
-模型感知轨迹必须由同一个被测模型生成。以下以 LLaVA-Med 为例；MedGemma / OralGPT 只替换模型 ID 与地址：
+模型感知轨迹必须由同一个被测模型生成。以下以 MedGemma 为例；OralGPT-Omni 只替换模型 ID 与地址：
 
 ```bash
-bash scripts/run_perception_trajectory.sh --limit 1 --num-workers 1 \
-  --model llava-med-7b --base-url http://127.0.0.1:8001/v1
+bash scripts/run_perception_trajectory.sh --limit 1 --num-workers 1 --question-workers 1 \
+  --model medgemma --base-url http://127.0.0.1:8002/v1
+bash scripts/run_perception_evaluation.sh --limit 1 --num-workers 1 --question-workers 1 \
+  --model medgemma
 
-bash scripts/run_step4.sh --limit 1 --num-workers 1 \
+bash scripts/run_step4_answers.sh --limit 1 --num-workers 1 \
   --trajectories standard_trajectory,model_perception_trajectory \
   --methods full_context_memory,summary_memory,vector_memory,mem0_memory,langmem_memory,graphiti_memory \
-  --answer-model llava-med-7b \
-  --answer-base-url http://127.0.0.1:8001/v1 \
-  --answer-workers 1 --score-workers 1 --method-workers 1
+  --answer-model medgemma \
+  --answer-base-url http://127.0.0.1:8002/v1 \
+  --answer-workers 1 --method-workers 1
+bash scripts/run_step4_scoring.sh --limit 1 --num-workers 1 \
+  --trajectories standard_trajectory,model_perception_trajectory \
+  --methods full_context_memory,summary_memory,vector_memory,mem0_memory,langmem_memory,graphiti_memory \
+  --answer-model medgemma \
+  --answer-base-url http://127.0.0.1:8002/v1 \
+  --score-workers 1 --method-workers 1
 ```
 
-MedGemma 与 OralGPT-Omni 的参数：
+OralGPT-Omni-7B 对应参数：
 
 ```bash
-# MedGemma
---answer-model medgemma --answer-base-url http://127.0.0.1:8002/v1
-
-# OralGPT-Omni-7B
 --answer-model oralgpt-omni-7b --answer-base-url http://127.0.0.1:8003/v1
 ```
 
@@ -288,22 +299,28 @@ MedGemma 与 OralGPT-Omni 的参数：
 
 ## 四、Step4 评测
 
-对同一条临床轨迹，按阶段流式读取信息，并在每个阶段结束后释放并回答该阶段的任务；再对作答打分，汇总不同记忆方法的对比报告。
+对同一条临床轨迹，按阶段流式读取信息，并在每个阶段结束后释放并回答该阶段的任务。Step4 分为两个清晰阶段：先生成并冻结 `answers.json`，再读取冻结答案调用 verifier 打分并汇总报告。
 
 ### 运行
 
-使用 `scripts/run_step4.sh` 独立启动测评：
+推荐分两步运行 Step4：
 
 ```bash
 # 默认：前 4 个病人的标准轨迹 + full_context_memory
-bash scripts/run_step4.sh --limit 4 --num-workers 1 \
-  --answer-workers 2 --score-workers 1 --method-workers 1
+bash scripts/run_step4_answers.sh --limit 4 --num-workers 1 \
+  --answer-workers 2 --method-workers 1
+bash scripts/run_step4_scoring.sh --limit 4 --num-workers 1 \
+  --score-workers 1 --method-workers 1
 
 # 指定轨迹变体和多种记忆方法
-bash scripts/run_step4.sh --all --num-workers 1 \
+bash scripts/run_step4_answers.sh --all --num-workers 1 \
   --trajectories short_noisy,medium_noisy,long_noisy,no_ct \
   --methods single_stage_memory,summary_memory,mem0_memory \
-  --answer-workers 2 --score-workers 1 --method-workers 1
+  --answer-workers 2 --method-workers 1
+bash scripts/run_step4_scoring.sh --all --num-workers 1 \
+  --trajectories short_noisy,medium_noisy,long_noisy,no_ct \
+  --methods single_stage_memory,summary_memory,mem0_memory \
+  --score-workers 1 --method-workers 1
 ```
 
 ### 命令行参数
@@ -317,11 +334,12 @@ bash scripts/run_step4.sh --all --num-workers 1 \
 | `--answer-workers` | `2` | 同一轨迹内并行回答数，只允许 `1` 或 `2`；跨 method 共享此上限 |
 | `--score-workers` | `1` | verifier 并行评分数，允许 `1`–`4`；跨 method 共享此上限。默认单路评分以获得最高稳定性 |
 | `--method-workers` | `1` | 并行 memory method 数；仅多 GPU 或多服务实例时建议大于 `1` |
-| `--force` | 关闭 | 重新执行所选方法和评分；底层单请求缓存仍可复用 |
+| `--phase` | 脚本固定传入 | 底层 Python 参数；`answers` 只生成 `answers.json` / `memory_metrics.json`，`scoring` 只读取冻结 answers 并打分 |
+| `--force` | 关闭 | 在 answers 阶段重建所选方法回答；在 scoring 阶段重新打分；底层单请求缓存仍可复用 |
 | `--answer-model` | `.env` 的 `ANSWER_OPENAI_MODEL` | 覆盖本次被测回答模型名，并用于结果目录隔离 |
 | `--answer-base-url` | `.env` 的 `ANSWER_OPENAI_BASE_URL` | 覆盖本次被测模型的 OpenAI-compatible 地址 |
 
-同一阶段的问题会并行回答，阶段之间及 `summary_memory` 更新仍按时间顺序执行。评分按任务并行。Answer 与 Verifier 使用不同服务时，默认还能在方法之间形成回答/评分流水线；`--method-workers > 1` 则会直接并行运行不同 memory method。
+同一阶段的问题会并行回答，阶段之间及 `summary_memory` 更新仍按时间顺序执行。评分按任务并行。正式实验建议先运行 answers 阶段冻结被测模型输出，再运行 scoring 阶段；这样本地 answer 服务和远端 verifier 的失败、限流、成本都能独立控制。
 
 当前 Step4 单次请求超时为 300 秒。输出上限分别为：treatment 回答 4096、其他回答 2048、`summary_memory` 4096、base/rubric/evidence 评分 2048 tokens。单个评分请求连续四次失败时，该题会记录到方法报告的 `failed_tasks` 并跳过，其他题和患者继续运行；含失败任务的报告不会被视为完成，重新执行同一命令会复用成功缓存并补评失败题。
 
@@ -340,7 +358,9 @@ bash scripts/run_step4.sh --all --num-workers 1 \
 所有方法共享同一个 answer model；`summary_memory`、`mem0_memory`、`langmem_memory` 和 `graphiti_memory` 的记忆构建使用 `MEMO_OPENAI_*`，四种检索方法共享 `EMBEDDING_OPENAI_*`。每次运行按“病人 × 轨迹 × 方法”建立独立 namespace，并在轨迹开始前 `reset()`；阶段按顺序释放后才允许写入记忆。
 
 ```bash
-bash scripts/run_step4.sh --all \
+bash scripts/run_step4_answers.sh --all \
+  --methods full_context_memory,summary_memory,vector_memory,mem0_memory,langmem_memory,graphiti_memory
+bash scripts/run_step4_scoring.sh --all \
   --methods full_context_memory,summary_memory,vector_memory,mem0_memory,langmem_memory,graphiti_memory
 ```
 
@@ -510,8 +530,7 @@ PDF ─MinerU─► 全文/表格/图片 ─►  抽取模型 extract_timeline �
 ```
 report_pipeline/
 ├── step0_ingest/                      # PDF 摄取、时间线抽取与校验
-├── step1_report_trajectory/           # 报告时间点阶段化、标准轨迹与模型感知轨迹
-│   └── run_perception_trajectory.py   # 仅重新感知图片 observation QA
+├── step1_report_trajectory/           # 报告时间点阶段化与标准轨迹
 ├── run_step0_step1_report.py          # PDF -> 标准轨迹
 ├── run_step2_report.py                # 标准轨迹 -> evidence/graph
 ├── run_step3_report.py                # evidence/graph -> tasks/rubrics
@@ -528,12 +547,16 @@ bash scripts/run_step0_step1_report.sh --all --num-workers 2
 bash scripts/run_step2_report.sh --all --num-workers 2 --stage-workers 2
 bash scripts/run_step3_report.sh --all --num-workers 2 --task-workers 4
 
-# 用 .env 中的 ANSWER 模型生成模型感知轨迹；报告级并行数为 4
-bash scripts/run_perception_trajectory_report.sh --all --num-workers 4
+# 用 .env 中的 ANSWER 模型生成模型感知轨迹，再单独运行 verifier 感知评估；报告级并行数为 4
+bash scripts/run_perception_trajectory.sh --dataset report --all --num-workers 4 --question-workers 1
+bash scripts/run_perception_evaluation.sh --dataset report --all --num-workers 4 --question-workers 1
 
-bash scripts/run_step4_report.sh --all --num-workers 1 \
+bash scripts/run_step4_report_answers.sh --all --num-workers 1 \
   --methods full_context_memory \
-  --answer-workers 2 --score-workers 1 --method-workers 1
+  --answer-workers 2 --method-workers 1
+bash scripts/run_step4_report_scoring.sh --all --num-workers 1 \
+  --methods full_context_memory \
+  --score-workers 1 --method-workers 1
 
 # 先用一篇报告做测试
 bash scripts/run_step0_step1_report.sh --limit 1 --num-workers 1
@@ -541,26 +564,32 @@ bash scripts/run_step0_step1_report.sh --limit 1 --num-workers 1
 bash scripts/run_step2_report.sh --limit 1 --num-workers 1 --stage-workers 2
 bash scripts/run_step3_report.sh --limit 1 --num-workers 1 --task-workers 4
 
-bash scripts/run_perception_trajectory_report.sh --limit 1 --num-workers 1
+bash scripts/run_perception_trajectory.sh --dataset report --limit 1 --num-workers 1 --question-workers 1
+bash scripts/run_perception_evaluation.sh --dataset report --limit 1 --num-workers 1 --question-workers 1
 
-bash scripts/run_step4_report.sh --limit 1 --num-workers 1 \
+bash scripts/run_step4_report_answers.sh --limit 1 --num-workers 1 \
   --methods full_context_memory \
-  --answer-workers 1 --score-workers 1 --method-workers 1
+  --answer-workers 1 --method-workers 1
+bash scripts/run_step4_report_scoring.sh --limit 1 --num-workers 1 \
+  --methods full_context_memory \
+  --score-workers 1 --method-workers 1
 ```
 
-Report 模型感知只重新回答带 `image_paths` 的 observation QA；无图 observation 和所有 evaluation QA 原样复制。单篇 Report 内按时间顺序串行处理，以便后续图片 QA 只能使用此前已经释放的文本 observation 和模型图片 observation；`--num-workers` 并行处理不同 Report。也可以覆盖 `.env` 中的 Answer 服务：
+Report 模型感知只重新回答带 `image_paths` 的 observation QA；无图 observation 和所有 evaluation QA 原样复制。图片 observation 可以来自 perception 或 followup 阶段，感知评估在 `perception_report.json` 的 `overall` 中给出总分，并在 `by_stage_type` 中按阶段类型汇总，不重复保存每题内容。后续图片 QA 只使用此前已释放的文本 observation，不再累计模型图片 observation。`--num-workers` 并行处理不同 Report，`--question-workers` 并行处理同一 Report 内的问题；本地 VLM 共用单卡时建议先保持 `--question-workers 1`。也可以覆盖 `.env` 中的 Answer 服务：
 
 ```bash
-bash scripts/run_perception_trajectory_report.sh --limit 4 --num-workers 4 \
+bash scripts/run_perception_trajectory.sh --dataset report --limit 4 --num-workers 4 --question-workers 1 \
   --model gpt-5 --base-url https://api.openai.com/v1
+bash scripts/run_perception_evaluation.sh --dataset report --limit 4 --num-workers 4 --question-workers 2 \
+  --model gpt-5
 ```
 
 输出路径与病人侧一致：
 
 ```text
 outputs/report/<PDF stem>/trajectories/model_perception_trajectory/<answer_model>/
-├── model_perception_trajectory.json
-└── perception_report.json
+├── model_perception_trajectory.json      # run_perception_trajectory.sh 生成
+└── perception_report.json                # run_perception_evaluation.sh 生成
 ```
 
 通用参数与病人侧一致：
@@ -577,9 +606,9 @@ outputs/report/<PDF stem>/trajectories/model_perception_trajectory/<answer_model
 - Step0/1：`--max-iters`、`--model`；单篇报告内部的摄取、抽取/校验反馈循环和轨迹生成保持串行。
 - Step2：`--stage-workers` 默认 `2`；Step3：`--task-workers` 默认 `4`。先完成全部 Step2，再单独运行 Step3，可避免慢速任务规划阻塞后续报告的证据图生成。
 - 模型感知轨迹：`--model`、`--base-url` 可覆盖 `.env` 的 `ANSWER_OPENAI_MODEL` 和 `ANSWER_OPENAI_BASE_URL`；同一 Report 内图片 QA 保持串行。
-- Step4：`--methods`、`--answer-model`、`--answer-base-url`、`--answer-workers`、`--score-workers`、`--method-workers`。
+- Step4：`run_step4_report_answers.sh` 先生成冻结答案，`run_step4_report_scoring.sh` 再读取答案打分；参数包括 `--methods`、`--answer-model`、`--answer-base-url`、`--answer-workers`、`--score-workers`、`--method-workers`。
 
-Step0 摄取、时间线抽取和 Step1 轨迹分别检查已有产物并自动续跑。Step4 支持 method 级答案和评分续跑。三个 report 脚本会自动激活 `cmfbench`，并将额外命令行参数传给对应 Python 入口。
+Step0 摄取、时间线抽取和 Step1 轨迹分别检查已有产物并自动续跑。Step4 支持 method 级答案和评分续跑。所有 report 脚本会自动激活 `cmfbench`，并将额外命令行参数传给对应 Python 入口。
 
 ### 产物（`outputs/report/<PDF stem>/`）
 

@@ -21,6 +21,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--answer-workers", type=int, choices=(1, 2), default=2)
     parser.add_argument("--score-workers", type=int, choices=(1, 2, 3, 4), default=1)
     parser.add_argument("--method-workers", type=int, default=1)
+    parser.add_argument("--phase", choices=("answers", "scoring"), required=True)
     return parser.parse_args()
 
 
@@ -43,6 +44,7 @@ def main() -> int:
                 trajectory,
                 args.methods,
                 answer_model,
+                args.phase,
             )
             for trajectory in args.trajectories
         ):
@@ -60,6 +62,7 @@ def main() -> int:
             answer_workers=args.answer_workers,
             score_workers=args.score_workers,
             method_workers=args.method_workers,
+            phase=args.phase,
         )
         return "completed"
 
