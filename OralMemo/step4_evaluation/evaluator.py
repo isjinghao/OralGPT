@@ -2,6 +2,7 @@
 from __future__ import annotations
 import json
 import re
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from threading import Semaphore
@@ -27,7 +28,9 @@ class CachedLLM:
             return None
 
     def complete(self, prompt: str, cache_key: str, max_tokens: int = 4096,
-                 temperature: float = 0.0, timeout: int = 300) -> dict:
+                 temperature: float = 0.0, timeout: int = 300,
+                 required_keys: tuple[str, ...] = (),
+                 validator: Callable[[dict], None] | None = None) -> dict:
         path = self.cache_dir / f"{cache_key}.json"
         cache_input = {
             "type": "json",
@@ -36,14 +39,40 @@ class CachedLLM:
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
+        if required_keys:
+            cache_input["required_keys"] = list(required_keys)
         cached = self._load_cache(path)
         if cached and cached.get("input") == cache_input:
-            return cached["result"]
-        result = self.client.complete_json(
-            prompt, temperature=temperature, max_tokens=max_tokens, timeout=timeout
-        )
-        write_json_atomic(path, {"input": cache_input, "result": result})
-        return result
+            result = cached["result"]
+            if validator is None:
+                return result
+            try:
+                validator(result)
+                return result
+            except (KeyError, TypeError, ValueError) as exc:
+                self.client.log("llm/retry", f"Cached JSON failed validation; regenerating: {exc}")
+                path.unlink(missing_ok=True)
+
+        last_error: Exception | None = None
+        for attempt in range(2):
+            try:
+                result = self.client.complete_json(
+                    prompt,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    timeout=timeout,
+                    required_keys=required_keys,
+                    validator=validator,
+                )
+                write_json_atomic(path, {"input": cache_input, "result": result})
+                return result
+            except (KeyError, TypeError, ValueError) as exc:
+                last_error = exc
+                if attempt == 0:
+                    self.client.log("llm/retry", f"Invalid verifier JSON after repair; retrying once: {exc}")
+                    continue
+                raise
+        raise last_error or RuntimeError("Verifier JSON generation failed")
 
     def complete_text(self, prompt: str, cache_key: str, max_tokens: int = 4096,
                       temperature: float = 0.0, timeout: int = 300) -> str:

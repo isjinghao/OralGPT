@@ -121,11 +121,33 @@ def judge_rubric(llm: CachedLLM, record: dict, rubric: dict) -> dict:
         answer=record["model_answer"],
         criteria=json.dumps(payload, ensure_ascii=False),
     )
-    data = llm.complete(prompt, cache_key=f"rubric_{record['task_id']}", max_tokens=2048)
+    expected_names = {str(item["name"]).strip() for item in criteria_defs}
+
+    def validate_rubric(data: dict) -> None:
+        graded_items = data.get("criteria")
+        if not isinstance(graded_items, list):
+            raise ValueError(f"Rubric criteria must be a list for task {record['task_id']}")
+        names = []
+        for item in graded_items:
+            if not isinstance(item, dict):
+                raise ValueError(f"Rubric criterion must be an object for task {record['task_id']}")
+            names.append(str(item.get("name", "")).strip())
+        if len(set(names)) != len(names) or set(names) != expected_names:
+            raise ValueError(
+                f"Rubric criteria mismatch for task {record['task_id']}; "
+                f"expected={sorted(expected_names)} got={names}"
+            )
+
+    data = llm.complete(
+        prompt,
+        cache_key=f"rubric_{record['task_id']}",
+        max_tokens=2048,
+        required_keys=("criteria",),
+        validator=validate_rubric,
+    )
 
     graded = data["criteria"]
     graded_by_name = {str(item["name"]).strip(): item for item in graded}
-    expected_names = {str(item["name"]).strip() for item in criteria_defs}
     if len(graded_by_name) != len(graded) or set(graded_by_name) != expected_names:
         raise ValueError(f"Rubric criteria mismatch for task {record['task_id']}")
 

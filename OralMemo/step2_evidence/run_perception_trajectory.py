@@ -2,23 +2,22 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import yaml
+from openai import BadRequestError
 from config import get_settings
 from llm_client import ChatClient
 from report_pipeline.paths import REPORT_OUTPUT_ROOT, REPORT_PDF_DIR
 from utils.batch_utils import add_batch_arguments, log, patient_output_root, run_patient_batch, selected_patients, selected_reports
-from utils.image_utils import image_data_url
+from utils.image_utils import grayscale_image_data_urls, image_data_urls
 from utils.json_utils import read_json, write_json
 
 
 PROMPTS_DIR = Path(__file__).resolve().parent.parent / "step1_patient_trajectory" / "prompts"
 DIRECT_CONTEXT_STAGE_IDS = {"S0_PROFILE", "S5_TMJ"}
-PERCEPTION_CACHE_VERSION = "raw_output_v1"
 
 
 def perception_max_tokens() -> int:
@@ -28,16 +27,6 @@ def perception_max_tokens() -> int:
 def load_prompt(filename: str, key: str) -> str:
     data = yaml.safe_load((PROMPTS_DIR / filename).read_text(encoding="utf-8"))
     return data[key]
-
-
-def resolve_image_path(root: Path, image_path: str) -> Path:
-    path = Path(image_path)
-    return path if path.is_absolute() else root / path
-
-
-def image_urls(root: Path, image_paths: list[str]) -> list[str]:
-    paths = [resolve_image_path(root, image_path) for image_path in image_paths]
-    return [url for path in paths if path.is_file() and (url := image_data_url(path))]
 
 
 def clean_question(question: str) -> str:
@@ -81,30 +70,8 @@ def initial_profile_records(stages: list[dict]) -> list[dict]:
     return records
 
 
-def cache_path(
-    cache_dir: Path,
-    model: str,
-    stage_id: str,
-    source_turn_id: int,
-    question: str,
-    system_prompt: str,
-    prompt: str,
-    image_paths: list[str],
-) -> Path:
-    payload = "\n".join(
-        [
-            PERCEPTION_CACHE_VERSION,
-            model,
-            stage_id,
-            str(source_turn_id),
-            question,
-            system_prompt,
-            prompt,
-            ",".join(image_paths),
-        ]
-    )
-    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
-    return cache_dir / f"perception_{stage_id}_{source_turn_id}_{digest}.json"
+def cache_path(cache_dir: Path, stage_id: str, source_turn_id: int) -> Path:
+    return cache_dir / f"perception_{stage_id}_{source_turn_id}.json"
 
 
 def generate_answer(
@@ -126,31 +93,37 @@ def generate_answer(
         modality=", ".join(stage.get("modality", [])) or "unknown",
         question=question,
     )
-    path = cache_path(
-        cache_dir,
-        client.model,
-        stage["stage_id"],
-        int(qa.get("source_turn_id", 0)),
-        question,
-        system_prompt,
-        prompt,
-        qa.get("image_paths", []) or [],
-    )
+    path = cache_path(cache_dir, stage["stage_id"], int(qa.get("source_turn_id", 0)))
     if path.exists() and not force:
         return read_json(path)["answer"].strip()
 
-    urls = image_urls(image_root, qa.get("image_paths", []) or [])
+    image_paths = qa.get("image_paths", []) or []
+    urls = image_data_urls(image_root, image_paths)
     if not urls:
         raise FileNotFoundError(f"No readable images for {stage['stage_id']} source_turn_id={qa.get('source_turn_id')}")
 
-    answer = client.complete_text(
-        prompt,
-        temperature=0.0,
-        max_tokens=perception_max_tokens(),
-        images=urls,
-        timeout=300,
-        system_prompt=system_prompt,
-    ).strip()
+    try:
+        answer = client.complete_text(
+            prompt,
+            temperature=0.0,
+            max_tokens=perception_max_tokens(),
+            images=urls,
+            timeout=300,
+            system_prompt=system_prompt,
+        ).strip()
+    except BadRequestError as exc:
+        if "content_policy_violation" not in str(exc):
+            raise
+        client.log("llm/retry", "content_policy_violation; retrying once with grayscale processed images")
+        grayscale_urls = grayscale_image_data_urls(image_root, image_paths)
+        answer = client.complete_text(
+            prompt,
+            temperature=0.0,
+            max_tokens=perception_max_tokens(),
+            images=grayscale_urls,
+            timeout=300,
+            system_prompt=system_prompt,
+        ).strip()
     if not answer:
         raise RuntimeError(f"Empty model answer for {stage['stage_id']} source_turn_id={qa.get('source_turn_id')}")
     write_json(path, {"answer": answer})
