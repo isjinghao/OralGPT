@@ -40,21 +40,17 @@ class _TrackedEmbeddings(Embeddings):
     def __init__(self, memory: MemoryMethod) -> None:
         self.memory = memory
         self.model = os.environ.get("EMBEDDING_MODEL", "text-embedding-3-small")
-        self.dimensions = int(os.environ.get("EMBEDDING_DIM", "1536"))
         self.client = OpenAI(
-            api_key=os.environ["EMBEDDING_OPENAI_API_KEY"],
+            api_key=os.environ.get("EMBEDDING_OPENAI_API_KEY", "EMPTY"),
             base_url=os.environ.get("EMBEDDING_OPENAI_BASE_URL", "https://api.openai.com/v1"),
         )
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
-        response = self.client.embeddings.create(
-            model=self.model,
-            input=texts,
-            dimensions=self.dimensions,
-        )
+        response = self.client.embeddings.create(model=self.model, input=texts)
+        usage = response.usage
         self.memory.add_metrics(
             embedding_calls=1,
-            embedding_tokens=int(response.usage.prompt_tokens or 0),
+            embedding_tokens=int(usage.prompt_tokens or 0) if usage else 0,
         )
         return [item.embedding for item in response.data]
 

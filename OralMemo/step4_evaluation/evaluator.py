@@ -30,7 +30,9 @@ class CachedLLM:
     def complete(self, prompt: str, cache_key: str, max_tokens: int = 4096,
                  temperature: float = 0.0, timeout: int = 300,
                  required_keys: tuple[str, ...] = (),
-                 validator: Callable[[dict], None] | None = None) -> dict:
+                 validator: Callable[[dict], None] | None = None,
+                 json_schema_name: str | None = None,
+                 json_schema: dict | None = None) -> dict:
         path = self.cache_dir / f"{cache_key}.json"
         cache_input = {
             "type": "json",
@@ -41,6 +43,9 @@ class CachedLLM:
         }
         if required_keys:
             cache_input["required_keys"] = list(required_keys)
+        if json_schema is not None:
+            cache_input["json_schema_name"] = json_schema_name
+            cache_input["json_schema"] = json_schema
         cached = self._load_cache(path)
         if cached and cached.get("input") == cache_input:
             result = cached["result"]
@@ -63,6 +68,8 @@ class CachedLLM:
                     timeout=timeout,
                     required_keys=required_keys,
                     validator=validator,
+                    json_schema_name=json_schema_name,
+                    json_schema=json_schema,
                 )
                 write_json_atomic(path, {"input": cache_input, "result": result})
                 return result

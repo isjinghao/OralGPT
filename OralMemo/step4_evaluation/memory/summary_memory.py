@@ -6,6 +6,14 @@ from step4_evaluation.memory.base import MemoryMethod, format_stage_input
 from step4_evaluation.templating import render
 
 
+SUMMARY_MEMORY_SCHEMA = {
+    "type": "object",
+    "properties": {"memory": {"type": "string"}},
+    "required": ["memory"],
+    "additionalProperties": False,
+}
+
+
 def _to_text(value) -> str:
     if value is None:
         return ""
@@ -48,7 +56,14 @@ class SummaryMemory(MemoryMethod):
         )
         before = llm.client.usage_snapshot()
         try:
-            data = llm.complete(prompt, cache_key=cache_key, max_tokens=4096)
+            data = llm.complete(
+                prompt,
+                cache_key=cache_key,
+                max_tokens=4096,
+                required_keys=("memory",),
+                json_schema_name="summary_memory_update",
+                json_schema=SUMMARY_MEMORY_SCHEMA,
+            )
         finally:
             after = llm.client.usage_snapshot()
             self.add_metrics(

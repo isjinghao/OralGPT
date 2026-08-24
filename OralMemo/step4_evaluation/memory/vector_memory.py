@@ -18,11 +18,10 @@ class VectorMemory(MemoryMethod):
         self._vectors: list[np.ndarray] = []
         self._pending = ""
         self._client = OpenAI(
-            api_key=os.environ["EMBEDDING_OPENAI_API_KEY"],
+            api_key=os.environ.get("EMBEDDING_OPENAI_API_KEY", "EMPTY"),
             base_url=os.environ.get("EMBEDDING_OPENAI_BASE_URL", "https://api.openai.com/v1"),
         )
         self._model = os.environ.get("EMBEDDING_MODEL", "text-embedding-3-small")
-        self._dimensions = int(os.environ.get("EMBEDDING_DIM", "1536"))
 
     def reset(self) -> None:
         self._texts = []
@@ -33,14 +32,11 @@ class VectorMemory(MemoryMethod):
         self._pending = format_stage_input(stage)
 
     def _embed(self, text: str) -> np.ndarray:
-        response = self._client.embeddings.create(
-            model=self._model,
-            input=text,
-            dimensions=self._dimensions,
-        )
+        response = self._client.embeddings.create(model=self._model, input=text)
+        usage = response.usage
         self.add_metrics(
             embedding_calls=1,
-            embedding_tokens=int(response.usage.prompt_tokens or 0),
+            embedding_tokens=int(usage.prompt_tokens or 0) if usage else 0,
         )
         return np.asarray(response.data[0].embedding, dtype=float)
 

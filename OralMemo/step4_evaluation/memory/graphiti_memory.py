@@ -70,25 +70,23 @@ class _TrackedEmbedder(OpenAIEmbedder):
         response = await self.client.embeddings.create(
             input=input_data,
             model=self.config.embedding_model,
-            dimensions=self.config.embedding_dim,
         )
         self.memory.add_metrics(
             embedding_calls=1,
             embedding_tokens=int(response.usage.prompt_tokens or 0),
         )
-        return response.data[0].embedding[:self.config.embedding_dim]
+        return response.data[0].embedding
 
     async def create_batch(self, input_data_list):
         response = await self.client.embeddings.create(
             input=input_data_list,
             model=self.config.embedding_model,
-            dimensions=self.config.embedding_dim,
         )
         self.memory.add_metrics(
             embedding_calls=1,
             embedding_tokens=int(response.usage.prompt_tokens or 0),
         )
-        return [item.embedding[:self.config.embedding_dim] for item in response.data]
+        return [item.embedding for item in response.data]
 
 
 class GraphitiMemory(MemoryMethod):
@@ -108,20 +106,20 @@ class GraphitiMemory(MemoryMethod):
         super().setup(workdir, namespace)
         self._group_id = re.sub(r"[^A-Za-z0-9_-]", "_", namespace)
         self._async_loop = _AsyncLoop()
+        graphiti_api_key = os.environ.get("GRAPHITI_OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY") or memo_api_key()
         llm_config = LLMConfig(
-            api_key=memo_api_key(),
-            base_url=os.environ.get("MEMO_OPENAI_BASE_URL", "https://api.openai.com/v1"),
-            model=os.environ.get("MEMO_OPENAI_MODEL", "gpt-4o-mini"),
+            api_key=graphiti_api_key,
+            base_url=os.environ.get("GRAPHITI_OPENAI_BASE_URL", os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")),
+            model=os.environ.get("GRAPHITI_OPENAI_MODEL", "gpt-5-mini"),
             temperature=0,
         )
         llm = _TrackedOpenAIClient(self, config=llm_config, reasoning="low")
         embedder = _TrackedEmbedder(
             self,
             config=OpenAIEmbedderConfig(
-                api_key=os.environ["EMBEDDING_OPENAI_API_KEY"],
+                api_key=os.environ.get("EMBEDDING_OPENAI_API_KEY", "EMPTY"),
                 base_url=os.environ.get("EMBEDDING_OPENAI_BASE_URL", "https://api.openai.com/v1"),
                 embedding_model=os.environ.get("EMBEDDING_MODEL", "text-embedding-3-small"),
-                embedding_dim=int(os.environ.get("EMBEDDING_DIM", "1536")),
             ),
         )
         self._graphiti = Graphiti(

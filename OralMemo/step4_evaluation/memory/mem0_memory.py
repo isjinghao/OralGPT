@@ -97,10 +97,10 @@ class Mem0Memory(MemoryMethod):
 
 
     def _default_config(self) -> dict:
-        llm_api_key = memo_api_key()
-        llm_base_url = os.environ.get("MEMO_OPENAI_BASE_URL", "https://api.openai.com/v1")
-        llm_model = os.environ.get("MEMO_OPENAI_MODEL", "gpt-4o-mini")
-        embedding_api_key = os.environ["EMBEDDING_OPENAI_API_KEY"]
+        llm_api_key = os.environ.get("MEM0_OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY") or memo_api_key()
+        llm_base_url = os.environ.get("MEM0_OPENAI_BASE_URL", os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1"))
+        llm_model = os.environ.get("MEM0_OPENAI_MODEL", "gpt-5-mini")
+        embedding_api_key = os.environ.get("EMBEDDING_OPENAI_API_KEY", "EMPTY")
         embedding_base_url = os.environ.get("EMBEDDING_OPENAI_BASE_URL", "https://api.openai.com/v1")
 
         config: dict = {
@@ -120,7 +120,6 @@ class Mem0Memory(MemoryMethod):
                     "model": self.embedding_model,
                     "api_key": embedding_api_key,
                     "openai_base_url": embedding_base_url,
-                    "embedding_dims": int(os.environ.get("EMBEDDING_DIM", "1536")),
                 },
             },
         }

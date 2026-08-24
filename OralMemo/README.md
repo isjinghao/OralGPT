@@ -73,7 +73,10 @@ OralMemo/
     │   ├── single_stage_memory.py    #     单阶段基线：每阶段清空，只保留当前阶段
     │   ├── full_context_memory.py    #     全上下文基线：拼接全部历史阶段原文
     │   ├── summary_memory.py         #     记忆基线：LLM 增量把每阶段融入一份紧凑记忆
-    │   └── mem0_memory.py            #     mem0 检索式记忆（可选，需 pip install mem0ai）
+    │   ├── vector_memory.py          #     原始阶段向量检索
+    │   ├── mem0_memory.py            #     mem0 检索式记忆
+    │   ├── langmem_memory.py         #     LangMem 长期语义记忆
+    │   └── graphiti_memory.py        #     Graphiti 时序图记忆
     └── prompts/
         ├── answer.yaml               #   基于记忆回答问题 prompt 模板
         ├── memory_update.yaml        #   summary_memory 增量巩固 prompt 模板
@@ -120,23 +123,30 @@ VERIFIER_OPENAI_API_KEY=你的校验模型key
 VERIFIER_OPENAI_BASE_URL=https://api.openai.com/v1
 VERIFIER_OPENAI_MODEL=gpt-4o
 
-# 可选：记忆构建模型；未设置时回退到 OPENAI_*
-MEMO_OPENAI_API_KEY=你的记忆模型key
-MEMO_OPENAI_BASE_URL=https://api.openai.com/v1
-MEMO_OPENAI_MODEL=gpt-4o-mini
+# memory construction (summary / LangMem): 本地 Qwen2.5-7B-Instruct
+MEMO_OPENAI_BASE_URL=http://127.0.0.1:8004/v1
+MEMO_OPENAI_MODEL=qwen2.5-7b-instruct-memory
 
-# 检索记忆共用 embedding
-EMBEDDING_OPENAI_API_KEY=你的embedding模型key
-EMBEDDING_OPENAI_BASE_URL=https://api.openai.com/v1
-EMBEDDING_MODEL=text-embedding-3-small
-EMBEDDING_DIM=1536
+# memory construction (mem0): 远端 LLM，保持原始 mem0 语义
+MEM0_OPENAI_BASE_URL=https://api.openai.com/v1
+MEM0_OPENAI_MODEL=gpt-5-mini
+
+# shared embedding (vector / mem0 / LangMem / Graphiti): 本地 Qwen3-Embedding-0.6B
+EMBEDDING_OPENAI_BASE_URL=http://127.0.0.1:8005/v1
+EMBEDDING_MODEL=qwen3-embedding-0.6b
 
 # Graphiti 使用 Neo4j
 GRAPHITI_NEO4J_URI=bolt://localhost:7687
 GRAPHITI_NEO4J_USER=neo4j
 GRAPHITI_NEO4J_PASSWORD=你的Neo4j密码
+
+# memory construction (Graphiti): 远端 LLM，保留 Graphiti 默认 rerank
+GRAPHITI_OPENAI_BASE_URL=https://api.openai.com/v1
+GRAPHITI_OPENAI_MODEL=gpt-5-mini
 EOF
 ```
+
+本地 Qwen / embedding 服务不需要在 `.env` 写 API key 字段。如果 `mem0_memory` 或 `graphiti_memory` 使用不同于 `OPENAI_API_KEY` 的远端 key，再分别添加 `MEM0_OPENAI_API_KEY` 或 `GRAPHITI_OPENAI_API_KEY`。
 
 固定数据路径：
 
@@ -214,12 +224,13 @@ bash scripts/run_step4_scoring.sh --all --num-workers 1 \
 | --- | --- |
 | Step1 / Step2 / Step3 | `.env` 中的 `BENCHMARK_OPENAI_*` |
 | Step4 所有方法 | `.env` 中的 `ANSWER_OPENAI_*`、`VERIFIER_OPENAI_*` |
-| `summary_memory`、`mem0_memory`、`langmem_memory`、`graphiti_memory` | `.env` 中的 `MEMO_OPENAI_*` |
-| `vector_memory`、`mem0_memory`、`langmem_memory`、`graphiti_memory` | `.env` 中的 `EMBEDDING_OPENAI_*` |
-| `graphiti_memory` | Neo4j 与 `.env` 中的 `GRAPHITI_NEO4J_*` |
+| `summary_memory`、`langmem_memory` | 本地 Qwen memory 服务，默认 `http://127.0.0.1:8004/v1` |
+| `vector_memory`、`mem0_memory`、`langmem_memory`、`graphiti_memory` | 本地 Qwen3 embedding 服务，默认 `http://127.0.0.1:8005/v1` |
+| `mem0_memory` | `.env` 中的 `MEM0_OPENAI_*` 作为建忆 LLM，默认 `gpt-5-mini` |
+| `graphiti_memory` | Neo4j、`.env` 中的 `GRAPHITI_NEO4J_*`，以及 `GRAPHITI_OPENAI_*` 建图 / rerank LLM，默认 `gpt-5-mini` |
 | `model_perception_trajectory` 或本地 VLM 作为 answer model | 对应本地 VLM 的 OpenAI-compatible 服务 |
 
-`single_stage_memory` 与 `full_context_memory` 不依赖 Memo LLM、embedding 或 Neo4j。运行完整 memory 对比前，先确认 `.env` 的 Memo、embedding 和 Neo4j 配置均已填写；不要把真实 key 或 Neo4j 密码提交到 Git。
+`single_stage_memory` 与 `full_context_memory` 不依赖 Memo LLM、embedding 或 Neo4j。运行 `summary_memory`、`langmem_memory` 前需要启动本地 memory Qwen；运行 `vector_memory`、`mem0_memory`、`langmem_memory`、`graphiti_memory` 前需要启动本地 embedding Qwen。Step4 answer 脚本会默认导出上述本地地址，也可以通过同名环境变量覆盖。
 
 ### Autodl 容器：启动本地 VLM
 
@@ -229,14 +240,18 @@ bash scripts/run_step4_scoring.sh --all --num-workers 1 \
 | --- | --- | --- | --- | --- |
 | MedGemma | `start_medgemma_api.sh` | `http://127.0.0.1:8002/v1` | `medgemma` | `/root/autodl-tmp/venvs/vllm` + vLLM OpenAI server |
 | OralGPT-Omni-7B | `start_oralgpt_omni_api.sh` | `http://127.0.0.1:8003/v1` | `oralgpt-omni-7b` | `/root/autodl-tmp/venvs/vllm` + vLLM OpenAI server |
+| Qwen2.5-7B-Instruct for memory | `bash /root/autodl-tmp/serve/start_qwen25_memory_api.sh` | `http://127.0.0.1:8004/v1` | `qwen2.5-7b-instruct-memory` | `/root/autodl-tmp/venvs/vllm` + vLLM OpenAI server，启用 tool-call |
+| Qwen3-Embedding-0.6B | `bash /root/autodl-tmp/serve/start_qwen3_embedding_api.sh` | `http://127.0.0.1:8005/v1` | `qwen3-embedding-0.6b` | `/root/autodl-tmp/venvs/vllm` + vLLM OpenAI embedding server |
 
-MedGemma 与 OralGPT-Omni 当前使用 vLLM 后端以支持服务端批处理和并发调度。vLLM 脚本可用环境变量覆盖：`PORT`、`MAX_MODEL_LEN`、`GPU_MEMORY_UTILIZATION`、`MAX_NUM_SEQS`、`MODEL_PATH`、`MODEL_ID`。
+MedGemma、OralGPT-Omni、memory Qwen 与 embedding Qwen 当前使用 vLLM 后端以支持服务端批处理和并发调度。vLLM 脚本可用环境变量覆盖：`PORT`、`MAX_MODEL_LEN`、`GPU_MEMORY_UTILIZATION`、`MAX_NUM_SEQS`、`MODEL_PATH`、`MODEL_ID`。
 
 按需启动一个或多个模型：
 
 ```bash
 bash /root/autodl-tmp/serve/start_medgemma_api.sh
 bash /root/autodl-tmp/serve/start_oralgpt_omni_api.sh
+bash /root/autodl-tmp/serve/start_qwen25_memory_api.sh
+bash /root/autodl-tmp/serve/start_qwen3_embedding_api.sh
 ```
 
 检查服务。vLLM 服务统一用 `/v1/models` 或 `/health` 检查：
@@ -244,10 +259,14 @@ bash /root/autodl-tmp/serve/start_oralgpt_omni_api.sh
 ```bash
 curl http://127.0.0.1:8002/v1/models
 curl http://127.0.0.1:8003/v1/models
+curl http://127.0.0.1:8004/v1/models
+curl http://127.0.0.1:8005/v1/models
 
 # 查看日志
 tail -f /root/autodl-tmp/serve/logs/medgemma-api.log
 tail -f /root/autodl-tmp/serve/logs/oralgpt-omni-api.log
+tail -f /root/autodl-tmp/serve/logs/qwen25-memory-vllm.log
+tail -f /root/autodl-tmp/serve/logs/qwen3-embedding-vllm.log
 ```
 
 停止全部本地模型服务：
@@ -355,7 +374,7 @@ bash scripts/run_step4_scoring.sh --all --num-workers 1 \
 | `langmem_memory` | `LangMemMemory` | LangMem 提取、更新长期语义记忆并检索 top-8 |
 | `graphiti_memory` | `GraphitiMemory` | Graphiti 增量写入时序知识图谱并混合检索 top-8；需要 Neo4j |
 
-所有方法共享同一个 answer model；`summary_memory`、`mem0_memory`、`langmem_memory` 和 `graphiti_memory` 的记忆构建使用 `MEMO_OPENAI_*`，四种检索方法共享 `EMBEDDING_OPENAI_*`。每次运行按“病人 × 轨迹 × 方法”建立独立 namespace，并在轨迹开始前 `reset()`；阶段按顺序释放后才允许写入记忆。
+所有方法共享同一个 answer model；`summary_memory` 和 `langmem_memory` 的 memory construction 使用 `MEMO_OPENAI_*`，默认指向本地 Qwen2.5 memory 服务；`mem0_memory` 使用 `MEM0_OPENAI_*`，`graphiti_memory` 使用 `GRAPHITI_OPENAI_*`，默认均为远端 `gpt-5-mini` 以保持方法语义；四种检索方法共享 `EMBEDDING_OPENAI_*`，默认指向本地 Qwen3-Embedding-0.6B 服务。每次运行按“病人 × 轨迹 × 方法”建立独立 namespace，并在轨迹开始前 `reset()`；阶段按顺序释放后才允许写入记忆。
 
 ```bash
 bash scripts/run_step4_answers.sh --all \

@@ -87,19 +87,23 @@ class ChatClient:
         images: list[str] | None,
         timeout: int,
         system_prompt: str | None,
+        response_format: dict | None = None,
     ) -> str:
         messages = self._messages(prompt, images, system_prompt)
         request_max_tokens = max_tokens
         max_retry_tokens = int(os.environ.get("OPENAI_EMPTY_CONTENT_RETRY_MAX_TOKENS", "8192"))
         for attempt in range(4):
             try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=messages,
-                    temperature=temperature,
-                    max_tokens=request_max_tokens,
-                    timeout=timeout,
-                )
+                kwargs = {
+                    "model": self.model,
+                    "messages": messages,
+                    "temperature": temperature,
+                    "max_tokens": request_max_tokens,
+                    "timeout": timeout,
+                }
+                if response_format is not None:
+                    kwargs["response_format"] = response_format
+                response = self.client.chat.completions.create(**kwargs)
                 usage = response.usage
                 with self._usage_lock:
                     self._usage["calls"] += 1
@@ -154,8 +158,28 @@ class ChatClient:
     def complete_json(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
                       images: list[str] | None = None, timeout: int = 300,
                       system_prompt: str | None = None, required_keys: tuple[str, ...] = (),
-                      validator: Callable[[dict], None] | None = None) -> dict:
-        content = self._complete(prompt, temperature, max_tokens, images, timeout, system_prompt)
+                      validator: Callable[[dict], None] | None = None,
+                      json_schema_name: str | None = None,
+                      json_schema: dict | None = None) -> dict:
+        response_format = None
+        if json_schema is not None:
+            response_format = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": json_schema_name or "structured_response",
+                    "schema": json_schema,
+                    "strict": True,
+                },
+            }
+        content = self._complete(
+            prompt,
+            temperature,
+            max_tokens,
+            images,
+            timeout,
+            system_prompt,
+            response_format=response_format,
+        )
         try:
             return parse_required_json(content, required_keys, validator)
         except (TypeError, ValueError) as exc:
@@ -165,7 +189,15 @@ class ChatClient:
                 "Return only a valid JSON object that preserves the information in the original response."
                 f"{required}\nParsing error: {exc}\n\nOriginal response:\n{content}"
             )
-            repaired = self._complete(repair_prompt, 0.0, max_tokens, None, timeout, system_prompt)
+            repaired = self._complete(
+                repair_prompt,
+                0.0,
+                max_tokens,
+                None,
+                timeout,
+                system_prompt,
+                response_format=response_format,
+            )
             return parse_required_json(repaired, required_keys, validator)
 
     def complete_text(self, prompt: str, temperature: float = 0.0, max_tokens: int = 8000,
