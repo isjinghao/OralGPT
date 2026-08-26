@@ -8,17 +8,31 @@ from collections.abc import Callable
 from datetime import datetime, timezone
 from threading import Lock
 
-from openai import APIConnectionError, APITimeoutError, BadRequestError, InternalServerError, OpenAI, RateLimitError
+from openai import APIConnectionError, APIStatusError, APITimeoutError, BadRequestError, InternalServerError, OpenAI, RateLimitError
 
 from utils.batch_utils import log
+from utils.retry_utils import is_transient_error
 
 
 class ChatClient:
-    def __init__(self, api_key: str, base_url: str, model: str, log_prefix: str = "[llm]"):
+    def __init__(
+        self,
+        api_key: str,
+        base_url: str,
+        model: str,
+        log_prefix: str = "[llm]",
+        request_model: str | None = None,
+    ):
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
-        self.client = OpenAI(api_key=api_key, base_url=self.base_url + "/")
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url=self.base_url + "/",
+            timeout=int(os.environ.get("OPENAI_REQUEST_TIMEOUT", "300")),
+            max_retries=0,
+        )
         self.model = model
+        self.request_model = request_model or model
         self.log_prefix = log_prefix
         self._usage = {"calls": 0, "input_tokens": 0, "output_tokens": 0}
         self._usage_lock = Lock()
@@ -95,7 +109,7 @@ class ChatClient:
         for attempt in range(4):
             try:
                 kwargs = {
-                    "model": self.model,
+                    "model": self.request_model,
                     "messages": messages,
                     "temperature": temperature,
                     "max_tokens": request_max_tokens,
@@ -146,6 +160,18 @@ class ChatClient:
                     raise
                 wait_seconds = min(60, 2 ** attempt * 5)
                 self.log("llm/retry", f"Upstream request failed; wait={wait_seconds}s next_attempt={attempt + 2}/4")
+                time.sleep(wait_seconds)
+            except APIStatusError as exc:
+                if not is_transient_error(exc):
+                    raise
+                if attempt >= 3:
+                    self.log("llm/error", f"APIStatusError status={exc.status_code} after 4 attempts")
+                    raise
+                wait_seconds = min(60, 2 ** attempt * 5)
+                self.log(
+                    "llm/retry",
+                    f"APIStatusError status={exc.status_code}; wait={wait_seconds}s next_attempt={attempt + 2}/4",
+                )
                 time.sleep(wait_seconds)
             except (APIConnectionError, APITimeoutError, InternalServerError) as exc:
                 if attempt >= 3:
@@ -206,9 +232,24 @@ class ChatClient:
         return self._complete(prompt, temperature, max_tokens, images, timeout, system_prompt)
 
 
-def build_client(settings, role: str, patient_id: str, *, log_prefix: str, model: str | None = None, base_url: str | None = None) -> ChatClient:
+def build_client(
+    settings,
+    role: str,
+    patient_id: str,
+    *,
+    log_prefix: str,
+    model: str | None = None,
+    base_url: str | None = None,
+    request_model: str | None = None,
+) -> ChatClient:
     cfg = settings.llm_for(role)
-    return ChatClient(cfg.api_key, base_url or cfg.base_url, model or cfg.model, f"{log_prefix}[{patient_id}]")
+    return ChatClient(
+        cfg.api_key,
+        base_url or cfg.base_url,
+        model or cfg.model,
+        f"{log_prefix}[{patient_id}]",
+        request_model=request_model,
+    )
 
 
 def is_upstream_request_failed(exc: Exception) -> bool:

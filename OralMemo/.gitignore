@@ -19,3 +19,5 @@ reports/pmc_aws_summary.json
 
 # Local prompt reference
 prompts_zh.md
+
+logs/

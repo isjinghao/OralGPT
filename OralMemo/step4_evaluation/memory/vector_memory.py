@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import os
+import time
 
 import numpy as np
-from openai import OpenAI
+from openai import APIConnectionError, APITimeoutError, InternalServerError, OpenAI
 
-from step4_evaluation.memory.base import MemoryMethod, format_stage_input
+from step4_evaluation.memory.base import MemoryMethod, format_stage_input, normalize_query
 
 
 class VectorMemory(MemoryMethod):
@@ -20,6 +21,8 @@ class VectorMemory(MemoryMethod):
         self._client = OpenAI(
             api_key=os.environ.get("EMBEDDING_OPENAI_API_KEY", "EMPTY"),
             base_url=os.environ.get("EMBEDDING_OPENAI_BASE_URL", "https://api.openai.com/v1"),
+            timeout=int(os.environ.get("EMBEDDING_REQUEST_TIMEOUT", "120")),
+            max_retries=0,
         )
         self._model = os.environ.get("EMBEDDING_MODEL", "text-embedding-3-small")
 
@@ -32,7 +35,14 @@ class VectorMemory(MemoryMethod):
         self._pending = format_stage_input(stage)
 
     def _embed(self, text: str) -> np.ndarray:
-        response = self._client.embeddings.create(model=self._model, input=text)
+        for attempt in range(4):
+            try:
+                response = self._client.embeddings.create(model=self._model, input=text)
+                break
+            except (APIConnectionError, APITimeoutError, InternalServerError):
+                if attempt >= 3:
+                    raise
+                time.sleep(2 ** attempt)
         usage = response.usage
         self.add_metrics(
             embedding_calls=1,
@@ -50,6 +60,7 @@ class VectorMemory(MemoryMethod):
     def context(self, query: str | None = None) -> str:
         if not self._texts:
             return ""
+        query = normalize_query(query)
         if not query:
             return "\n\n".join(self._texts[-self.top_k:])
         query_vector = self._embed(query)

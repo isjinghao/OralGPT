@@ -17,6 +17,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--trajectories", type=parse_csv, default=["standard_trajectory"])
     parser.add_argument("--methods", type=parse_csv, default=["full_context_memory"])
     parser.add_argument("--answer-model", default=None, help="Override ANSWER_OPENAI_MODEL for this run")
+    parser.add_argument("--answer-output-model", default=None, help="Write results under this answer-model folder")
     parser.add_argument("--answer-base-url", default=None, help="Override ANSWER_OPENAI_BASE_URL for this run")
     parser.add_argument("--answer-workers", type=int, choices=(1, 2), default=2)
     parser.add_argument("--score-workers", type=int, choices=(1, 2, 3, 4), default=1)
@@ -32,7 +33,8 @@ def main() -> int:
         raise ValueError(f"Unknown memory methods: {unknown_methods}")
 
     settings = get_settings()
-    answer_model = args.answer_model or settings.llm_for("answer").model
+    answer_request_model = args.answer_model or settings.llm_for("answer").model
+    answer_model = args.answer_output_model or answer_request_model
     reports = selected_reports(PDF_DIR, args.all, args.limit)
 
     def worker(report: dict) -> str:
@@ -57,6 +59,7 @@ def main() -> int:
             args.trajectories,
             args.methods,
             answer_model=answer_model,
+            answer_request_model=answer_request_model,
             answer_base_url=args.answer_base_url,
             force=args.force,
             answer_workers=args.answer_workers,

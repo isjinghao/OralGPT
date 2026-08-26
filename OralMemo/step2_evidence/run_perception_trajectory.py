@@ -74,6 +74,15 @@ def cache_path(cache_dir: Path, stage_id: str, source_turn_id: int) -> Path:
     return cache_dir / f"perception_{stage_id}_{source_turn_id}.json"
 
 
+def image_retry_reason(exc: BadRequestError) -> str | None:
+    message = str(exc)
+    if "content_policy_violation" in message or "data_inspection_failed" in message:
+        return "image rejected"
+    if "Exceeded limit on max bytes per data-uri item" in message:
+        return "image too large"
+    return None
+
+
 def generate_answer(
     client: ChatClient,
     profile: str,
@@ -112,9 +121,10 @@ def generate_answer(
             system_prompt=system_prompt,
         ).strip()
     except BadRequestError as exc:
-        if "content_policy_violation" not in str(exc):
+        reason = image_retry_reason(exc)
+        if reason is None:
             raise
-        client.log("llm/retry", "content_policy_violation; retrying once with grayscale processed images")
+        client.log("llm/retry", f"{reason}; retrying once with grayscale processed images")
         grayscale_urls = grayscale_image_data_urls(image_root, image_paths)
         answer = client.complete_text(
             prompt,

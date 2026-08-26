@@ -39,11 +39,19 @@ def _judge_record(
     rubric_by_task: dict[str, dict],
     llm: CachedLLM,
     semaphore: Semaphore,
+    max_tokens: int,
 ) -> tuple[dict | None, dict | None]:
     with semaphore:
         if record["task_type"] in BASE_TYPES:
-            return None, judge_base(llm, record)
-        return judge_rubric(llm, record, rubric_by_task[record["task_id"]]), judge_evidence(llm, record)
+            return None, judge_base(llm, record, max_tokens=max_tokens)
+        return (
+            judge_rubric(llm, record, rubric_by_task[record["task_id"]], max_tokens=max_tokens),
+            judge_evidence(llm, record, max_tokens=max_tokens),
+        )
+
+
+def default_judge_max_tokens(log_prefix: str) -> int:
+    return 2048 if "[report__" in log_prefix else 4096
 
 
 def score_method(
@@ -67,10 +75,11 @@ def score_method(
     treatment: list[dict] = []
     followup: list[dict] = []
     per_task: list[dict] = []
+    judge_max_tokens = default_judge_max_tokens(log_prefix)
 
     with ThreadPoolExecutor(max_workers=score_workers) as executor:
         futures = [
-            executor.submit(_judge_record, rec, rubric_by_task, llm, score_semaphore)
+            executor.submit(_judge_record, rec, rubric_by_task, llm, score_semaphore, judge_max_tokens)
             for rec in records
         ]
 

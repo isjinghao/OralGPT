@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 import typing
 
 from typing_extensions import NotRequired, Required
@@ -16,11 +17,12 @@ from langchain_core.embeddings import Embeddings
 from langchain_openai import ChatOpenAI
 from langgraph.store.memory import InMemoryStore
 from langmem import create_memory_store_manager
-from openai import OpenAI
+from openai import APIConnectionError, APITimeoutError, InternalServerError, OpenAI
 
 from config import memo_api_key
-from step4_evaluation.memory.base import MemoryMethod, format_stage_input
+from step4_evaluation.memory.base import MemoryMethod, format_stage_input, normalize_query
 from step4_evaluation.templating import render
+from utils.retry_utils import is_transient_error
 
 
 class _UsageCallback(BaseCallbackHandler):
@@ -43,10 +45,19 @@ class _TrackedEmbeddings(Embeddings):
         self.client = OpenAI(
             api_key=os.environ.get("EMBEDDING_OPENAI_API_KEY", "EMPTY"),
             base_url=os.environ.get("EMBEDDING_OPENAI_BASE_URL", "https://api.openai.com/v1"),
+            timeout=int(os.environ.get("EMBEDDING_REQUEST_TIMEOUT", "120")),
+            max_retries=0,
         )
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
-        response = self.client.embeddings.create(model=self.model, input=texts)
+        for attempt in range(4):
+            try:
+                response = self.client.embeddings.create(model=self.model, input=texts)
+                break
+            except (APIConnectionError, APITimeoutError, InternalServerError):
+                if attempt >= 3:
+                    raise
+                time.sleep(2 ** attempt)
         usage = response.usage
         self.memory.add_metrics(
             embedding_calls=1,
@@ -76,6 +87,8 @@ class LangMemMemory(MemoryMethod):
             base_url=os.environ.get("MEMO_OPENAI_BASE_URL", "https://api.openai.com/v1"),
             model=os.environ.get("MEMO_OPENAI_MODEL", "gpt-4o-mini"),
             temperature=0,
+            timeout=int(os.environ.get("MEMORY_REQUEST_TIMEOUT", "300")),
+            max_retries=0,
             callbacks=[callback],
         )
         self._embeddings = _TrackedEmbeddings(self)
@@ -101,11 +114,21 @@ class LangMemMemory(MemoryMethod):
     def update(self, llm, cache_key: str) -> None:
         if not self._pending:
             return
-        self._manager.invoke({"messages": [{"role": "user", "content": self._pending}]})
+        for attempt in range(4):
+            try:
+                self._manager.invoke({"messages": [{"role": "user", "content": self._pending}]})
+                break
+            except Exception as exc:
+                if attempt >= 3 or not is_transient_error(exc):
+                    raise
+                time.sleep(2 ** attempt)
         self._pending = ""
 
     def context(self, query: str | None = None) -> str:
-        items = self._manager.search(query=query or "", limit=self.top_k)
+        query = normalize_query(query)
+        if not query:
+            return ""
+        items = self._manager.search(query=query, limit=self.top_k)
         lines = []
         for item in items:
             value = item.value.get("content", item.value) if isinstance(item.value, dict) else item.value

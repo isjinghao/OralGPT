@@ -49,7 +49,7 @@ def _normalize_coverage(selected_evidence: list[dict], judged_items: list[dict],
     return normalized, covered_count, len(normalized)
 
 
-def judge_base(llm: CachedLLM, record: dict) -> dict:
+def judge_base(llm: CachedLLM, record: dict, max_tokens: int = 2048) -> dict:
     # 判定 base 任务，并对预先筛选的全部 selected_evidence 统一计算 ERS
     selected_evidence = _selected_evidence_payload(record)
     prompt = render(
@@ -59,7 +59,7 @@ def judge_base(llm: CachedLLM, record: dict) -> dict:
         answer=record["model_answer"],
         selected_evidence=json.dumps(selected_evidence, ensure_ascii=False),
     )
-    data = llm.complete(prompt, cache_key=f"judge_base_{record['task_id']}", max_tokens=2048)
+    data = llm.complete(prompt, cache_key=f"judge_base_{record['task_id']}", max_tokens=max_tokens)
     evidence, covered_evidence, total_evidence = _normalize_coverage(
         selected_evidence, data.get("evidence", []) or []
     )
@@ -72,7 +72,7 @@ def judge_base(llm: CachedLLM, record: dict) -> dict:
     }
 
 
-def judge_evidence(llm: CachedLLM, record: dict) -> dict:
+def judge_evidence(llm: CachedLLM, record: dict, max_tokens: int = 2048) -> dict:
     # 仅测量证据召回；selected_evidence 已在 benchmark 生成阶段筛为该题所需证据
     selected_evidence = _selected_evidence_payload(record)
     compact = [
@@ -90,7 +90,7 @@ def judge_evidence(llm: CachedLLM, record: dict) -> dict:
         answer=record["model_answer"],
         selected_evidence=json.dumps(compact, ensure_ascii=False),
     )
-    data = llm.complete(prompt, cache_key=f"judge_evidence_{record['task_id']}", max_tokens=2048)
+    data = llm.complete(prompt, cache_key=f"judge_evidence_{record['task_id']}", max_tokens=max_tokens)
     evidence, covered_evidence, total_evidence = _normalize_coverage(
         selected_evidence,
         [],
@@ -103,7 +103,7 @@ def judge_evidence(llm: CachedLLM, record: dict) -> dict:
     }
 
 
-def judge_rubric(llm: CachedLLM, record: dict, rubric: dict) -> dict:
+def judge_rubric(llm: CachedLLM, record: dict, rubric: dict, max_tokens: int = 2048) -> dict:
     # 按 rubric 清单为一条治疗/随访作答打分
     criteria_defs = rubric.get("criteria", [])
     payload = [
@@ -141,7 +141,7 @@ def judge_rubric(llm: CachedLLM, record: dict, rubric: dict) -> dict:
     data = llm.complete(
         prompt,
         cache_key=f"rubric_{record['task_id']}",
-        max_tokens=2048,
+        max_tokens=max_tokens,
         required_keys=("criteria",),
         validator=validate_rubric,
     )

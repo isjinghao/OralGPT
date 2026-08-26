@@ -59,7 +59,7 @@ class CachedLLM:
                 path.unlink(missing_ok=True)
 
         last_error: Exception | None = None
-        for attempt in range(2):
+        for attempt in range(3):
             try:
                 result = self.client.complete_json(
                     prompt,
@@ -75,8 +75,11 @@ class CachedLLM:
                 return result
             except (KeyError, TypeError, ValueError) as exc:
                 last_error = exc
-                if attempt == 0:
-                    self.client.log("llm/retry", f"Invalid verifier JSON after repair; retrying once: {exc}")
+                if attempt < 2:
+                    self.client.log(
+                        "llm/retry",
+                        f"Invalid verifier JSON after repair; retrying generation: {exc}",
+                    )
                     continue
                 raise
         raise last_error or RuntimeError("Verifier JSON generation failed")

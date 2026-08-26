@@ -9,6 +9,21 @@ import time
 from pathlib import Path
 from threading import Lock
 
+
+def normalize_query(value: object) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value.strip()
+    if isinstance(value, (list, tuple)):
+        return "\n".join(part for item in value if (part := normalize_query(item)))
+    if isinstance(value, dict):
+        for key in ("text", "content"):
+            if key in value:
+                return normalize_query(value[key])
+    return str(value).strip()
+
+
 def format_stage_input(stage: dict) -> str:
     # 把一个阶段的结构化数据格式化为可读文本块
     modality = ", ".join(stage.get("modality", [])) or "none"

@@ -10,24 +10,33 @@ mem0(https://github.com/mem0ai/mem0) 是面向 LLM 应用的记忆层: 从输入
 """
 from __future__ import annotations
 import os
+import time
 
 from mem0.embeddings.openai import OpenAIEmbedding
 
 from config import memo_api_key
-from step4_evaluation.memory.base import MemoryMethod, format_stage_input
+from step4_evaluation.memory.base import MemoryMethod, format_stage_input, normalize_query
+from utils.batch_utils import log
+from utils.retry_utils import is_transient_error
+
+
+QWEN3_EMBEDDING_DIM = 1024
+MEMORY_TIMEOUT = int(os.environ.get("MEMORY_REQUEST_TIMEOUT", "300"))
+EMBEDDING_TIMEOUT = int(os.environ.get("EMBEDDING_REQUEST_TIMEOUT", "120"))
 
 
 class _TrackedEmbedding(OpenAIEmbedding):
     def __init__(self, memory, config) -> None:
         self.memory = memory
         super().__init__(config)
+        self.client = self.client.with_options(timeout=EMBEDDING_TIMEOUT, max_retries=0)
 
     def embed(self, text, memory_action=None):
         text = text.replace("\n", " ")
         kwargs = {"input": [text], "model": self.config.model, "encoding_format": "float"}
-        if self._pass_dimensions_to_api:
+        if self._pass_dimensions_to_api and "qwen3-embedding" not in self.config.model.lower():
             kwargs["dimensions"] = self.config.embedding_dims
-        response = self.client.embeddings.create(**kwargs)
+        response = self.memory._call_with_retry("embedding", lambda: self.client.embeddings.create(**kwargs))
         self.memory.add_metrics(
             embedding_calls=1,
             embedding_tokens=int(response.usage.prompt_tokens or 0),
@@ -43,9 +52,9 @@ class _TrackedEmbedding(OpenAIEmbedding):
                 "model": self.config.model,
                 "encoding_format": "float",
             }
-            if self._pass_dimensions_to_api:
+            if self._pass_dimensions_to_api and "qwen3-embedding" not in self.config.model.lower():
                 kwargs["dimensions"] = self.config.embedding_dims
-            response = self.client.embeddings.create(**kwargs)
+            response = self.memory._call_with_retry("embedding", lambda: self.client.embeddings.create(**kwargs))
             self.memory.add_metrics(
                 embedding_calls=1,
                 embedding_tokens=int(response.usage.prompt_tokens or 0),
@@ -88,6 +97,11 @@ class Mem0Memory(MemoryMethod):
         if self._memory is None:
             from mem0 import Memory
             self._memory = Memory.from_config(self._config_override or self._default_config())
+            if hasattr(self._memory.llm.client, "with_options"):
+                self._memory.llm.client = self._memory.llm.client.with_options(
+                    timeout=MEMORY_TIMEOUT,
+                    max_retries=0,
+                )
             self._memory.embedding_model = _TrackedEmbedding(
                 self,
                 self._memory.embedding_model.config,
@@ -102,6 +116,7 @@ class Mem0Memory(MemoryMethod):
         llm_model = os.environ.get("MEM0_OPENAI_MODEL", "gpt-5-mini")
         embedding_api_key = os.environ.get("EMBEDDING_OPENAI_API_KEY", "EMPTY")
         embedding_base_url = os.environ.get("EMBEDDING_OPENAI_BASE_URL", "https://api.openai.com/v1")
+        embedding_dims = QWEN3_EMBEDDING_DIM if "qwen3-embedding" in self.embedding_model.lower() else 1536
 
         config: dict = {
             "llm": {
@@ -120,6 +135,7 @@ class Mem0Memory(MemoryMethod):
                     "model": self.embedding_model,
                     "api_key": embedding_api_key,
                     "openai_base_url": embedding_base_url,
+                    "embedding_dims": embedding_dims,
                 },
             },
         }
@@ -129,6 +145,7 @@ class Mem0Memory(MemoryMethod):
                 "config": {
                     "collection_name": "oralmem",
                     "path": str(self.storage_dir),
+                    "embedding_model_dims": embedding_dims,
                 },
             }
         return config
@@ -140,6 +157,21 @@ class Mem0Memory(MemoryMethod):
             input_tokens=int(usage.prompt_tokens or 0) if usage else 0,
             output_tokens=int(usage.completion_tokens or 0) if usage else 0,
         )
+
+    def _call_with_retry(self, label: str, callback):
+        for attempt in range(4):
+            try:
+                return callback()
+            except Exception as exc:
+                if attempt >= 3 or not is_transient_error(exc):
+                    raise
+                wait_seconds = min(30, 2 ** attempt * 2)
+                log(
+                    f"[memory][{self.namespace}][mem0/retry] {label} {type(exc).__name__}: "
+                    f"{exc}; wait={wait_seconds}s next_attempt={attempt + 2}/4"
+                )
+                time.sleep(wait_seconds)
+        raise RuntimeError(f"mem0 {label} failed")
 
     def reset(self) -> None:
         self._pending = ""
@@ -153,16 +185,23 @@ class Mem0Memory(MemoryMethod):
         # mem0 使用自带 LLM 完成事实抽取与写入决策, 传入的 llm 不使用
         if not self._pending:
             return
-        self._client().add(self._pending, user_id=self.user_id)
+        self._call_with_retry("add", lambda: self._client().add(self._pending, user_id=self.user_id))
         self._pending = ""
 
     def context(self, query: str | None = None) -> str:
         client = self._client()
         filters = {"user_id": self.user_id}
+        query = normalize_query(query)
         if query:
-            result = client.search(query, filters=filters, top_k=self.search_limit)
+            result = self._call_with_retry(
+                "search",
+                lambda: client.search(query, filters=filters, top_k=self.search_limit),
+            )
         else:
-            result = client.get_all(filters=filters, top_k=self.search_limit)
+            result = self._call_with_retry(
+                "get_all",
+                lambda: client.get_all(filters=filters, top_k=self.search_limit),
+            )
         items = result.get("results", result) if isinstance(result, dict) else result
         lines = []
         for item in items or []:
@@ -175,5 +214,8 @@ class Mem0Memory(MemoryMethod):
         if self._memory is None:
             return
         self._memory.close()
-        self._memory.vector_store.client.close()
-        self._memory._telemetry_vector_store.client.close()
+        for store_name in ("vector_store", "_telemetry_vector_store"):
+            store = getattr(self._memory, store_name, None)
+            client = getattr(store, "client", None)
+            if client is not None:
+                client.close()

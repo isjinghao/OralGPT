@@ -306,6 +306,7 @@ def run_patient(
     methods: list[str],
     *,
     answer_model: str,
+    answer_request_model: str | None = None,
     answer_base_url: str | None = None,
     force: bool = False,
     answer_workers: int = 2,
@@ -324,6 +325,7 @@ def run_patient(
             log_prefix="[evaluation]",
             model=answer_model,
             base_url=answer_base_url,
+            request_model=answer_request_model,
         ) as answer_client,
         build_client(settings, "verifier", patient_id, log_prefix="[evaluation]") as verifier_client,
         build_client(settings, "memo", patient_id, log_prefix="[evaluation]") as memo_client,
@@ -372,6 +374,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--trajectories", type=parse_csv, default=["standard_trajectory"])
     parser.add_argument("--methods", type=parse_csv, default=["full_context_memory"])
     parser.add_argument("--answer-model", default=None, help="Override ANSWER_OPENAI_MODEL for this run")
+    parser.add_argument("--answer-output-model", default=None, help="Write results under this answer-model folder")
     parser.add_argument("--answer-base-url", default=None, help="Override ANSWER_OPENAI_BASE_URL for this run")
     parser.add_argument("--answer-workers", type=int, choices=(1, 2), default=2)
     parser.add_argument("--score-workers", type=int, choices=(1, 2, 3, 4), default=1)
@@ -387,7 +390,8 @@ def main() -> int:
         raise ValueError(f"Unknown memory methods: {unknown_methods}")
     settings = get_settings()
     patients = selected_patients(settings.dataset_json, args.all, args.limit)
-    answer_model = args.answer_model or settings.llm_for("answer").model
+    answer_request_model = args.answer_model or settings.llm_for("answer").model
+    answer_model = args.answer_output_model or answer_request_model
 
     def worker(item: dict) -> str:
         patient_id = item["id"]
@@ -411,6 +415,7 @@ def main() -> int:
             args.trajectories,
             args.methods,
             answer_model=answer_model,
+            answer_request_model=answer_request_model,
             answer_base_url=args.answer_base_url,
             force=args.force,
             answer_workers=args.answer_workers,
