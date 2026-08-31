@@ -46,6 +46,7 @@ Three pins are **not optional**:
 
 ## 2. Data and weights
 
+Gated — request access on each page, then `hf auth login`.
 
 | | |
 |---|---|
@@ -168,11 +169,15 @@ Two ready-made launchers wrap exactly the two commands above:
 
 **Two things to know**
 
-- **`evaluator: coco` is required.**
+- **`evaluator: coco` is required.** The default metric groups by an explicit `modality` key on every
+  image record — ours have one, yours will not, and it raises rather than silently scoring a subset.
 - **≤ 256 classes is shape-safe.** The head sizes its classifier as `max(256, num_classes)` and class
-  prototypes come from the text tower rather than a learned per-class matrix. 
+  prototypes come from the text tower rather than a learned per-class matrix, so any vocabulary up to
+  256 loads into the checkpoint unchanged. Past that the classifier branch changes shape and would be
+  dropped; `run_finetune.py` stops you.
 
-Adding a class the model was never trained on is a one-line edit to the two vocabulary files.
+Adding a class the model was never trained on is a one-line edit to the two vocabulary files. No
+retraining — that is what open-vocabulary means here.
 
 ## 5. Test
 

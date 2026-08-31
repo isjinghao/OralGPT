@@ -3,7 +3,6 @@
 AAAI2027
 Baselines
 logs
-OralCLIP
 OralGPT-series
 outputs
 pretrained
@@ -12,6 +11,12 @@ pretrained_models
 !README.md
 # SKILL.md is the skill -- the blanket *.md rule above would drop it and ship the scripts alone.
 !skills/**/*.md
+
+# OralCLIP: the directory is research code and data; only the inference module ships.
+OralCLIP/*
+!OralCLIP/model.py
+!OralCLIP/infer.py
+!OralCLIP/README.md
 
 bench_jsons
 datas
