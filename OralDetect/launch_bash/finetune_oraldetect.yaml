@@ -1,0 +1,51 @@
+# Finetune OralDetect. Fill in the paths below -- they are placeholders.
+#
+# This file is the ONLY thing you edit. run_finetune.py does the rest -- path checks, the resolved
+# config, the checkpoint key diff, auto-resume. Relative paths are resolved from the repo root.
+
+paths:
+  # framework root -- goes on PYTHONPATH and is the cwd for training
+  wedetect:   WeDetect
+  # the recipe (schedule / pipeline / evaluator). Its architecture must match `init` below.
+  config:     WeDetect/config/oraldetect_finetune.py
+
+  # WHAT YOU START FROM.
+  #   oraldetect.pth       the released detector -- already converged. Use lr 5e-6 / 6 epochs.
+  #   oraldetect_init.pth  towers loaded, neck+head random -- has to learn detection.
+  #                        Use lr 2e-5 / 12 epochs.
+  init:       /path/to/weights/OralDetect/oraldetect.pth
+
+  # The text tower, an HF-format directory (config.json + model.safetensors + tokenizer).
+  # `OralCLIP/oralbert/` from the weights repo. Required: the detector rebuilds its text tower
+  # from here on every forward pass.
+  text_tower: /path/to/weights/OralCLIP/oralbert
+
+  work_dir:   /path/to/output
+
+data:
+  data_root:   /path/to/your/images/          # `file_name` in the COCO files is relative to this
+  train_ann:   /path/to/your/instances_train.json
+  val_ann:     /path/to/your/instances_val.json
+
+  # class_names: list[str].          The ORDER defines the label indices.
+  # class_texts: list[list[str]].    Same order, one list of prompts per class.
+  # The loader matches categories BY NAME: every `categories[].name` in your COCO json must be a
+  # byte-exact match for a string in class_names, or its annotations are silently dropped.
+  class_names: /path/to/your/class_names.json
+  class_texts: /path/to/your/class_texts.json
+
+  # coco         -> plain COCO mAP. Use this for any dataset that is not ours.
+  # per_modality -> per-modality mAP + MACRO-5/MACRO-4. Requires an explicit `modality` key on
+  #                 every image record; raises if absent.
+  evaluator:   coco
+
+train:
+  lr: 5.0e-6          # see `init` above -- 2.0e-5 when starting from oraldetect_init.pth
+  epochs: 6           #                     12
+  gpus: 4             # must equal torchrun's --nproc_per_node; run_finetune.py asserts it
+  batch_per_gpu: 4    # 4 x 4 = effective 16 at 1024x1024, ~28 GB/GPU
+
+# Abort before training if `init` would not land cleanly on the model built from `config`.
+# mmengine drops mismatched keys with only a log line, so without this a drifted architecture
+# trains a partly random model that looks fine until the numbers come in.
+strict_load: true

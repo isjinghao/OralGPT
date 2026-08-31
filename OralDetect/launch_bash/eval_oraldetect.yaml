@@ -1,0 +1,47 @@
+# Evaluate an OralDetect checkpoint. Fill in the paths below -- they are placeholders.
+#
+# This file is the ONLY thing you edit. run_eval.py does the rest. Relative paths are resolved
+# from the repo root.
+
+paths:
+  wedetect:   WeDetect
+  # The same config the finetune uses. Eval needs none of its own: that file already carries a
+  # complete test_pipeline / test_dataloader / test_evaluator, and reusing it is what guarantees
+  # the model being scored is identical to the one that was trained.
+  config:     WeDetect/config/oraldetect_finetune.py
+
+  # what is being scored: the released detector, or your own work_dir/best_*.pth
+  checkpoint: /path/to/weights/OralDetect/oraldetect.pth
+  text_tower: /path/to/weights/OralCLIP/oralbert
+
+  # one subdirectory per bench is created under here, each holding preds.bbox.json
+  out_dir:    /path/to/eval_output
+
+data:
+  data_root:   /path/to/your/images/
+  class_names: /path/to/your/class_names.json
+  class_texts: /path/to/your/class_texts.json
+
+  # coco         -> plain COCO mAP. Use this for any dataset that is not ours.
+  # per_modality -> per-modality mAP + MACRO-5/MACRO-4. Requires an explicit `modality` key on
+  #                 every image record; raises if absent.
+  evaluator:   coco
+
+# Every entry is scored in one run. `data_root` is optional per bench and overrides data.data_root,
+# which is how a held-out set living under a different root is scored in the same job.
+benches:
+  - name: test
+    ann:  /path/to/your/instances_test.json
+
+  # - name: openset
+  #   ann:  /path/to/your/instances_openset.json
+  #   data_root: /path/to/other/images/
+
+eval:
+  gpus: 4           # must equal torchrun's --nproc_per_node
+  batch_per_gpu: 1  # the pipeline letterboxes to a fixed 1024, so >1 is safe; 1 is what our
+                    # published numbers used -- leave it alone if you intend to compare
+  dump_preds: true  # write preds.bbox.json per bench, for offline re-scoring
+
+# Abort if the checkpoint would not land cleanly on the model built from `config`.
+strict_load: true

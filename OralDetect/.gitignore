@@ -1,0 +1,34 @@
+.vscode/
+.claude
+AAAI2027
+Baselines
+logs
+OralCLIP
+OralGPT-series
+outputs
+pretrained
+pretrained_models
+*.md
+!README.md
+# SKILL.md is the skill -- the blanket *.md rule above would drop it and ship the scripts alone.
+!skills/**/*.md
+
+bench_jsons
+datas
+visualization
+tools
+_outdate_files
+launch_logs
+
+# Launchers: the *_ours.* copies hold our absolute paths, cluster account and checkpoint
+# locations. The unsuffixed ones are the shipped templates and DO go in.
+launch_bash/*_ours.*
+
+# build artefacts
+__pycache__/
+*.pyc
+work_dirs/
+
+# scratch launchers while walking the README
+launch_bash/my_*
+skill_draft/
