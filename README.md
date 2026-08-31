@@ -18,6 +18,9 @@
   </a> &nbsp;|&nbsp;
   <a href="https://huggingface.co/OralGPT" target="_blank">
     🤗 <b>MMOral-Uni-Bench (Coming soon)</b>
+  </a> &nbsp;|&nbsp;
+  <a href="https://huggingface.co/OralGPT" target="_blank">
+    🤗 <b>OralMemo-Bench (Coming soon)</b>
   </a>
 </div>
 
