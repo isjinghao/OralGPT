@@ -27,7 +27,7 @@ def normalize_query(value: object) -> str:
 def format_stage_input(stage: dict) -> str:
     # 把一个阶段的结构化数据格式化为可读文本块
     modality = ", ".join(stage.get("modality", [])) or "none"
-    lines = [f"[Stage {stage['stage_id']} | modality: {modality}]"]
+    lines = []
     for qa in stage["qa_pairs"]:
         role = qa["role"]
         if role == "evaluation":
@@ -40,7 +40,10 @@ def format_stage_input(stage: dict) -> str:
         tag = f" [noise:{noise_category}]" if noise_category else ""
         lines.append(f"Q{tag}: {human}")
         lines.append(f"A: {assistant}")
-    return "\n".join(lines)
+    if not lines:
+        return ""
+    header = f"[Stage {stage['stage_id']} | modality: {modality}]"
+    return "\n".join([header] + lines)
 
 
 class MemoryMethod(ABC):

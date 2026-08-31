@@ -1,6 +1,7 @@
 """记忆基线: 增量把每阶段信息由大模型融入一份紧凑的结构化记忆。
 """
 from __future__ import annotations
+import os
 
 from step4_evaluation.memory.base import MemoryMethod, format_stage_input
 from step4_evaluation.templating import render
@@ -59,7 +60,7 @@ class SummaryMemory(MemoryMethod):
             data = llm.complete(
                 prompt,
                 cache_key=cache_key,
-                max_tokens=4096,
+                max_tokens=int(os.environ.get("SUMMARY_MEMORY_MAX_TOKENS", "4096")),
                 required_keys=("memory",),
                 json_schema_name="summary_memory_update",
                 json_schema=SUMMARY_MEMORY_SCHEMA,

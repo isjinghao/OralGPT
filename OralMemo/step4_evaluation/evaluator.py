@@ -1,5 +1,6 @@
 """Step4 流式评测引擎: 缓存 LLM 封装、按阶段流式读取轨迹并在问题释放时刻提问"""
 from __future__ import annotations
+import os
 import json
 import re
 from collections.abc import Callable
@@ -113,7 +114,10 @@ def answer_question(method: MemoryMethod, task: dict, llm: CachedLLM) -> dict:
         memory=memory_context,
         question=task["question"],
     )
-    max_tokens = 4096 if task["task_type"] == "treatment" else 2048
+    if task["task_type"] == "treatment":
+        max_tokens = int(os.environ.get("STEP4_TREATMENT_ANSWER_MAX_TOKENS", "4096"))
+    else:
+        max_tokens = int(os.environ.get("STEP4_ANSWER_MAX_TOKENS", "2048"))
     answer = llm.complete_text(prompt, cache_key=f"answer_{task['task_id']}", max_tokens=max_tokens)
     return {
         "task_id": task["task_id"],
