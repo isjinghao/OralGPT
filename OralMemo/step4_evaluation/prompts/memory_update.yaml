@@ -7,7 +7,7 @@ template: |
     stage / modality each fact came from.
   - If a new fact updates or contradicts an earlier one, keep the latest and note the change.
   - Drop small talk, scheduling, and logistics noise.
-  - Be concise: use short structured bullet lines grouped by stage.
+  - Be concise: keep the whole memory under about 800 words using short structured bullet lines grouped by stage.
 
   EXISTING MEMORY:
   $existing_memory
@@ -15,5 +15,5 @@ template: |
   NEW STAGE:
   $new_stage
 
-  Return strict JSON only, no markdown, no commentary:
-  {"memory": "<updated consolidated memory as structured bullet lines>"}
+  Return only the updated memory as concise structured bullet lines.
+  Do not wrap it in JSON, markdown fences, or commentary.

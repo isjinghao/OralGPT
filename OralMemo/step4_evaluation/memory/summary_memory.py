@@ -7,13 +7,6 @@ from step4_evaluation.memory.base import MemoryMethod, format_stage_input
 from step4_evaluation.templating import render
 
 
-SUMMARY_MEMORY_SCHEMA = {
-    "type": "object",
-    "properties": {"memory": {"type": "string"}},
-    "required": ["memory"],
-    "additionalProperties": False,
-}
-
 
 def _to_text(value) -> str:
     if value is None:
@@ -55,15 +48,13 @@ class SummaryMemory(MemoryMethod):
             existing_memory=self._summary or "(empty)",
             new_stage=self._pending,
         )
+        max_tokens = min(int(os.environ.get("SUMMARY_MEMORY_MAX_TOKENS", "1024")), 1024)
         before = llm.client.usage_snapshot()
         try:
-            data = llm.complete(
+            memory = llm.complete_text(
                 prompt,
                 cache_key=cache_key,
-                max_tokens=int(os.environ.get("SUMMARY_MEMORY_MAX_TOKENS", "4096")),
-                required_keys=("memory",),
-                json_schema_name="summary_memory_update",
-                json_schema=SUMMARY_MEMORY_SCHEMA,
+                max_tokens=max_tokens,
             )
         finally:
             after = llm.client.usage_snapshot()
@@ -72,7 +63,7 @@ class SummaryMemory(MemoryMethod):
                 input_tokens=after["input_tokens"] - before["input_tokens"],
                 output_tokens=after["output_tokens"] - before["output_tokens"],
             )
-        memory = _to_text(data.get("memory"))
+        memory = _to_text(memory)
         if not memory:
             raise ValueError("Summary memory update returned empty memory")
         self._summary = memory
