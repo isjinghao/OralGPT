@@ -88,6 +88,21 @@ Keep this list current (use the todo tool if available):
 [ ] 6. finetuned model scored; before/after table shown
 ```
 
+## Preflight — the environment
+
+One import line, before anything else. `import wedetect` pulls in `webdataset` at module scope, so
+an env that looks complete still dies at the first launcher; the notebook stack is what renders the
+two figures.
+
+```bash
+python -c "import torch, mmcv, mmengine, mmdet, transformers, webdataset, yaml; \
+           import matplotlib, nbformat, nbclient, ipykernel; print('env ok')"
+```
+
+Anything missing: `pip install -r $REPO/requirements.txt` — torch and mmcv first, from the repo
+README, because they need build flags a requirements file cannot carry. Use one interpreter for
+every command in this skill; `run_nb.py` runs the notebooks in whichever one invokes it.
+
 ---
 
 ## Step 1 — Labels into COCO
@@ -190,8 +205,15 @@ Render the boxes:
 python $SKILL/scripts/make_preview_nb.py \
     --ann "$DATAS/instances_train.json" --images "$IMAGE_ROOT" \
     --out "$REPORT/step3_preview.ipynb" --n 12
-jupyter nbconvert --execute --to notebook --inplace "$REPORT/step3_preview.ipynb"
+python $SKILL/scripts/run_nb.py "$REPORT/step3_preview.ipynb"
 ```
+
+`run_nb.py` executes the notebook in place with *this* interpreter. Do not substitute
+`jupyter nbconvert`: the CLI is absent from most conda envs that still have nbconvert importable,
+a registered `python3` kernelspec can point at an interpreter without matplotlib in it, and a host
+Jupyter config (AI Studio's, for one) buries the output in warnings. `run_nb.py` sidesteps all
+three. One `WARNING | Kernel is running over TCP without encryption` line is the kernel's own
+noise, not a failure.
 
 Writes `$REPORT/step3_preview.png` (annotated samples) and `$REPORT/step3_preview_classes.png`
 (boxes per class), plus a geometry check for xyxy-stored-as-xywh and normalised-instead-of-pixel
@@ -328,7 +350,7 @@ python $SKILL/scripts/make_compare_nb.py --gt "$DATAS/instances_val.json" --imag
     --after  "$OUT/eval_after/val/preds.bbox.json" \
     --out "$REPORT/step6_compare.ipynb" --n 8 --score 0.2 \
     --label-before released --label-after finetuned
-jupyter nbconvert --execute --to notebook --inplace "$REPORT/step6_compare.ipynb"
+python $SKILL/scripts/run_nb.py "$REPORT/step6_compare.ipynb"
 ```
 
 Writes `$REPORT/step6_compare.png`: ground truth / before / after side by side, sorted by how much

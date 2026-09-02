@@ -142,17 +142,24 @@ def main():
     ap.add_argument("--n", type=int, default=12)
     ap.add_argument("--seed", type=int, default=0)
     a = ap.parse_args()
+    # The notebook is executed with its own directory as cwd, not this one, so a relative path
+    # baked into a cell resolves against the wrong root and the notebook fails on an unreadable
+    # file. Absolutise here, once, while the caller's cwd is still the right anchor.
+    a.ann, a.images, a.out = (osp.abspath(x) for x in (a.ann, a.images, a.out))
     for p in (a.ann,):
         if not osp.isfile(p):
             raise SystemExit(f"no such file: {p}")
+    if not osp.isdir(a.images):
+        raise SystemExit(f"no such image root: {a.images}")
 
     cells = []
-    for kind, body in CELLS:
+    for i, (kind, body) in enumerate(CELLS):
         src = (body.format(ann=a.ann, images=a.images, n=a.n, seed=a.seed,
                           png=osp.splitext(a.out)[0] + ".png")
                if ("{ann" in body or "{images" in body) else body)
         cells.append({
             "cell_type": "markdown" if kind == "md" else "code",
+            "id": f"cell{i}",          # nbformat 5 requires it; without it every read warns
             "metadata": {},
             "source": src.splitlines(keepends=True),
             **({} if kind == "md" else {"execution_count": None, "outputs": []}),
@@ -176,7 +183,8 @@ def main():
 
     json.dump(nb, open(a.out, "w"), indent=1)
     print(f"wrote {a.out}  ({len(cells)} cells, {a.n} samples, seed {a.seed})")
-    print("run it with:  jupyter nbconvert --execute --to notebook --inplace " + a.out)
+    print(f"run it with:  python {osp.join(osp.dirname(osp.abspath(__file__)), 'run_nb.py')} "
+          f"{a.out}")
 
 
 if __name__ == "__main__":

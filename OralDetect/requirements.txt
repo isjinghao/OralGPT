@@ -1,0 +1,36 @@
+# OralDetect runtime dependencies.
+#
+# torch and mmcv are NOT here: both need flags pip cannot carry in a requirements file --
+# torch its CUDA index URL, mmcv a source build against that torch. Install those two first,
+# exactly as README §1 spells out, then:
+#
+#     pip install -r requirements.txt
+#
+# Versions are the ones the released checkpoints were trained and scored with.
+
+# --- framework ---------------------------------------------------------------
+mmengine==0.10.7
+mmdet==3.3.0
+timm==0.9.16
+
+# --- data pipeline -----------------------------------------------------------
+numpy<2                     # mmengine will pull 2.x on its own, and the pipeline breaks
+albumentations==1.3.1       # 1.4+ rejects the extra keys mmdet.Albu passes
+opencv-python-headless      # never alongside opencv-python -- both own cv2/
+webdataset                  # wedetect/datasets/wdscoco.py imports it at module scope, so
+                            # `import wedetect` fails without it even for plain COCO training
+pycocotools
+Pillow
+tqdm
+
+# --- text tower --------------------------------------------------------------
+transformers
+
+# --- launchers ---------------------------------------------------------------
+pyyaml
+
+# --- skills/oraldetect-finetune ----------------------------------------------
+matplotlib                  # every figure the skill's report is built from
+nbformat                    # the two notebooks: written by make_*_nb.py,
+nbclient                    # executed by scripts/run_nb.py,
+ipykernel                   # in this interpreter

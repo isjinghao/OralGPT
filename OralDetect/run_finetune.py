@@ -77,6 +77,28 @@ def load_yaml(path: str) -> dict:
     return cfg
 
 
+def retarget_text_sampling(node, n: int) -> int:
+    """Point every RandomLoadText in `node` at an n-class vocabulary. Returns how many it found.
+
+    RandomLoadText pads each sample's prompt list to `max_num_samples`, and the config bakes in 87
+    -- the vocabulary this checkpoint was trained on. Left alone it hands the model 87 prompts
+    while `num_train_classes` says n, and the first batch dies on the shape mismatch. At n=1 the
+    padding *is* the batch: one real prompt and 86 empty strings.
+    """
+    hit = 0
+    if isinstance(node, dict):
+        if node.get("type") == "RandomLoadText":
+            node["max_num_samples"] = n
+            node["num_neg_samples"] = (n, n)      # sample the whole vocabulary, as 87 did for 87
+            hit += 1
+        for v in node.values():
+            hit += retarget_text_sampling(v, n)
+    elif isinstance(node, (list, tuple)):
+        for v in node:
+            hit += retarget_text_sampling(v, n)
+    return hit
+
+
 def build_cfg(y: dict):
     """The mmengine Config, with every path and hyper-parameter from the yaml merged over it."""
     from mmengine.config import Config
@@ -132,10 +154,18 @@ def build_cfg(y: dict):
         cfg.default_hooks.checkpoint.save_best = "coco/bbox_mAP"
         over.pop("val_evaluator.ann_file")
     cfg.merge_from_dict(over)
+    # The pipelines are lists of dicts, so merge_from_dict cannot reach into them by name; and
+    # train_pipeline / train_pipeline_stage2 are separate objects from the dataloader's copy.
+    n_text = sum(retarget_text_sampling(cfg.get(k), n) for k in
+                 ("train_dataloader", "train_dataset", "train_pipeline", "train_pipeline_stage2",
+                  "text_transform", "custom_hooks"))
+    if not n_text:
+        sys.exit(f"FATAL: no RandomLoadText found in {y['paths']['config']} -- the prompt sampler "
+                 f"moved, and the vocabulary size would stay at the config's baked-in value.")
     cfg.test_dataloader = cfg.val_dataloader
     cfg.test_evaluator = cfg.val_evaluator
     cfg.work_dir = y["paths"]["work_dir"]
-    return cfg, n
+    return cfg, n, n_text
 
 
 def check_load(cfg, strict: bool) -> None:
@@ -188,7 +218,7 @@ def main() -> int:
     os.chdir(y["paths"]["wedetect"])          # the configs use paths relative to the framework root
     import wedetect  # noqa: F401             # registers every custom module
 
-    cfg, n_cls = build_cfg(y)
+    cfg, n_cls, n_text = build_cfg(y)
 
     # torchrun's world size is the truth; the yaml value only exists so the .sh can read it.
     # Not enforced under --dry-run: the whole point of a dry run is to validate the config on one
@@ -200,18 +230,33 @@ def main() -> int:
                  f"Fix --nproc_per_node in the .sh or train.gpus in the yaml.")
 
     os.makedirs(cfg.work_dir, exist_ok=True)
-    resume = osp.isfile(osp.join(cfg.work_dir, "last_checkpoint"))
+    # mmengine's load_or_resume(): resume=True *with load_from set* resumes from load_from -- the
+    # released weights -- and every epoch already trained is silently thrown away. Resume has to
+    # mean resume, so load_from is repointed at whatever last_checkpoint names.
+    last = osp.join(cfg.work_dir, "last_checkpoint")
+    resume_ckpt = open(last).read().strip() if osp.isfile(last) else None
+    if resume_ckpt and not osp.isfile(resume_ckpt):
+        moved = osp.join(cfg.work_dir, osp.basename(resume_ckpt))   # work_dir copied or renamed
+        if not osp.isfile(moved):
+            sys.exit(f"FATAL: {last} names {resume_ckpt}, which does not exist. Point it at a "
+                     f"checkpoint that does, or delete it to train from {cfg.load_from} again.")
+        resume_ckpt = moved
+    resume = resume_ckpt is not None
     cfg.resume = resume
+    if resume:
+        cfg.load_from = resume_ckpt
 
     say("=" * 78)
     say("OralDetect finetune")
     say("=" * 78)
-    say(f"  init        : {cfg.load_from}")
+    say(f"  init        : {y['paths']['init']}")
     say(f"  config      : {y['paths']['config']}")
     say(f"  train ann   : {cfg.train_dataloader.dataset.dataset.ann_file}")
     say(f"  val ann     : {cfg.val_dataloader.dataset.dataset.ann_file}")
     say(f"  image root  : {cfg.train_dataloader.dataset.dataset.data_root}")
     say(f"  vocab       : {n_cls} classes  ({y['data']['class_names']})")
+    say(f"  prompts     : {n_cls} per sample  ({n_text} RandomLoadText retargeted from the "
+        f"config's 87)")
     say(f"  evaluator   : {cfg.val_evaluator['type']}  -> save_best "
         f"{cfg.default_hooks.checkpoint.save_best}")
     say(f"  resolution  : {cfg.img_scale}   mosaic: "
@@ -220,7 +265,7 @@ def main() -> int:
     say(f"  batch       : {cfg.train_dataloader.batch_size}/gpu x {world} gpu = "
         f"{cfg.train_dataloader.batch_size * world} effective")
     say(f"  work dir    : {cfg.work_dir}")
-    say(f"  resume      : {'YES -- ' + open(osp.join(cfg.work_dir, 'last_checkpoint')).read().strip() if resume else 'no (fresh run)'}")
+    say(f"  resume      : {'YES -- ' + resume_ckpt if resume else 'no (fresh run)'}")
 
     # On resume the weights come from the resume checkpoint, not load_from, so the check is moot.
     if not resume:

@@ -33,8 +33,17 @@ pip install "setuptools<70" wheel "numpy<2"
 MMCV_WITH_OPS=1 FORCE_CUDA=1 TORCH_CUDA_ARCH_LIST="8.0;8.6;8.9" \
     pip install mmcv==2.1.0 --no-binary mmcv --no-build-isolation
 pip install mmengine==0.10.7 mmdet==3.3.0 timm==0.9.16 \
-            albumentations==1.3.1 opencv-python-headless transformers pyyaml
+            albumentations==1.3.1 opencv-python-headless transformers pyyaml \
+            webdataset matplotlib
 ```
+
+Or, after torch and mmcv are in: `pip install -r requirements.txt`.
+
+`webdataset` is not optional — `wedetect/datasets/wdscoco.py` imports it at module scope, so
+`import wedetect` fails without it whether or not you train on shards.
+
+The `skills/oraldetect-finetune` skill additionally needs `nbformat nbclient ipykernel` for the
+two notebooks it renders.
 
 Three pins are **not optional**:
 

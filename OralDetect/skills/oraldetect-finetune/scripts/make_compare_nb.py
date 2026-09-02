@@ -107,17 +107,25 @@ def main():
     ap.add_argument("--label-before", default="before")
     ap.add_argument("--label-after", default="after")
     a = ap.parse_args()
+    # Executed notebooks run with their own directory as cwd, not this one -- bake absolute paths
+    # or every cell that opens a file breaks the moment the report lives elsewhere.
+    a.gt, a.images, a.before, a.after, a.out = (
+        osp.abspath(x) for x in (a.gt, a.images, a.before, a.after, a.out))
     for p in (a.gt, a.before, a.after):
         if not osp.isfile(p):
             raise SystemExit(f"no such file: {p}")
+    if not osp.isdir(a.images):
+        raise SystemExit(f"no such image root: {a.images}")
 
     fmt = dict(gt=a.gt, images=a.images, before=a.before, after=a.after,
                n=a.n, seed=a.seed, score=a.score, lb=a.label_before,
                la=a.label_after, png=osp.splitext(a.out)[0] + '.png')
     cells = []
-    for kind, body in CELLS:
+    for i, (kind, body) in enumerate(CELLS):
         src = body.format(**fmt)
-        cells.append({"cell_type": "markdown" if kind == "md" else "code", "metadata": {},
+        cells.append({"cell_type": "markdown" if kind == "md" else "code",
+                      "id": f"cell{i}",     # nbformat 5 requires it; without it every read warns
+                      "metadata": {},
                       "source": src.splitlines(keepends=True),
                       **({} if kind == "md" else {"execution_count": None, "outputs": []})})
 
@@ -136,6 +144,8 @@ def main():
         "nbformat": 4, "nbformat_minor": 5}
     json.dump(nb, open(a.out, "w"), indent=1)
     print(f"wrote {a.out}  ({a.n} images, score >= {a.score})")
+    print(f"run it with:  python {osp.join(osp.dirname(osp.abspath(__file__)), 'run_nb.py')} "
+          f"{a.out}")
 
 
 if __name__ == "__main__":
