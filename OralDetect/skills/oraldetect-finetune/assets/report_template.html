@@ -1,0 +1,634 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- charset first, inside the first 1024 bytes: the Artifact wrapper supplies one
+     when this is published, but opened as a plain file there is nothing else to stop
+     a browser decoding UTF-8 Chinese as the system legacy encoding. No <!doctype>,
+     <html>, <head> or <body> here -- the publish path wraps the file and forbids them;
+     pass --standalone to make_report_html.py for a document to open or email. -->
+<title>{{PAGE_TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@600&display=swap">
+
+<style>
+/* ── tokens ──────────────────────────────────────────────────────────────
+   Palette is taken from the box colours the figures actually draw:
+   amber = released model, teal = finetuned model. The three mAP series use
+   one teal hue stepped light→dark, because IoU 0.50 / 0.50:0.95 / 0.75 is an
+   ordered scale of strictness, not three unrelated categories.
+   All values validated with the data-viz validator, both modes.          */
+:root {
+  color-scheme: light;
+  --page:        #F4F6F5;
+  --surface:     #FCFDFC;
+  --surface-2:   #EDF1F0;
+  --ink:         #121A1B;
+  --ink-2:       #4C5A5C;
+  --ink-3:       #78878A;
+  --rule:        #DEE4E3;
+  --rule-2:      #C6CFCE;
+  --accent:      #00889F;   /* finetuned */
+  --baseline:    #B26A0F;   /* released  */
+  --good:        #006300;
+  --bad:         #D03B3B;
+  --s1:          #5FB3C4;   /* mAP@50   — most lenient */
+  --s2:          #00889F;   /* mAP@[.50:.95] */
+  --s3:          #0A5163;   /* mAP@75   — strictest */
+  --grid:        #E4E9E8;
+  --axis:        #C6CFCE;
+  --wash:        rgba(0,136,159,0.07);
+  --shadow:      0 1px 2px rgba(18,26,27,.05), 0 8px 24px -14px rgba(18,26,27,.22);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page:      #0C100F;
+    --surface:   #161B1A;
+    --surface-2: #1E2523;
+    --ink:       #E9EEED;
+    --ink-2:     #AAB6B5;
+    --ink-3:     #7E8C8B;
+    --rule:      #29312F;
+    --rule-2:    #3A4443;
+    --accent:    #2FA3B6;
+    --baseline:  #C08320;
+    --good:      #0CA30C;
+  --bad:       #D03B3B;
+    --bad:       #D03B3B;
+    --s1:        #8FD3E0;
+    --s2:        #2FA3B6;
+    --s3:        #15788C;
+    --grid:      #222A29;
+    --axis:      #38423F;
+    --wash:      rgba(47,163,182,0.10);
+    --shadow:    0 1px 2px rgba(0,0,0,.30), 0 8px 24px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page:      #0C100F;
+  --surface:   #161B1A;
+  --surface-2: #1E2523;
+  --ink:       #E9EEED;
+  --ink-2:     #AAB6B5;
+  --ink-3:     #7E8C8B;
+  --rule:      #29312F;
+  --rule-2:    #3A4443;
+  --accent:    #2FA3B6;
+  --baseline:  #C08320;
+  --good:      #0CA30C;
+  --s1:        #8FD3E0;
+  --s2:        #2FA3B6;
+  --s3:        #15788C;
+  --grid:      #222A29;
+  --axis:      #38423F;
+  --wash:      rgba(47,163,182,0.10);
+  --shadow:    0 1px 2px rgba(0,0,0,.30), 0 8px 24px -14px rgba(0,0,0,.7);
+}
+
+/* ── type ──────────────────────────────────────────────────────────────── */
+:root {
+  --serif: "Newsreader", "Noto Serif SC", Georgia, "Songti SC", serif;
+  --sans:  "IBM Plex Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --mono:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── layout ────────────────────────────────────────────────────────────── */
+.wrap  { max-width: 1200px; margin: 0 auto; padding: 0 28px 96px; }
+.col   { max-width: 760px; }
+.col-w { max-width: 1000px; }
+
+section { padding-block: 44px; border-top: 1px solid var(--rule); }
+section:first-of-type { border-top: 0; }
+
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; text-wrap: balance; margin: 0; letter-spacing: -.008em; }
+h1 { font-size: clamp(30px, 4.6vw, 46px); line-height: 1.14; }
+h2 { font-size: clamp(21px, 2.5vw, 27px); line-height: 1.25; }
+h3 { font-size: 17px; line-height: 1.35; }
+
+p { margin: 0; }
+.stack   { display: flex; flex-direction: column; gap: 16px; }
+.stack-s { display: flex; flex-direction: column; gap: 9px; }
+.stack-l { display: flex; flex-direction: column; gap: 28px; }
+
+.eyebrow {
+  font-family: var(--sans); font-size: 11px; font-weight: 600;
+  letter-spacing: .13em; text-transform: uppercase; color: var(--ink-3); margin: 0;
+}
+.lede  { font-family: var(--serif); font-size: 19px; line-height: 1.62; color: var(--ink-2); }
+.muted { color: var(--ink-2); }
+.small { font-size: 13.5px; color: var(--ink-2); }
+code, .mono { font-family: var(--mono); font-size: .875em; }
+code {
+  background: var(--surface-2); border-radius: 3px;
+  padding: .1em .34em; color: var(--ink);
+}
+b, strong { font-weight: 600; }
+
+/* ── masthead ──────────────────────────────────────────────────────────── */
+.masthead {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--page) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+}
+.masthead .wrap {
+  padding-block: 11px; display: flex; align-items: baseline;
+  gap: 14px; flex-wrap: wrap; padding-bottom: 11px;
+}
+.mark {
+  font-family: var(--sans); font-weight: 600; font-size: 13px;
+  letter-spacing: .01em; color: var(--ink);
+}
+.mark .dim { color: var(--ink-3); font-weight: 400; }
+.masthead .runid { margin-left: auto; font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); }
+
+/* ── hero ──────────────────────────────────────────────────────────────── */
+.hero { padding-top: 60px; padding-bottom: 8px; }
+.metastrip {
+  display: flex; flex-wrap: wrap; gap: 0 26px;
+  font-family: var(--mono); font-size: 12px; color: var(--ink-3);
+  padding-top: 6px;
+}
+.metastrip span b { color: var(--ink-2); font-weight: 500; }
+
+/* ── chart ─────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 8px; box-shadow: var(--shadow); overflow: hidden;
+}
+.card-head {
+  display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
+  padding: 18px 20px 0;
+}
+.card-head .t { display: flex; flex-direction: column; gap: 2px; }
+.card-head h3 { font-family: var(--sans); font-weight: 600; font-size: 14.5px; }
+.card-head .sub { font-size: 12.5px; color: var(--ink-3); }
+.toggle { margin-left: auto; display: flex; gap: 2px; background: var(--surface-2); border-radius: 6px; padding: 2px; }
+.toggle button {
+  font-family: var(--sans); font-size: 12px; font-weight: 500;
+  border: 0; background: transparent; color: var(--ink-2);
+  padding: 4px 11px; border-radius: 4px; cursor: pointer;
+}
+.toggle button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.toggle button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 20px; padding: 14px 20px 4px; }
+.key { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-2); }
+.key .swatch { width: 17px; height: 2px; border-radius: 2px; flex: none; }
+.key .swatch.dash { height: 0; border-top: 2px dashed currentColor; border-radius: 0; }
+
+.plotwrap { position: relative; padding: 4px 20px 18px; }
+.plotwrap svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.plotwrap svg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.tip {
+  position: absolute; pointer-events: none; opacity: 0;
+  transition: opacity .12s ease;
+  background: var(--surface); border: 1px solid var(--rule-2);
+  border-radius: 6px; padding: 8px 11px; box-shadow: var(--shadow);
+  font-size: 12px; white-space: nowrap; z-index: 4;
+}
+.tip.on { opacity: 1; }
+.tip .ep { font-family: var(--mono); font-size: 11px; color: var(--ink-3); display: block; margin-bottom: 4px; }
+.tip .row { display: flex; align-items: center; gap: 7px; }
+.tip .row .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.tip .row .nm { color: var(--ink-2); }
+.tip .row .vl { margin-left: auto; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+
+.tablewrap { max-height: 420px; overflow: auto; padding: 4px 20px 18px; }
+
+/* ── tables ────────────────────────────────────────────────────────────── */
+.tscroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: right; padding: 7px 12px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; padding-left: 0; }
+th:last-child, td:last-child { padding-right: 0; }
+thead th {
+  font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--ink-3); border-bottom-color: var(--rule-2);
+}
+tbody td { font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: 12.5px; }
+tbody td:first-child { font-family: var(--sans); font-size: 13.5px; color: var(--ink-2); }
+tbody tr:last-child td { border-bottom: 0; }
+tr.rule-above td { border-top: 1px solid var(--rule-2); }
+td.up { color: var(--good); }
+td.emph, tr.emph td { color: var(--ink); font-weight: 500; }
+.chip-b, .chip-a {
+  display: inline-block; width: 9px; height: 9px; border-radius: 2px;
+  margin-right: 7px; vertical-align: baseline;
+}
+.chip-b { background: var(--baseline); }
+.chip-a { background: var(--accent); }
+
+/* ── figure plates ─────────────────────────────────────────────────────── */
+figure { margin: 0; }
+.plate {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 8px; box-shadow: var(--shadow); overflow: hidden;
+}
+.plate img { display: block; width: 100%; height: auto; }
+figcaption {
+  font-size: 12px; font-weight: 600; letter-spacing: .11em; text-transform: uppercase;
+  color: var(--ink-3); padding-top: 11px;
+}
+figcaption b { color: var(--ink); }
+
+.pipeline { display: flex; flex-direction: column; }
+.step {
+  display: grid; grid-template-columns: 46px 1fr auto; gap: 0 16px;
+  align-items: baseline; padding: 13px 0; border-bottom: 1px solid var(--rule);
+}
+.step:last-child { border-bottom: 0; }
+.step .idx { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); }
+.step .what { font-size: 13.5px; color: var(--ink-2); }
+.step .what b { color: var(--ink); font-weight: 600; }
+.step .ok {
+  font-family: var(--mono); font-size: 11px; color: var(--good);
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+}
+.step .ok.bad { color: var(--bad); }
+.step .ok.unk { color: var(--ink-3); }
+@media (max-width: 640px) {
+  .step { grid-template-columns: 40px 1fr; }
+  .step .ok { grid-column: 2; }
+}
+
+pre {
+  margin: 0; background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 8px; padding: 15px 18px; overflow-x: auto;
+  font-family: var(--mono); font-size: 12.5px; line-height: 1.72; color: var(--ink-2);
+}
+pre b { color: var(--ink); font-weight: 500; }
+pre .cm { color: var(--ink-3); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+</style>
+<style>
+/* headline metric table — the page's centrepiece */
+.headline th, .headline td { padding: 13px 14px; }
+.headline tbody tr.big td { font-size: 21px; }
+.headline tbody tr.big td:first-child { font-size: 15px; }
+.headline .metric { display: flex; flex-direction: column; gap: 1px; }
+.headline .metric .nm { color: var(--ink); font-weight: 500; }
+.headline .metric .hint { font-size: 12px; color: var(--ink-3); font-family: var(--sans); font-weight: 400; }
+.headline .en { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); font-weight: 400; }
+.headline td.up { font-weight: 500; }
+.finding {
+  font-family: var(--serif); font-size: 19px; line-height: 1.62;
+  color: var(--ink-2);
+}
+.finding b { color: var(--ink); font-weight: 600; }
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <span class="mark">OralDetect <span class="dim">/ {{SUBJECT}}</span></span>
+    <span class="runid">{{RUN_META}}</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ─── hero ─────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="col stack">
+      <p class="eyebrow">Finetune report</p>
+      <h1>{{TITLE}}</h1>
+      <div class="metastrip">
+{{HERO_META}}
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 1. 执行记录 ─── -->
+    <section>
+    <div class="col-w stack-l">
+      <div class="stack-s">
+        <p class="eyebrow">执行记录</p>
+        <h2>六步流程，每步一个检查点</h2>
+        <p class="small">
+          上一步的检查点不通过就不会进入下一步，所以每一行的"通过"都是真的跑过的。
+        </p>
+      </div>
+
+      <div class="pipeline">
+{{PIPELINE_ROWS}}
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 2. 原始数据 ──────────────────────────────────────────────── -->
+  <section>
+    <div class="col-w stack-l">
+      <div class="stack-s">
+        <p class="eyebrow">原始数据</p>
+        <h2>{{DATASET_H2}}</h2>
+      </div>
+
+      <div class="tscroll">
+        <table>
+          <thead><tr><th>数据集</th><th>图片</th><th>标注框</th><th>平均每图框数</th><th>类别数</th><th>平均每图类别数</th><th>用途</th></tr></thead>
+          <tbody>
+{{DATASET_ROWS}}
+          </tbody>
+        </table>
+      </div>
+
+      <figure>
+        <div class="plate">
+          <img src="{{IMG_PREVIEW}}" alt="{{PREVIEW_ALT}}">
+        </div>
+        <figcaption>训练数据可视化</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ─── 3. 结果 ──────────────────────────────────────────────────── -->
+  <section>
+    <div class="col-w stack-l">
+      <div class="stack-s">
+        <p class="eyebrow">结果</p>
+        <h2>{{RESULT_H2}}</h2>
+      </div>
+
+      <div class="tscroll">
+        <table class="headline">
+          <thead>
+            <tr>
+              <th>指标</th>
+              <th><span class="chip-b"></span>微调前</th>
+              <th><span class="chip-a"></span>微调后</th>
+              <th>提升</th>
+            </tr>
+          </thead>
+          <tbody>
+{{METRIC_ROWS}}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── 4. 训练过程 ─────────────────────────────────────────────── -->
+  <section>
+    <div class="col-w stack-l">
+      <div class="stack-s">
+        <p class="eyebrow">训练过程</p>
+        <h2>模型在验证图上的表现变化</h2>
+        <p class="small">{{CHART_NOTE}}</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="t">
+            <h3>验证集得分</h3>
+            <span class="sub">{{CHART_SUB}}</span>
+          </div>
+          <div class="toggle" role="group" aria-label="视图切换">
+            <button id="btn-chart" aria-pressed="true">图表</button>
+            <button id="btn-table" aria-pressed="false">数据表</button>
+          </div>
+        </div>
+
+        <div class="legend" id="legend">
+          <span class="key"><span class="swatch" style="background:var(--s1)"></span>宽松判定 mAP@50</span>
+          <span class="key"><span class="swatch" style="background:var(--s2)"></span>综合 mAP</span>
+          <span class="key"><span class="swatch" style="background:var(--s3)"></span>严格判定 mAP@75</span>
+          <span class="key" style="color:var(--ink-3)"><span class="swatch dash"></span><span style="color:var(--ink-2)">虚线 = 微调前</span></span>
+        </div>
+
+        <div class="plotwrap" id="plotwrap">
+          <svg id="chart" viewBox="0 0 900 400" role="img"
+               aria-label="{{CHART_ARIA}}"
+               tabindex="0"></svg>
+          <div class="tip" id="tip" aria-hidden="true"></div>
+        </div>
+
+        <div class="tablewrap tscroll" id="tableview" hidden>
+          <table>
+            <thead>
+              <tr><th>轮次</th><th>综合 mAP</th><th>mAP@50</th><th>mAP@75</th><th>训练损失</th></tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── 5. 可视化结果 ───────────────────────────────────────────── -->
+  <section>
+    <div class="col-w stack-l">
+      <div class="stack-s">
+        <p class="eyebrow">可视化</p>
+        <h2>可视化结果</h2>
+        <p class="finding">{{FINDING}}</p>
+      </div>
+
+      <figure>
+        <div class="plate">
+          <img src="{{IMG_COMPARE}}" alt="{{COMPARE_ALT}}">
+        </div>
+      </figure>
+    </div>
+  </section>
+
+
+  <!-- ─── 6. 交付 ─────────────────────────────────────────────────── -->
+  <section>
+    <div class="col-w stack-l">
+      <div class="stack-s">
+        <p class="eyebrow">交付</p>
+        <h2>产物与复现命令</h2>
+      </div>
+
+{{DELIVERABLES}}
+    </div>
+  </section>
+</div>
+
+<script>
+// ── data ────────────────────────────────────────────────────────────────
+const D = {{CURVE_DATA}};
+
+// series in ordinal order: lenient -> strict
+const S = [
+  {k:"m50", name:"宽松 mAP@50",  col:"--s1", base:{{BASE_M50}}},
+  {k:"mAP", name:"综合 mAP",     col:"--s2", base:{{BASE_MAP}}},
+  {k:"m75", name:"严格 mAP@75",  col:"--s3", base:{{BASE_M75}}}
+];
+
+const NS = "http://www.w3.org/2000/svg";
+const L = 46, R = 826, T = 16, B = 366, YMAX = 0.9;
+const X = e => L + (e - 1) / 59 * (R - L);
+const Y = v => B - v / YMAX * (B - T);
+const el = (n, a) => { const x = document.createElementNS(NS, n); for (const k in a) x.setAttribute(k, a[k]); return x; };
+const cssvar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+const svg = document.getElementById("chart");
+const tip = document.getElementById("tip");
+
+function draw() {
+  svg.textContent = "";
+  const grid = cssvar("--grid"), axis = cssvar("--axis"),
+        ink3 = cssvar("--ink-3"), ink2 = cssvar("--ink-2"), surface = cssvar("--surface");
+
+  // gridlines — solid hairlines, one step off surface
+  [0, 0.2, 0.4, 0.6, 0.8].forEach(v => {
+    svg.appendChild(el("line", {x1:L, x2:R, y1:Y(v), y2:Y(v), stroke:grid, "stroke-width":1}));
+    const t = el("text", {x:L-10, y:Y(v)+4, "text-anchor":"end", fill:ink3,
+                          "font-size":11, "font-family":"var(--sans)"});
+    t.style.fontVariantNumeric = "tabular-nums";
+    t.textContent = v.toFixed(1);
+    svg.appendChild(t);
+  });
+  svg.appendChild(el("line", {x1:L, x2:R, y1:B, y2:B, stroke:axis, "stroke-width":1}));
+
+  [1, 10, 20, 30, 40, 50, 60].forEach(e => {
+    const t = el("text", {x:X(e), y:B+21, "text-anchor":"middle", fill:ink3,
+                          "font-size":11, "font-family":"var(--sans)"});
+    t.style.fontVariantNumeric = "tabular-nums";
+    t.textContent = e;
+    svg.appendChild(t);
+  });
+  const xl = el("text", {x:(L+R)/2, y:B+38, "text-anchor":"middle", fill:ink3,
+                         "font-size":11, "font-family":"var(--sans)"});
+  xl.textContent = "epoch";
+  svg.appendChild(xl);
+
+  // released baselines — dashed because they ARE thresholds, not grid
+  S.forEach(s => {
+    svg.appendChild(el("line", {x1:L, x2:R, y1:Y(s.base), y2:Y(s.base),
+      stroke:cssvar(s.col), "stroke-width":1.5, "stroke-dasharray":"5 5", opacity:.55}));
+  });
+  const bl = el("text", {x:R+6, y:Y(0.209)+4, fill:ink3, "font-size":11, "font-family":"var(--sans)"});
+  bl.textContent = "released";
+  svg.appendChild(bl);
+
+  // series lines — 2px, round caps
+  S.forEach(s => {
+    const d = D.map((p, i) => (i ? "L" : "M") + X(p.e).toFixed(1) + " " + Y(p[s.k]).toFixed(1)).join(" ");
+    const path = el("path", {d, fill:"none", stroke:cssvar(s.col),
+      "stroke-width":2, "stroke-linejoin":"round", "stroke-linecap":"round"});
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const len = 3000;
+      path.style.strokeDasharray = len;
+      path.style.strokeDashoffset = len;
+      path.style.transition = "stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1)";
+      requestAnimationFrame(() => requestAnimationFrame(() => { path.style.strokeDashoffset = 0; }));
+    }
+    svg.appendChild(path);
+
+    // end marker: r>=4 with a 2px surface ring
+    const last = D[D.length - 1];
+    svg.appendChild(el("circle", {cx:X(last.e), cy:Y(last[s.k]), r:4.5,
+      fill:cssvar(s.col), stroke:surface, "stroke-width":2}));
+
+    // selective direct labels: endpoints only
+    const t = el("text", {x:X(last.e)+10, y:Y(last[s.k])+4, fill:ink2,
+      "font-size":11.5, "font-family":"var(--sans)", "font-weight":500});
+    t.style.fontVariantNumeric = "tabular-nums";
+    t.textContent = last[s.k].toFixed(3);
+    svg.appendChild(t);
+  });
+
+  // hover layer
+  const cross = el("line", {x1:0, x2:0, y1:T, y2:B, stroke:axis, "stroke-width":1, opacity:0});
+  svg.appendChild(cross);
+  const dots = S.map(s => {
+    const c = el("circle", {r:5, fill:cssvar(s.col), stroke:surface, "stroke-width":2, opacity:0});
+    svg.appendChild(c); return c;
+  });
+  svg.appendChild(el("rect", {x:L, y:T, width:R-L, height:B-T, fill:"transparent", id:"hit"}));
+  return {cross, dots};
+}
+
+let H = draw();
+let cur = -1;
+
+function show(i) {
+  if (i < 0 || i >= D.length) return;
+  cur = i;
+  const p = D[i], x = X(p.e);
+  H.cross.setAttribute("x1", x); H.cross.setAttribute("x2", x); H.cross.setAttribute("opacity", 1);
+  S.forEach((s, j) => {
+    H.dots[j].setAttribute("cx", x);
+    H.dots[j].setAttribute("cy", Y(p[s.k]));
+    H.dots[j].setAttribute("opacity", 1);
+  });
+  tip.innerHTML =
+    '<span class="ep">epoch ' + p.e + (p.e === 58 ? " · best" : "") + '</span>' +
+    S.map(s => '<span class="row"><span class="dot" style="background:var(' + s.col + ')"></span>' +
+      '<span class="nm">' + s.name + '</span><span class="vl">' + p[s.k].toFixed(3) + '</span></span>').join("");
+  tip.classList.add("on");
+
+  const box = svg.getBoundingClientRect();
+  const scale = box.width / 900;
+  let left = x * scale + 14;
+  if (left + tip.offsetWidth > box.width - 4) left = x * scale - tip.offsetWidth - 14;
+  tip.style.left = Math.max(4, left) + "px";
+  tip.style.top = Math.max(4, Y(p.mAP) * scale - tip.offsetHeight / 2) + "px";
+}
+
+function hide() {
+  cur = -1;
+  H.cross.setAttribute("opacity", 0);
+  H.dots.forEach(d => d.setAttribute("opacity", 0));
+  tip.classList.remove("on");
+}
+
+function nearest(clientX) {
+  const box = svg.getBoundingClientRect();
+  const vx = (clientX - box.left) / box.width * 900;
+  const e = Math.round((vx - L) / (R - L) * 59 + 1);
+  return Math.min(D.length - 1, Math.max(0, e - 1));
+}
+
+svg.addEventListener("pointermove", ev => show(nearest(ev.clientX)));
+svg.addEventListener("pointerleave", hide);
+svg.addEventListener("focus", () => show(cur < 0 ? D.length - 1 : cur));
+svg.addEventListener("blur", hide);
+svg.addEventListener("keydown", ev => {
+  if (ev.key === "ArrowRight") { show(Math.min(D.length - 1, cur + 1)); ev.preventDefault(); }
+  else if (ev.key === "ArrowLeft") { show(Math.max(0, cur - 1)); ev.preventDefault(); }
+  else if (ev.key === "Escape") hide();
+});
+
+// ── table view twin ─────────────────────────────────────────────────────
+document.getElementById("tbody").innerHTML = D.map(p =>
+  "<tr" + (p.e === 58 ? ' class="emph"' : "") + "><td>" + p.e + "</td><td>" +
+  p.mAP.toFixed(3) + "</td><td>" + p.m50.toFixed(3) + "</td><td>" + p.m75.toFixed(3) +
+  "</td><td>" + (p.loss === null ? "—" : p.loss.toFixed(2)) + "</td></tr>").join("");
+
+const bc = document.getElementById("btn-chart"), bt = document.getElementById("btn-table"),
+      vChart = document.getElementById("plotwrap"), vTable = document.getElementById("tableview"),
+      legend = document.getElementById("legend");
+function view(chart) {
+  bc.setAttribute("aria-pressed", chart); bt.setAttribute("aria-pressed", !chart);
+  vChart.hidden = !chart; vTable.hidden = chart; legend.hidden = !chart;
+  if (!chart) hide();
+}
+bc.addEventListener("click", () => view(true));
+bt.addEventListener("click", () => view(false));
+
+// redraw on theme flip so the SVG picks up the new token values
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { H = draw(); hide(); });
+new MutationObserver(() => { H = draw(); hide(); })
+  .observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+</script>

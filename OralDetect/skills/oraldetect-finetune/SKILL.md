@@ -341,6 +341,31 @@ ground truth neither run finds.
 >
 > Print: `[STEP 6/6] before/after compared — all checks finished`
 
+## Final step — The report page
+
+One HTML page, rendered from $SKILL/assets/report_template.html. 
+
+$SKILL/assets/example_report.html is a finished one — open it first and match it: section order, how much copy each section carries, how the numbers read.
+
+```bash
+python $SKILL/scripts/make_report_html.py \
+    --work-dir "$OUT" \
+    --train "$DATAS/instances_train.json" --val "$DATAS/instances_val.json" \
+    --title      "在 <dataset folder> 数据集上微调 OralDetect" \
+    --subject    "<class name>" --subject-cn "<that class in the reader's language>" \
+    --photo-noun "<what the images are>" \
+    --gpu "<1×A100-40G>" --minutes <wall clock> \
+    --finding    "<one sentence>" \
+    --out "$REPORT/report.html"
+```
+
+`--title` and `--finding` are the only things it cannot compute. The finding is **one sentence** on what the comparison figure shows that the metrics cannot, from the figure you looked at in step 6, with numbers you can point to.
+
+Add `--standalone --out "$REPORT/report_standalone.html"` for a copy to open or email.
+
+> **Checkpoint ** — `$REPORT/report.html` exists, its numbers match `$REPORT/step6_metrics.txt`, both figures render, the chart draws, and no step claims a tick it cannot evidence. Say in the terminal what the page deliberately leaves out.
+
+> Print: `[FINAL STEP] report page written — all checks finished`
 ---
 
 ## Expected questions
