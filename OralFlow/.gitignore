@@ -1,0 +1,10 @@
+outputs/
+SH9HCMFdata/
+oralgpt_cmf_llamafactory_sft_dataset.json
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.env
+reports/pdf/
+reports/figures/

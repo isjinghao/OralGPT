@@ -1,0 +1,161 @@
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+from string import Template
+
+import yaml
+from openai import InternalServerError
+
+from report_pipeline.step0_ingest.pdf_extract import read_fulltext
+
+_PROMPT_DIR = Path(__file__).with_name("prompts")
+
+
+TAIL_HEADINGS = [
+    "Discussion", "References", "Competing interests", "Conflict of interest",
+    "Author contributions", "Authors' contributions", "Acknowledgements",
+    "Acknowledgments", "Abbreviations", "Funding", "Declarations", "Ethics approval",
+]
+
+
+def tpl(name: str) -> Template:
+    data = yaml.safe_load((_PROMPT_DIR / f"{name}.yaml").read_text(encoding="utf-8"))
+    return Template(data["template"])
+
+
+def trim_tail(fulltext: str, min_pos: int = 4000) -> str:
+
+    cut = len(fulltext)
+    for h in TAIL_HEADINGS:
+        m = re.search(r"\n\s*" + re.escape(h) + r"\s*\n", fulltext, re.IGNORECASE)
+        if m and m.start() > min_pos:
+            cut = min(cut, m.start())
+    return fulltext[:cut]
+
+
+def trim_head(fulltext: str) -> str:
+
+    m = re.search(r"\n\s*(Case\s+(?:presentation|report|description))\s*\n", fulltext, re.IGNORECASE)
+    if m and m.start() > 200:
+        return fulltext[m.start():]
+    return fulltext
+
+
+def load_source_text(raw_dir: Path, max_chars: int = 16000, max_table_chars: int = 6000,
+                     n_tables: int = 2) -> tuple[str, str]:
+
+    fulltext = read_fulltext(raw_dir)
+    fulltext = trim_tail(trim_head(fulltext))[:max_chars]
+    tables = json.loads((raw_dir / "tables.json").read_text(encoding="utf-8"))
+    tables_sorted = sorted(tables, key=lambda t: -len(t.get("html", "")))
+    tables_text = json.dumps(tables_sorted[:n_tables], ensure_ascii=False)[:max_table_chars]
+    return fulltext, tables_text
+
+
+def figures_block(figures: list[dict]) -> str:
+    if not figures:
+        return "(none)"
+    return "\n".join(f"- {f['figure']}: {f['caption']}" for f in figures)
+
+
+def feedback_block(issues: list[dict] | None) -> str:
+    if not issues:
+        return ""
+    lines = ["===== REVIEWER FEEDBACK ON YOUR PREVIOUS EXTRACTION (fix ALL of these) ====="]
+    for it in issues:
+        lines.append(
+            f"- [{it.get('severity','?')}] at {it.get('location','?')}: {it.get('problem','')}"
+            f" | source says: {it.get('source_evidence','')}"
+            f" | fix: {it.get('suggested_fix','')}"
+        )
+    return "\n".join(lines)
+
+
+def _extraction_prompt(fulltext: str, tables_text: str, figures: list[dict]) -> str:
+    return tpl("timeline_extraction").substitute(
+        figures_block=figures_block(figures),
+        tables_text=tables_text,
+        fulltext=fulltext,
+    )
+
+
+def validate_timepoints(timepoints: object) -> None:
+    if not isinstance(timepoints, list) or not all(isinstance(item, dict) for item in timepoints):
+        raise ValueError("timepoints must be a list of objects")
+    if any(not isinstance(item.get("qa_pairs"), list) or not all(isinstance(qa, dict) for qa in item["qa_pairs"]) for item in timepoints):
+        raise ValueError("each timepoint must contain qa_pairs as a list of objects")
+
+
+def validate_timeline(result: dict) -> None:
+    validate_timepoints(result["timepoints"])
+
+
+def validate_repairs(result: dict) -> None:
+    repairs = result["repairs"]
+    if not isinstance(repairs, list) or not all(isinstance(item, dict) for item in repairs):
+        raise ValueError("repairs must be a list of objects")
+    for repair in repairs:
+        if not isinstance(repair.get("start_index"), int) or not isinstance(repair.get("end_index"), int):
+            raise ValueError("each repair needs integer start_index and end_index")
+        try:
+            validate_timepoints(repair["replacement_timepoints"])
+        except KeyError:
+            raise ValueError("each repair needs replacement_timepoints") from None
+
+
+def extract_timeline(client, raw_dir: Path, figures: list[dict]) -> dict:
+
+    fulltext, tables_text = load_source_text(raw_dir)
+    try:
+        return client.complete_json(
+            _extraction_prompt(fulltext, tables_text, figures),
+            temperature=0.0,
+            max_tokens=16000,
+            required_keys=("timepoints",),
+            validator=validate_timeline,
+        )
+    except InternalServerError:
+        client.log("step0/extract", "retrying once with compact source after InternalServerError")
+        fulltext, tables_text = load_source_text(raw_dir, max_chars=12000, max_table_chars=3000)
+        return client.complete_json(
+            _extraction_prompt(fulltext, tables_text, figures),
+            temperature=0.0,
+            max_tokens=8000,
+            required_keys=("timepoints",),
+            validator=validate_timeline,
+        )
+
+
+def repair_timeline(
+    client,
+    raw_dir: Path,
+    figures: list[dict],
+    timeline: dict,
+    issues: list[dict],
+) -> dict:
+
+    fulltext, tables_text = load_source_text(raw_dir)
+    indexed_timeline = [
+        {"timepoint_index": index, **timepoint}
+        for index, timepoint in enumerate(timeline["timepoints"])
+    ]
+    prompt = tpl("timeline_repair").substitute(
+        figures_block=figures_block(figures),
+        feedback_block=feedback_block(issues),
+        timeline_json=json.dumps(indexed_timeline, ensure_ascii=False),
+        tables_text=tables_text,
+        fulltext=fulltext,
+    )
+    result = client.complete_json(
+        prompt,
+        temperature=0.0,
+        max_tokens=8000,
+        required_keys=("repairs",),
+        validator=validate_repairs,
+    )
+    repaired = {"timepoints": list(timeline["timepoints"])}
+    for patch in sorted(result["repairs"], key=lambda item: item["start_index"], reverse=True):
+        repaired["timepoints"][patch["start_index"]:patch["end_index"] + 1] = patch["replacement_timepoints"]
+    return repaired

@@ -1,2 +1,0 @@
-"""Small OralMemBench construction pipeline."""
-
