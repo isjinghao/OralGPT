@@ -55,3 +55,5 @@ runs/
 *.parquet
 *.npy
 *.npz
+
+/OralMemo/
