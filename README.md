@@ -30,15 +30,15 @@
     <a href="https://huggingface.co/OralGPT"><b>[Coming]OralFlow-Bench</b></a>
   </p>
   <p>
-    🚧&ensp;<a href="./OralGPT-X/"><b>OralGPT-X</b></a>
-    &ensp;·&ensp;
-    <a href="./OralDetect/"><b>OralDetect</b></a>
+    🚧&ensp;<a href="./OralDetect/"><b>OralDetect</b></a>
     &ensp;·&ensp;
     <b>OralClue</b>
     &ensp;·&ensp;
     <b>OralRSI</b>
     &ensp;·&ensp;
     <b>OralGPT-3D</b>
+    &ensp;·&ensp;
+    <a href="./OralGPT-X/"><b>OralGPT-X</b></a>
     &ensp;·&ensp;
     <a href="./OralGPT-V/"><b>OralGPT-V</b></a>
   </p>
