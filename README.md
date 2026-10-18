@@ -19,11 +19,11 @@
   <p>
     🤗&ensp;<a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench"><b>MMOral-OPG-Bench</b></a>
     &ensp;·&ensp;
-    <a href="https://huggingface.co/OralGPT"><b>[Coming]MMOral-Uni-Bench</b></a>
-    <br>
     <a href="https://huggingface.co/datasets/OralGPT/OralDetect-Bench"><b>OralDetect-Bench</b></a>
     &ensp;·&ensp;
     <a href="https://arxiv.org/abs/2605.27378"><b>OralQA-ZH</b></a>
+    <br>
+    🤗&ensp;<a href="https://huggingface.co/OralGPT"><b>[Coming]MMOral-Uni-Bench</b></a>
     &ensp;·&ensp;
     <a href="https://huggingface.co/OralGPT"><b>[Coming]OralFlow-Bench</b></a>
   </p>
