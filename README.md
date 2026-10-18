@@ -19,13 +19,13 @@
   <p>
     🤗&ensp;<a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench"><b>MMOral-OPG-Bench</b></a>
     &ensp;·&ensp;
-    <a href="https://huggingface.co/OralGPT"><b>[Coming soon]MMOral-Uni-Bench</b></a>
+    <a href="https://huggingface.co/OralGPT"><b>[Coming]MMOral-Uni-Bench</b></a>
     <br>
     <a href="https://huggingface.co/datasets/OralGPT/OralDetect-Bench"><b>OralDetect-Bench</b></a>
     &ensp;·&ensp;
     <a href="https://arxiv.org/abs/2605.27378"><b>OralQA-ZH</b></a>
     &ensp;·&ensp;
-    <a href="https://huggingface.co/OralGPT"><b>[Coming soon]OralFlow-Bench</b></a>
+    <a href="https://huggingface.co/OralGPT"><b>[Coming]OralFlow-Bench</b></a>
   </p>
   <p>
     🚧&ensp;<a href="./OralGPT-X/"><b>OralGPT-X</b></a>
@@ -107,11 +107,11 @@ Clinical evaluation sets. Run MMOral language-model benchmarks with [MMOral-Benc
 | Benchmark | What it evaluates | Status | Link |
 | --- | --- | --- | --- |
 | **MMOral-OPG-Bench** | Open- and closed-ended panoramic X-ray understanding. Items are reviewed by clinical dentists. | Released | [Hugging Face](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench) · [EvalKit](./MMOral-Bench-EvalKit/) |
-| **MMOral-Omni-Bench** | Multi-modality dental understanding | Coming soon | [EvalKit](./MMOral-Bench-EvalKit/) |
-| **MMOral-Uni-Bench** | Unified dental MLLM evaluation | Coming soon | [Hugging Face org](https://huggingface.co/OralGPT) |
+| **MMOral-Omni-Bench** | Multi-modality dental understanding | Coming | [EvalKit](./MMOral-Bench-EvalKit/) |
+| **MMOral-Uni-Bench** | Unified dental MLLM evaluation | Coming | [Hugging Face org](https://huggingface.co/OralGPT) |
 | **OralDetect-Bench** | Open-vocabulary detection on five modalities | Released | [Hugging Face](https://huggingface.co/datasets/OralGPT/OralDetect-Bench) |
 | **OralQA-ZH** | Chinese multiple-choice questions across 11 oral subspecialties, introduced with OralAgent | Released | [OralAgent](https://arxiv.org/abs/2605.27378) |
-| **OralFlow-Bench** | Longitudinal multimodal oral and maxillofacial trajectories | Coming soon | [OralFlow](./OralFlow/) |
+| **OralFlow-Bench** | Longitudinal multimodal oral and maxillofacial trajectories | Coming | [OralFlow](./OralFlow/) |
 | **OralGPT-X-Bench** | CBCT restoration, orthognathic simulation, and MRI translation | In repo | [OralGPT-X](./OralGPT-X/oralgpt_x_bench/) |
 
 Evaluation steps for MMOral-OPG-Bench are in [MMOral-Bench-EvalKit](./MMOral-Bench-EvalKit/).
