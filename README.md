@@ -66,7 +66,7 @@
 ## News
 
 - **[2026-10-11]** 🎉 **PlaqueSAM** has been published in **npj Digital Medicine**: [Photography-based dental plaque detection and report generation among preschool children using PlaqueSAM](https://www.nature.com/articles/s41746-026-03385-9). Code: [isjinghao/PlaqueSAM](https://github.com/isjinghao/PlaqueSAM).
-- **[2026-09-xx]** 🔥 **OralFlow** is coming soon...
+- **[2026-09-01]** 🔥 **OralFlow** is coming soon...
 - **[2026-08-29]** 🔥🔥 **OralDetect**, an open-vocabulary dental detector spanning 5 imaging modalities, has been released: weights on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralDetect-Family), with the [training set](https://huggingface.co/datasets/OralGPT/OralDetect-Training) and [benchmark](https://huggingface.co/datasets/OralGPT/OralDetect-Bench). 👏 Welcome to detect on your own dental images.
 - **[2026-04-09]** 🔥 **OralAgent** has been released on [arXiv](https://arxiv.org/abs/2605.27378).
 - **[2026-03-27]** 🔥 **[NeurIPS 2025] MMOral‑OPG‑Bench** is now supported on [**VLMEvalKit**](https://github.com/open-compass/VLMEvalKit/blob/main/vlmeval/dataset/mmoral_opg_open.py) for evaluation.
@@ -92,10 +92,10 @@ Specialist and general models in the OralGPT family. PlaqueSAM lives in its own 
 | **OralGPT-Omni** | Versatile dental MLLM across intraoral photos and video, radiographs, histopathology, and text | [CVPR 2026](https://arxiv.org/abs/2511.22055) | [HF](https://huggingface.co/OralGPT/OralGPT-Omni-7B-Instruct) · [MMOral-Omni](./MMOral-Omni/) |
 | **OralGPT-Plus** | Learns to use visual tools via reinforcement learning for panoramic X-ray analysis | [CVPR 2026](https://arxiv.org/abs/2603.06366) | [OralGPT-Plus](./OralGPT-Plus/) |
 | **OralAgent** | Interactive dental image analysis with reasoning, tools, and knowledge | [arXiv 2026](https://arxiv.org/abs/2605.27378) | [Paper](https://arxiv.org/abs/2605.27378) |
-| **OralGPT-CMF** | Fine-tuned multimodal model for oral and maxillofacial cases | — | [HF](https://huggingface.co/OralGPT/OralGPT-CMF-v1) · [OralGPT-CMF](./OralGPT-CMF/) |
+| **OralGPT-CMF** | Fine-tuned multimodal model for oral and maxillofacial cases | Ongoing | [HF](https://huggingface.co/OralGPT/OralGPT-CMF-v1) · [OralGPT-CMF](./OralGPT-CMF/) |
 | **OralDetect** | Open-vocabulary detector across five imaging modalities | Released | [HF](https://huggingface.co/OralGPT/OralDetect-Family) · [OralDetect](./OralDetect/) |
 | **PlaqueSAM** | Plaque detection and visual report generation from smartphone photos of preschool children | [npj Digital Medicine 2026](https://doi.org/10.1038/s41746-026-03385-9) | [GitHub](https://github.com/isjinghao/PlaqueSAM) |
-| **OralGPT-X** | Oral image generation and translation for CBCT, MRI, and orthognathic imaging | — | [OralGPT-X](./OralGPT-X/) |
+| **OralGPT-X** | Oral image generation and translation for CBCT, MRI, and orthognathic imaging | Ongoing | [OralGPT-X](./OralGPT-X/) |
 | **OralGPT-V** | Oral world model | In progress | [OralGPT-V](./OralGPT-V/) |
 
 Supported imaging and text inputs across the family include intraoral images and videos, photographs, panoramic X-rays, periapical radiographs, cephalometric radiographs, histopathological images, and textual question answering.
