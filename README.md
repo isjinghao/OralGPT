@@ -50,7 +50,7 @@
 
 - **Researchers**: papers, benchmarks, and an evaluation toolkit.
 - **Developers**: in-repo training and evaluation entry points, plus released weights on [Hugging Face](https://huggingface.co/OralGPT).
-- **Collaborators**: contact below.
+- **Collaborators**: listed [below](#collaborators).
 
 ## Table of Contents
 
@@ -59,6 +59,7 @@
 - [Benchmarks](#benchmarks)
 - [Repository](#repository)
 - [Citation](#citation)
+- [Collaborators](#collaborators)
 - [Contact](#contact)
 
 ---
@@ -185,6 +186,12 @@ If you find our work helpful, please cite us:
   publisher={Nature Publishing Group UK London}
 }
 ```
+
+## Collaborators
+
+- [Jing HAO](https://isjinghao.github.io/)
+- [Jiahao BAO](https://scholar.google.com/citations?user=nvCj17EAAAAJ&hl=zh-CN)
+- [Yuci Liang](https://scholar.google.com/citations?user=tewbmFkAAAAJ&hl=en)
 
 ## Contact
 
