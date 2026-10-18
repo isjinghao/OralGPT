@@ -15,6 +15,8 @@
     <a href="https://arxiv.org/abs/2605.27378"><b>[arXiv'26]OralAgent</b></a>
     &ensp;·&ensp;
     <a href="https://doi.org/10.1038/s41746-026-03385-9"><b>[npj Digit. Med.'26]PlaqueSAM</b></a>
+    &ensp;·&ensp;
+    <b>OralFlow</b>
   </p>
   <p>
     🤗&ensp;<a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench"><b>MMOral-OPG-Bench</b></a>
