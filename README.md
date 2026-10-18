@@ -23,9 +23,23 @@
     <br>
     <a href="https://huggingface.co/datasets/OralGPT/OralDetect-Bench"><b>OralDetect-Bench</b></a>
     &ensp;·&ensp;
+    <a href="https://arxiv.org/abs/2605.27378"><b>OralQA-ZH</b></a>
+    &ensp;·&ensp;
     <a href="https://huggingface.co/OralGPT"><b>[Coming soon]OralFlow-Bench</b></a>
   </p>
-  <p>🚧&ensp;<b>Ongoing</b></p>
+  <p>
+    🚧&ensp;<a href="./OralGPT-X/"><b>OralGPT-X</b></a>
+    &ensp;·&ensp;
+    <a href="./OralDetect/"><b>OralDetect</b></a>
+    &ensp;·&ensp;
+    <b>OralClue</b>
+    &ensp;·&ensp;
+    <b>OralRSI</b>
+    &ensp;·&ensp;
+    <b>OralGPT-3D</b>
+    &ensp;·&ensp;
+    <a href="./OralGPT-V/"><b>OralGPT-V</b></a>
+  </p>
 </div>
 
 # OralGPT Family 🦷
@@ -96,6 +110,7 @@ Clinical evaluation sets. Run MMOral language-model benchmarks with [MMOral-Benc
 | **MMOral-Omni-Bench** | Multi-modality dental understanding | Coming soon | [EvalKit](./MMOral-Bench-EvalKit/) |
 | **MMOral-Uni-Bench** | Unified dental MLLM evaluation | Coming soon | [Hugging Face org](https://huggingface.co/OralGPT) |
 | **OralDetect-Bench** | Open-vocabulary detection on five modalities | Released | [Hugging Face](https://huggingface.co/datasets/OralGPT/OralDetect-Bench) |
+| **OralQA-ZH** | Chinese multiple-choice questions across 11 oral subspecialties, introduced with OralAgent | Released | [OralAgent](https://arxiv.org/abs/2605.27378) |
 | **OralFlow-Bench** | Longitudinal multimodal oral and maxillofacial trajectories | Coming soon | [OralFlow](./OralFlow/) |
 | **OralGPT-X-Bench** | CBCT restoration, orthognathic simulation, and MRI translation | In repo | [OralGPT-X](./OralGPT-X/oralgpt_x_bench/) |
 
