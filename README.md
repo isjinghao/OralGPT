@@ -6,25 +6,29 @@
   <img src="assets/logo_OralDetect.png" width="150px">
   <br><br>
 
-  <a href="https://arxiv.org/abs/2509.09254"><b>OralGPT</b></a> · NeurIPS 2025
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://arxiv.org/abs/2511.22055"><b>OralGPT-Omni</b></a> · CVPR 2026
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://arxiv.org/abs/2603.06366"><b>OralGPT-Plus</b></a> · CVPR 2026
+  <a href="https://arxiv.org/abs/2509.09254">📄 <b>OralGPT</b></a> · NeurIPS 2025
+  &nbsp;&nbsp;
+  <a href="https://arxiv.org/abs/2511.22055">📄 <b>OralGPT-Omni</b></a> · CVPR 2026
+  &nbsp;&nbsp;
+  <a href="https://arxiv.org/abs/2603.06366">📄 <b>OralGPT-Plus</b></a> · CVPR 2026
   <br>
-  <a href="https://arxiv.org/abs/2605.27378"><b>OralAgent</b></a> · arXiv 2026
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://doi.org/10.1038/s41746-026-03385-9"><b>PlaqueSAM</b></a> · npj Digital Medicine 2026
+  <a href="https://arxiv.org/abs/2605.27378">📄 <b>OralAgent</b></a> · arXiv 2026
+  &nbsp;&nbsp;
+  <a href="https://doi.org/10.1038/s41746-026-03385-9">📄 <b>PlaqueSAM</b></a> · npj Digital Medicine 2026
 
   <br><br>
 
-  <a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench"><b>MMOral-OPG-Bench</b></a>
+  <a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench">🤗 <b>MMOral-OPG-Bench</b></a>
   &nbsp;&nbsp;·&nbsp;&nbsp;
-  <a href="https://huggingface.co/datasets/OralGPT/OralDetect-Bench"><b>OralDetect-Bench</b></a>
+  <a href="https://huggingface.co/datasets/OralGPT/OralDetect-Bench">🤗 <b>OralDetect-Bench</b></a>
   <br>
-  <a href="https://huggingface.co/OralGPT"><b>MMOral-Uni-Bench</b></a> · Coming soon
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://huggingface.co/OralGPT"><b>OralFlow-Bench</b></a> · Coming soon
+  <a href="https://huggingface.co/OralGPT">🤗 <b>MMOral-Uni-Bench</b></a> · Coming soon
+  &nbsp;&nbsp;
+  <a href="https://huggingface.co/OralGPT">🤗 <b>OralFlow-Bench</b></a> · Coming soon
+
+  <br><br>
+
+  🚧 <b>Ongoing</b>
 </div>
 
 # OralGPT Family 🦷
