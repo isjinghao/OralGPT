@@ -4,40 +4,29 @@
   <img src="assets/logo_OralAgent.png" width="150px">
   <img src="assets/logo_OralFlow.png" width="150px">
   <img src="assets/logo_OralDetect.png" width="150px">
+  <br><br>
+  <p>
+    📄&ensp;<a href="https://arxiv.org/abs/2509.09254"><b>[NeurIPS'25]OralGPT</b></a>
+    &ensp;·&ensp;
+    <a href="https://arxiv.org/abs/2511.22055"><b>[CVPR'26]OralGPT-Omni</b></a>
+    &ensp;·&ensp;
+    <a href="https://arxiv.org/abs/2603.06366"><b>[CVPR'26]OralGPT-Plus</b></a>
+    <br>
+    <a href="https://arxiv.org/abs/2605.27378"><b>[arXiv'26]OralAgent</b></a>
+    &ensp;·&ensp;
+    <a href="https://doi.org/10.1038/s41746-026-03385-9"><b>[npj Digit. Med.'26]PlaqueSAM</b></a>
+  </p>
+  <p>
+    🤗&ensp;<a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench"><b>MMOral-OPG-Bench</b></a>
+    &ensp;·&ensp;
+    <a href="https://huggingface.co/OralGPT"><b>[Coming soon]MMOral-Uni-Bench</b></a>
+    <br>
+    <a href="https://huggingface.co/datasets/OralGPT/OralDetect-Bench"><b>OralDetect-Bench</b></a>
+    &ensp;·&ensp;
+    <a href="https://huggingface.co/OralGPT"><b>[Coming soon]OralFlow-Bench</b></a>
+  </p>
+  <p>🚧&ensp;<b>Ongoing</b></p>
 </div>
-
-<table>
-  <tr>
-    <td valign="top" align="center" width="36">📄</td>
-    <td>
-      <a href="https://arxiv.org/abs/2509.09254"><b>[NeurIPS'25]OralGPT</b></a>
-      &nbsp;·&nbsp;
-      <a href="https://arxiv.org/abs/2511.22055"><b>[CVPR'26]OralGPT-Omni</b></a>
-      &nbsp;·&nbsp;
-      <a href="https://arxiv.org/abs/2603.06366"><b>[CVPR'26]OralGPT-Plus</b></a>
-      <br>
-      <a href="https://arxiv.org/abs/2605.27378"><b>[arXiv'26]OralAgent</b></a>
-      &nbsp;·&nbsp;
-      <a href="https://doi.org/10.1038/s41746-026-03385-9"><b>[npj Digit. Med.'26]PlaqueSAM</b></a>
-    </td>
-  </tr>
-  <tr>
-    <td valign="top" align="center">🤗</td>
-    <td>
-      <a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench"><b>MMOral-OPG-Bench</b></a>
-      &nbsp;·&nbsp;
-      <a href="https://huggingface.co/OralGPT"><b>[Coming soon]MMOral-Uni-Bench</b></a>
-      <br>
-      <a href="https://huggingface.co/datasets/OralGPT/OralDetect-Bench"><b>OralDetect-Bench</b></a>
-      &nbsp;·&nbsp;
-      <a href="https://huggingface.co/OralGPT"><b>[Coming soon]OralFlow-Bench</b></a>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">🚧</td>
-    <td><b>Ongoing</b></td>
-  </tr>
-</table>
 
 # OralGPT Family 🦷
 
