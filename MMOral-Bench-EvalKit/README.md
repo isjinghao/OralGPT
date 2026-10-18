@@ -2,10 +2,15 @@
 
 ## ☀️ 0. Benchmarks supported:
 
-1. 🦷 MMOral-OPG-Bench <a href="https://arxiv.org/pdf/2509.09254" target="_blank"><b>[Paper]</b></a>
+1. 🦷 MMOral-OPG-Bench <a href="https://arxiv.org/pdf/2509.09254" target="_blank"><b>[Paper]</b></a> · <a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench"><b>[Hugging Face]</b></a>
 2. ⚕️ MMOral-Omni-Bench <a href="" target="_blank"><b>[Coming soon]</b></a>
 
-This is the unified evaluation toolkit for the current MMOral benchmarks. It supports both MMOral-OPG-Bench splits:
+This is the unified evaluation toolkit for the current MMOral benchmarks. MMOral-OPG-Bench items are reviewed by clinical dentists. It supports both MMOral-OPG-Bench splits:
+
+<div align="center">
+  <img src="../assets/MMOral-OPG-Bench-Performance.jpg">
+</div>
+
 
 - `MMOral_OPG_CLOSED`: closed-ended multiple-choice evaluation.
 - `MMOral_OPG_OPEN`: open-ended evaluation with an LLM judge.

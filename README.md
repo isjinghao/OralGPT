@@ -6,16 +6,25 @@
   <img src="assets/logo_OralDetect.png" width="150px">
   <br><br>
 
-  <a href="https://arxiv.org/abs/2509.09254"><b>[NeurIPS'25] OralGPT</b></a> &nbsp;|&nbsp;
-  <a href="https://arxiv.org/abs/2511.22055"><b>[CVPR'26] OralGPT-Omni</b></a> &nbsp;|&nbsp;
-  <a href="https://arxiv.org/abs/2603.06366"><b>[CVPR'26] OralGPT-Plus</b></a> &nbsp;|&nbsp;
-  <a href="https://arxiv.org/abs/2605.27378"><b>[arXiv'26] OralAgent</b></a> &nbsp;|&nbsp;
-  <a href="https://doi.org/10.1038/s41746-026-03385-9"><b>[npj Digit. Med.'26] PlaqueSAM</b></a>
+  <a href="https://arxiv.org/abs/2509.09254"><b>OralGPT</b></a> · NeurIPS 2025
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://arxiv.org/abs/2511.22055"><b>OralGPT-Omni</b></a> · CVPR 2026
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://arxiv.org/abs/2603.06366"><b>OralGPT-Plus</b></a> · CVPR 2026
   <br>
-  <a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench">🤗 <b>MMOral-OPG-Bench</b></a> &nbsp;|&nbsp;
-  <a href="https://huggingface.co/datasets/OralGPT/OralDetect-Bench">🤗 <b>OralDetect-Bench</b></a> &nbsp;|&nbsp;
-  <a href="https://huggingface.co/OralGPT">🤗 <b>MMOral-Uni-Bench (Coming soon)</b></a> &nbsp;|&nbsp;
-  <a href="https://huggingface.co/OralGPT">🤗 <b>OralFlow-Bench (Coming soon)</b></a>
+  <a href="https://arxiv.org/abs/2605.27378"><b>OralAgent</b></a> · arXiv 2026
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://doi.org/10.1038/s41746-026-03385-9"><b>PlaqueSAM</b></a> · npj Digital Medicine 2026
+
+  <br><br>
+
+  <a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench"><b>MMOral-OPG-Bench</b></a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="https://huggingface.co/datasets/OralGPT/OralDetect-Bench"><b>OralDetect-Bench</b></a>
+  <br>
+  <a href="https://huggingface.co/OralGPT"><b>MMOral-Uni-Bench</b></a> · Coming soon
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://huggingface.co/OralGPT"><b>OralFlow-Bench</b></a> · Coming soon
 </div>
 
 # OralGPT Family 🦷
@@ -52,10 +61,6 @@
 - **[2025-09-22]** 🚀 Multiple **Dental Visual Expert Models** have been released on 🤗 [Hugging Face](https://huggingface.co/Bryceee/Teeth_Visual_Experts_Models).
 - **[2025-09-19]** 🎉 Our paper of **OralGPT** has been accepted by **NeurIPS 2025**.
 - **[2025-09-11]** 🎉 Our paper of **OralGPT** has been released on [arXiv](https://arxiv.org/abs/2509.09254).
-- 🔜 We are actively developing **MMOral-Bench v2**, which will include:
-  - ✅ More dental imaging modalities
-  - ✅ Professional dentistry exam questions
-  - ✅ Comprehensive evaluation of multiple MLLM performance in digital dentistry
 - 🤝 For collaboration inquiries, please contact us at: 📮 isjinghao@gmail.com
 
 ---
@@ -93,29 +98,7 @@ Clinical evaluation sets. Run MMOral language-model benchmarks with [MMOral-Benc
 | **OralFlow-Bench** | Longitudinal multimodal oral and maxillofacial trajectories | Coming soon | [OralFlow](./OralFlow/) |
 | **OralGPT-X-Bench** | CBCT restoration, orthognathic simulation, and MRI translation | In repo | [OralGPT-X](./OralGPT-X/oralgpt_x_bench/) |
 
-### MMOral-OPG-Bench
-
-<div align="center">
-  <img src="assets/MMOral-OPG-Bench-Performance.jpg">
-</div>
-
-Splits:
-
-- `MMOral_OPG_CLOSED` — closed-ended multiple choice
-- `MMOral_OPG_OPEN` — open-ended answers scored by an LLM judge
-
-From `MMOral-Bench-EvalKit/`, add API keys to `.env` (`OPENAI_API_KEY`, `OPENAI_API_BASE`), set models and the judge in `config_mmoral_opg.json`, then:
-
-```bash
-python run.py --config config_mmoral_opg.json \
-  --mode all \
-  --api-nproc 8 \
-  --work-dir '.' \
-  --verbose
-  # --reuse
-```
-
-`--reuse` resumes existing results. Full options are in [MMOral-Bench-EvalKit/README.md](./MMOral-Bench-EvalKit/README.md). The same toolkit is wired into upstream [VLMEvalKit](https://github.com/open-compass/VLMEvalKit/blob/main/vlmeval/dataset/mmoral_opg_open.py).
+Evaluation steps for MMOral-OPG-Bench are in [MMOral-Bench-EvalKit](./MMOral-Bench-EvalKit/).
 
 ---
 
