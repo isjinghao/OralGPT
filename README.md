@@ -46,7 +46,7 @@
 
 # OralGPT Family 🦷
 
-**OralGPT** is a family of dental AI **models** and **benchmarks** for digital dentistry, covering multimodal language models, specialist vision models, and clinical evaluation.
+**OralGPT** is a family of dental AI **models** and **benchmarks** for digital dentistry, covering multimodal large language models, tool-using agents, and clinical evaluation.
 
 - **Researchers**: papers, benchmarks, and an evaluation toolkit.
 - **Developers**: in-repo training and evaluation entry points, plus released weights on [Hugging Face](https://huggingface.co/OralGPT).
