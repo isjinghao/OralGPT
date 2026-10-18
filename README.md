@@ -50,7 +50,9 @@
 
 - **Researchers**: papers, benchmarks, and an evaluation toolkit.
 - **Developers**: in-repo training and evaluation entry points, plus released weights on [Hugging Face](https://huggingface.co/OralGPT).
-- **Collaborators**: listed [below](#collaborators).
+- **Collaborators**:<br>
+  💻 **AI**: [Jing HAO](https://isjinghao.github.io/) · [Xinpeng LU](https://scholar.google.com/citations?user=b3N2f4kAAAAJ&hl=zh-CN) · Siyuan DAI · [Yuci LIANG](https://scholar.google.com/citations?user=tewbmFkAAAAJ&hl=en) · Yuxuan FAN<br>
+  🦷 **clinical**: [Jiahao BAO](https://scholar.google.com/citations?user=nvCj17EAAAAJ&hl=zh-CN) · Lizhuo LIN
 
 ## Table of Contents
 
@@ -59,7 +61,6 @@
 - [Benchmarks](#benchmarks)
 - [Repository](#repository)
 - [Citation](#citation)
-- [Collaborators](#collaborators)
 - [Contact](#contact)
 
 ---
@@ -186,12 +187,6 @@ If you find our work helpful, please cite us:
   publisher={Nature Publishing Group UK London}
 }
 ```
-
-## Collaborators
-
-- [Jing HAO](https://isjinghao.github.io/)
-- [Jiahao BAO](https://scholar.google.com/citations?user=nvCj17EAAAAJ&hl=zh-CN)
-- [Yuci Liang](https://scholar.google.com/citations?user=tewbmFkAAAAJ&hl=en)
 
 ## Contact
 
