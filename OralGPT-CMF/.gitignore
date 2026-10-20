@@ -1,3 +1,28 @@
 # OralGPT-CMF validation outputs
 scripts/outputs_val/
 scripts/validation/
+
+# Local datasets, evaluation artifacts and model weights
+output/
+outputs/
+sft_data/
+sft_data_v3_question_prompts/
+sft_data_*/
+sft_output/
+.sft_data*/
+.sft_turn_level*/
+media/
+models/
+checkpoints/
+checkpoint-*/
+logs/
+runs/
+wandb/
+/sft/VQA*_final*.json
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.bin
+*.onnx
+*.gguf
