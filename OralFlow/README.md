@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/oralflow_logo.png" alt="OralFlow-Bench logo" width="200">
+  <img src="https://github.com/isjinghao/OralGPT/blob/main/assets/logo_OralFlow.png?raw=true" alt="OralFlow-Bench logo" width="200">
 </p>
 
 <h1 align="center">OralFlow-Bench</h1>
