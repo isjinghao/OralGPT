@@ -1,0 +1,56 @@
+### model
+model_name_or_path: /root/autodl-tmp/models/Qwen3.5-9B
+image_max_pixels: 602112
+trust_remote_code: true
+flash_attn: sdpa
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target: all
+freeze_vision_tower: true
+freeze_multi_modal_projector: true
+
+### dataset
+dataset: oralcmf_sft_train
+eval_dataset: oralcmf_sft_validation
+dataset_dir: /root/autodl-tmp/OralGPT/OralGPT-CMF/sft/data/turn_level
+template: qwen3_5_nothink
+cutoff_len: 16384
+overwrite_cache: true
+preprocessing_num_workers: 16
+dataloader_num_workers: 4
+
+### output
+output_dir: /root/autodl-tmp/OralGPT/OralGPT-CMF/sft/models/qwen3_5_9b_lora_turn_level
+logging_steps: 5
+save_steps: 100
+save_total_limit: 3
+load_best_model_at_end: true
+metric_for_best_model: eval_loss
+greater_is_better: false
+plot_loss: true
+overwrite_output_dir: false
+save_only_model: false
+report_to: tensorboard
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
+learning_rate: 1.0e-4
+num_train_epochs: 2.0
+lr_scheduler_type: cosine
+warmup_steps: 70
+bf16: true
+gradient_checkpointing: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+
+### eval
+per_device_eval_batch_size: 1
+eval_strategy: steps
+eval_steps: 100

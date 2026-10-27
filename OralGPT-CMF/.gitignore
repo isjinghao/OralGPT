@@ -1,14 +1,13 @@
-# OralGPT-CMF validation outputs
-scripts/outputs_val/
-scripts/validation/
+# Local credentials and Python caches
+.env
+.env.*
+__pycache__/
+*.pyc
 
 # Local datasets, evaluation artifacts and model weights
-output/
-outputs/
-sft_data/
-sft_data_v3_question_prompts/
-sft_data_*/
-sft_output/
+/output/
+/sft/data/
+/sft/models/
 .sft_data*/
 .sft_turn_level*/
 media/
@@ -18,7 +17,7 @@ checkpoint-*/
 logs/
 runs/
 wandb/
-/sft/VQA*_final*.json
+/VQA*_final*.json
 *.safetensors
 *.ckpt
 *.pt
