@@ -1,0 +1,546 @@
+{
+  "trajectory_id": "report__CR0266__standard_trajectory",
+  "patient_id": "report__CR0266",
+  "patient_name": "CR0266",
+  "group": "report",
+  "trajectory_type": "standard_trajectory",
+  "stages": [
+    {
+      "stage_id": "T0_perception_00",
+      "order": 0,
+      "stage_type": "perception",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "Initial presentation",
+        "t_months": 0
+      },
+      "image_paths": [
+        "outputs/report/CR0266/images/p02_img001.jpg",
+        "outputs/report/CR0266/images/p02_img002.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 1,
+          "human": "<image>\nWhat gingival finding is visible at the mandibular left first molar, and what recession depth and furcation grade were documented on examination?",
+          "assistant": "The mandibular left first molar presented with 5 mm of buccal recession and Class II furcation invasion with a Class B vertical component.",
+          "image_paths": [
+            "outputs/report/CR0266/images/p02_img001.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 2,
+          "human": "<image>\nWhat radiographic appearance is shown in Figure 2 at the initial presentation?",
+          "assistant": "Extensive furcation involvement was suggested radiographically.",
+          "image_paths": [
+            "outputs/report/CR0266/images/p02_img002.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 3,
+          "human": "Describe the lesion visible in the photograph and report its documented size and response to wiping with gauze.",
+          "assistant": "A 55-year-old man presented for extraction of the mandibular left first molar. A 2 × 4-mm white streak on the buccal marginal gingiva did not wipe off with gauze.",
+          "image_paths": [],
+          "role": "observation"
+        }
+      ]
+    },
+    {
+      "stage_id": "T1_treatment_00",
+      "order": 1,
+      "stage_type": "treatment",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "timepoint": {
+        "date_text": "Initial procedure: extraction and socket assessment",
+        "t_months": 0
+      },
+      "image_paths": [],
+      "qa_pairs": [
+        {
+          "source_turn_id": 4,
+          "human": "What initial treatment was planned for the mandibular left first molar?",
+          "assistant": "The tooth was planned for extraction and immediate implant placement.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 5,
+          "human": "What medication was given before the procedure?",
+          "assistant": "The patient premedicated with 2 g amoxicillin prior to the procedure.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 6,
+          "human": "How was the extraction performed and what precautions were taken?",
+          "assistant": "Following administration of local anesthesia, atraumatic extraction was performed by sectioning the tooth through the furcation and elevating both roots, taking care to avoid damage to the socket walls.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 7,
+          "human": "How was the extraction socket prepared after extraction?",
+          "assistant": "The socket was carefully debrided with a surgical curette to remove all remnants of soft tissue, and the socket was irrigated with saline solution.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 8,
+          "human": "What was done with the buccal gingival streak?",
+          "assistant": "The streak of leukoplakia on the buccal gingiva was excised and stored in formalin solution for histologic analysis.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 9,
+          "human": "What was determined by periodontal probing of the socket?",
+          "assistant": "All socket walls were intact with no fenestration or dehiscence present. There was a height discrepancy between the buccal and lingual bone crest; the lingual bone crest was more coronal than the buccal bone crest, consistent with the initial presentation of buccal recession. The socket was classified as Type B according to Smith and Tarnow.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 10,
+          "human": "What septal bone finding supported implant stabilization?",
+          "assistant": "Enough septal bone was observed to stabilize but not completely surround the implant, which would leave gaps between one or more of the surfaces of the implant and the socket walls.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 11,
+          "human": "What implant placement approach was selected?",
+          "assistant": "A flapless implant approach was employed.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        }
+      ]
+    },
+    {
+      "stage_id": "T2_treatment_01",
+      "order": 2,
+      "stage_type": "treatment",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "timepoint": {
+        "date_text": "Initial procedure: implant placement",
+        "t_months": 0
+      },
+      "image_paths": [],
+      "qa_pairs": [
+        {
+          "source_turn_id": 12,
+          "human": "How was the implant osteotomy prepared?",
+          "assistant": "The implant osteotomy was initiated in the septal bone with a round bur, and twist drills were used to progressively enlarge the osteotomy as per the manufacturer’s recommendations.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 13,
+          "human": "What happened to the mesial and distal portions of the septum during osteotomy preparation?",
+          "assistant": "The coronal two-thirds of the mesial and distal aspect of the septum was obliterated.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 14,
+          "human": "What stability check was performed during progressive osteotomy preparation?",
+          "assistant": "Careful attention was paid to make sure that after each successive drill there was sufficient resistance to movement of the drill and guide pin within the osteotomy.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 15,
+          "human": "What implant was placed and with what insertion torque?",
+          "assistant": "A 4.5 × 9-mm TX Astra Tech implant fixture was placed with more than 35 Ncm of torque.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 16,
+          "human": "How was the implant collar positioned relative to the buccal and lingual bone crests?",
+          "assistant": "The collar of the implant was placed at the level of septal bone that was coincident with the buccal bone crest and 2 mm apical to the lingual bone crest.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 17,
+          "human": "What was the initial bone-to-implant contact and where were the remaining implant surfaces exposed?",
+          "assistant": "The bone-to-implant contact was 360 degrees in the apical third of the implant and extended coronally on the buccal and lingual implant surfaces. The coronal two-thirds of the proximal surfaces of the implant were not in contact with bone and were exposed to the residual socket space.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 18,
+          "human": "What was the distance from the implant to the socket walls?",
+          "assistant": "The distance from the mesial and distal border of the implant to their respective socket walls was 4 to 5 mm.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        },
+        {
+          "source_turn_id": 19,
+          "human": "What was done after implant placement, and what grafting or flap procedures were omitted?",
+          "assistant": "A cover screw was placed over the implant, and the implant was left to heal within the extraction socket without the use of a bone graft, barrier membrane, or coronal flap advancement.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T2_treatment_01"
+        }
+      ]
+    },
+    {
+      "stage_id": "T3_followup_00",
+      "order": 3,
+      "stage_type": "followup",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "1 week postoperative",
+        "t_months": 0
+      },
+      "image_paths": [
+        "outputs/report/CR0266/images/p03_img007.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 20,
+          "human": "<image>\nWhat soft-tissue and socket appearance is visible at the 1-week postoperative visit in Figure 7?",
+          "assistant": "The surrounding soft tissue had collapsed toward the center of the socket, and a fibrin clot occupied the gap distance.",
+          "image_paths": [
+            "outputs/report/CR0266/images/p03_img007.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 21,
+          "human": "How was the site healing at 1 week postoperatively?",
+          "assistant": "The site was healing within normal limits. No signs of delayed healing or infection were present.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 22,
+          "human": "What covered the gap between the implant and the mesial and distal socket walls?",
+          "assistant": "There was a white layer overlying the gap between the implant and the mesial and distal socket walls, which indicated the presence of a fibrin clot superficially.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 23,
+          "human": "What was noted about the wound edge at the excisional biopsy area and the cover screw?",
+          "assistant": "The wound edge in the area of the excisional biopsy was further away from the center of the socket than the other wound edges and was expected to be the last area to reach the center of the socket during healing. The marginal soft tissue appeared to have collapsed toward the center of the socket and was slightly covering the lingual side of the cover screw.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 24,
+          "human": "What did histologic analysis show for the gingival lesion?",
+          "assistant": "The biopsy results showed that the histology of the lesion was consistent with hyperkeratosis.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 25,
+          "human": "What further management was indicated for the gingival lesion?",
+          "assistant": "No further treatment was indicated.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T3_followup_00",
+          "release_after_stage": "T3_followup_00"
+        }
+      ]
+    },
+    {
+      "stage_id": "T4_followup_01",
+      "order": 4,
+      "stage_type": "followup",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "1-month postoperative visit",
+        "t_months": 1
+      },
+      "image_paths": [
+        "outputs/report/CR0266/images/p03_img008.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 26,
+          "human": "<image>\nWhat tissue appearance is visible at the 1-month postoperative visit in Figure 8?",
+          "assistant": "Young migrating tissue occupied the previous gap distance. Most of the cover screw and a portion of the implant were still exposed.",
+          "image_paths": [
+            "outputs/report/CR0266/images/p03_img008.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 27,
+          "human": "Where had the marginal soft tissue migrated at 1 month?",
+          "assistant": "The marginal soft tissue had migrated from the wound edges and was now contacting the implant and cover screw.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 28,
+          "human": "How did the new tissue differ from the original tissue surrounding the socket?",
+          "assistant": "The new tissue had a thinner epithelial layer with visible red streaks, indicative of blood vessels, and it did not appear completely keratinized at this time. The younger tissue was located more apically in the socket than the surrounding older tissue.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 29,
+          "human": "What was noted about the cover screw and plaque at 1 month?",
+          "assistant": "A portion of the cover screw was still not covered with soft tissue, but moderate plaque buildup was noted at the site.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 30,
+          "human": "What oral hygiene management was prescribed at 1 month?",
+          "assistant": "The patient was instructed to apply chlorhexidine gluconate 0.12% to this area twice a day.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T4_followup_01",
+          "release_after_stage": "T4_followup_01"
+        }
+      ]
+    },
+    {
+      "stage_id": "T5_followup_02",
+      "order": 5,
+      "stage_type": "followup",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "2 months postoperative",
+        "t_months": 2
+      },
+      "image_paths": [
+        "outputs/report/CR0266/images/p03_img009.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 31,
+          "human": "<image>\nWhat tissue migration and cover-screw appearance are visible at 2 months in Figure 9?",
+          "assistant": "The tissue in the center of the socket had migrated coronally. A portion of the cover screw was still exposed.",
+          "image_paths": [
+            "outputs/report/CR0266/images/p03_img009.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 32,
+          "human": "How had the soft tissue changed at 2 months?",
+          "assistant": "The soft tissue had thickened and appeared keratinized; blood vessels were no longer visible to the naked eye. The newly formed soft tissue was more continuous with the surrounding tissue, indicating that it had proliferated coronally.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 33,
+          "human": "What part of the cover screw remained visible at 2 months?",
+          "assistant": "The gingiva had migrated onto the area of the cover screw that was previously exposed, but a small area on the distal aspect of the cover screw was still visible.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 34,
+          "human": "What cleaning instruction was continued at 2 months?",
+          "assistant": "The patient was instructed to continue to clean this area with chlorhexidine gluconate 0.12% until the next visit.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T5_followup_02",
+          "release_after_stage": "T5_followup_02"
+        }
+      ]
+    },
+    {
+      "stage_id": "T6_followup_03",
+      "order": 6,
+      "stage_type": "followup",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "3 months postoperative; implant uncovery and restoration",
+        "t_months": 3
+      },
+      "image_paths": [
+        "outputs/report/CR0266/images/p04_img010.jpg",
+        "outputs/report/CR0266/images/p04_img011.jpg",
+        "outputs/report/CR0266/images/p04_img012.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 35,
+          "human": "<image>\nWhat soft-tissue appearance is visible at 3 months in Figure 10?",
+          "assistant": "The soft tissue had completely submerged the implant cover screw.",
+          "image_paths": [
+            "outputs/report/CR0266/images/p04_img010.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 36,
+          "human": "<image>\nWhat radiographic appearance is shown at implant uncovery in Figure 11?",
+          "assistant": "There was suggestion of bone fill in the previous socket spaces.",
+          "image_paths": [
+            "outputs/report/CR0266/images/p04_img011.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 37,
+          "human": "<image>\nWhat bone appearance is visible at implant uncovery in Figure 12?",
+          "assistant": "Bone fill was present around the implant.",
+          "image_paths": [
+            "outputs/report/CR0266/images/p04_img012.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 38,
+          "human": "What radiographic timing was reported for mineralized bone fill?",
+          "assistant": "Radiographic evidence of mineralized bone fill was not expected until 6 months.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 39,
+          "human": "What was found clinically after the implant was exposed?",
+          "assistant": "The buccal crest height and contour were precisely continuous with the buccal surface of the implant, whereas the lingual crest was thicker and was above the implant platform. Sounding with a probe revealed hard tissue around the implant except for a 1- to 2-mm area on the mesial and distal sides immediately adjacent to the first few threads of the implant that felt softer. No mobility of the implant was detected.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 40,
+          "human": "What procedure was performed for implant uncovery?",
+          "assistant": "A crestal incision was made and a full thickness flap was elevated to expose the implant and the cover screw.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T6_followup_03",
+          "release_after_stage": "T6_followup_03"
+        },
+        {
+          "source_turn_id": 41,
+          "human": "What did the absence of implant mobility indicate?",
+          "assistant": "The absence of implant mobility indicated that the implant had achieved secondary stability.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T6_followup_03",
+          "release_after_stage": "T6_followup_03"
+        },
+        {
+          "source_turn_id": 42,
+          "human": "What was placed after implant exposure and how were the soft tissues managed?",
+          "assistant": "A healing abutment was secured to the implant, and the soft tissues were sutured and adapted to the healing abutment.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T6_followup_03",
+          "release_after_stage": "T6_followup_03"
+        },
+        {
+          "source_turn_id": 43,
+          "human": "How was the implant restored?",
+          "assistant": "The patient then returned to the restorative dentist and the implant was restored with a screw-retained porcelain-fused-to-metal crown.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T6_followup_03",
+          "release_after_stage": "T6_followup_03"
+        }
+      ]
+    },
+    {
+      "stage_id": "T7_followup_04",
+      "order": 7,
+      "stage_type": "followup",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "2 years and 2 months postoperatively",
+        "t_months": 26
+      },
+      "image_paths": [
+        "outputs/report/CR0266/images/p04_img013.jpg",
+        "outputs/report/CR0266/images/p04_img014.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 44,
+          "human": "<image>\nWhat is visible in the clinical view of the implant restoration at 2 years and 2 months postoperatively in Figure 13?",
+          "assistant": "The implant restoration was clinically present at 2 years and 2 months postoperatively.",
+          "image_paths": [
+            "outputs/report/CR0266/images/p04_img013.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 45,
+          "human": "<image>\nWhat radiographic bone-level appearance is shown at 2 years and 2 months postoperatively in Figure 14?",
+          "assistant": "Crestal bone levels were up to the implant platform.",
+          "image_paths": [
+            "outputs/report/CR0266/images/p04_img014.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 46,
+          "human": "What were the peri-implant soft-tissue findings at the 2-year-and-2-month periodontal maintenance visit?",
+          "assistant": "The peri-implant soft tissue appeared healthy, with a wide zone of attached keratinized tissue on the buccal and lingual surfaces. Probing depths ranged from 2 to 3 mm with no bleeding on probing.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 47,
+          "human": "What did the periapical radiograph demonstrate at that visit?",
+          "assistant": "The periapical radiograph demonstrated crestal bone levels up to the implant platform.",
+          "image_paths": [],
+          "role": "observation"
+        }
+      ]
+    }
+  ]
+}

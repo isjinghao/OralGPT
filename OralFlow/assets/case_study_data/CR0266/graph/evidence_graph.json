@@ -1,0 +1,285 @@
+{
+  "patient_id": "report__CR0266",
+  "edges": [
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t4_followup_01_26_postoperative_gap_tissue_appearance_01",
+      "reason": "Early collapse of the surrounding soft tissue toward the socket center is consistent with subsequent migration of young tissue into the previous gap.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0001"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t4_followup_01_27_marginal_soft_tissue_contact_with_cover_screw_01",
+      "reason": "The early inward soft-tissue collapse helps explain subsequent marginal tissue contact with the cover screw.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0002"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t4_followup_01_27_marginal_soft_tissue_contact_with_implant_01",
+      "reason": "The early inward soft-tissue collapse is compatible with later marginal tissue contact with the implant.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0003"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t4_followup_01_27_marginal_soft_tissue_position_relative_to_wound_edges_01",
+      "reason": "The initial inward collapse provides a direct precursor to later migration of marginal tissue from the wound edges.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0004"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t5_followup_02_31_socket_center_tissue_position_01",
+      "reason": "The early movement of soft tissue toward the socket center is part of the positional progression preceding later coronal migration of central socket tissue.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0005"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_socket_gap_content_01",
+      "target": "report_CR0266_t4_followup_01_26_postoperative_gap_tissue_appearance_01",
+      "reason": "The early fibrin clot occupying the implant-socket gap is the initial healing content later replaced or occupied by young migrating tissue.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0006"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_socket_gap_content_01",
+      "target": "report_CR0266_t5_followup_02_31_socket_center_tissue_position_01",
+      "reason": "The early clot-filled gap establishes the healing space in which later central socket tissue migration occurred.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0007"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_socket_gap_content_01",
+      "target": "report_CR0266_t6_followup_03_36_bone_fill_in_previous_socket_spaces_01",
+      "reason": "The fibrin clot occupying the initial gap is an early stage of healing that provides context for later suggested bone fill in the previous socket spaces.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0008"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_22_implant_socket_gap_coverage_01",
+      "target": "report_CR0266_t6_followup_03_37_bone_fill_around_implant_01",
+      "reason": "The initially covered implant-socket gap is the same localized space in which bone fill was later observed around the implant.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0009"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_23_marginal_soft_tissue_position_01",
+      "target": "report_CR0266_t4_followup_01_28_younger_tissue_location_relative_to_surrounding_older_tissue_01",
+      "reason": "Early marginal tissue collapse toward the socket center is compatible with the later apical location of younger tissue relative to older surrounding tissue.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0010"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_23_marginal_soft_tissue_position_01",
+      "target": "report_CR0266_t6_followup_03_35_soft_tissue_appearance_01",
+      "reason": "The early inward marginal tissue movement contributes to interpreting the later complete soft-tissue submergence of the cover screw.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0011"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_23_wound_edge_distance_to_socket_center_01",
+      "target": "report_CR0266_t4_followup_01_28_younger_tissue_location_relative_to_surrounding_older_tissue_01",
+      "reason": "The wound edge positioned farther from the socket center, particularly at the biopsy area, is compatible with younger tissue remaining more apical than surrounding older tissue.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0012"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_23_soft_tissue_covering_cover_screw_01",
+      "target": "report_CR0266_t5_followup_02_32_soft_tissue_continuity_01",
+      "reason": "Early soft-tissue coverage of the lingual cover-screw side supports the later finding that newly formed tissue became more continuous with surrounding tissue.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0013"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_23_soft_tissue_covering_cover_screw_01",
+      "target": "report_CR0266_t6_followup_03_35_soft_tissue_appearance_01",
+      "reason": "Initial partial soft-tissue coverage of the cover screw is a direct precursor to its later complete submergence.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0014"
+    },
+    {
+      "source": "report_CR0266_t4_followup_01_26_cover_screw_exposure_extent_01",
+      "target": "report_CR0266_t5_followup_02_31_cover_screw_exposure_01",
+      "reason": "Both observations measure cover-screw exposure at successive visits, with different qualitative extents that do not alone establish a definite change.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0015"
+    },
+    {
+      "source": "report_CR0266_t4_followup_01_26_postoperative_gap_tissue_appearance_01",
+      "target": "report_CR0266_t5_followup_02_31_socket_center_tissue_position_01",
+      "reason": "Young tissue occupying the previous gap provides the healing context for its subsequent coronal migration in the socket center.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0016"
+    },
+    {
+      "source": "report_CR0266_t4_followup_01_26_postoperative_gap_tissue_appearance_01",
+      "target": "report_CR0266_t6_followup_03_39_peri_implant_tissue_on_probing_01",
+      "reason": "The early tissue occupying the implant-socket gap contributes to interpreting the later hard tissue encountered around the implant on probing.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0017"
+    },
+    {
+      "source": "report_CR0266_t0_perception_00_2_radiographic_furcation_involvement_01",
+      "target": "report_CR0266_t6_followup_03_38_expected_radiographic_timing_of_mineralized_bone_fill_01",
+      "reason": "Both concern radiographic assessment of mineralized structures, but the initial furcation finding does not specifically support the later timing expectation for bone-fill visibility.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0018"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t4_followup_01_28_new_tissue_complete_keratinization_01",
+      "reason": "Both describe postoperative soft-tissue healing, but early tissue position does not specifically establish later keratinization status.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0019"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t4_followup_01_28_new_tissue_epithelial_layer_thickness_relative_to_surrounding_socket_tissue_01",
+      "reason": "Both concern healing soft tissue at the socket, but tissue position does not specifically support the later epithelial-layer thickness finding.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0020"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t4_followup_01_28_new_tissue_visible_red_streaks_01",
+      "reason": "Both are postoperative soft-tissue observations at the healing site, but position does not specifically support the presence of red streaks.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0021"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t4_followup_01_29_cover_screw_soft_tissue_coverage_01",
+      "reason": "The findings share the theme of soft-tissue healing around the implant site, but early position does not specifically establish the later residual cover-screw exposure.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0022"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t6_followup_03_39_peri_implant_tissue_on_probing_01",
+      "reason": "Both concern peri-implant healing, but early soft-tissue position does not specifically establish the later hard-tissue probing finding.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0023"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t6_followup_03_39_soft_tissue_area_on_probing_01",
+      "reason": "Both concern tissue around the healing implant site, but the generalized early position finding does not support the localized mesial soft-tissue area.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0024"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "target": "report_CR0266_t6_followup_03_39_soft_tissue_area_on_probing_02",
+      "reason": "Both concern tissue around the healing implant site, but the generalized early position finding does not support the localized distal soft-tissue area.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0025"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_20_socket_gap_content_01",
+      "target": "report_CR0266_t4_followup_01_28_new_tissue_epithelial_layer_thickness_relative_to_surrounding_socket_tissue_01",
+      "reason": "Both describe sequential socket healing, but the early fibrin clot does not specifically support the later epithelial-layer thickness comparison.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0026"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_23_marginal_soft_tissue_position_01",
+      "target": "report_CR0266_t5_followup_02_32_soft_tissue_continuity_01",
+      "reason": "Both concern soft-tissue healing at the socket, but early marginal position does not specifically establish later continuity with surrounding tissue.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0027"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_23_marginal_soft_tissue_position_01",
+      "target": "report_CR0266_t6_followup_03_39_lingual_crest_position_01",
+      "reason": "The findings involve the same general implant site but different tissues and anatomical levels: marginal soft tissue versus lingual bony crest.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0028"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_23_marginal_soft_tissue_position_01",
+      "target": "report_CR0266_t7_followup_04_46_attached_keratinized_tissue_01",
+      "reason": "Both concern longer-term soft-tissue healing at the implant site, but early marginal position does not specifically establish the later zone of attached keratinized tissue.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0029"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_23_soft_tissue_covering_cover_screw_01",
+      "target": "report_CR0266_t4_followup_01_28_younger_tissue_location_relative_to_surrounding_older_tissue_01",
+      "reason": "Both describe postoperative tissue organization around the socket, but partial lingual cover-screw coverage does not specifically determine the younger tissue's apical location.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0030"
+    },
+    {
+      "source": "report_CR0266_t3_followup_00_23_soft_tissue_covering_cover_screw_01",
+      "target": "report_CR0266_t7_followup_04_46_attached_keratinized_tissue_01",
+      "reason": "Both concern soft-tissue maturation around the implant site, but early partial cover-screw coverage does not specifically establish the later attached keratinized tissue zone.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0031"
+    },
+    {
+      "source": "report_CR0266_t4_followup_01_26_implant_exposure_extent_01",
+      "target": "report_CR0266_t5_followup_02_31_cover_screw_exposure_01",
+      "reason": "Exposure findings at the same implant site are clinically related, but implant exposure and cover-screw exposure are different entities.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0032"
+    },
+    {
+      "source": "report_CR0266_t4_followup_01_26_implant_exposure_extent_01",
+      "target": "report_CR0266_t6_followup_03_39_peri_implant_tissue_on_probing_01",
+      "reason": "Both concern the peri-implant site during healing, but the extent of implant exposure does not specifically support the later hard-tissue probing result.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0033"
+    },
+    {
+      "source": "report_CR0266_t4_followup_01_26_postoperative_gap_tissue_appearance_01",
+      "target": "report_CR0266_t6_followup_03_39_soft_tissue_area_on_probing_01",
+      "reason": "Both concern healing tissue around the implant, but generalized tissue filling of the prior gap does not specifically support the localized mesial soft-tissue area.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0034"
+    },
+    {
+      "source": "report_CR0266_t4_followup_01_26_postoperative_gap_tissue_appearance_01",
+      "target": "report_CR0266_t6_followup_03_39_soft_tissue_area_on_probing_02",
+      "reason": "Both concern healing tissue around the implant, but generalized tissue filling of the prior gap does not specifically support the localized distal soft-tissue area.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0035"
+    }
+  ]
+}

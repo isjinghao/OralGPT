@@ -1,0 +1,1247 @@
+{
+  "patient_id": "report__CR0098",
+  "evidence": [
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_1_buccal_gingival_abscess_location_01",
+      "source_turn_id": 1,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "An abscess was present on the buccal gingiva interproximally between #30 and #31.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "buccal gingival abscess location",
+        "value": "interproximal between #30 and #31",
+        "unit": null,
+        "side": null,
+        "tooth": "#30-#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_1_periapical_lesion_extent_01",
+      "source_turn_id": 1,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The preoperative radiograph demonstrated a periapical lesion extending from the distal root of #30 to the mesial and distal roots of #31.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "periapical lesion extent",
+        "value": "from distal root of #30 to mesial and distal roots of #31",
+        "unit": null,
+        "side": null,
+        "tooth": "#30-#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_1_abscess_tracing_location_01",
+      "source_turn_id": 1,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Tracing showed the abscess to the interproximal area between #30 and #31.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "abscess tracing location",
+        "value": "interproximal area between #30 and #31",
+        "unit": null,
+        "side": null,
+        "tooth": "#30-#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_electric_pulp_test_response_01",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Tooth #31 had no response to electric pulp testing at the initial workup.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "electric_pulp_test_response",
+        "value": "no response",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_cold_test_response_01",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Tooth #31 had no response to cold testing at the initial workup.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "cold_test_response",
+        "value": "no response",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_interproximal_probing_depth_01",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Interproximal probing depths were 9–13 mm at the initial workup.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "interproximal_probing_depth",
+        "value": "9-13",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_probing_depth_other_areas_01",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Normal probing depths were present in all other areas at the initial workup.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "probing_depth_other_areas",
+        "value": "normal",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_prior_restoration_01",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Tooth #30 was previously restored with a full coverage gold crown.",
+      "fact_type": "history",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "prior_restoration",
+        "value": "full coverage gold crown",
+        "unit": null,
+        "side": null,
+        "tooth": "#30"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_prior_restoration_02",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Tooth #31 was previously restored with a full coverage gold crown.",
+      "fact_type": "history",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "prior_restoration",
+        "value": "full coverage gold crown",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_recurrent_caries_clinical_signs_01",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Tooth #30 had no clinical signs of recurrent caries at the initial workup.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "recurrent_caries_clinical_signs",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": "#30"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_recurrent_caries_clinical_signs_02",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Tooth #31 had no clinical signs of recurrent caries at the initial workup.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "recurrent_caries_clinical_signs",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_pulp_diagnosis_01",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Tooth #30 was diagnosed with normal pulp at the initial workup.",
+      "fact_type": "diagnosis",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "pulp_diagnosis",
+        "value": "normal pulp",
+        "unit": null,
+        "side": null,
+        "tooth": "#30"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_apical_tissue_diagnosis_01",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Tooth #30 was diagnosed with normal apical tissues at the initial workup.",
+      "fact_type": "diagnosis",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "apical_tissue_diagnosis",
+        "value": "normal apical tissues",
+        "unit": null,
+        "side": null,
+        "tooth": "#30"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_pulp_diagnosis_02",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Tooth #31 was diagnosed with necrotic pulp at the initial workup.",
+      "fact_type": "diagnosis",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "pulp_diagnosis",
+        "value": "necrotic pulp",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t0_perception_00_2_apical_diagnosis_01",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Tooth #31 was diagnosed with acute apical abscess at the initial workup.",
+      "fact_type": "diagnosis",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "apical_diagnosis",
+        "value": "acute apical abscess",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t2_followup_00_4_immediate_postoperative_radiograph_after_nsrct_01",
+      "source_turn_id": 4,
+      "introduced_stage": "T2_followup_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "An immediate postoperative radiograph following NSRCT on #31 was reported.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "immediate_postoperative_radiograph_after_NSRCT",
+        "value": "reported",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_5_cbct_timing_after_nsrct_01",
+      "source_turn_id": 5,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The postoperative CBCT scan was obtained 1 month after NSRCT on #31.",
+      "fact_type": "other",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "cbct_timing_after_nsrct",
+        "value": "1 month after NSRCT",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_5_radiolucent_lesion_extent_01",
+      "source_turn_id": 5,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "CBCT cross sections showed an extensive radiolucent lesion.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "radiolucent_lesion_extent",
+        "value": "extensive",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_5_radiolucent_lesion_location_01",
+      "source_turn_id": 5,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The radiolucent lesion extended from the distal root of #30 to the distal root of #31.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "radiolucent_lesion_location",
+        "value": "from distal root of #30 to distal root of #31",
+        "unit": null,
+        "side": null,
+        "tooth": "#30; #31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_5_buccal_plate_loss_location_01",
+      "source_turn_id": 5,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Loss of buccal plate was present interproximally between #30 and #31.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "buccal_plate_loss_location",
+        "value": "interproximal between #30 and #31",
+        "unit": null,
+        "side": "buccal",
+        "tooth": "#30; #31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_5_periodontal_defect_walls_01",
+      "source_turn_id": 5,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "A 1 wall periodontal defect was present between #30 and #31.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "periodontal_defect_walls",
+        "value": "1 wall defect between #30 and #31",
+        "unit": null,
+        "side": null,
+        "tooth": "#30; #31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_6_persistent_sinus_tract_presence_1_month_post_treatment_01",
+      "source_turn_id": 6,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "One month post-treatment, a persistent sinus tract was present.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "persistent_sinus_tract_presence_1_month_post_treatment",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_6_postoperative_radiograph_sinus_tract_tracing_location_01",
+      "source_turn_id": 6,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The postoperative radiograph 1 month after treatment demonstrated a sinus tract traced to the interproximal area between #30 and #31.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "postoperative_radiograph_sinus_tract_tracing_location",
+        "value": "interproximal area between #30 and #31",
+        "unit": null,
+        "side": null,
+        "tooth": "#30/#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+      "source_turn_id": 6,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Clinical findings showed a persistent sinus tract present 1 month after NSRCT interproximally between #30 and #31.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "clinical_sinus_tract_location_1_month_after_NSRCT",
+        "value": "interproximal between #30 and #31",
+        "unit": null,
+        "side": null,
+        "tooth": "#30/#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_6_cbct_obtained_01",
+      "source_turn_id": 6,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "A CBCT scan was obtained.",
+      "fact_type": "other",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "CBCT_obtained",
+        "value": "yes",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+      "source_turn_id": 6,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "CBCT revealed complete loss of the buccal bone between #30 and #31.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "CBCT_buccal_bone_loss_between_30_31",
+        "value": "complete loss",
+        "unit": null,
+        "side": null,
+        "tooth": "#30/#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_6_cbct_interproximal_bone_loss_between_30_31_01",
+      "source_turn_id": 6,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "CBCT revealed complete loss of the interproximal bone between #30 and #31.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "CBCT_interproximal_bone_loss_between_30_31",
+        "value": "complete loss",
+        "unit": null,
+        "side": null,
+        "tooth": "#30/#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+      "source_turn_id": 6,
+      "introduced_stage": "T3_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The CBCT findings led to a 1-wall defect.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "CBCT_bony_defect_wall_count",
+        "value": "1-wall defect",
+        "unit": null,
+        "side": null,
+        "tooth": "#30/#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_9_buccal_plate_loss_01",
+      "source_turn_id": 9,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Loss of buccal plate was visualized between #30 and #31 after lesion removal for biopsy.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "buccal_plate_loss",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": "#30-#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_9_defect_wall_type_01",
+      "source_turn_id": 9,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "A 1-wall defect was visualized between #30 and #31 after lesion removal for biopsy.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "defect_wall_type",
+        "value": "1-wall defect",
+        "unit": null,
+        "side": null,
+        "tooth": "#30-#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_10_mesial_root_apex_resection_01",
+      "source_turn_id": 10,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The mesial root apex of #31 had been resected.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "mesial_root_apex_resection",
+        "value": "resected",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_10_distal_root_apex_resection_01",
+      "source_turn_id": 10,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The distal root apex of #31 had been resected.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "distal_root_apex_resection",
+        "value": "resected",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_10_apicoectomy_status_01",
+      "source_turn_id": 10,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The apicoectomy of #31 was shown completed.",
+      "fact_type": "treatment",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "apicoectomy_status",
+        "value": "completed",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_10_retrograde_filling_placement_01",
+      "source_turn_id": 10,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "A retrograde filling was placed during the completed apicoectomy of #31.",
+      "fact_type": "treatment",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "retrograde_filling_placement",
+        "value": "placed",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_11_defect_location_01",
+      "source_turn_id": 11,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The defect was between teeth #30 and #31.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "defect_location",
+        "value": "between teeth #30 and #31",
+        "unit": null,
+        "side": null,
+        "tooth": "30-31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_11_graft_material_01",
+      "source_turn_id": 11,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The operative record documents the use of mineralized freeze-dried bone allograft and enamel matrix derivative (EMD).",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "graft_material",
+        "value": "mineralized freeze-dried bone allograft",
+        "unit": null,
+        "side": null,
+        "tooth": "30-31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_11_adjunct_material_01",
+      "source_turn_id": 11,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The operative record documents the use of mineralized freeze-dried bone allograft and enamel matrix derivative (EMD).",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "adjunct_material",
+        "value": "EMD",
+        "unit": null,
+        "side": null,
+        "tooth": "30-31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_11_radiographic_graft_placement_01",
+      "source_turn_id": 11,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Radiopaque material is visible in the defect between teeth #30 and #31 on the immediate postoperative radiograph.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "radiographic_graft_placement",
+        "value": "allograft placed in defect",
+        "unit": null,
+        "side": null,
+        "tooth": "30-31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_12_surgical_flap_position_01",
+      "source_turn_id": 12,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The flap was replaced at the surgical site.",
+      "fact_type": "treatment",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "surgical_flap_position",
+        "value": "replaced",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t4_followup_02_12_suture_material_size_01",
+      "source_turn_id": 12,
+      "introduced_stage": "T4_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The flap was sutured with 6–0 polypropylene sutures.",
+      "fact_type": "treatment",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "suture_material_size",
+        "value": "6–0 polypropylene sutures",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t5_followup_03_18_postoperative_gingival_recession_01",
+      "source_turn_id": 18,
+      "introduced_stage": "T5_followup_03",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The 2-week postoperative photo showed gingival recession in the surgical area.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "postoperative_gingival_recession",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t5_followup_03_18_interproximal_granulation_01",
+      "source_turn_id": 18,
+      "introduced_stage": "T5_followup_03",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The interproximal area between #30 and #31 was granulating at 2 weeks postoperatively.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "interproximal_granulation",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": "#30-#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t5_followup_03_18_postoperative_food_impaction_01",
+      "source_turn_id": 18,
+      "introduced_stage": "T5_followup_03",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Food impaction occurred in the surgical area during the healing phase.",
+      "fact_type": "history",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "postoperative_food_impaction",
+        "value": "present during healing phase",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t5_followup_03_19_healing_status_2_weeks_01",
+      "source_turn_id": 19,
+      "introduced_stage": "T5_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 2 weeks, delayed healing was observed.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "longitudinal_outcome",
+      "normalized": {
+        "field": "healing_status_2_weeks",
+        "value": "delayed healing",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t5_followup_03_19_recession_status_2_weeks_01",
+      "source_turn_id": 19,
+      "introduced_stage": "T5_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 2 weeks, recession was observed.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "recession_status_2_weeks",
+        "value": "observed",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t5_followup_03_19_food_impaction_location_01",
+      "source_turn_id": 19,
+      "introduced_stage": "T5_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Food impaction was present between #30 and #31.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "food_impaction_location",
+        "value": "between #30 and #31",
+        "unit": null,
+        "side": null,
+        "tooth": "#30,#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t5_followup_03_19_food_impaction_removal_01",
+      "source_turn_id": 19,
+      "introduced_stage": "T5_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Food impaction between #30 and #31 was removed.",
+      "fact_type": "treatment",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "food_impaction_removal",
+        "value": "removed",
+        "unit": null,
+        "side": null,
+        "tooth": "#30,#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t5_followup_03_19_biopsy_diagnosis_01",
+      "source_turn_id": 19,
+      "introduced_stage": "T5_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The biopsy report confirmed a definitive diagnosis of periapical cyst.",
+      "fact_type": "diagnosis",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "biopsy_diagnosis",
+        "value": "periapical cyst",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t6_followup_04_21_gingival_recession_01",
+      "source_turn_id": 21,
+      "introduced_stage": "T6_followup_04",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The 6-week postoperative photo showed slight recession on tooth #30.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "gingival_recession",
+        "value": "slight",
+        "unit": null,
+        "side": null,
+        "tooth": "30"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t6_followup_04_21_gingival_recession_02",
+      "source_turn_id": 21,
+      "introduced_stage": "T6_followup_04",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The 6-week postoperative photo showed slight recession on tooth #31.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "gingival_recession",
+        "value": "slight",
+        "unit": null,
+        "side": null,
+        "tooth": "31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t6_followup_04_21_inflammation_01",
+      "source_turn_id": 21,
+      "introduced_stage": "T6_followup_04",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The 6-week postoperative photo showed minimal inflammation present.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "inflammation",
+        "value": "minimal present",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t6_followup_04_21_sinus_tract_01",
+      "source_turn_id": 21,
+      "introduced_stage": "T6_followup_04",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The 6-week postoperative photo showed absence of a sinus tract.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "sinus_tract",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t6_followup_04_21_periapical_lesion_01",
+      "source_turn_id": 21,
+      "introduced_stage": "T6_followup_04",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The 6-week postoperative radiograph demonstrated resolution of the periapical lesion.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "periapical_lesion",
+        "value": "resolved",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t6_followup_04_21_graft_status_01",
+      "source_turn_id": 21,
+      "introduced_stage": "T6_followup_04",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The 6-week postoperative radiograph demonstrated maintenance of the graft.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "graft_status",
+        "value": "maintained",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t6_followup_04_22_healing_status_01",
+      "source_turn_id": 22,
+      "introduced_stage": "T6_followup_04",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 6 weeks, the site healed uneventfully.",
+      "fact_type": "followup_outcome",
+      "clinical_dimension": "longitudinal_outcome",
+      "normalized": {
+        "field": "healing_status",
+        "value": "uneventful healing",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t6_followup_04_22_recession_01",
+      "source_turn_id": 22,
+      "introduced_stage": "T6_followup_04",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 6 weeks, slight recession was present at the site.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "recession",
+        "value": "slight",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t6_followup_04_22_sinus_tract_01",
+      "source_turn_id": 22,
+      "introduced_stage": "T6_followup_04",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 6 weeks, a sinus tract was absent.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "sinus_tract",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_23_postoperative_interval_01",
+      "source_turn_id": 23,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The image was 1-year postoperative.",
+      "fact_type": "other",
+      "clinical_dimension": "patient_context",
+      "normalized": {
+        "field": "postoperative_interval",
+        "value": "1 year",
+        "unit": "year",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_23_periodontium_status_01",
+      "source_turn_id": 23,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Healthy periodontium was visible at tooth #30.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "periodontium_status",
+        "value": "healthy",
+        "unit": null,
+        "side": null,
+        "tooth": "#30"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_23_periodontium_status_02",
+      "source_turn_id": 23,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Healthy periodontium was visible at tooth #31.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "periodontium_status",
+        "value": "healthy",
+        "unit": null,
+        "side": null,
+        "tooth": "#31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_23_infection_signs_01",
+      "source_turn_id": 23,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The patient showed no signs of infection.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "infection_signs",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_24_cbct_bone_fill_01",
+      "source_turn_id": 24,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "At the 1-year postoperative visit, CBCT showed substantial bone fill at sites #30 and #31.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "CBCT bone fill",
+        "value": "substantial",
+        "unit": null,
+        "side": null,
+        "tooth": "#30 and #31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_24_cbct_graft_integration_01",
+      "source_turn_id": 24,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "At the 1-year postoperative visit, CBCT showed graft integration at sites #30 and #31.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "CBCT graft integration",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": "#30 and #31"
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_24_periapical_lesion_status_01",
+      "source_turn_id": 24,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "At the 1-year postoperative visit, the periapical lesion had resolved on CBCT.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "response",
+      "normalized": {
+        "field": "periapical lesion status",
+        "value": "resolved",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_25_symptom_status_1_year_01",
+      "source_turn_id": 25,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 1 year, the patient was asymptomatic.",
+      "fact_type": "symptom",
+      "clinical_dimension": "response",
+      "normalized": {
+        "field": "symptom_status_1_year",
+        "value": "asymptomatic",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_25_probing_depth_1_year_01",
+      "source_turn_id": 25,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 1 year, probing depths ranged 2–4 mm.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "probing_depth_1_year",
+        "value": "2–4",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_25_cbct_bone_fill_1_year_01",
+      "source_turn_id": 25,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 1 year, CBCT showed excellent bone fill.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "cbct_bone_fill_1_year",
+        "value": "excellent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_25_cbct_graft_integration_1_year_01",
+      "source_turn_id": 25,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 1 year, CBCT showed integration of the graft.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "cbct_graft_integration_1_year",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0098_t7_followup_05_25_cbct_periapical_lesion_status_1_year_01",
+      "source_turn_id": 25,
+      "introduced_stage": "T7_followup_05",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 1 year, CBCT showed resolution of the periapical lesion.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "cbct_periapical_lesion_status_1_year",
+        "value": "resolved",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    }
+  ]
+}

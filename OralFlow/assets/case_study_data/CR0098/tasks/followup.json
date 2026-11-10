@@ -1,0 +1,418 @@
+{
+  "patient_id": "report__CR0098",
+  "tasks": [
+    {
+      "task_id": "report_CR0098_followup_001",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T3_followup_01",
+      "release_after_stage": "T3_followup_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_pulp_diagnosis_02",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with necrotic pulp at the initial workup.",
+          "field": "pulp_diagnosis",
+          "value": "necrotic pulp",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_apical_diagnosis_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with acute apical abscess at the initial workup.",
+          "field": "apical_diagnosis",
+          "value": "acute apical abscess",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_interproximal_probing_depth_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Interproximal probing depths were 9–13 mm at the initial workup.",
+          "field": "interproximal_probing_depth",
+          "value": "9-13",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_probing_depth_other_areas_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Normal probing depths were present in all other areas at the initial workup.",
+          "field": "probing_depth_other_areas",
+          "value": "normal",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Clinical findings showed a persistent sinus tract present 1 month after NSRCT interproximally between #30 and #31.",
+          "field": "clinical_sinus_tract_location_1_month_after_NSRCT",
+          "value": "interproximal between #30 and #31",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the buccal bone between #30 and #31.",
+          "field": "CBCT_buccal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_interproximal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the interproximal bone between #30 and #31.",
+          "field": "CBCT_interproximal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The CBCT findings led to a 1-wall defect.",
+          "field": "CBCT_bony_defect_wall_count",
+          "value": "1-wall defect",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        }
+      ],
+      "question": "What diagnosis and prognosis were assigned after the persistent lesion was evaluated?",
+      "gold_answer": "Prognosis for #31 was deemed questionable; however the patient wished to save the tooth. A diagnosis of an endodontic-periodontal lesion without root damage in a non-periodontitis patient, Grade 3 was made."
+    },
+    {
+      "task_id": "report_CR0098_followup_002",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T3_followup_01",
+      "release_after_stage": "T3_followup_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Clinical findings showed a persistent sinus tract present 1 month after NSRCT interproximally between #30 and #31.",
+          "field": "clinical_sinus_tract_location_1_month_after_NSRCT",
+          "value": "interproximal between #30 and #31",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the buccal bone between #30 and #31.",
+          "field": "CBCT_buccal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_interproximal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the interproximal bone between #30 and #31.",
+          "field": "CBCT_interproximal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The CBCT findings led to a 1-wall defect.",
+          "field": "CBCT_bony_defect_wall_count",
+          "value": "1-wall defect",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        }
+      ],
+      "question": "What combined management approach was selected for the persistent lesion?",
+      "gold_answer": "A collaborative surgery was conducted to treat the lesion through apicoectomy of #31 with GTR."
+    },
+    {
+      "task_id": "report_CR0098_followup_003",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_02",
+      "release_after_stage": "T4_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_persistent_sinus_tract_presence_1_month_post_treatment_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "One month post-treatment, a persistent sinus tract was present.",
+          "field": "persistent_sinus_tract_presence_1_month_post_treatment",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the buccal bone between #30 and #31.",
+          "field": "CBCT_buccal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The CBCT findings led to a 1-wall defect.",
+          "field": "CBCT_bony_defect_wall_count",
+          "value": "1-wall defect",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        }
+      ],
+      "question": "What anesthesia and flap approach were used for the collaborative surgery?",
+      "gold_answer": "After obtaining written informed consent, the surgical area was anesthetized with 3.4 mL of 2% lidocaine with 1:100,000 epinephrine and 1.7 mL of 2% lidocaine with 1: 50,000 epinephrine. A full-thickness mucoperiosteal flap was elevated from #29 to #32 on the buccal and lingual to expose the lesion."
+    },
+    {
+      "task_id": "report_CR0098_followup_004",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_02",
+      "release_after_stage": "T4_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_9_defect_wall_type_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "A 1-wall defect was visualized between #30 and #31 after lesion removal for biopsy.",
+          "field": "defect_wall_type",
+          "value": "1-wall defect",
+          "unit": null,
+          "tooth": "#30-#31",
+          "side": null
+        }
+      ],
+      "question": "How was the lesion handled once surgically exposed?",
+      "gold_answer": "Once exposed, the entire lesion was curetted and placed in 10% formalin for biopsy."
+    },
+    {
+      "task_id": "report_CR0098_followup_005",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_02",
+      "release_after_stage": "T4_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_10_mesial_root_apex_resection_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The mesial root apex of #31 had been resected.",
+          "field": "mesial_root_apex_resection",
+          "value": "resected",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_10_distal_root_apex_resection_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The distal root apex of #31 had been resected.",
+          "field": "distal_root_apex_resection",
+          "value": "resected",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_10_retrograde_filling_placement_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "A retrograde filling was placed during the completed apicoectomy of #31.",
+          "field": "retrograde_filling_placement",
+          "value": "placed",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        }
+      ],
+      "question": "How was the apicoectomy of #31 performed?",
+      "gold_answer": "Mesial and distal roots of #31 were resected 3 mm from the root apices, prepared, and filled with retrograde fillings."
+    },
+    {
+      "task_id": "report_CR0098_followup_006",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_02",
+      "release_after_stage": "T4_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_defect_location_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The defect was between teeth #30 and #31.",
+          "field": "defect_location",
+          "value": "between teeth #30 and #31",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_graft_material_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The operative record documents the use of mineralized freeze-dried bone allograft and enamel matrix derivative (EMD).",
+          "field": "graft_material",
+          "value": "mineralized freeze-dried bone allograft",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_adjunct_material_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The operative record documents the use of mineralized freeze-dried bone allograft and enamel matrix derivative (EMD).",
+          "field": "adjunct_material",
+          "value": "EMD",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        }
+      ],
+      "question": "What regenerative procedures were performed at #30 and #31 during the surgery?",
+      "gold_answer": "Thorough root planing was completed on #30 and #31, followed by root conditioning with 24% EDTA for 2 minutes. The site was irrigated, and enamel matrix derivative (EMD) was applied. The site was filled with mineralized freeze-dried cortico-cancellous allograft and covered by a resorbable membrane."
+    },
+    {
+      "task_id": "report_CR0098_followup_007",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_02",
+      "release_after_stage": "T4_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_12_surgical_flap_position_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The flap was replaced at the surgical site.",
+          "field": "surgical_flap_position",
+          "value": "replaced",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_12_suture_material_size_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The flap was sutured with 6–0 polypropylene sutures.",
+          "field": "suture_material_size",
+          "value": "6–0 polypropylene sutures",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What closure and postoperative care were prescribed after the surgery?",
+      "gold_answer": "The flap was repositioned and sutured with 6–0 polypropylene sutures. Postoperative care included amoxicillin 500 mg three times a day for 7 days, 0.12% chlorhexidine rinse twice daily for 14 days, and ibuprofen 800 mg as needed."
+    },
+    {
+      "task_id": "report_CR0098_followup_008",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T5_followup_03",
+      "release_after_stage": "T5_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t5_followup_03_19_food_impaction_location_01",
+          "stage": "T5_followup_03",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Food impaction was present between #30 and #31.",
+          "field": "food_impaction_location",
+          "value": "between #30 and #31",
+          "unit": null,
+          "tooth": "#30,#31",
+          "side": null
+        }
+      ],
+      "question": "What management was performed for the healing complication noted at 2 weeks?",
+      "gold_answer": "Food impaction between #30 and #31 was removed."
+    }
+  ]
+}

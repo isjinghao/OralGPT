@@ -1,0 +1,145 @@
+{
+  "patient_id": "report__CR0098",
+  "tasks": [
+    {
+      "task_id": "cross_temporal_reasoning_001",
+      "patient_id": "report__CR0098",
+      "task_type": "cross_temporal_reasoning",
+      "ask_after_stage": "T6_followup_04",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_persistent_sinus_tract_presence_1_month_post_treatment_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "One month post-treatment, a persistent sinus tract was present.",
+          "field": "persistent_sinus_tract_presence_1_month_post_treatment",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t6_followup_04_22_sinus_tract_01",
+          "stage": "T6_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 6 weeks, a sinus tract was absent.",
+          "field": "sinus_tract",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "The sinus tract was present at 1 month post-treatment but absent at 6 weeks, indicating interval resolution.",
+      "question": "What change did follow-up show in the sinus tract between the 1-month post-treatment assessment and the 6-week assessment?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is appropriate for cross-temporal reasoning and answerable at the 6-week stage using the provided evidence. The gold answer correctly describes the change but includes an unsupported detail about NSRCT. Removing that detail yields a concise, fully supported answer.",
+        "issues": [
+          "Answer includes unsupported treatment detail (NSRCT) not present in selected evidence."
+        ],
+        "fixed_question": null,
+        "fixed_answer": "The sinus tract was present at 1 month post-treatment but absent at 6 weeks, indicating interval resolution."
+      }
+    },
+    {
+      "task_id": "cross_temporal_reasoning_002",
+      "patient_id": "report__CR0098",
+      "task_type": "cross_temporal_reasoning",
+      "ask_after_stage": "T7_followup_05",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_defect_location_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The defect was between teeth #30 and #31.",
+          "field": "defect_location",
+          "value": "between teeth #30 and #31",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_graft_material_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The operative record documents the use of mineralized freeze-dried bone allograft and enamel matrix derivative (EMD).",
+          "field": "graft_material",
+          "value": "mineralized freeze-dried bone allograft",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_adjunct_material_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The operative record documents the use of mineralized freeze-dried bone allograft and enamel matrix derivative (EMD).",
+          "field": "adjunct_material",
+          "value": "EMD",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_cbct_bone_fill_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, CBCT showed substantial bone fill at sites #30 and #31.",
+          "field": "CBCT bone fill",
+          "value": "substantial",
+          "unit": null,
+          "tooth": "#30 and #31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_cbct_graft_integration_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, CBCT showed graft integration at sites #30 and #31.",
+          "field": "CBCT graft integration",
+          "value": "present",
+          "unit": null,
+          "tooth": "#30 and #31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_periapical_lesion_status_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, the periapical lesion had resolved on CBCT.",
+          "field": "periapical lesion status",
+          "value": "resolved",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At surgery, the defect between #30 and #31 was filled with mineralized freeze-dried bone allograft combined with EMD. By 1 year, CBCT showed substantial bone fill, graft integration, and resolution of the periapical lesion.",
+      "question": "In the surgical report for the defect between teeth #30 and #31, what material was placed there, and what did the 1-year postoperative CBCT show about the repair and lesion status?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, non-leaking, and answerable from the provided evidence. The gold answer is supported by the selected evidence and matches the requested cross-temporal comparison: the defect was filled with mineralized freeze-dried bone allograft plus EMD, and the 1-year postoperative CBCT showed substantial bone fill, graft integration, and resolution of the periapical lesion.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    }
+  ]
+}

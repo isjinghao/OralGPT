@@ -1,0 +1,199 @@
+{
+  "patient_id": "report__CR0266",
+  "tasks": [
+    {
+      "task_id": "report_CR0266_followup_001",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T3_followup_00",
+      "release_after_stage": "T3_followup_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_24_gingival_lesion_histology_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+          "field": "gingival_lesion_histology",
+          "value": "consistent with hyperkeratosis",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What further management was indicated for the gingival lesion?",
+      "gold_answer": "No further treatment was indicated."
+    },
+    {
+      "task_id": "report_CR0266_followup_002",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_01",
+      "release_after_stage": "T4_followup_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_29_site_plaque_buildup_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 1 month, moderate plaque buildup was noted at the site.",
+          "field": "site_plaque_buildup",
+          "value": "moderate",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What oral hygiene management was prescribed at 1 month?",
+      "gold_answer": "The patient was instructed to apply chlorhexidine gluconate 0.12% to this area twice a day."
+    },
+    {
+      "task_id": "report_CR0266_followup_003",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T5_followup_02",
+      "release_after_stage": "T5_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_31_cover_screw_exposure_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At 2 months, a portion of the cover screw was still exposed.",
+          "field": "cover_screw_exposure",
+          "value": "portion still exposed",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What cleaning instruction was continued at 2 months?",
+      "gold_answer": "The patient was instructed to continue to clean this area with chlorhexidine gluconate 0.12% until the next visit."
+    },
+    {
+      "task_id": "report_CR0266_followup_004",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T6_followup_03",
+      "release_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_37_bone_fill_around_implant_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Bone fill was present around the implant at implant uncovery.",
+          "field": "bone_fill_around_implant",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What procedure was performed for implant uncovery?",
+      "gold_answer": "A crestal incision was made and a full thickness flap was elevated to expose the implant and the cover screw."
+    },
+    {
+      "task_id": "report_CR0266_followup_005",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T6_followup_03",
+      "release_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_39_implant_mobility_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "No mobility of the implant was detected.",
+          "field": "implant_mobility",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What did the absence of implant mobility indicate?",
+      "gold_answer": "The absence of implant mobility indicated that the implant had achieved secondary stability."
+    },
+    {
+      "task_id": "report_CR0266_followup_006",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T6_followup_03",
+      "release_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_26_implant_exposure_extent_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "A portion of the implant was still exposed at the 1-month postoperative visit.",
+          "field": "implant_exposure_extent",
+          "value": "portion still exposed",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_27_marginal_soft_tissue_contact_with_implant_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 1 month, the marginal soft tissue was contacting the implant.",
+          "field": "marginal_soft_tissue_contact_with_implant",
+          "value": "contacting implant",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What was placed after implant exposure and how were the soft tissues managed?",
+      "gold_answer": "A healing abutment was secured to the implant, and the soft tissues were sutured and adapted to the healing abutment."
+    },
+    {
+      "task_id": "report_CR0266_followup_007",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T6_followup_03",
+      "release_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_37_bone_fill_around_implant_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Bone fill was present around the implant at implant uncovery.",
+          "field": "bone_fill_around_implant",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_39_implant_mobility_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "No mobility of the implant was detected.",
+          "field": "implant_mobility",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "How was the implant restored?",
+      "gold_answer": "The patient then returned to the restorative dentist and the implant was restored with a screw-retained porcelain-fused-to-metal crown."
+    }
+  ]
+}

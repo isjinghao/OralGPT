@@ -1,0 +1,325 @@
+{
+  "patient_id": "report__CR0098",
+  "edges": [
+    {
+      "source": "report_CR0098_t0_perception_00_1_periapical_lesion_extent_01",
+      "target": "report_CR0098_t3_followup_01_5_radiolucent_lesion_extent_01",
+      "reason": "The preoperative radiograph gives a more specific extent and location for the same periapical/radiolucent lesion later described more generally as extensive.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0001"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+      "target": "report_CR0098_t6_followup_04_21_sinus_tract_01",
+      "reason": "A sinus tract was still present at 1 month, which supports the later 6-week finding that the sinus tract was absent after interval improvement.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0002"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+      "target": "report_CR0098_t6_followup_04_22_sinus_tract_01",
+      "reason": "The earlier persistent sinus tract at the same site supports the later change to an absent sinus tract at 6 weeks.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0003"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_persistent_sinus_tract_presence_1_month_post_treatment_01",
+      "target": "report_CR0098_t6_followup_04_21_sinus_tract_01",
+      "reason": "Persistent sinus tract at 1 month supports the later 6-week absence as a real interval clinical change.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0004"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_persistent_sinus_tract_presence_1_month_post_treatment_01",
+      "target": "report_CR0098_t6_followup_04_22_sinus_tract_01",
+      "reason": "Persistent sinus tract at 1 month supports the later 6-week absence as a real interval clinical change.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0005"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_postoperative_radiograph_sinus_tract_tracing_location_01",
+      "target": "report_CR0098_t6_followup_04_21_sinus_tract_01",
+      "reason": "Tracing the sinus tract to the interproximal area at 1 month supports the later finding that no sinus tract remained at 6 weeks.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0006"
+    },
+    {
+      "source": "report_CR0098_t0_perception_00_1_buccal_gingival_abscess_location_01",
+      "target": "report_CR0098_t4_followup_02_9_buccal_plate_loss_01",
+      "reason": "Both describe pathology at the same interproximal buccal gingival site between #30 and #31, but the abscess location does not specifically establish later buccal plate loss.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0007"
+    },
+    {
+      "source": "report_CR0098_t0_perception_00_1_buccal_gingival_abscess_location_01",
+      "target": "report_CR0098_t5_followup_03_18_postoperative_gingival_recession_01",
+      "reason": "Both concern the same surgical region, but the initial abscess location only provides surrounding context for later gingival recession.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0008"
+    },
+    {
+      "source": "report_CR0098_t0_perception_00_1_periapical_lesion_extent_01",
+      "target": "report_CR0098_t6_followup_04_21_periapical_lesion_01",
+      "reason": "The same lesion is involved, but the preoperative extent mainly contextualizes rather than directly supports later resolution.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0009"
+    },
+    {
+      "source": "report_CR0098_t0_perception_00_1_periapical_lesion_extent_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_periapical_lesion_status_1_year_01",
+      "reason": "The preoperative lesion extent is related to the later 1-year lesion status, but it does not directly establish the resolved state.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0010"
+    },
+    {
+      "source": "report_CR0098_t0_perception_00_2_interproximal_probing_depth_01",
+      "target": "report_CR0098_t3_followup_01_6_cbct_interproximal_bone_loss_between_30_31_01",
+      "reason": "Severe interproximal probing depths and interproximal bone loss describe the same periodontal area, but the probing depth does not specifically prove the CBCT bone-loss finding.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0011"
+    },
+    {
+      "source": "report_CR0098_t0_perception_00_2_interproximal_probing_depth_01",
+      "target": "report_CR0098_t5_followup_03_18_interproximal_granulation_01",
+      "reason": "Both are findings at the interproximal site between #30 and #31, but the initial probing depth mainly provides broader periodontal context.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0012"
+    },
+    {
+      "source": "report_CR0098_t0_perception_00_2_interproximal_probing_depth_01",
+      "target": "report_CR0098_t7_followup_05_25_probing_depth_1_year_01",
+      "reason": "Both relate to probing depth over time, but the initial interproximal measurement is not the same scope as the later 1-year generalized probing depth.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0013"
+    },
+    {
+      "source": "report_CR0098_t0_perception_00_2_probing_depth_other_areas_01",
+      "target": "report_CR0098_t7_followup_05_25_probing_depth_1_year_01",
+      "reason": "Normal probing depths in other areas provide periodontal background, but they do not directly determine the later 1-year probing depth range.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0014"
+    },
+    {
+      "source": "report_CR0098_t2_followup_00_4_immediate_postoperative_radiograph_after_nsrct_01",
+      "target": "report_CR0098_t5_followup_03_18_postoperative_gingival_recession_01",
+      "reason": "Both are postoperative observations, but the immediate radiograph does not specifically support later gingival recession.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0015"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_5_radiolucent_lesion_extent_01",
+      "target": "report_CR0098_t6_followup_04_21_periapical_lesion_01",
+      "reason": "These refer to the same disease process, but the extensive radiolucent lesion mainly contextualizes the later resolved lesion rather than proving it.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0016"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_5_radiolucent_lesion_extent_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_periapical_lesion_status_1_year_01",
+      "reason": "The CBCT lesion extent at 1 month is related to the later 1-year resolution, but it is not direct evidence of that resolved status.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0017"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_bone_fill_1_year_01",
+      "reason": "The 1-wall defect is the same treated osseous site, but defect morphology mainly provides context for later bone fill.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0018"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_graft_integration_1_year_01",
+      "reason": "The earlier defect configuration relates to the grafted site, but it does not directly establish later graft integration.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0019"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_periapical_lesion_status_1_year_01",
+      "reason": "The defect wall count is relevant to the same operative region, but it is not needed to reason about 1-year lesion resolution.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0020"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_bone_fill_1_year_01",
+      "reason": "Both concern the same buccal/interproximal osseous defect, but the earlier bone-loss finding only contextualizes later bone fill.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0021"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_graft_integration_1_year_01",
+      "reason": "The earlier buccal bone loss is related to the grafted defect, but it does not specifically support graft integration.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0022"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_periapical_lesion_status_1_year_01",
+      "reason": "The buccal bone loss is part of the same lesion complex, but it only provides background for the later resolved lesion status.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0023"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_interproximal_bone_loss_between_30_31_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_bone_fill_1_year_01",
+      "reason": "Interproximal bone loss and later bone fill involve the same site, but the earlier finding is contextual rather than direct support.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0024"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_interproximal_bone_loss_between_30_31_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_graft_integration_1_year_01",
+      "reason": "The earlier interproximal bone loss is related to the grafted defect, but it does not directly prove graft integration.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0025"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_interproximal_bone_loss_between_30_31_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_periapical_lesion_status_1_year_01",
+      "reason": "The interproximal bone loss belongs to the same lesion complex, but it mainly contextualizes later lesion resolution.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0026"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_obtained_01",
+      "target": "report_CR0098_t7_followup_05_24_cbct_bone_fill_01",
+      "reason": "The scan being obtained is procedural context for later CBCT bone-fill findings, but it does not support the finding itself.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0027"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_obtained_01",
+      "target": "report_CR0098_t7_followup_05_24_cbct_graft_integration_01",
+      "reason": "This only notes that CBCT imaging was performed, which contextualizes the later graft-integration observation.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0028"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_obtained_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_bone_fill_1_year_01",
+      "reason": "The fact that CBCT was obtained is imaging context for the later 1-year bone-fill assessment.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0029"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_obtained_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_graft_integration_1_year_01",
+      "reason": "This is only modality context for the later 1-year graft-integration finding.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0030"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_cbct_obtained_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_periapical_lesion_status_1_year_01",
+      "reason": "The CBCT acquisition provides context for the later 1-year lesion-status interpretation.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0031"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_bone_fill_1_year_01",
+      "reason": "The sinus tract location is part of the same clinical course, but it does not specifically support later bone fill.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0032"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_graft_integration_1_year_01",
+      "reason": "The sinus tract location is related to the treated site, but it is only contextual for later graft integration.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0033"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_periapical_lesion_status_1_year_01",
+      "reason": "The sinus tract is part of the same infection process, but the location finding does not directly establish lesion resolution.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0034"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+      "target": "report_CR0098_t7_followup_05_25_probing_depth_1_year_01",
+      "reason": "Both are follow-up periodontal findings, but the sinus tract location does not directly inform the later probing depth range.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0035"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_persistent_sinus_tract_presence_1_month_post_treatment_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_bone_fill_1_year_01",
+      "reason": "The persistent sinus tract indicates the earlier disease course, but it only provides context for later bone fill.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0036"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_persistent_sinus_tract_presence_1_month_post_treatment_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_graft_integration_1_year_01",
+      "reason": "This earlier symptom reflects the treated lesion course, but it does not specifically support graft integration.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0037"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_persistent_sinus_tract_presence_1_month_post_treatment_01",
+      "target": "report_CR0098_t7_followup_05_25_cbct_periapical_lesion_status_1_year_01",
+      "reason": "The persistent sinus tract is related to the same infection process, but it is only broad context for later lesion resolution.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0038"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_persistent_sinus_tract_presence_1_month_post_treatment_01",
+      "target": "report_CR0098_t7_followup_05_25_probing_depth_1_year_01",
+      "reason": "The earlier sinus tract presence and later probing depth are both follow-up findings, but they are not directly dependent.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0039"
+    },
+    {
+      "source": "report_CR0098_t3_followup_01_6_postoperative_radiograph_sinus_tract_tracing_location_01",
+      "target": "report_CR0098_t5_followup_03_18_postoperative_gingival_recession_01",
+      "reason": "Both are postoperative findings in the same region, but the sinus-tract tracing does not specifically support gingival recession.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0040"
+    }
+  ]
+}

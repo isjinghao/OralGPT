@@ -1,0 +1,368 @@
+{
+  "trajectory_id": "report__CR0098__standard_trajectory",
+  "patient_id": "report__CR0098",
+  "patient_name": "CR0098",
+  "group": "report",
+  "trajectory_type": "standard_trajectory",
+  "stages": [
+    {
+      "stage_id": "T0_perception_00",
+      "order": 0,
+      "stage_type": "perception",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "Preoperative / initial diagnostic workup",
+        "t_months": 0
+      },
+      "image_paths": [
+        "outputs/report/CR0098/images/p02_img000.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 1,
+          "human": "<image>\nWhat was visible in the preoperative clinical and radiographic images of #31?",
+          "assistant": "An abscess was present on the buccal gingiva interproximally between #30 and #31. The preoperative radiograph demonstrated a periapical lesion extending from the distal root of #30 to the mesial and distal roots of #31, and tracing showed the abscess to the interproximal area between #30 and #31.",
+          "image_paths": [
+            "outputs/report/CR0098/images/p02_img000.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 2,
+          "human": "What diagnostic findings were recorded for #30 and #31 at the initial workup?",
+          "assistant": "#31 had no response to electric pulp testing and cold testing. 9–13 mm probing depths were present interproximally, with normal probing depths present in all other areas. Teeth #30 and #31 were previously restored with full coverage gold crowns with no clinical signs of recurrent caries. Tooth #30 was diagnosed as normal pulp and normal apical tissues, and #31 was diagnosed as necrotic pulp with acute apical abscess.",
+          "image_paths": [],
+          "role": "observation"
+        }
+      ]
+    },
+    {
+      "stage_id": "T1_treatment_00",
+      "order": 1,
+      "stage_type": "treatment",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "timepoint": {
+        "date_text": "After initial diagnosis",
+        "t_months": 0
+      },
+      "image_paths": [],
+      "qa_pairs": [
+        {
+          "source_turn_id": 3,
+          "human": "What initial endodontic treatment was performed for #31?",
+          "assistant": "#31 received NSRCT by an endodontist.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T0_perception_00",
+          "release_after_stage": "T1_treatment_00"
+        }
+      ]
+    },
+    {
+      "stage_id": "T2_followup_00",
+      "order": 2,
+      "stage_type": "followup",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "timepoint": {
+        "date_text": "Immediate postoperative following NSRCT on #31",
+        "t_months": 0
+      },
+      "image_paths": [],
+      "qa_pairs": [
+        {
+          "source_turn_id": 4,
+          "human": "What immediate postoperative radiographic documentation was reported after NSRCT on #31?",
+          "assistant": "An immediate postoperative radiograph following NSRCT on #31 was reported.",
+          "image_paths": [],
+          "role": "observation"
+        }
+      ]
+    },
+    {
+      "stage_id": "T3_followup_01",
+      "order": 3,
+      "stage_type": "followup",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "1 month after NSRCT on #31",
+        "t_months": 1
+      },
+      "image_paths": [
+        "outputs/report/CR0098/images/p03_img002.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 5,
+          "human": "<image>\nWhat was visible on the postoperative CBCT scan obtained 1 month after NSRCT on #31?",
+          "assistant": "Cross sections showed an extensive radiolucent lesion extending from the distal root of #30 to the distal root of #31, with loss of buccal plate present interproximally between #30 and #31, leading to a 1 wall periodontal defect.",
+          "image_paths": [
+            "outputs/report/CR0098/images/p03_img002.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 6,
+          "human": "What clinical and imaging findings were reported 1 month after NSRCT on #31?",
+          "assistant": "One-month post-treatment, a persistent sinus tract was present. The postoperative radiograph 1 month after treatment demonstrated a sinus tract traced to the interproximal area between #30 and #31, and clinical findings showed a persistent sinus tract present 1 month after NSRCT interproximally between #30 and #31. A CBCT scan was obtained which revealed complete loss of the buccal and interproximal bone between #30 and #31, leading to a 1-wall defect.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 7,
+          "human": "What diagnosis and prognosis were assigned after the persistent lesion was evaluated?",
+          "assistant": "Prognosis for #31 was deemed questionable; however the patient wished to save the tooth. A diagnosis of an endodontic-periodontal lesion without root damage in a non-periodontitis patient, Grade 3 was made.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T3_followup_01",
+          "release_after_stage": "T3_followup_01"
+        },
+        {
+          "source_turn_id": 8,
+          "human": "What combined management approach was selected for the persistent lesion?",
+          "assistant": "A collaborative surgery was conducted to treat the lesion through apicoectomy of #31 with GTR.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T3_followup_01",
+          "release_after_stage": "T3_followup_01"
+        }
+      ]
+    },
+    {
+      "stage_id": "T4_followup_02",
+      "order": 4,
+      "stage_type": "followup",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "Surgical intervention after 1-month post-NSRCT evaluation",
+        "t_months": 1
+      },
+      "image_paths": [
+        "outputs/report/CR0098/images/p03_img003.jpg",
+        "outputs/report/CR0098/images/p04_img004.jpg",
+        "outputs/report/CR0098/images/p04_img005.jpg",
+        "outputs/report/CR0098/images/p04_img006.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 9,
+          "human": "<image>\nWhat was visible after surgical access and removal of the lesion for biopsy?",
+          "assistant": "After removal of the lesion for biopsy, loss of buccal plate and a 1-wall defect could be visualized between #30 and #31.",
+          "image_paths": [
+            "outputs/report/CR0098/images/p03_img003.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 10,
+          "human": "<image>\nWhat was visible in the apicoectomy images of #31?",
+          "assistant": "The mesial and distal root apices of #31 had been resected, and the apicoectomy was shown completed with placement of a retrograde filling.",
+          "image_paths": [
+            "outputs/report/CR0098/images/p04_img004.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 11,
+          "human": "<image>\nWhat is visible in the defect on the immediate postoperative radiograph, and which materials were documented in the operative record?",
+          "assistant": "Radiopaque material is visible in the defect between teeth #30 and #31 on the immediate postoperative radiograph. The operative record documents the use of mineralized freeze-dried bone allograft and enamel matrix derivative (EMD).",
+          "image_paths": [
+            "outputs/report/CR0098/images/p04_img005.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 12,
+          "human": "<image>\nWhat was visible after the flap was replaced at the surgical site?",
+          "assistant": "The flap was replaced and sutured with 6–0 polypropylene sutures.",
+          "image_paths": [
+            "outputs/report/CR0098/images/p04_img006.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 13,
+          "human": "What anesthesia and flap approach were used for the collaborative surgery?",
+          "assistant": "After obtaining written informed consent, the surgical area was anesthetized with 3.4 mL of 2% lidocaine with 1:100,000 epinephrine and 1.7 mL of 2% lidocaine with 1: 50,000 epinephrine. A full-thickness mucoperiosteal flap was elevated from #29 to #32 on the buccal and lingual to expose the lesion.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T4_followup_02",
+          "release_after_stage": "T4_followup_02"
+        },
+        {
+          "source_turn_id": 14,
+          "human": "How was the lesion handled once surgically exposed?",
+          "assistant": "Once exposed, the entire lesion was curetted and placed in 10% formalin for biopsy.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T4_followup_02",
+          "release_after_stage": "T4_followup_02"
+        },
+        {
+          "source_turn_id": 15,
+          "human": "How was the apicoectomy of #31 performed?",
+          "assistant": "Mesial and distal roots of #31 were resected 3 mm from the root apices, prepared, and filled with retrograde fillings.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T4_followup_02",
+          "release_after_stage": "T4_followup_02"
+        },
+        {
+          "source_turn_id": 16,
+          "human": "What regenerative procedures were performed at #30 and #31 during the surgery?",
+          "assistant": "Thorough root planing was completed on #30 and #31, followed by root conditioning with 24% EDTA for 2 minutes. The site was irrigated, and enamel matrix derivative (EMD) was applied. The site was filled with mineralized freeze-dried cortico-cancellous allograft and covered by a resorbable membrane.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T4_followup_02",
+          "release_after_stage": "T4_followup_02"
+        },
+        {
+          "source_turn_id": 17,
+          "human": "What closure and postoperative care were prescribed after the surgery?",
+          "assistant": "The flap was repositioned and sutured with 6–0 polypropylene sutures. Postoperative care included amoxicillin 500 mg three times a day for 7 days, 0.12% chlorhexidine rinse twice daily for 14 days, and ibuprofen 800 mg as needed.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T4_followup_02",
+          "release_after_stage": "T4_followup_02"
+        }
+      ]
+    },
+    {
+      "stage_id": "T5_followup_03",
+      "order": 5,
+      "stage_type": "followup",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "2 weeks after treatment",
+        "t_months": 1
+      },
+      "image_paths": [
+        "outputs/report/CR0098/images/p04_img007.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 18,
+          "human": "<image>\nWhat was visible in the 2-week postoperative photo of the surgical area?",
+          "assistant": "The 2-week postoperative photo showed gingival recession with the interproximal area granulating in between #30 and #31 following food impaction in the surgical area during the healing phase.",
+          "image_paths": [
+            "outputs/report/CR0098/images/p04_img007.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 19,
+          "human": "What clinical outcome and biopsy result were reported at 2 weeks?",
+          "assistant": "At 2 weeks, delayed healing with recession was observed due to food impaction between #30 and #31, which was removed. The biopsy report confirmed a definitive diagnosis of periapical cyst.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 20,
+          "human": "What management was performed for the healing complication noted at 2 weeks?",
+          "assistant": "Food impaction between #30 and #31 was removed.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "T5_followup_03",
+          "release_after_stage": "T5_followup_03"
+        }
+      ]
+    },
+    {
+      "stage_id": "T6_followup_04",
+      "order": 6,
+      "stage_type": "followup",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "6 weeks after treatment",
+        "t_months": 2
+      },
+      "image_paths": [
+        "outputs/report/CR0098/images/p05_img008.jpg",
+        "outputs/report/CR0098/images/p05_img009.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 21,
+          "human": "<image>\n<image>\nWhat was visible in the 6-week postoperative clinical and radiographic images?",
+          "assistant": "The 6-week postoperative photo showed slight recession on #30 and #31 with minimal inflammation present and absence of a sinus tract. The 6-week postoperative radiograph demonstrated resolution of the periapical lesion and maintenance of the graft.",
+          "image_paths": [
+            "outputs/report/CR0098/images/p05_img008.jpg",
+            "outputs/report/CR0098/images/p05_img009.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 22,
+          "human": "What healing status was reported at 6 weeks?",
+          "assistant": "At 6 weeks, the site healed uneventfully with slight recession and absence of a sinus tract.",
+          "image_paths": [],
+          "role": "observation"
+        }
+      ]
+    },
+    {
+      "stage_id": "T7_followup_05",
+      "order": 7,
+      "stage_type": "followup",
+      "modality": [
+        "TEXT_QA",
+        "FIGURE_QA"
+      ],
+      "timepoint": {
+        "date_text": "1 year after treatment",
+        "t_months": 13
+      },
+      "image_paths": [
+        "outputs/report/CR0098/images/p05_img010.jpg",
+        "outputs/report/CR0098/images/p05_img011.jpg",
+        "outputs/report/CR0098/images/p06_img012.jpg"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 23,
+          "human": "<image>\n<image>\nWhat was visible in the 1-year postoperative clinical images?",
+          "assistant": "The 1-year postoperative photo showed healthy periodontium at #30 and #31, and the patient showed no signs of infection.",
+          "image_paths": [
+            "outputs/report/CR0098/images/p05_img010.jpg",
+            "outputs/report/CR0098/images/p05_img011.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 24,
+          "human": "<image>\nWhat was visible on the CBCT scan at the 1-year postoperative visit?",
+          "assistant": "The CBCT scan showed substantial bone fill with graft integration at sites #30 and #31, and the periapical lesion had resolved.",
+          "image_paths": [
+            "outputs/report/CR0098/images/p06_img012.jpg"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 25,
+          "human": "What clinical and CBCT outcomes were reported at 1 year?",
+          "assistant": "At 1 year, the patient was asymptomatic, with probing depths ranging 2–4 mm. The CBCT showed excellent bone fill, integration of the graft, and resolution of the periapical lesion.",
+          "image_paths": [],
+          "role": "observation"
+        }
+      ]
+    }
+  ]
+}

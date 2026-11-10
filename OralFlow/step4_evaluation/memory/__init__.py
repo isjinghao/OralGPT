@@ -5,13 +5,11 @@ from step4_evaluation.memory.full_context_memory import FullContextMemory
 from step4_evaluation.memory.graphiti_memory import GraphitiMemory
 from step4_evaluation.memory.langmem_memory import LangMemMemory
 from step4_evaluation.memory.mem0_memory import Mem0Memory
-from step4_evaluation.memory.single_stage_memory import SingleStageMemory
 from step4_evaluation.memory.summary_memory import SummaryMemory
 from step4_evaluation.memory.vector_memory import VectorMemory
 
 
 _REGISTRY: dict[str, type[MemoryMethod]] = {
-    SingleStageMemory.name: SingleStageMemory,   # single_stage_memory
     FullContextMemory.name: FullContextMemory,   # full_context_memory
     SummaryMemory.name: SummaryMemory,
     Mem0Memory.name: Mem0Memory,
@@ -36,7 +34,6 @@ def build_methods(names: list[str] | None = None) -> list[MemoryMethod]:
 __all__ = [
     "MemoryMethod",
     "format_stage_input",
-    "SingleStageMemory",
     "FullContextMemory",
     "SummaryMemory",
     "Mem0Memory",

@@ -1,0 +1,1015 @@
+{
+  "patient_id": "report__CR0098",
+  "tasks": [
+    {
+      "task_id": "modality_perception_001",
+      "patient_id": "report__CR0098",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T0_perception_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_electric_pulp_test_response_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 had no response to electric pulp testing at the initial workup.",
+          "field": "electric_pulp_test_response",
+          "value": "no response",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_cold_test_response_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 had no response to cold testing at the initial workup.",
+          "field": "cold_test_response",
+          "value": "no response",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_pulp_diagnosis_02",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with necrotic pulp at the initial workup.",
+          "field": "pulp_diagnosis",
+          "value": "necrotic pulp",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_apical_diagnosis_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with acute apical abscess at the initial workup.",
+          "field": "apical_diagnosis",
+          "value": "acute apical abscess",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        }
+      ],
+      "gold_answer": "Tooth #31 had no response to electric pulp or cold testing and was diagnosed with necrotic pulp. Its apical diagnosis was acute apical abscess.",
+      "question": "At the initial dental workup, what were the pulp and apical diagnoses for tooth #31, based on the clinical testing findings?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, answerable at the initial workup stage, and aligned with the modality (TEXT_QA). The gold answer directly matches the selected evidence for both pulp and apical diagnoses, and the included clinical test responses are also supported by the evidence. No temporal or modality inconsistencies detected.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "modality_perception_002",
+      "patient_id": "report__CR0098",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T3_followup_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_5_cbct_timing_after_nsrct_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The postoperative CBCT scan was obtained 1 month after NSRCT on #31.",
+          "field": "cbct_timing_after_nsrct",
+          "value": "1 month after NSRCT",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_5_radiolucent_lesion_extent_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "CBCT cross sections showed an extensive radiolucent lesion.",
+          "field": "radiolucent_lesion_extent",
+          "value": "extensive",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_5_radiolucent_lesion_location_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The radiolucent lesion extended from the distal root of #30 to the distal root of #31.",
+          "field": "radiolucent_lesion_location",
+          "value": "from distal root of #30 to distal root of #31",
+          "unit": null,
+          "tooth": "#30; #31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the buccal bone between #30 and #31.",
+          "field": "CBCT_buccal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_interproximal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the interproximal bone between #30 and #31.",
+          "field": "CBCT_interproximal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The CBCT findings led to a 1-wall defect.",
+          "field": "CBCT_bony_defect_wall_count",
+          "value": "1-wall defect",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        }
+      ],
+      "gold_answer": "One month after NSRCT on #31, CBCT showed an extensive radiolucent lesion extending from the distal root of #30 to the distal root of #31. There was complete loss of the buccal and interproximal bone between #30 and #31, producing a 1-wall defect.",
+      "question": "At the follow-up CBCT obtained one month after NSRCT on #31, what radiographic findings were described regarding the lesion extent and the condition of the bone between #30 and #31?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is well-posed for a modality_perception task at the specified follow-up and references CBCT appropriately. The gold answer is concise and fully supported by the selected evidence, accurately capturing lesion extent and the bone condition (buccal and interproximal loss leading to a 1-wall defect) without adding unsupported details.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "modality_perception_003",
+      "patient_id": "report__CR0098",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T7_followup_05",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_23_postoperative_interval_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The image was 1-year postoperative.",
+          "field": "postoperative_interval",
+          "value": "1 year",
+          "unit": "year",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_cbct_bone_fill_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, CBCT showed substantial bone fill at sites #30 and #31.",
+          "field": "CBCT bone fill",
+          "value": "substantial",
+          "unit": null,
+          "tooth": "#30 and #31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_cbct_graft_integration_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, CBCT showed graft integration at sites #30 and #31.",
+          "field": "CBCT graft integration",
+          "value": "present",
+          "unit": null,
+          "tooth": "#30 and #31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_periapical_lesion_status_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, the periapical lesion had resolved on CBCT.",
+          "field": "periapical lesion status",
+          "value": "resolved",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At the 1-year postoperative visit, CBCT showed substantial bone fill and graft integration at sites #30 and #31. The periapical lesion had resolved.",
+      "question": "What did follow-up CBCT imaging show regarding sites #30 and #31 and the periapical lesion?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, aligned with a modality perception task, and answerable at T7. All elements of the gold answer (1-year postoperative timing, substantial bone fill and graft integration at sites #30 and #31, and resolution of the periapical lesion) are directly supported by FIGURE_QA evidence. Modality and temporal consistency are appropriate.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "longitudinal_evidence_recall_001",
+      "patient_id": "report__CR0098",
+      "task_type": "longitudinal_evidence_recall",
+      "ask_after_stage": "T6_followup_04",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Clinical findings showed a persistent sinus tract present 1 month after NSRCT interproximally between #30 and #31.",
+          "field": "clinical_sinus_tract_location_1_month_after_NSRCT",
+          "value": "interproximal between #30 and #31",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t6_followup_04_22_sinus_tract_01",
+          "stage": "T6_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 6 weeks, a sinus tract was absent.",
+          "field": "sinus_tract",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Before the 6-week finding that a sinus tract was absent, the relevant earlier context was the 1-month post-NSRCT visit, when a persistent sinus tract was present interproximally between #30 and #31.",
+      "question": "Before the 6-week clinical examination documented that no sinus tract was present, what had the 1-month post-NSRCT clinical examination shown about the sinus tract and its location?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, timepoint-appropriate, and answerable from the selected evidence. The gold answer is supported by the 1-month post-NSRCT clinical findings showing a persistent sinus tract interproximally between #30 and #31, which contrasts correctly with the later 6-week absence finding.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "longitudinal_evidence_recall_002",
+      "patient_id": "report__CR0098",
+      "task_type": "longitudinal_evidence_recall",
+      "ask_after_stage": "T7_followup_05",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_interproximal_probing_depth_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Interproximal probing depths were 9–13 mm at the initial workup.",
+          "field": "interproximal_probing_depth",
+          "value": "9-13",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_25_probing_depth_1_year_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 1 year, probing depths ranged 2–4 mm.",
+          "field": "probing_depth_1_year",
+          "value": "2–4",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Probing depths decreased, from 9–13 mm interproximally at the initial workup to 2–4 mm at 1 year.",
+      "question": "How did the periodontal probing depths at the 1-year follow-up compare with those documented during the initial workup?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is appropriate for longitudinal evidence recall and answerable at the 1-year follow-up. The gold answer is supported by the selected evidence but is indirect; a more explicit comparative statement improves clarity.",
+        "issues": [
+          "Answer is indirect and does not explicitly state the comparative change."
+        ],
+        "fixed_question": null,
+        "fixed_answer": "Probing depths decreased, from 9–13 mm interproximally at the initial workup to 2–4 mm at 1 year."
+      }
+    },
+    {
+      "task_id": "cross_temporal_reasoning_001",
+      "patient_id": "report__CR0098",
+      "task_type": "cross_temporal_reasoning",
+      "ask_after_stage": "T6_followup_04",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_persistent_sinus_tract_presence_1_month_post_treatment_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "One month post-treatment, a persistent sinus tract was present.",
+          "field": "persistent_sinus_tract_presence_1_month_post_treatment",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t6_followup_04_22_sinus_tract_01",
+          "stage": "T6_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 6 weeks, a sinus tract was absent.",
+          "field": "sinus_tract",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "The sinus tract was present at 1 month post-treatment but absent at 6 weeks, indicating interval resolution.",
+      "question": "What change did follow-up show in the sinus tract between the 1-month post-treatment assessment and the 6-week assessment?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is appropriate for cross-temporal reasoning and answerable at the 6-week stage using the provided evidence. The gold answer correctly describes the change but includes an unsupported detail about NSRCT. Removing that detail yields a concise, fully supported answer.",
+        "issues": [
+          "Answer includes unsupported treatment detail (NSRCT) not present in selected evidence."
+        ],
+        "fixed_question": null,
+        "fixed_answer": "The sinus tract was present at 1 month post-treatment but absent at 6 weeks, indicating interval resolution."
+      }
+    },
+    {
+      "task_id": "cross_temporal_reasoning_002",
+      "patient_id": "report__CR0098",
+      "task_type": "cross_temporal_reasoning",
+      "ask_after_stage": "T7_followup_05",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_defect_location_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The defect was between teeth #30 and #31.",
+          "field": "defect_location",
+          "value": "between teeth #30 and #31",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_graft_material_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The operative record documents the use of mineralized freeze-dried bone allograft and enamel matrix derivative (EMD).",
+          "field": "graft_material",
+          "value": "mineralized freeze-dried bone allograft",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_adjunct_material_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The operative record documents the use of mineralized freeze-dried bone allograft and enamel matrix derivative (EMD).",
+          "field": "adjunct_material",
+          "value": "EMD",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_cbct_bone_fill_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, CBCT showed substantial bone fill at sites #30 and #31.",
+          "field": "CBCT bone fill",
+          "value": "substantial",
+          "unit": null,
+          "tooth": "#30 and #31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_cbct_graft_integration_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, CBCT showed graft integration at sites #30 and #31.",
+          "field": "CBCT graft integration",
+          "value": "present",
+          "unit": null,
+          "tooth": "#30 and #31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_periapical_lesion_status_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, the periapical lesion had resolved on CBCT.",
+          "field": "periapical lesion status",
+          "value": "resolved",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At surgery, the defect between #30 and #31 was filled with mineralized freeze-dried bone allograft combined with EMD. By 1 year, CBCT showed substantial bone fill, graft integration, and resolution of the periapical lesion.",
+      "question": "In the surgical report for the defect between teeth #30 and #31, what material was placed there, and what did the 1-year postoperative CBCT show about the repair and lesion status?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, non-leaking, and answerable from the provided evidence. The gold answer is supported by the selected evidence and matches the requested cross-temporal comparison: the defect was filled with mineralized freeze-dried bone allograft plus EMD, and the 1-year postoperative CBCT showed substantial bone fill, graft integration, and resolution of the periapical lesion.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "memory_update_conflict_correction_001",
+      "patient_id": "report__CR0098",
+      "task_type": "memory_update_conflict_correction",
+      "ask_after_stage": "T5_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_pulp_diagnosis_02",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with necrotic pulp at the initial workup.",
+          "field": "pulp_diagnosis",
+          "value": "necrotic pulp",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_apical_diagnosis_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with acute apical abscess at the initial workup.",
+          "field": "apical_diagnosis",
+          "value": "acute apical abscess",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t5_followup_03_19_biopsy_diagnosis_01",
+          "stage": "T5_followup_03",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The biopsy report confirmed a definitive diagnosis of periapical cyst.",
+          "field": "biopsy_diagnosis",
+          "value": "periapical cyst",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Update the stored diagnostic state by adding the biopsy-confirmed definitive diagnosis of periapical cyst. Earlier, tooth #31 had been diagnosed with necrotic pulp and acute apical abscess at the initial workup, so the biopsy finding adds information beyond those initial diagnoses.",
+      "question": "What did the later pathology evidence add to the earlier diagnostic record for tooth #31?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural and answerable at the specified timepoint. The gold answer is supported by the evidence: earlier diagnoses for tooth #31 were necrotic pulp and acute apical abscess, and later biopsy evidence added a definitive diagnosis of periapical cyst.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "memory_update_conflict_correction_002",
+      "patient_id": "report__CR0098",
+      "task_type": "memory_update_conflict_correction",
+      "ask_after_stage": "T6_followup_04",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Clinical findings showed a persistent sinus tract present 1 month after NSRCT interproximally between #30 and #31.",
+          "field": "clinical_sinus_tract_location_1_month_after_NSRCT",
+          "value": "interproximal between #30 and #31",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t6_followup_04_22_sinus_tract_01",
+          "stage": "T6_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 6 weeks, a sinus tract was absent.",
+          "field": "sinus_tract",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Revise the stored sinus-tract status from a persistent sinus tract interproximally between #30 and #31 at 1 month after NSRCT to absence of a sinus tract at 6 weeks.",
+      "question": "At the later follow-up, what was the sinus-tract status compared with the earlier 1-month post-NSRCT finding?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural and answerable at the requested later follow-up. The gold answer is supported by the evidence: the sinus tract was persistent and interproximal between #30 and #31 at 1 month after NSRCT, and absent at 6 weeks. No unsupported detail needs removal.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "report_CR0098_treatment_001",
+      "patient_id": "report__CR0098",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T1_treatment_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_pulp_diagnosis_02",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with necrotic pulp at the initial workup.",
+          "field": "pulp_diagnosis",
+          "value": "necrotic pulp",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_apical_diagnosis_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with acute apical abscess at the initial workup.",
+          "field": "apical_diagnosis",
+          "value": "acute apical abscess",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        }
+      ],
+      "question": "What initial endodontic treatment was performed for #31?",
+      "gold_answer": "#31 received NSRCT by an endodontist."
+    },
+    {
+      "task_id": "report_CR0098_followup_001",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T3_followup_01",
+      "release_after_stage": "T3_followup_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_pulp_diagnosis_02",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with necrotic pulp at the initial workup.",
+          "field": "pulp_diagnosis",
+          "value": "necrotic pulp",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_apical_diagnosis_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with acute apical abscess at the initial workup.",
+          "field": "apical_diagnosis",
+          "value": "acute apical abscess",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_interproximal_probing_depth_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Interproximal probing depths were 9–13 mm at the initial workup.",
+          "field": "interproximal_probing_depth",
+          "value": "9-13",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_probing_depth_other_areas_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Normal probing depths were present in all other areas at the initial workup.",
+          "field": "probing_depth_other_areas",
+          "value": "normal",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Clinical findings showed a persistent sinus tract present 1 month after NSRCT interproximally between #30 and #31.",
+          "field": "clinical_sinus_tract_location_1_month_after_NSRCT",
+          "value": "interproximal between #30 and #31",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the buccal bone between #30 and #31.",
+          "field": "CBCT_buccal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_interproximal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the interproximal bone between #30 and #31.",
+          "field": "CBCT_interproximal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The CBCT findings led to a 1-wall defect.",
+          "field": "CBCT_bony_defect_wall_count",
+          "value": "1-wall defect",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        }
+      ],
+      "question": "What diagnosis and prognosis were assigned after the persistent lesion was evaluated?",
+      "gold_answer": "Prognosis for #31 was deemed questionable; however the patient wished to save the tooth. A diagnosis of an endodontic-periodontal lesion without root damage in a non-periodontitis patient, Grade 3 was made."
+    },
+    {
+      "task_id": "report_CR0098_followup_002",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T3_followup_01",
+      "release_after_stage": "T3_followup_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Clinical findings showed a persistent sinus tract present 1 month after NSRCT interproximally between #30 and #31.",
+          "field": "clinical_sinus_tract_location_1_month_after_NSRCT",
+          "value": "interproximal between #30 and #31",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the buccal bone between #30 and #31.",
+          "field": "CBCT_buccal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_interproximal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the interproximal bone between #30 and #31.",
+          "field": "CBCT_interproximal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The CBCT findings led to a 1-wall defect.",
+          "field": "CBCT_bony_defect_wall_count",
+          "value": "1-wall defect",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        }
+      ],
+      "question": "What combined management approach was selected for the persistent lesion?",
+      "gold_answer": "A collaborative surgery was conducted to treat the lesion through apicoectomy of #31 with GTR."
+    },
+    {
+      "task_id": "report_CR0098_followup_003",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_02",
+      "release_after_stage": "T4_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_persistent_sinus_tract_presence_1_month_post_treatment_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "One month post-treatment, a persistent sinus tract was present.",
+          "field": "persistent_sinus_tract_presence_1_month_post_treatment",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the buccal bone between #30 and #31.",
+          "field": "CBCT_buccal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The CBCT findings led to a 1-wall defect.",
+          "field": "CBCT_bony_defect_wall_count",
+          "value": "1-wall defect",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        }
+      ],
+      "question": "What anesthesia and flap approach were used for the collaborative surgery?",
+      "gold_answer": "After obtaining written informed consent, the surgical area was anesthetized with 3.4 mL of 2% lidocaine with 1:100,000 epinephrine and 1.7 mL of 2% lidocaine with 1: 50,000 epinephrine. A full-thickness mucoperiosteal flap was elevated from #29 to #32 on the buccal and lingual to expose the lesion."
+    },
+    {
+      "task_id": "report_CR0098_followup_004",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_02",
+      "release_after_stage": "T4_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_9_defect_wall_type_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "A 1-wall defect was visualized between #30 and #31 after lesion removal for biopsy.",
+          "field": "defect_wall_type",
+          "value": "1-wall defect",
+          "unit": null,
+          "tooth": "#30-#31",
+          "side": null
+        }
+      ],
+      "question": "How was the lesion handled once surgically exposed?",
+      "gold_answer": "Once exposed, the entire lesion was curetted and placed in 10% formalin for biopsy."
+    },
+    {
+      "task_id": "report_CR0098_followup_005",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_02",
+      "release_after_stage": "T4_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_10_mesial_root_apex_resection_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The mesial root apex of #31 had been resected.",
+          "field": "mesial_root_apex_resection",
+          "value": "resected",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_10_distal_root_apex_resection_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The distal root apex of #31 had been resected.",
+          "field": "distal_root_apex_resection",
+          "value": "resected",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_10_retrograde_filling_placement_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "A retrograde filling was placed during the completed apicoectomy of #31.",
+          "field": "retrograde_filling_placement",
+          "value": "placed",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        }
+      ],
+      "question": "How was the apicoectomy of #31 performed?",
+      "gold_answer": "Mesial and distal roots of #31 were resected 3 mm from the root apices, prepared, and filled with retrograde fillings."
+    },
+    {
+      "task_id": "report_CR0098_followup_006",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_02",
+      "release_after_stage": "T4_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_defect_location_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The defect was between teeth #30 and #31.",
+          "field": "defect_location",
+          "value": "between teeth #30 and #31",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_graft_material_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The operative record documents the use of mineralized freeze-dried bone allograft and enamel matrix derivative (EMD).",
+          "field": "graft_material",
+          "value": "mineralized freeze-dried bone allograft",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_11_adjunct_material_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The operative record documents the use of mineralized freeze-dried bone allograft and enamel matrix derivative (EMD).",
+          "field": "adjunct_material",
+          "value": "EMD",
+          "unit": null,
+          "tooth": "30-31",
+          "side": null
+        }
+      ],
+      "question": "What regenerative procedures were performed at #30 and #31 during the surgery?",
+      "gold_answer": "Thorough root planing was completed on #30 and #31, followed by root conditioning with 24% EDTA for 2 minutes. The site was irrigated, and enamel matrix derivative (EMD) was applied. The site was filled with mineralized freeze-dried cortico-cancellous allograft and covered by a resorbable membrane."
+    },
+    {
+      "task_id": "report_CR0098_followup_007",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_02",
+      "release_after_stage": "T4_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_12_surgical_flap_position_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The flap was replaced at the surgical site.",
+          "field": "surgical_flap_position",
+          "value": "replaced",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t4_followup_02_12_suture_material_size_01",
+          "stage": "T4_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The flap was sutured with 6–0 polypropylene sutures.",
+          "field": "suture_material_size",
+          "value": "6–0 polypropylene sutures",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What closure and postoperative care were prescribed after the surgery?",
+      "gold_answer": "The flap was repositioned and sutured with 6–0 polypropylene sutures. Postoperative care included amoxicillin 500 mg three times a day for 7 days, 0.12% chlorhexidine rinse twice daily for 14 days, and ibuprofen 800 mg as needed."
+    },
+    {
+      "task_id": "report_CR0098_followup_008",
+      "patient_id": "report__CR0098",
+      "task_type": "followup",
+      "ask_after_stage": "T5_followup_03",
+      "release_after_stage": "T5_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t5_followup_03_19_food_impaction_location_01",
+          "stage": "T5_followup_03",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Food impaction was present between #30 and #31.",
+          "field": "food_impaction_location",
+          "value": "between #30 and #31",
+          "unit": null,
+          "tooth": "#30,#31",
+          "side": null
+        }
+      ],
+      "question": "What management was performed for the healing complication noted at 2 weeks?",
+      "gold_answer": "Food impaction between #30 and #31 was removed."
+    }
+  ]
+}

@@ -1,0 +1,325 @@
+{
+  "patient_id": "group1__CHENSISI",
+  "edges": [
+    {
+      "source": "group1_CHENSISI_s1_fp_4_chin_deviation_01",
+      "target": "group1_CHENSISI_s4_ct_8_chin_deviation_01",
+      "reason": "Same right chin deviation attribute re-assessed on CT; differing description does not by itself establish a clinical change.",
+      "relation": "remeasures",
+      "type": "measurement_link",
+      "edge_id": "edge_0001"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_chin_deviation_01",
+      "target": "group1_CHENSISI_s3_xr_xla_7_menton_deviation_01",
+      "reason": "Frontal photo right chin deviation is corroborated by cephalometric mild menton deviation finding.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0002"
+    },
+    {
+      "source": "group1_CHENSISI_s3_xr_xla_7_menton_deviation_01",
+      "target": "group1_CHENSISI_s4_ct_8_chin_deviation_01",
+      "reason": "Mild menton deviation on PA ceph is refined with precise laterality and severity on CT.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0003"
+    },
+    {
+      "source": "group1_CHENSISI_s0_profile_2_chief_complaint_01",
+      "target": "group1_CHENSISI_s1_fp_4_facial_profile_01",
+      "reason": "Concave facial profile confirms the mandibular protrusion chief complaint.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0004"
+    },
+    {
+      "source": "group1_CHENSISI_s0_profile_2_chief_complaint_01",
+      "target": "group1_CHENSISI_s2_dp_5_reverse_overjet_01",
+      "reason": "Reverse overjet confirms the mandibular protrusion chief complaint.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0005"
+    },
+    {
+      "source": "group1_CHENSISI_s0_profile_2_chief_complaint_01",
+      "target": "group1_CHENSISI_s2_dp_5_molar_relationship_01",
+      "reason": "Bilateral Class III molars confirm the mandibular protrusion chief complaint.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0006"
+    },
+    {
+      "source": "group1_CHENSISI_s0_profile_2_chief_complaint_01",
+      "target": "group1_CHENSISI_s3_xr_xla_7_anb_01",
+      "reason": "Severe negative ANB confirms the mandibular protrusion chief complaint.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0007"
+    },
+    {
+      "source": "group1_CHENSISI_s0_profile_2_chief_complaint_01",
+      "target": "group1_CHENSISI_s4_ct_8_mandibular_sagittal_position_01",
+      "reason": "CT-confirmed mandibular protrusion supports the chief complaint.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0008"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_chin_deviation_01",
+      "target": "group1_CHENSISI_s2_dp_5_lower_dental_midline_shift_01",
+      "reason": "Right chin deviation and right lower dental midline shift are complementary evidence of the same right-sided asymmetry.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0009"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_chin_deviation_01",
+      "target": "group1_CHENSISI_s4_ct_8_transverse_asymmetry_summary_01",
+      "reason": "Right chin deviation on photo is confirmed by CT transverse asymmetry summary showing chin deviation.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0010"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_facial_symmetry_01",
+      "target": "group1_CHENSISI_s2_dp_5_occlusal_cant_01",
+      "reason": "Facial asymmetry is corroborated by the occlusal cant finding.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0011"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_facial_symmetry_01",
+      "target": "group1_CHENSISI_s3_xr_xla_7_menton_deviation_01",
+      "reason": "Facial asymmetry is corroborated by cephalometric menton deviation.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0012"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_facial_symmetry_01",
+      "target": "group1_CHENSISI_s4_ct_8_gonial_asymmetry_01",
+      "reason": "Facial asymmetry is confirmed by CT gonial/ramus asymmetry.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0013"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_facial_profile_01",
+      "target": "group1_CHENSISI_s3_xr_xla_7_anb_01",
+      "reason": "Concave profile is confirmed by severe skeletal Class III ANB value.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0014"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_facial_profile_01",
+      "target": "group1_CHENSISI_s4_ct_8_skeletal_classification_01",
+      "reason": "Concave profile is confirmed by CT skeletal Class III classification.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0015"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_nasolabial_angle_01",
+      "target": "group1_CHENSISI_s4_ct_8_maxillary_sagittal_position_01",
+      "reason": "Obtuse nasolabial angle is corroborated by CT-confirmed maxillary retrusion.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0016"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_upper_incisor_display_at_rest_01",
+      "target": "group1_CHENSISI_s4_ct_8_vertical_pattern_01",
+      "reason": "Absent incisor display at rest supports the CT finding of no vertical maxillary excess.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0017"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_gummy_smile_01",
+      "target": "group1_CHENSISI_s4_ct_8_vertical_pattern_01",
+      "reason": "Absent gummy smile supports the CT finding of no vertical maxillary excess.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0018"
+    },
+    {
+      "source": "group1_CHENSISI_s2_dp_5_molar_relationship_01",
+      "target": "group1_CHENSISI_s3_xr_xla_7_dental_relationship_01",
+      "reason": "Class III molar relationship is confirmed by the radiographic Class III crossbite/negative overjet finding.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0019"
+    },
+    {
+      "source": "group1_CHENSISI_s2_dp_5_molar_relationship_01",
+      "target": "group1_CHENSISI_s4_ct_8_skeletal_classification_01",
+      "reason": "Class III molars are confirmed by the CT skeletal Class III classification.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0020"
+    },
+    {
+      "source": "group1_CHENSISI_s2_dp_5_reverse_overjet_01",
+      "target": "group1_CHENSISI_s3_xr_xla_7_wits_01",
+      "reason": "Reverse overjet is confirmed by severely negative Wits appraisal.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0021"
+    },
+    {
+      "source": "group1_CHENSISI_s2_dp_5_reverse_overjet_01",
+      "target": "group1_CHENSISI_s3_xr_xla_7_anb_01",
+      "reason": "Reverse overjet is confirmed by severely negative ANB.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0022"
+    },
+    {
+      "source": "group1_CHENSISI_s2_dp_5_occlusal_cant_01",
+      "target": "group1_CHENSISI_s4_ct_8_maxillary_cant_01",
+      "reason": "Occlusal cant reports left side higher while CT maxillary cant reports left side lower, a direct directional conflict.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0023"
+    },
+    {
+      "source": "group1_CHENSISI_s2_dp_5_occlusal_cant_01",
+      "target": "group1_CHENSISI_s4_ct_8_transverse_asymmetry_summary_01",
+      "reason": "Occlusal cant is corroborated by the coordinated transverse cant described in the CT asymmetry summary.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0024"
+    },
+    {
+      "source": "group1_CHENSISI_s2_dp_5_anterior_open_bite_01",
+      "target": "group1_CHENSISI_s3_xr_xla_7_mp_sn_01",
+      "reason": "Anterior open bite is supported by the steeper mandibular plane angle.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0025"
+    },
+    {
+      "source": "group1_CHENSISI_s2_dp_5_anterior_open_bite_01",
+      "target": "group1_CHENSISI_s3_xr_xla_7_ans_me_n_me_01",
+      "reason": "Anterior open bite is supported by increased lower anterior facial height.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0026"
+    },
+    {
+      "source": "group1_CHENSISI_s3_xr_xla_7_menton_deviation_01",
+      "target": "group1_CHENSISI_s4_ct_8_gonial_asymmetry_01",
+      "reason": "Mild menton deviation is refined with detailed CT gonial/ramus asymmetry findings.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0027"
+    },
+    {
+      "source": "group1_CHENSISI_s3_xr_xla_7_menton_deviation_01",
+      "target": "group1_CHENSISI_s4_ct_8_transverse_asymmetry_summary_01",
+      "reason": "Mild menton deviation is refined by the detailed CT transverse asymmetry summary.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0028"
+    },
+    {
+      "source": "group1_CHENSISI_s3_xr_xla_7_snb_01",
+      "target": "group1_CHENSISI_s4_ct_8_mandibular_sagittal_position_01",
+      "reason": "Prognathic SNB is confirmed by CT-documented protruded mandible.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0029"
+    },
+    {
+      "source": "group1_CHENSISI_s3_xr_xla_7_fh_npo_01",
+      "target": "group1_CHENSISI_s4_ct_8_chin_morphology_01",
+      "reason": "Prominent chin on lateral ceph is confirmed by CT protruded, robust chin morphology.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0030"
+    },
+    {
+      "source": "group1_CHENSISI_s3_xr_xla_7_anb_01",
+      "target": "group1_CHENSISI_s4_ct_8_skeletal_classification_01",
+      "reason": "Severe ANB is confirmed by CT skeletal Class III classification.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0031"
+    },
+    {
+      "source": "group1_CHENSISI_s3_xr_xla_7_wits_01",
+      "target": "group1_CHENSISI_s4_ct_8_skeletal_classification_01",
+      "reason": "Severe Wits appraisal is confirmed by CT skeletal Class III classification.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0032"
+    },
+    {
+      "source": "group1_CHENSISI_s3_xr_xla_7_mp_sn_01",
+      "target": "group1_CHENSISI_s4_ct_8_lower_anterior_facial_height_01",
+      "reason": "Steeper mandibular plane angle on ceph conflicts with CT's low/flat mandibular plane angle finding.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0033"
+    },
+    {
+      "source": "group1_CHENSISI_s3_xr_xla_7_ans_me_n_me_01",
+      "target": "group1_CHENSISI_s4_ct_8_lower_anterior_facial_height_01",
+      "reason": "Increased lower anterior facial height on ceph conflicts with CT's normal-to-reduced height finding.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0034"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_facial_symmetry_01",
+      "target": "group1_CHENSISI_s4_ct_8_orbital_symmetry_01",
+      "reason": "Broad facial asymmetry finding relates to but does not specifically confirm the localized normal orbital symmetry finding.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0035"
+    },
+    {
+      "source": "group1_CHENSISI_s1_fp_4_facial_symmetry_01",
+      "target": "group1_CHENSISI_s4_ct_8_zygomatic_symmetry_01",
+      "reason": "Broad facial asymmetry finding relates to but does not specifically confirm the localized normal zygomatic symmetry finding.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0036"
+    },
+    {
+      "source": "group1_CHENSISI_s2_dp_5_anterior_open_bite_01",
+      "target": "group1_CHENSISI_s4_ct_8_lower_anterior_facial_height_01",
+      "reason": "Anterior open bite shares the vertical pattern theme with facial height but does not specifically confirm the CT's normal-to-reduced height description.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0037"
+    },
+    {
+      "source": "group1_CHENSISI_s2_dp_5_lower_dental_midline_shift_01",
+      "target": "group1_CHENSISI_s3_xr_xla_7_dental_relationship_01",
+      "reason": "Midline shift shares the dental status theme with the general Class III dental relationship but is not specifically addressed by it.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0038"
+    },
+    {
+      "source": "group1_CHENSISI_s2_dp_5_upper_dental_midline_01",
+      "target": "group1_CHENSISI_s3_xr_xla_7_dental_relationship_01",
+      "reason": "Upper midline position shares the dental status theme with the general Class III dental relationship but is not specifically addressed by it.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0039"
+    },
+    {
+      "source": "group1_CHENSISI_s3_xr_xla_7_co_go_01",
+      "target": "group1_CHENSISI_s4_ct_8_gonial_asymmetry_01",
+      "reason": "General short ramus measurement (Co-Go) relates to but does not specifically confirm the localized image-left gonial/ramus asymmetry finding.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0040"
+    }
+  ]
+}

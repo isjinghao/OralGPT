@@ -1,0 +1,301 @@
+{
+  "patient_id": "group1__WANGYING",
+  "edges": [
+    {
+      "source": "group1_WANGYING_s2_dp_5_overjet_01",
+      "target": "group1_WANGYING_s4_ct_8_overjet_01",
+      "reason": "Same overjet attribute reassessed on 3D CT; qualitative 'increased' value does not itself establish a new clinical state beyond the DP measurement.",
+      "relation": "remeasures",
+      "type": "measurement_link",
+      "edge_id": "edge_0001"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_pa_ceph_transverse_asymmetry_01",
+      "target": "group1_WANGYING_s4_ct_8_transverse_asymmetry_01",
+      "reason": "Both are whole-craniofacial, same-scope assessments of transverse skeletal asymmetry across PA ceph and 3D CT, both finding none.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0002"
+    },
+    {
+      "source": "group1_WANGYING_s0_profile_2_chief_complaint_02",
+      "target": "group1_WANGYING_s1_fp_4_gummy_smile_01",
+      "reason": "Chief complaint of gummy smile is given precise quantification (4 mm) on clinical photo exam.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0003"
+    },
+    {
+      "source": "group1_WANGYING_s0_profile_2_chief_complaint_01",
+      "target": "group1_WANGYING_s2_dp_5_overjet_01",
+      "reason": "Chief complaint of incisor protrusion is quantified with 8 mm overjet on dental photo exam.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0004"
+    },
+    {
+      "source": "group1_WANGYING_s0_profile_2_chief_complaint_01",
+      "target": "group1_WANGYING_s3_xr_xla_7_overjet_01",
+      "reason": "Chief complaint of protrusion is further quantified via cephalometric overjet measurement.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0005"
+    },
+    {
+      "source": "group1_WANGYING_s0_profile_2_chief_complaint_02",
+      "target": "group1_WANGYING_s1_fp_4_incisor_display_at_rest_01",
+      "reason": "Gummy smile complaint is refined with a specific incisor display at rest measurement.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0006"
+    },
+    {
+      "source": "group1_WANGYING_s1_fp_4_profile_type_01",
+      "target": "group1_WANGYING_s3_xr_xla_7_lip_position_to_e_plane_01",
+      "reason": "Convex profile finding is specifically explained/confirmed by protrusive lip position relative to E-plane.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0007"
+    },
+    {
+      "source": "group1_WANGYING_s1_fp_4_nasolabial_angle_01",
+      "target": "group1_WANGYING_s3_xr_xla_7_lip_position_to_e_plane_01",
+      "reason": "Acute nasolabial angle and protrusive lip-to-E-plane measurement both specifically indicate upper lip/incisor protrusion.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0008"
+    },
+    {
+      "source": "group1_WANGYING_s2_dp_5_overjet_01",
+      "target": "group1_WANGYING_s3_xr_xla_7_overjet_01",
+      "reason": "Same overjet attribute remeasured cephalometrically with a different value; does not itself establish clinical change.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0009"
+    },
+    {
+      "source": "group1_WANGYING_s2_dp_5_overbite_01",
+      "target": "group1_WANGYING_s3_xr_xla_7_overbite_01",
+      "reason": "Same overbite attribute remeasured cephalometrically with a different value; does not itself establish clinical change.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0010"
+    },
+    {
+      "source": "group1_WANGYING_s2_dp_5_molar_relationship_02",
+      "target": "group1_WANGYING_s3_xr_xla_7_anb_01",
+      "reason": "Right Class II molar relationship (dental) is complementary evidence supporting the skeletal Class II ANB interpretation.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0011"
+    },
+    {
+      "source": "group1_WANGYING_s2_dp_5_molar_relationship_02",
+      "target": "group1_WANGYING_s3_xr_xla_7_wits_01",
+      "reason": "Right Class II molar relationship complements the positive Wits appraisal supporting skeletal Class II.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0012"
+    },
+    {
+      "source": "group1_WANGYING_s2_dp_5_canting_01",
+      "target": "group1_WANGYING_s3_xr_xla_7_pa_ceph_transverse_asymmetry_01",
+      "reason": "Absence of canting on clinical exam is confirmed by absence of transverse asymmetry/cant on PA cephalometric radiograph.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0013"
+    },
+    {
+      "source": "group1_WANGYING_s2_dp_5_canting_01",
+      "target": "group1_WANGYING_s4_ct_8_maxillary_cant_01",
+      "reason": "Absence of canting is confirmed by absence of maxillary cant on 3D CT.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0014"
+    },
+    {
+      "source": "group1_WANGYING_s1_fp_4_facial_symmetry_01",
+      "target": "group1_WANGYING_s3_xr_xla_7_pa_ceph_transverse_asymmetry_01",
+      "reason": "Whole-face symmetric assessment on photo matches same-scope absence of transverse asymmetry on PA cephalometric radiograph.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0015"
+    },
+    {
+      "source": "group1_WANGYING_s1_fp_4_facial_symmetry_01",
+      "target": "group1_WANGYING_s4_ct_8_transverse_asymmetry_01",
+      "reason": "Whole-face symmetric assessment on photo matches same-scope absence of transverse skeletal asymmetry on 3D CT.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0016"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_sna_01",
+      "target": "group1_WANGYING_s4_ct_8_maxilla_sagittal_position_01",
+      "reason": "Mildly increased SNA is confirmed by CT finding of maxilla normal-to-mildly protrusive.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0017"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_snb_01",
+      "target": "group1_WANGYING_s4_ct_8_mandible_sagittal_position_01",
+      "reason": "Decreased SNB is confirmed by CT finding of retruded/deficient mandible.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0018"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_anb_01",
+      "target": "group1_WANGYING_s4_ct_8_skeletal_class_01",
+      "reason": "ANB-based skeletal Class II is refined with CT classification specifying mandibular retrognathia as the cause.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0019"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_anb_01",
+      "target": "group1_WANGYING_s4_ct_8_dominant_deformity_01",
+      "reason": "ANB skeletal Class II is refined by CT identification of the dominant deformity (mandibular retrognathia with clockwise rotation).",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0020"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_sn_mp_01",
+      "target": "group1_WANGYING_s4_ct_8_facial_height_pattern_01",
+      "reason": "Hyperdivergent SN-MP angle is confirmed by CT long-face pattern with increased lower facial height.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0021"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_sn_mp_01",
+      "target": "group1_WANGYING_s4_ct_8_gonial_angle_01",
+      "reason": "Clockwise mandibular rotation on ceph is confirmed by obtuse gonial angle on CT.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0022"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_co_go_01",
+      "target": "group1_WANGYING_s4_ct_8_mandible_sagittal_position_01",
+      "reason": "Short ramus length is complementary structural evidence supporting the CT finding of mandibular retrusion/deficiency.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0023"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_co_go_01",
+      "target": "group1_WANGYING_s4_ct_8_dominant_deformity_01",
+      "reason": "Short ramus complements the CT diagnosis of mandibular retrognathia as the dominant deformity.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0024"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_lip_position_to_e_plane_01",
+      "target": "group1_WANGYING_s4_ct_8_chin_position_01",
+      "reason": "Cephalometric finding of retruded chin with protrusive lips is confirmed by CT retruded chin position.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0025"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_overjet_01",
+      "target": "group1_WANGYING_s4_ct_8_overjet_01",
+      "reason": "Increased cephalometric overjet is confirmed directionally by CT finding of increased overjet.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0026"
+    },
+    {
+      "source": "group1_WANGYING_s2_dp_5_molar_relationship_02",
+      "target": "group1_WANGYING_s4_ct_8_skeletal_class_01",
+      "reason": "Right Class II molar relationship complements CT skeletal Class II classification.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0027"
+    },
+    {
+      "source": "group1_WANGYING_s1_fp_4_profile_type_01",
+      "target": "group1_WANGYING_s4_ct_8_chin_position_01",
+      "reason": "Convex facial profile is confirmed by CT finding of retruded chin, a primary contributor to convexity.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0028"
+    },
+    {
+      "source": "group1_WANGYING_s1_fp_4_profile_type_01",
+      "target": "group1_WANGYING_s4_ct_8_dominant_deformity_01",
+      "reason": "Convex profile is confirmed by CT diagnosis of mandibular retrognathia as the dominant deformity.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0029"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_snb_01",
+      "target": "group1_WANGYING_s4_ct_8_dominant_deformity_01",
+      "reason": "Decreased SNB complements the CT diagnosis of mandibular retrognathia.",
+      "type": "clinical_support",
+      "relation": "supports",
+      "edge_id": "edge_0030"
+    },
+    {
+      "source": "group1_WANGYING_s2_dp_5_upper_dental_midline_01",
+      "target": "group1_WANGYING_s4_ct_8_maxillary_cant_01",
+      "reason": "Central upper dental midline is confirmed by CT finding of centered maxillary midline with no cant.",
+      "relation": "supports",
+      "type": "clinical_support",
+      "edge_id": "edge_0031"
+    },
+    {
+      "source": "group1_WANGYING_s1_fp_4_facial_symmetry_01",
+      "target": "group1_WANGYING_s4_ct_8_ramus_symmetry_01",
+      "reason": "Broad facial symmetry assessment relates to but is not specifically needed to interpret the localized ramus symmetry finding on CT.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0032"
+    },
+    {
+      "source": "group1_WANGYING_s1_fp_4_upper_lip_length_01",
+      "target": "group1_WANGYING_s3_xr_xla_7_lip_position_to_e_plane_01",
+      "reason": "Upper lip length is a related soft-tissue theme but measures a different attribute (length vs. protrusion) than E-plane lip position.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0033"
+    },
+    {
+      "source": "group1_WANGYING_s1_fp_4_facial_symmetry_01",
+      "target": "group1_WANGYING_s4_ct_8_menton_deviation_01",
+      "reason": "Broad facial symmetry finding shares theme with but does not specifically drive interpretation of the localized menton deviation measure.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0034"
+    },
+    {
+      "source": "group1_WANGYING_s2_dp_5_crowding_01",
+      "target": "group1_WANGYING_s3_xr_xla_7_impa_01",
+      "reason": "Lower crowding and proclined lower incisors share a dental-alveolar theme but are distinct findings not directly confirming one another.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0035"
+    },
+    {
+      "source": "group1_WANGYING_s2_dp_5_crowding_01",
+      "target": "group1_WANGYING_s3_xr_xla_7_l1_nb_01",
+      "reason": "Lower crowding and lower incisor angulation are thematically related dental findings without direct confirmatory link.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0036"
+    },
+    {
+      "source": "group1_WANGYING_s3_xr_xla_7_pa_ceph_transverse_asymmetry_01",
+      "target": "group1_WANGYING_s4_ct_8_menton_deviation_01",
+      "reason": "Overall PA ceph symmetry assessment shares theme with but is broader than the localized CT menton deviation measure.",
+      "type": "context_consistency",
+      "relation": "compatible",
+      "edge_id": "edge_0037"
+    }
+  ]
+}

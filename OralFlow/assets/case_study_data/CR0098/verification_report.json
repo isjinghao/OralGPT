@@ -1,0 +1,13 @@
+[
+  {
+    "iteration": 1,
+    "passed": true,
+    "n_issues": 0,
+    "n_high": 0,
+    "n_actionable": 0,
+    "verification": {
+      "passed": true,
+      "issues": []
+    }
+  }
+]

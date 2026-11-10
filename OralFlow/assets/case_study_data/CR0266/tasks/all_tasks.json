@@ -1,0 +1,1323 @@
+{
+  "patient_id": "report__CR0266",
+  "tasks": [
+    {
+      "task_id": "modality_perception_001",
+      "patient_id": "report__CR0266",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T0_perception_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_buccal_marginal_gingiva_white_streak_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white streak was present on the buccal marginal gingiva.",
+          "field": "buccal_marginal_gingiva_white_streak",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_size_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak measured 2 × 4 mm.",
+          "field": "white_streak_size",
+          "value": "2 × 4",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_wipeability_with_gauze_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak did not wipe off with gauze.",
+          "field": "white_streak_wipeability_with_gauze",
+          "value": "did not wipe off",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "A 2 × 4 mm white streak was present on the buccal marginal gingiva. It did not wipe off with gauze.",
+      "question": "What was observed on the buccal marginal gingiva at that examination, including its size and whether it could be wiped off with gauze?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is well-formed for the modality_perception task at the specified timepoint, and the gold answer is fully supported by the selected TEXT_QA evidence, preserving location, size, and wipeability details.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "modality_perception_002",
+      "patient_id": "report__CR0266",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T3_followup_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_24_gingival_lesion_histology_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+          "field": "gingival_lesion_histology",
+          "value": "consistent with hyperkeratosis",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+      "question": "What did biopsy histology of the gingival lesion show?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, answerable at the specified follow-up stage, and aligned with the modality (TEXT_QA). The gold answer exactly matches the selected evidence and preserves all clinical details without unsupported information.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "modality_perception_003",
+      "patient_id": "report__CR0266",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T7_followup_04",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_peri_implant_soft_tissue_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Peri-implant soft tissue appeared healthy.",
+          "field": "peri-implant_soft_tissue",
+          "value": "healthy",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_attached_keratinized_tissue_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Wide zone of attached keratinized tissue on the buccal and lingual surfaces.",
+          "field": "attached_keratinized_tissue",
+          "value": "wide zone",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_probing_depth_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Probing depths ranged from 2 to 3 mm.",
+          "field": "probing_depth",
+          "value": "2-3",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_bleeding_on_probing_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "No bleeding on probing.",
+          "field": "bleeding_on_probing",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "The peri-implant soft tissue appeared healthy, with a wide zone of attached keratinized tissue on the buccal and lingual surfaces. Probing depths ranged from 2 to 3 mm, with no bleeding on probing.",
+      "question": "What did the clinical examination show about the peri-implant soft tissue, keratinized tissue, probing depths, and bleeding on probing at the relevant follow-up?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, non-leaking, and answerable at T7_followup_04. The gold answer is fully supported by the selected evidence: healthy peri-implant soft tissue, a wide zone of attached keratinized tissue on buccal and lingual surfaces, probing depths of 2–3 mm, and no bleeding on probing.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "longitudinal_evidence_recall_001",
+      "patient_id": "report__CR0266",
+      "task_type": "longitudinal_evidence_recall",
+      "ask_after_stage": "T3_followup_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_buccal_marginal_gingiva_white_streak_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white streak was present on the buccal marginal gingiva.",
+          "field": "buccal_marginal_gingiva_white_streak",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_size_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak measured 2 × 4 mm.",
+          "field": "white_streak_size",
+          "value": "2 × 4",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_wipeability_with_gauze_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak did not wipe off with gauze.",
+          "field": "white_streak_wipeability_with_gauze",
+          "value": "did not wipe off",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_24_gingival_lesion_histology_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+          "field": "gingival_lesion_histology",
+          "value": "consistent with hyperkeratosis",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At presentation, a 2 × 4 mm white streak was present on the buccal marginal gingiva and did not wipe off with gauze. At the 1-week postoperative follow-up, biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+      "question": "What were the initial clinical examination findings of the gingival lesion, and what did the biopsy histology show at the 1-week postoperative follow-up?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, answerable at the requested timepoint, and matches the longitudinal recall task type. The gold answer is supported by the evidence: the initial exam showed a 2 × 4 mm white streak on the buccal marginal gingiva that did not wipe off with gauze, and the follow-up biopsy histology was consistent with hyperkeratosis.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "longitudinal_evidence_recall_002",
+      "patient_id": "report__CR0266",
+      "task_type": "longitudinal_evidence_recall",
+      "ask_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_20_socket_gap_content_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-week postoperative visit, a fibrin clot occupied the gap distance.",
+          "field": "socket_gap_content",
+          "value": "fibrin clot occupied gap distance",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_22_implant_socket_gap_coverage_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white layer overlaid the gap between the implant and the mesial and distal socket walls.",
+          "field": "implant_socket_gap_coverage",
+          "value": "white layer overlying gap between implant and mesial/distal socket walls",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_37_bone_fill_around_implant_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Bone fill was present around the implant at implant uncovery.",
+          "field": "bone_fill_around_implant",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At the 1-week postoperative visit, a fibrin clot occupied the gap between the implant and the mesial and distal socket walls, with a white layer overlying the gap. At implant uncovery 3 months postoperatively, bone fill was present around the implant.",
+      "question": "What did follow-up show about the gap between the implant and the socket walls at 1 week, and what was observed around the implant at uncovery 3 months later?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, non-leaking, and answerable at the specified timepoint. The gold answer is supported by the selected evidence: the 1-week follow-up showed a fibrin clot in the implant-socket gap with a white layer overlying it, and at 3-month uncovery there was bone fill around the implant.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "cross_temporal_reasoning_001",
+      "patient_id": "report__CR0266",
+      "task_type": "cross_temporal_reasoning",
+      "ask_after_stage": "T3_followup_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_buccal_marginal_gingiva_white_streak_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white streak was present on the buccal marginal gingiva.",
+          "field": "buccal_marginal_gingiva_white_streak",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_size_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak measured 2 × 4 mm.",
+          "field": "white_streak_size",
+          "value": "2 × 4",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_wipeability_with_gauze_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak did not wipe off with gauze.",
+          "field": "white_streak_wipeability_with_gauze",
+          "value": "did not wipe off",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_24_gingival_lesion_histology_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+          "field": "gingival_lesion_histology",
+          "value": "consistent with hyperkeratosis",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At presentation, the buccal marginal gingiva had a 2 × 4 mm white streak that did not wipe off with gauze. Histology from the gingival lesion biopsy was consistent with hyperkeratosis.",
+      "question": "What were the size, wipeability, and later biopsy histology findings of the white streak on the buccal marginal gingiva?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question appropriately requires cross-temporal reasoning, referencing initial lesion characteristics and later biopsy findings. The gold answer is concise and fully supported by the selected evidence, with correct timing, site, and modality.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "cross_temporal_reasoning_002",
+      "patient_id": "report__CR0266",
+      "task_type": "cross_temporal_reasoning",
+      "ask_after_stage": "T7_followup_04",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_23_soft_tissue_covering_cover_screw_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The marginal soft tissue was slightly covering the lingual side of the cover screw.",
+          "field": "soft_tissue_covering_cover_screw",
+          "value": "slightly covering",
+          "unit": null,
+          "tooth": null,
+          "side": "lingual"
+        },
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_28_new_tissue_epithelial_layer_thickness_relative_to_surrounding_socket_tissue_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The new tissue had a thinner epithelial layer than the original tissue surrounding the socket.",
+          "field": "new_tissue_epithelial_layer_thickness_relative_to_surrounding_socket_tissue",
+          "value": "thinner",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_28_new_tissue_visible_red_streaks_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The new tissue had visible red streaks.",
+          "field": "new_tissue_visible_red_streaks",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_28_red_streaks_interpretation_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The visible red streaks were described as indicative of blood vessels.",
+          "field": "red_streaks_interpretation",
+          "value": "indicative of blood vessels",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_28_new_tissue_complete_keratinization_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The new tissue did not appear completely keratinized at this time.",
+          "field": "new_tissue_complete_keratinization",
+          "value": "not apparent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_thickness_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The soft tissue had thickened.",
+          "field": "soft_tissue_thickness",
+          "value": "thickened",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_keratinization_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The soft tissue appeared keratinized.",
+          "field": "soft_tissue_keratinization",
+          "value": "keratinized",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_32_visible_blood_vessels_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Blood vessels were no longer visible to the naked eye.",
+          "field": "visible_blood_vessels",
+          "value": "not_visible_to_naked_eye",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_continuity_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The newly formed soft tissue was more continuous with the surrounding tissue.",
+          "field": "soft_tissue_continuity",
+          "value": "more_continuous_with_surrounding_tissue",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_proliferation_direction_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The newly formed soft tissue had proliferated coronally.",
+          "field": "soft_tissue_proliferation_direction",
+          "value": "coronal",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_35_soft_tissue_appearance_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At 3 months, the soft tissue had completely submerged the implant cover screw.",
+          "field": "soft_tissue_appearance",
+          "value": "completely submerged implant cover screw",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_peri_implant_soft_tissue_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Peri-implant soft tissue appeared healthy.",
+          "field": "peri-implant_soft_tissue",
+          "value": "healthy",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_attached_keratinized_tissue_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Wide zone of attached keratinized tissue on the buccal and lingual surfaces.",
+          "field": "attached_keratinized_tissue",
+          "value": "wide zone",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_probing_depth_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Probing depths ranged from 2 to 3 mm.",
+          "field": "probing_depth",
+          "value": "2-3",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_bleeding_on_probing_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "No bleeding on probing.",
+          "field": "bleeding_on_probing",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "The peri-implant soft tissue matured progressively: it initially provided only partial cover-screw coverage, then appeared thin, incompletely keratinized, and vascular at 1 month. By 2 months it was thicker, keratinized, more continuous with the surrounding tissue, and had proliferated coronally; by 3 months it completely submerged the cover screw. At 2 years and 2 months, the peri-implant tissue appeared healthy, with a wide zone of attached keratinized tissue, 2- to 3-mm probing depths, and no bleeding on probing.",
+      "question": "How did the peri-implant soft tissue appearance and coverage of the cover screw change over the follow-up period?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, non-leaking, and answerable from the longitudinal evidence. The gold answer is supported overall: it correctly summarizes the progression from slight/partial cover-screw coverage to thin, incompletely keratinized, vascular tissue, then thicker and more continuous keratinized tissue, complete submergence of the cover screw, and finally healthy peri-implant tissue with attached keratinized tissue, 2- to 3-mm probing depths, and no bleeding on probing.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "memory_update_conflict_correction_001",
+      "patient_id": "report__CR0266",
+      "task_type": "memory_update_conflict_correction",
+      "ask_after_stage": "T3_followup_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_buccal_marginal_gingiva_white_streak_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white streak was present on the buccal marginal gingiva.",
+          "field": "buccal_marginal_gingiva_white_streak",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_size_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak measured 2 × 4 mm.",
+          "field": "white_streak_size",
+          "value": "2 × 4",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_wipeability_with_gauze_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak did not wipe off with gauze.",
+          "field": "white_streak_wipeability_with_gauze",
+          "value": "did not wipe off",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_24_gingival_lesion_histology_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+          "field": "gingival_lesion_histology",
+          "value": "consistent with hyperkeratosis",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+      "question": "What did the later biopsy and histologic examination show about the non-wipeable white streak on the buccal marginal gingiva?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, non-leaking, and answerable at the requested follow-up stage. The later histology result is supported. The answer contains a little extra detail beyond the direct evidence, so it is best simplified.",
+        "issues": [
+          "The phrase \"was later biopsied\" is implied by the histology evidence but not stated as directly as the result itself."
+        ],
+        "fixed_question": null,
+        "fixed_answer": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis."
+      }
+    },
+    {
+      "task_id": "memory_update_conflict_correction_002",
+      "patient_id": "report__CR0266",
+      "task_type": "memory_update_conflict_correction",
+      "ask_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_23_soft_tissue_covering_cover_screw_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The marginal soft tissue was slightly covering the lingual side of the cover screw.",
+          "field": "soft_tissue_covering_cover_screw",
+          "value": "slightly covering",
+          "unit": null,
+          "tooth": null,
+          "side": "lingual"
+        },
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_35_soft_tissue_appearance_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At 3 months, the soft tissue had completely submerged the implant cover screw.",
+          "field": "soft_tissue_appearance",
+          "value": "completely submerged implant cover screw",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At 1 week, marginal soft tissue slightly covered the lingual side of the cover screw; by 3 months, the soft tissue had completely submerged the cover screw.",
+      "question": "How did the follow-up findings refine the description of soft-tissue coverage over the implant cover screw from 1 week to 3 months?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural and answerable at the requested timepoint. The gold answer is supported by the selected evidence: earlier follow-up showed slight lingual coverage of the cover screw, and the 3-month follow-up showed the cover screw was completely submerged by soft tissue.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "report_CR0266_treatment_001",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What initial treatment was planned for the mandibular left first molar?",
+      "gold_answer": "The tooth was planned for extraction and immediate implant placement."
+    },
+    {
+      "task_id": "report_CR0266_treatment_002",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What medication was given before the procedure?",
+      "gold_answer": "The patient premedicated with 2 g amoxicillin prior to the procedure."
+    },
+    {
+      "task_id": "report_CR0266_treatment_003",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_2_radiographic_furcation_involvement_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Extensive furcation involvement was suggested radiographically at the initial presentation.",
+          "field": "radiographic_furcation_involvement",
+          "value": "extensive; suggested radiographically",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "How was the extraction performed and what precautions were taken?",
+      "gold_answer": "Following administration of local anesthesia, atraumatic extraction was performed by sectioning the tooth through the furcation and elevating both roots, taking care to avoid damage to the socket walls."
+    },
+    {
+      "task_id": "report_CR0266_treatment_004",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "How was the extraction socket prepared after extraction?",
+      "gold_answer": "The socket was carefully debrided with a surgical curette to remove all remnants of soft tissue, and the socket was irrigated with saline solution."
+    },
+    {
+      "task_id": "report_CR0266_treatment_005",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_buccal_marginal_gingiva_white_streak_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white streak was present on the buccal marginal gingiva.",
+          "field": "buccal_marginal_gingiva_white_streak",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_wipeability_with_gauze_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak did not wipe off with gauze.",
+          "field": "white_streak_wipeability_with_gauze",
+          "value": "did not wipe off",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What was done with the buccal gingival streak?",
+      "gold_answer": "The streak of leukoplakia on the buccal gingiva was excised and stored in formalin solution for histologic analysis."
+    },
+    {
+      "task_id": "report_CR0266_treatment_006",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_1_recession_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "5 mm buccal recession.",
+          "field": "recession",
+          "value": "5",
+          "unit": "mm",
+          "tooth": "mandibular left first molar",
+          "side": "buccal"
+        }
+      ],
+      "question": "What was determined by periodontal probing of the socket?",
+      "gold_answer": "All socket walls were intact with no fenestration or dehiscence present. There was a height discrepancy between the buccal and lingual bone crest; the lingual bone crest was more coronal than the buccal bone crest, consistent with the initial presentation of buccal recession. The socket was classified as Type B according to Smith and Tarnow."
+    },
+    {
+      "task_id": "report_CR0266_treatment_007",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What septal bone finding supported implant stabilization?",
+      "gold_answer": "Enough septal bone was observed to stabilize but not completely surround the implant, which would leave gaps between one or more of the surfaces of the implant and the socket walls."
+    },
+    {
+      "task_id": "report_CR0266_treatment_008",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What implant placement approach was selected?",
+      "gold_answer": "A flapless implant approach was employed."
+    },
+    {
+      "task_id": "report_CR0266_treatment_009",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "How was the implant osteotomy prepared?",
+      "gold_answer": "The implant osteotomy was initiated in the septal bone with a round bur, and twist drills were used to progressively enlarge the osteotomy as per the manufacturer’s recommendations."
+    },
+    {
+      "task_id": "report_CR0266_treatment_010",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_2_radiographic_furcation_involvement_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Extensive furcation involvement was suggested radiographically at the initial presentation.",
+          "field": "radiographic_furcation_involvement",
+          "value": "extensive; suggested radiographically",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What happened to the mesial and distal portions of the septum during osteotomy preparation?",
+      "gold_answer": "The coronal two-thirds of the mesial and distal aspect of the septum was obliterated."
+    },
+    {
+      "task_id": "report_CR0266_treatment_011",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_2_radiographic_furcation_involvement_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Extensive furcation involvement was suggested radiographically at the initial presentation.",
+          "field": "radiographic_furcation_involvement",
+          "value": "extensive; suggested radiographically",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What stability check was performed during progressive osteotomy preparation?",
+      "gold_answer": "Careful attention was paid to make sure that after each successive drill there was sufficient resistance to movement of the drill and guide pin within the osteotomy."
+    },
+    {
+      "task_id": "report_CR0266_treatment_012",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What implant was placed and with what insertion torque?",
+      "gold_answer": "A 4.5 × 9-mm TX Astra Tech implant fixture was placed with more than 35 Ncm of torque."
+    },
+    {
+      "task_id": "report_CR0266_treatment_013",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_1_tooth_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Mandibular left first molar.",
+          "field": "tooth",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": null,
+          "side": "left"
+        }
+      ],
+      "question": "How was the implant collar positioned relative to the buccal and lingual bone crests?",
+      "gold_answer": "The collar of the implant was placed at the level of septal bone that was coincident with the buccal bone crest and 2 mm apical to the lingual bone crest."
+    },
+    {
+      "task_id": "report_CR0266_treatment_014",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_2_radiographic_furcation_involvement_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Extensive furcation involvement was suggested radiographically at the initial presentation.",
+          "field": "radiographic_furcation_involvement",
+          "value": "extensive; suggested radiographically",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What was the initial bone-to-implant contact and where were the remaining implant surfaces exposed?",
+      "gold_answer": "The bone-to-implant contact was 360 degrees in the apical third of the implant and extended coronally on the buccal and lingual implant surfaces. The coronal two-thirds of the proximal surfaces of the implant were not in contact with bone and were exposed to the residual socket space."
+    },
+    {
+      "task_id": "report_CR0266_treatment_015",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What was the distance from the implant to the socket walls?",
+      "gold_answer": "The distance from the mesial and distal border of the implant to their respective socket walls was 4 to 5 mm."
+    },
+    {
+      "task_id": "report_CR0266_treatment_016",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What was done after implant placement, and what grafting or flap procedures were omitted?",
+      "gold_answer": "A cover screw was placed over the implant, and the implant was left to heal within the extraction socket without the use of a bone graft, barrier membrane, or coronal flap advancement."
+    },
+    {
+      "task_id": "report_CR0266_followup_001",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T3_followup_00",
+      "release_after_stage": "T3_followup_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_24_gingival_lesion_histology_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+          "field": "gingival_lesion_histology",
+          "value": "consistent with hyperkeratosis",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What further management was indicated for the gingival lesion?",
+      "gold_answer": "No further treatment was indicated."
+    },
+    {
+      "task_id": "report_CR0266_followup_002",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T4_followup_01",
+      "release_after_stage": "T4_followup_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_29_site_plaque_buildup_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 1 month, moderate plaque buildup was noted at the site.",
+          "field": "site_plaque_buildup",
+          "value": "moderate",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What oral hygiene management was prescribed at 1 month?",
+      "gold_answer": "The patient was instructed to apply chlorhexidine gluconate 0.12% to this area twice a day."
+    },
+    {
+      "task_id": "report_CR0266_followup_003",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T5_followup_02",
+      "release_after_stage": "T5_followup_02",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_31_cover_screw_exposure_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At 2 months, a portion of the cover screw was still exposed.",
+          "field": "cover_screw_exposure",
+          "value": "portion still exposed",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What cleaning instruction was continued at 2 months?",
+      "gold_answer": "The patient was instructed to continue to clean this area with chlorhexidine gluconate 0.12% until the next visit."
+    },
+    {
+      "task_id": "report_CR0266_followup_004",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T6_followup_03",
+      "release_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_37_bone_fill_around_implant_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Bone fill was present around the implant at implant uncovery.",
+          "field": "bone_fill_around_implant",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What procedure was performed for implant uncovery?",
+      "gold_answer": "A crestal incision was made and a full thickness flap was elevated to expose the implant and the cover screw."
+    },
+    {
+      "task_id": "report_CR0266_followup_005",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T6_followup_03",
+      "release_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_39_implant_mobility_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "No mobility of the implant was detected.",
+          "field": "implant_mobility",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What did the absence of implant mobility indicate?",
+      "gold_answer": "The absence of implant mobility indicated that the implant had achieved secondary stability."
+    },
+    {
+      "task_id": "report_CR0266_followup_006",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T6_followup_03",
+      "release_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_26_implant_exposure_extent_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "A portion of the implant was still exposed at the 1-month postoperative visit.",
+          "field": "implant_exposure_extent",
+          "value": "portion still exposed",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_27_marginal_soft_tissue_contact_with_implant_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 1 month, the marginal soft tissue was contacting the implant.",
+          "field": "marginal_soft_tissue_contact_with_implant",
+          "value": "contacting implant",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What was placed after implant exposure and how were the soft tissues managed?",
+      "gold_answer": "A healing abutment was secured to the implant, and the soft tissues were sutured and adapted to the healing abutment."
+    },
+    {
+      "task_id": "report_CR0266_followup_007",
+      "patient_id": "report__CR0266",
+      "task_type": "followup",
+      "ask_after_stage": "T6_followup_03",
+      "release_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_37_bone_fill_around_implant_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Bone fill was present around the implant at implant uncovery.",
+          "field": "bone_fill_around_implant",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_39_implant_mobility_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "No mobility of the implant was detected.",
+          "field": "implant_mobility",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "How was the implant restored?",
+      "gold_answer": "The patient then returned to the restorative dentist and the implant was restored with a screw-retained porcelain-fused-to-metal crown."
+    }
+  ]
+}

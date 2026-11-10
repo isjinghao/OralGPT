@@ -1,0 +1,160 @@
+{
+  "patient_id": "report__CR0266",
+  "tasks": [
+    {
+      "task_id": "modality_perception_001",
+      "patient_id": "report__CR0266",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T0_perception_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_buccal_marginal_gingiva_white_streak_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white streak was present on the buccal marginal gingiva.",
+          "field": "buccal_marginal_gingiva_white_streak",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_size_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak measured 2 × 4 mm.",
+          "field": "white_streak_size",
+          "value": "2 × 4",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_wipeability_with_gauze_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak did not wipe off with gauze.",
+          "field": "white_streak_wipeability_with_gauze",
+          "value": "did not wipe off",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "A 2 × 4 mm white streak was present on the buccal marginal gingiva. It did not wipe off with gauze.",
+      "question": "What was observed on the buccal marginal gingiva at that examination, including its size and whether it could be wiped off with gauze?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is well-formed for the modality_perception task at the specified timepoint, and the gold answer is fully supported by the selected TEXT_QA evidence, preserving location, size, and wipeability details.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "modality_perception_002",
+      "patient_id": "report__CR0266",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T3_followup_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_24_gingival_lesion_histology_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+          "field": "gingival_lesion_histology",
+          "value": "consistent with hyperkeratosis",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+      "question": "What did biopsy histology of the gingival lesion show?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, answerable at the specified follow-up stage, and aligned with the modality (TEXT_QA). The gold answer exactly matches the selected evidence and preserves all clinical details without unsupported information.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "modality_perception_003",
+      "patient_id": "report__CR0266",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T7_followup_04",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_peri_implant_soft_tissue_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Peri-implant soft tissue appeared healthy.",
+          "field": "peri-implant_soft_tissue",
+          "value": "healthy",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_attached_keratinized_tissue_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Wide zone of attached keratinized tissue on the buccal and lingual surfaces.",
+          "field": "attached_keratinized_tissue",
+          "value": "wide zone",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_probing_depth_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Probing depths ranged from 2 to 3 mm.",
+          "field": "probing_depth",
+          "value": "2-3",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_bleeding_on_probing_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "No bleeding on probing.",
+          "field": "bleeding_on_probing",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "The peri-implant soft tissue appeared healthy, with a wide zone of attached keratinized tissue on the buccal and lingual surfaces. Probing depths ranged from 2 to 3 mm, with no bleeding on probing.",
+      "question": "What did the clinical examination show about the peri-implant soft tissue, keratinized tissue, probing depths, and bleeding on probing at the relevant follow-up?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, non-leaking, and answerable at T7_followup_04. The gold answer is fully supported by the selected evidence: healthy peri-implant soft tissue, a wide zone of attached keratinized tissue on buccal and lingual surfaces, probing depths of 2–3 mm, and no bleeding on probing.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    }
+  ]
+}

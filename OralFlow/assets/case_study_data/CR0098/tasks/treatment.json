@@ -1,0 +1,42 @@
+{
+  "patient_id": "report__CR0098",
+  "tasks": [
+    {
+      "task_id": "report_CR0098_treatment_001",
+      "patient_id": "report__CR0098",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T1_treatment_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_pulp_diagnosis_02",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with necrotic pulp at the initial workup.",
+          "field": "pulp_diagnosis",
+          "value": "necrotic pulp",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_apical_diagnosis_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with acute apical abscess at the initial workup.",
+          "field": "apical_diagnosis",
+          "value": "acute apical abscess",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        }
+      ],
+      "question": "What initial endodontic treatment was performed for #31?",
+      "gold_answer": "#31 received NSRCT by an endodontist."
+    }
+  ]
+}

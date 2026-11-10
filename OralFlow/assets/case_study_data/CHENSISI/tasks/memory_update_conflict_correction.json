@@ -1,0 +1,122 @@
+{
+  "patient_id": "group1__CHENSISI",
+  "tasks": [
+    {
+      "task_id": "memory_update_conflict_correction_001",
+      "patient_id": "group1__CHENSISI",
+      "task_type": "memory_update_conflict_correction",
+      "ask_after_stage": "S4_CT",
+      "selected_evidence": [
+        {
+          "evidence_id": "group1_CHENSISI_s3_xr_xla_7_mp_sn_01",
+          "stage": "S3_XR_XLA",
+          "modality": [
+            "XLData"
+          ],
+          "fact_text": "Mandibular plane angle steeper: MP-SN approximately 36.6 degrees, FMA approximately 28 degrees.",
+          "field": "MP-SN",
+          "value": "36.6",
+          "unit": "degree",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s3_xr_xla_7_ans_me_n_me_01",
+          "stage": "S3_XR_XLA",
+          "modality": [
+            "XLData"
+          ],
+          "fact_text": "Hyperdivergent tendency with increased lower anterior facial height: ANS-Me/N-Me approximately 58%, increased.",
+          "field": "ANS-Me/N-Me",
+          "value": "58",
+          "unit": "%",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s4_ct_8_vertical_pattern_01",
+          "stage": "S4_CT",
+          "modality": [
+            "CT"
+          ],
+          "fact_text": "Horizontal growth/short-face tendency with low mandibular plane angle and relatively strong posterior facial height; no vertical maxillary excess",
+          "field": "vertical_pattern",
+          "value": "horizontal growth tendency, low mandibular plane angle, no vertical maxillary excess",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s4_ct_8_lower_anterior_facial_height_01",
+          "stage": "S4_CT",
+          "modality": [
+            "CT"
+          ],
+          "fact_text": "Overall normal-to-reduced lower anterior facial height with flat/low mandibular plane angle",
+          "field": "lower_anterior_facial_height",
+          "value": "normal-to-reduced, flat/low mandibular plane angle",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "The lateral cephalometric analysis suggested a hyperdivergent vertical pattern, with a steeper mandibular plane angle (MP-SN ~36.6°, FMA ~28°) and increased lower anterior facial height (ANS-Me/N-Me ~58%). In contrast, the 3D CT assessment described a horizontal growth/short-face tendency with a low mandibular plane angle and a normal-to-reduced lower anterior facial height. These findings directly conflict rather than simply refining one another, so the patient's vertical skeletal pattern should be considered unresolved pending reconciliation of the cephalometric and CT assessments.",
+      "question": "The cephalometric measurements earlier suggested a hyperdivergent vertical pattern with a steep mandibular plane angle and increased lower anterior facial height, but how does the vertical growth pattern seen on the 3D CT compare, and does this change how we should interpret the patient's vertical skeletal pattern?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The comparison is valid: XLData clearly documents a hyperdivergent pattern (steep MP-SN/FMA, increased ANS-Me/N-Me) while CT clearly documents the opposite (low mandibular plane angle, horizontal/short-face tendency, normal-to-reduced lower facial height), and these were not previously available together, so this is a genuine cross-modality conflict appropriate for this task type. However, the gold answer overstates certainty by calling the CT finding an 'objective measurement-based finding' equivalent to the cephalometric measurements (the CT evidence is descriptive, not a quantified angle), and it adds an unsupported downstream claim about surgical vertical maxillary positioning/impaction that is not grounded in any selected evidence. Repairing by removing the surgical-planning extrapolation and softening the equivalence claim while preserving the acknowledgment of conflict and unresolved status.",
+        "issues": [
+          "Gold answer includes an unsupported extrapolation about surgical planning (vertical maxillary positioning/impaction) not present in the evidence.",
+          "Gold answer characterizes the CT finding as 'objective measurement-based' though the CT evidence is qualitative/descriptive rather than a quantified angle, slightly overstating parity with the XLData measurements."
+        ],
+        "fixed_question": null,
+        "fixed_answer": "The lateral cephalometric analysis suggested a hyperdivergent vertical pattern, with a steeper mandibular plane angle (MP-SN ~36.6°, FMA ~28°) and increased lower anterior facial height (ANS-Me/N-Me ~58%). In contrast, the 3D CT assessment described a horizontal growth/short-face tendency with a low mandibular plane angle and a normal-to-reduced lower anterior facial height. These findings directly conflict rather than simply refining one another, so the patient's vertical skeletal pattern should be considered unresolved pending reconciliation of the cephalometric and CT assessments."
+      }
+    },
+    {
+      "task_id": "memory_update_conflict_correction_002",
+      "patient_id": "group1__CHENSISI",
+      "task_type": "memory_update_conflict_correction",
+      "ask_after_stage": "S4_CT",
+      "selected_evidence": [
+        {
+          "evidence_id": "group1_CHENSISI_s2_dp_5_occlusal_cant_01",
+          "stage": "S2_DP",
+          "modality": [
+            "DP"
+          ],
+          "fact_text": "Occlusal canting present, with left side 2 mm higher",
+          "field": "occlusal_cant",
+          "value": 2,
+          "unit": "mm",
+          "tooth": null,
+          "side": "left_higher"
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s4_ct_8_maxillary_cant_01",
+          "stage": "S4_CT",
+          "modality": [
+            "CT"
+          ],
+          "fact_text": "Mild vertical cant of the maxillary dentoalveolar complex with image-left side appearing slightly lower",
+          "field": "maxillary_cant",
+          "value": "mild, image-left lower",
+          "unit": null,
+          "tooth": null,
+          "side": "left"
+        }
+      ],
+      "gold_answer": "The intraoral photographic exam found an occlusal cant with the left side 2 mm higher than the right, a quantified measurement. The later three-dimensional CT gave a qualitative impression of a mild maxillary dentoalveolar cant with the left side appearing slightly lower, which conflicts in direction with the earlier quantified finding. Because the CT description is not itself a quantified measurement, it should not simply override the earlier objective finding, so the true direction of the maxillary cant remains uncertain and needs clarification before planning any surgical cant correction.",
+      "question": "Earlier intraoral photographs described an occlusal cant with the left side 2 mm higher than the right, but how does the maxillary dentoalveolar cant direction measured on the three-dimensional CT compare to that earlier finding, and what does this mean for confirming the true direction of the cant before surgical planning?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question and evidence support a genuine directional conflict between the earlier intraoral-photo occlusal cant finding (left 2 mm higher, a quantified measurement) and the later CT maxillary dentoalveolar cant finding (left slightly lower). However, the gold answer mischaracterizes both findings as equally weighted 'objective assessments': the DP finding is a quantified measurement while the CT finding is a qualitative descriptive impression ('mild', 'slightly lower') with no quantification. Per validation criterion 9, a qualitative impression must not be treated as overriding or equal to an objective measurement-based conclusion; the answer should acknowledge the discrepancy while flagging that the CT description lacks quantification rather than presenting it as an equally objective conflicting measurement. The fixed answer below preserves the disagreement and appropriate uncertainty while correctly characterizing the two evidence types.",
+        "issues": [
+          "Gold answer incorrectly labels both DP and CT findings as 'objective assessments' when the CT finding is a qualitative descriptive impression without quantification, violating the rule that qualitative impressions must not be equated with/override objective measurements."
+        ],
+        "fixed_question": null,
+        "fixed_answer": "The intraoral photographic exam found an occlusal cant with the left side 2 mm higher than the right, a quantified measurement. The later three-dimensional CT gave a qualitative impression of a mild maxillary dentoalveolar cant with the left side appearing slightly lower, which conflicts in direction with the earlier quantified finding. Because the CT description is not itself a quantified measurement, it should not simply override the earlier objective finding, so the true direction of the maxillary cant remains uncertain and needs clarification before planning any surgical cant correction."
+      }
+    }
+  ]
+}

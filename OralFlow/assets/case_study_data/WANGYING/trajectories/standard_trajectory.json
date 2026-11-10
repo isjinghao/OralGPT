@@ -1,0 +1,298 @@
+{
+  "trajectory_id": "group1__WANGYING__standard_trajectory",
+  "patient_id": "group1__WANGYING",
+  "patient_name": "WANGYING",
+  "group": "group1",
+  "trajectory_type": "standard_trajectory",
+  "stages": [
+    {
+      "stage_id": "S0_PROFILE",
+      "order": 0,
+      "stage_type": "perception",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "image_paths": [],
+      "qa_pairs": [
+        {
+          "source_turn_id": 1,
+          "human": "Please provide your basic information, including age, gender, height, etc.",
+          "assistant": "She is a 25-year-old woman, 167 cm tall and weighing 53 kg.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 2,
+          "human": "What is the primary concern of the patient?",
+          "assistant": "The patient’s primary concern is protrusion of the upper incisors with a gummy smile, present for 8 years.",
+          "image_paths": [],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 3,
+          "human": "What is the patient’s past medical or surgical history?",
+          "assistant": "The patient has no relevant past dental, medical, or surgical history.",
+          "image_paths": [],
+          "role": "observation"
+        }
+      ]
+    },
+    {
+      "stage_id": "S1_FP",
+      "order": 1,
+      "stage_type": "perception",
+      "modality": [
+        "FP"
+      ],
+      "image_paths": [
+        "SH9HCMFdata/group1/WANGYING/FP/FF0.png",
+        "SH9HCMFdata/group1/WANGYING/FP/FF1.png",
+        "SH9HCMFdata/group1/WANGYING/FP/FF2.png",
+        "SH9HCMFdata/group1/WANGYING/FP/FL0.png",
+        "SH9HCMFdata/group1/WANGYING/FP/FL1.png",
+        "SH9HCMFdata/group1/WANGYING/FP/FR0.png",
+        "SH9HCMFdata/group1/WANGYING/FP/FR1.png"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 4,
+          "human": "<image>\n<image>\n<image>\n<image>\n<image>\n<image>\n<image>\nWhat objective findings can be observed from the facial photographs?",
+          "assistant": "The facial photographs show a symmetric facial structure with 8 mm of maxillary incisor display at rest and a 4 mm gummy smile. The upper lip length is 20 mm. The profile is convex, and the nasolabial angle is acute.",
+          "image_paths": [
+            "SH9HCMFdata/group1/WANGYING/FP/FF0.png",
+            "SH9HCMFdata/group1/WANGYING/FP/FF1.png",
+            "SH9HCMFdata/group1/WANGYING/FP/FF2.png",
+            "SH9HCMFdata/group1/WANGYING/FP/FL0.png",
+            "SH9HCMFdata/group1/WANGYING/FP/FL1.png",
+            "SH9HCMFdata/group1/WANGYING/FP/FR0.png",
+            "SH9HCMFdata/group1/WANGYING/FP/FR1.png"
+          ],
+          "role": "observation"
+        }
+      ]
+    },
+    {
+      "stage_id": "S2_DP",
+      "order": 2,
+      "stage_type": "perception",
+      "modality": [
+        "DP"
+      ],
+      "image_paths": [
+        "SH9HCMFdata/group1/WANGYING/DP/DD.png",
+        "SH9HCMFdata/group1/WANGYING/DP/DF.png",
+        "SH9HCMFdata/group1/WANGYING/DP/DL.png",
+        "SH9HCMFdata/group1/WANGYING/DP/DLa.png",
+        "SH9HCMFdata/group1/WANGYING/DP/DR.png",
+        "SH9HCMFdata/group1/WANGYING/DP/DU.png"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 5,
+          "human": "<image>\n<image>\n<image>\n<image>\n<image>\n<image>\nWhat are the occlusal and dental findings based on the intraoral examination?",
+          "assistant": "Intraoral examination showed a Class I molar relationship on the left and Class II on the right, with an overjet of 8 mm and an overbite of 7 mm. The upper dental midline was central, while the lower dental midline was shifted 2 mm to the left. There was no canting, and crowding was present from 32 to 42.",
+          "image_paths": [
+            "SH9HCMFdata/group1/WANGYING/DP/DD.png",
+            "SH9HCMFdata/group1/WANGYING/DP/DF.png",
+            "SH9HCMFdata/group1/WANGYING/DP/DL.png",
+            "SH9HCMFdata/group1/WANGYING/DP/DLa.png",
+            "SH9HCMFdata/group1/WANGYING/DP/DR.png",
+            "SH9HCMFdata/group1/WANGYING/DP/DU.png"
+          ],
+          "role": "observation"
+        }
+      ]
+    },
+    {
+      "stage_id": "S3_XR_XLA",
+      "order": 3,
+      "stage_type": "perception",
+      "modality": [
+        "XR",
+        "XLData"
+      ],
+      "image_paths": [
+        "SH9HCMFdata/group1/WANGYING/XLadata.png",
+        "SH9HCMFdata/group1/WANGYING/XR/XF.png",
+        "SH9HCMFdata/group1/WANGYING/XR/XLa.png",
+        "SH9HCMFdata/group1/WANGYING/XR/XP.png"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 7,
+          "human": "<image>\n<image>\n<image>\nBased on the lateral and posteroanterior cephalometric radiographs and measurements, what are the key dento-skeletal characteristics of this patient?",
+          "assistant": "Key dento‐skeletal characteristics (from lateral and PA cephs and the measurements)\n\nSkeletal pattern\n- Skeletal Class II: ANB 7.6°, Wits +7.9 mm.\n- Maxilla mildly protrusive/forward: SNA 83.6° (slightly ↑).\n- Mandible retrusive and relatively small: SNB 76.0° (↓); short ramus/body values (e.g., Co–Go 66 mm; S‐Vert–Co 111 mm, both ↓); chin retruded (soft‐tissue convexity N′‐Sn‐Pg′ 23.2°).\n- Vertical pattern: mild hyperdivergence/clockwise rotation of the mandible (SN‐MP 36°, MP‐FH 29°, Y‐axis 66.6°). Overall anterior/posterior facial height proportions are near normal.\n\nDental pattern\n- Upper incisors near normal to slightly proclined/forward (U1‐NA 21°, 6.9 mm; U1‐SN 104.6°); mild dentoalveolar extrusion (U1‐PP 30.3 mm, U6‐PP 23.8 mm).\n- Lower incisors significantly proclined/forward (IMPA 100.5°, L1‐NB 37.1°, 9.0 mm); reduced inter‐incisal angle 114.4° → dental compensation for Class II.\n- Overjet increased to 6.1 mm; overbite increased to 4.5 mm (deep bite tendency).\n- Occlusal plane slightly steep (Mx occlusal plane‐FH 10.7°).\n\nSoft tissues\n- Convex profile with retruded chin and lip protrusion relative to E‐plane (UL‐EP +5.5 mm, LL‐EP +7.5 mm).\n\nTransverse (PA ceph)\n- No marked skeletal transverse asymmetry or cant is evident on the PA film.\n\nOverall diagnosis: Skeletal Class II due mainly to mandibular retrognathia with a mild hyperdivergent tendency; dentoalveolar compensation characterized by proclined lower (and slightly upper) incisors, increased overjet and mild deep bite, and a convex soft‐tissue profile with relatively protrusive lips.",
+          "image_paths": [
+            "SH9HCMFdata/group1/WANGYING/XLadata.png",
+            "SH9HCMFdata/group1/WANGYING/XR/XF.png",
+            "SH9HCMFdata/group1/WANGYING/XR/XLa.png"
+          ],
+          "role": "observation"
+        },
+        {
+          "source_turn_id": 9,
+          "human": "<image>\nPlease generate a comprehensive panoramic x-ray report based on the provided panoramic x-ray image.",
+          "assistant": "**Panoramic X-ray Report**\n\n**Image quality**\n- Diagnostic panoramic radiograph obtained with mild central superimposition/ghosting, but overall interpretable.\n\n**Dentition**\n- Partial permanent dentition is present.\n- Automated tooth identification detected most posterior and mandibular teeth; anterior maxillary teeth were only partially identified, likely due to overlap and image quality.\n- Bilateral mandibular third molars are present and appear unerupted/impacted.\n\n**Key findings**\n- **Impacted teeth:**  \n  - **38**: impacted mandibular left third molar.  \n  - **48**: impacted mandibular right third molar.  \n  Tool-based condition detection directly flagged one impacted tooth, and tooth localization supports bilateral mandibular third molar impaction.\n- **Periapical pathology:**  \n  - No periapical lesion detected.  \n  - No granuloma, cyst, or abscess identified by lesion subclass analysis.\n- **Caries / restorations / endodontics:**  \n  - No definite caries, crowns, fillings, implants, root canal treatment, or root pieces detected on automated analysis.\n- **Bone support:**  \n  - No definite generalized bone loss identified by automated bone-loss segmentation.\n- **Jaw structures:**  \n  - Bilateral maxillary sinuses are visualized.\n  - Bilateral mandibular canals are identified.\n\n**Impression**\n1. **Bilateral impacted mandibular third molars (38 and 48).**\n2. No definite radiographic evidence of periapical inflammatory lesion.\n3. No obvious restorations, implants, or endodontically treated teeth detected.\n4. No definite generalized periodontal bone loss identified on this panoramic image.",
+          "image_paths": [
+            "SH9HCMFdata/group1/WANGYING/XR/XP.png"
+          ],
+          "role": "observation"
+        }
+      ]
+    },
+    {
+      "stage_id": "S4_CT",
+      "order": 4,
+      "stage_type": "perception",
+      "modality": [
+        "CT"
+      ],
+      "image_paths": [
+        "SH9HCMFdata/group1/WANGYING/CT/CTF.png",
+        "SH9HCMFdata/group1/WANGYING/CT/CTL0.png",
+        "SH9HCMFdata/group1/WANGYING/CT/CTL1.png",
+        "SH9HCMFdata/group1/WANGYING/CT/CTR0.png",
+        "SH9HCMFdata/group1/WANGYING/CT/CTR1.png"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 8,
+          "human": "<image>\n<image>\n<image>\n<image>\n<image>\nPlease analyze the dentofacial deformity based on the provided 3D CT craniofacial reconstruction.\n\nYou may internally utilize prior sagittal information (e.g., from cephalometric analysis) as a reference to guide your understanding of maxillomandibular relationships.",
+          "assistant": "1. Frontal View Analysis:\n- Facial symmetry: Overall near-symmetric craniofacial skeleton; no appreciable menton (chin) deviation from the midsagittal plane on the 3D CT.\n- Orbital region: Bilaterally level orbital rims with symmetric vertical position; no vertical dystopia evident.\n- Zygomatic region: Symmetric zygomatic width and malar projection; no unilateral flattening.\n- Maxilla: No obvious maxillary cant or vertical asymmetry of the alveolar crest or piriform rims; midline appears centered.\n- Mandible: Mandibular angles appear bilaterally similar in height and contour; no conspicuous asymmetry of ramus height; chin appears centrally aligned.\n\n2. Lateral View Analysis:\n- Sagittal position of the maxilla: Approximately normal to mildly protrusive relative to the cranial base; zygomatic–maxillary buttress and ANS position are not posteriorly placed.\n- Sagittal position of the mandible: Retruded/deficient. The mandibular body and pogonion are positioned posteriorly with an obtuse gonial angle and a steep mandibular plane suggesting clockwise rotation.\n- Maxillomandibular relationship: Skeletal Class II pattern, dominated by mandibular retrognathia. Overjet on the CT appears increased, consistent with the mandibular setback relative to the maxilla.\n- Vertical facial proportions: Long-face tendency. Features include increased lower anterior facial height, steep mandibular plane, and clockwise rotation of the mandible.\n- Chin morphology: Retruded chin (pogonion posterior to a nasion vertical reference and to subnasale-based facial line), small-to-moderate symphyseal projection.\n\n3. Three-Dimensional Summary:\n- Sagittal discrepancies: Clear skeletal Class II relationship primarily due to mandibular retrusion; maxilla is normal to slightly protrusive but not the dominant factor.\n- Vertical discrepancies: Long-face pattern with increased lower facial height and obtuse gonial angle; mandibular clockwise rotation. Possible mild anterior vertical maxillary excess cannot be excluded, but the dominant vertical finding is mandibular plane steepness/rotation.\n- Transverse asymmetry: No significant transverse skeletal asymmetry detected. Orbits and zygomas are symmetric; maxillary base shows no obvious cant; mandibular rami and angles are bilaterally similar with the menton near midline.\n\nMorphology-based clinical inference:\n- The dominant deformity is mandibular retrognathia in a vertical (clockwise) pattern, producing a skeletal Class II relationship. If treatment planning, correction would typically center on mandibular advancement (with counterclockwise rotation as indicated by joint/occlusal constraints), with consideration of genioplasty for chin projection. Evaluate vertical maxillary dimension intraoperatively/with cephalometrics to decide on any adjunctive maxillary impaction for vertical control.",
+          "image_paths": [
+            "SH9HCMFdata/group1/WANGYING/CT/CTF.png",
+            "SH9HCMFdata/group1/WANGYING/CT/CTL0.png",
+            "SH9HCMFdata/group1/WANGYING/CT/CTL1.png",
+            "SH9HCMFdata/group1/WANGYING/CT/CTR0.png",
+            "SH9HCMFdata/group1/WANGYING/CT/CTR1.png"
+          ],
+          "role": "observation"
+        }
+      ]
+    },
+    {
+      "stage_id": "S5_TMJ",
+      "order": 5,
+      "stage_type": "perception",
+      "modality": [
+        "TMJ"
+      ],
+      "image_paths": [
+        "SH9HCMFdata/group1/WANGYING/TMJ/TMJL1.png",
+        "SH9HCMFdata/group1/WANGYING/TMJ/TMJL2.png",
+        "SH9HCMFdata/group1/WANGYING/TMJ/TMJL3.png",
+        "SH9HCMFdata/group1/WANGYING/TMJ/TMJR1.png",
+        "SH9HCMFdata/group1/WANGYING/TMJ/TMJR2.png",
+        "SH9HCMFdata/group1/WANGYING/TMJ/TMJR3.png"
+      ],
+      "qa_pairs": [
+        {
+          "source_turn_id": 6,
+          "human": "<image>\n<image>\n<image>\n<image>\n<image>\n<image>\nWhat are the temporomandibular joint (TMJ) findings on clinical examination?",
+          "assistant": "On clinical examination of the temporomandibular joints, mouth opening is 4 cm, the mandible shifts to the right on opening, and there are clicking sounds on both opening and closing bilaterally.",
+          "image_paths": [
+            "SH9HCMFdata/group1/WANGYING/TMJ/TMJL1.png",
+            "SH9HCMFdata/group1/WANGYING/TMJ/TMJL2.png",
+            "SH9HCMFdata/group1/WANGYING/TMJ/TMJL3.png",
+            "SH9HCMFdata/group1/WANGYING/TMJ/TMJR1.png",
+            "SH9HCMFdata/group1/WANGYING/TMJ/TMJR2.png",
+            "SH9HCMFdata/group1/WANGYING/TMJ/TMJR3.png"
+          ],
+          "role": "observation"
+        }
+      ]
+    },
+    {
+      "stage_id": "S6_TREATMENT",
+      "order": 6,
+      "stage_type": "treatment",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "image_paths": [],
+      "qa_pairs": [
+        {
+          "source_turn_id": 10,
+          "human": "What is the diagnosis based on the clinical, radiological, and functional findings?",
+          "assistant": "Part I: Dentofacial Deformity-Related Diagnosis 1. Skeletal Malocclusion (Orthognathic Perspective) - Sagittal skeletal pattern: Skeletal Class II pattern, dominated by mandibular retrognathia. Approximately normal to mildly protrusive maxilla relative to the cranial base; zygomatic-maxillary buttress and ANS position are not posteriorly placed. Mandible is retruded/deficient. - Vertical pattern: Long-face tendency. Features include increased lower anterior facial height, steep mandibular plane, and clockwise rotation of the mandible. - Transverse relationship: The facial examination shows a symmetric facial structure with 8 mm of maxillary incisor display at rest and a 4 mm gummy smile. Occlusal examination shows no canting. 2. Dental Malocclusion (Orthodontic Perspective) - Angle classification: Class II molar relationship on the left and right. - Overjet / overbite: Overjet of 8 mm and overbite of 7 mm. - Dental compensation: Dentoalveolar compensation characterized by marked mandibular incisor proclination/protrusion and slight maxillary incisor proclination. - Alignment: No canting, crowding present from 32 to 42. 3. Craniofacial and Structural Conditions - Congenital syndromes: No syndromic craniofacial anomaly identified on current imaging. - Condylar pathology: No definite condylar hyperplasia, hypoplasia, osteochondroma, or other osseous condylar deformity identified. - Jaw defects: Maxilla approximately normal to mildly protrusive; mandible retruded/deficient. - Airway-related conditions: Not assessable based on current data. - Temporomandibular joint disorders: Temporomandibular disorder (TMD), based on the provided clinical/functional diagnosis; specific structural TMJ abnormality is not definitively characterized on the current imaging dataset. 4. Integrated Dentofacial Diagnosis - Skeletal Class II pattern dominated by mandibular retrognathia, with an approximately normal to mildly protrusive maxilla. - Long-face tendency with increased lower anterior facial height, steep mandibular plane, and clockwise mandibular rotation. - Symmetric facial structure. - Class II molar relationship on the left and right. - Dentoalveolar compensation characterized by marked mandibular incisor proclination/protrusion and slight maxillary incisor proclination. Part II: Dental and Systemic Disease Diagnosis 1. Dental Hard Tissue Diseases - No definite radiographic evidence of caries, non-carious hard tissue defects, or periapical inflammatory disease on the current panoramic imaging. 2. Periodontal Conditions - No definite generalized periodontal bone loss identified radiographically. - Clinical periodontal status is not assessable based on current data. 3. Dentition and Prosthodontic Status - Third molars: 18, 28, 38, 48, per provided diagnosis sheet content; panoramic imaging clearly supports impaction of 38. - Restorative/prosthodontic status: No definite crowns, fixed prostheses, implants, or endodontically treated teeth identified. - Other missing teeth or agenesis: Not assessable based on current data. 4. Other Oral Pathologies - No definite odontogenic cyst, tumor, abscess, granuloma, or other focal osseous lesion identified. 5. Systemic Conditions - Not assessable based on current data.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "S5_TMJ",
+          "release_after_stage": "S6_TREATMENT"
+        },
+        {
+          "source_turn_id": 11,
+          "human": "What treatment strategies are available for this patient, and how do they differ conceptually?",
+          "assistant": "The primary available strategy is a comprehensive multidisciplinary approach: TMJ stabilization with rehabilitation therapy, presurgical orthodontic decompensation with planned extractions, orthognathic surgery with segmental Le Fort I osteotomy and BSSRO, and postsurgical orthodontic finishing. A clinically reasonable alternative is a modified comprehensive surgical plan using the same orthodontic-surgical pathway but omitting optional adjuncts such as PAOO or subapical osteotomy unless intra-treatment findings indicate need. A non-surgical or observation-based option would be limited and would not address the planned skeletal correction; its suitability requires further clinical and imaging evaluation.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "S5_TMJ",
+          "release_after_stage": "S6_TREATMENT"
+        },
+        {
+          "source_turn_id": 12,
+          "human": "Is active treatment necessary, or would observation or conservative treatment alone be sufficient?",
+          "assistant": "Active treatment appears necessary. Conservative management by itself may help TMJ stabilization but would not substitute for the planned orthodontic-surgical correction. Whether a purely conservative pathway is acceptable requires further clinical and imaging evaluation.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "S5_TMJ",
+          "release_after_stage": "S6_TREATMENT"
+        },
+        {
+          "source_turn_id": 13,
+          "human": "What functional, skeletal, occlusal, or aesthetic improvements are expected from treatment?",
+          "assistant": "Expected benefits include TMJ stabilization, dental leveling and alignment, orthodontic decompensation, correction of skeletal and occlusal discrepancies through maxillary and mandibular surgery, and improvement of final occlusal stability after postsurgical orthodontics. Aesthetic improvement is also expected from orthognathic correction, but the specific magnitude and facial goals require further clinical and imaging evaluation.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "S5_TMJ",
+          "release_after_stage": "S6_TREATMENT"
+        },
+        {
+          "source_turn_id": 14,
+          "human": "Can treatment start immediately, or is follow-up required before definitive intervention?",
+          "assistant": "Treatment can begin with rehabilitation measures such as an occlusal splint to stabilize the TMJ, followed by presurgical orthodontic preparation. Definitive surgery should follow completion of orthodontic leveling, alignment, and decompensation. The need for adjunctive PAOO or subapical osteotomy should be determined during ongoing evaluation and treatment progression.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "S5_TMJ",
+          "release_after_stage": "S6_TREATMENT"
+        },
+        {
+          "source_turn_id": 15,
+          "human": "What is the main treatment pathway, and what are the principal components of the plan?",
+          "assistant": "The main pathway is: 1) TMJ rehabilitation with occlusal splint therapy, 2) presurgical orthodontics with extraction of 34, 44, 38, and 48 for leveling, alignment, and decompensation, with PAOO in the 13-23 region if necessary, 3) orthognathic surgery with extraction of 14, 24, 18, and 28 combined with segmental Le Fort I osteotomy and BSSRO, with subapical osteotomy if necessary, and 4) postsurgical orthodontics to establish stable occlusion. The core objective is comprehensive skeletal and occlusal rehabilitation.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "S5_TMJ",
+          "release_after_stage": "S6_TREATMENT"
+        },
+        {
+          "source_turn_id": 16,
+          "human": "Are there alternative strategies, and how do they differ in invasiveness, comprehensiveness, and expected outcomes?",
+          "assistant": "An alternative within standard practice is a comprehensive orthognathic plan without optional adjunctive PAOO or subapical osteotomy unless treatment response shows they are required; this is somewhat less invasive but still comprehensive. Another theoretical alternative is conservative management with splint therapy and orthodontic camouflage, but this would be less comprehensive and would not predictably achieve the same skeletal correction as bimaxillary orthognathic surgery. Selection among these options requires further clinical and imaging evaluation.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "S5_TMJ",
+          "release_after_stage": "S6_TREATMENT"
+        },
+        {
+          "source_turn_id": 17,
+          "human": "Which plan is more comprehensive, which is more limited, and what factors influence plan selection?",
+          "assistant": "The most comprehensive plan is the full staged surgical-orthodontic pathway including TMJ rehabilitation, presurgical orthodontics, extractions, segmental Le Fort I osteotomy, BSSRO, and postsurgical orthodontics, with PAOO and subapical osteotomy used if indicated. A more limited plan would omit optional adjunctive procedures or rely on conservative measures, but this may reduce the extent of correction. Plan selection depends on TMJ status, severity of skeletal and dental discrepancy, orthodontic decompensation needs, surgical goals, and whether adjunctive procedures are necessary during treatment.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "S5_TMJ",
+          "release_after_stage": "S6_TREATMENT"
+        },
+        {
+          "source_turn_id": 18,
+          "human": "What is the recommended decision direction, what key factors affect final plan selection, and what still needs evaluation?",
+          "assistant": "The recommended direction is to proceed with staged comprehensive treatment beginning with TMJ stabilization and presurgical orthodontic preparation, followed by definitive orthognathic surgery and postsurgical finishing. Key factors affecting final selection include response of TMJ symptoms to rehabilitation, readiness for orthodontic decompensation, and intra-treatment need for PAOO or subapical osteotomy. Exact surgical design, necessity of all adjunctive procedures, and appropriateness of any less invasive alternative require further clinical and imaging evaluation.",
+          "image_paths": [],
+          "role": "evaluation",
+          "ask_after_stage": "S5_TMJ",
+          "release_after_stage": "S6_TREATMENT"
+        }
+      ]
+    }
+  ]
+}

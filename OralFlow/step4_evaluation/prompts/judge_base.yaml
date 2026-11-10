@@ -6,36 +6,22 @@ template: |
   2. For each item in SELECTED EVIDENCE, whether the answer correctly covers that clinical fact.
 
   Evidence scope:
-  - SELECTED EVIDENCE was filtered during task construction and contains only the evidence
-    required to answer this question. Every listed item is part of the fixed gold evidence set and
-    must be judged. Do not introduce an in-scope/out-of-scope distinction during evaluation.
+  - SELECTED EVIDENCE was filtered during task construction and contains only the evidence required to answer this question. Every listed item is part of the fixed gold evidence set and must be judged. Do not introduce an in-scope/out-of-scope distinction during evaluation.
 
   Clinical semantic equivalence:
-  - Accept clinically equivalent or synonymous phrasing as covering the same fact; do not require
-    identical terminology. Examples of equivalent expressions:
-      * "mandibular excess" / "protruded chin" / "mandibular prognathism" ≈ "mandibular protrusion"
-      * "skeletal Class III" ≈ "bilateral Class III molar relationship" (when describing the same relationship)
-      * "concave facial profile" ≈ "prognathic mandibular profile"
-  - Judge on clinical meaning, not surface wording.
+  - Accept clinically equivalent paraphrases. Verify the anatomical structure and level (skeletal, dental, or soft tissue), and preserve key qualifiers, including laterality, direction, negation, severity, and diagnostic certainty. Consider examination modality and time point when relevant.Related findings cannot replace the target finding. Do not infer missing information. Apply numerical tolerances only to the same measurement and anatomical site.
 
   Numeric tolerance (apply per fact type):
   - Quantitative LINEAR measurements (mm, e.g. chin/menton deviation, overjet, overbite, midline shift):
-    the DIRECTION / sign / laterality (left vs right, positive vs negative/reverse) MUST match; the
-    magnitude is acceptable if it is within ±2 mm OR ±20% of the reference value, whichever is larger.
-    Do NOT fail an item solely for a small magnitude difference within this tolerance.
-  - ANGULAR measurements (degrees, e.g. SNA/SNB/ANB, nasolabial angle): acceptable within ±10°, and any
-    qualitative descriptor (acute/obtuse/normal, high-angle/low-angle) MUST match.
-  - CATEGORICAL / CLASSIFICATION findings (Angle or skeletal Class I/II/III, presence vs absence of a
-    sign, left vs right laterality, crossbite yes/no): must match EXACTLY. A wrong class or wrong
-    direction is incorrect / not covered — no tolerance here.
+    the DIRECTION / sign / laterality (left vs right, positive vs negative/reverse) MUST match; the magnitude is acceptable if it is within ±2 mm OR ±20% of the reference value, whichever is larger. Do NOT fail an item solely for a small magnitude difference within this tolerance.
+  - ANGULAR measurements (degrees, e.g. SNA/SNB/ANB, nasolabial angle): acceptable within ±3°, and any qualitative descriptor (acute/obtuse/normal, high-angle/low-angle) MUST match. Apply numerical tolerances only when the answer refers to the same measurement and anatomical site. When the sign, direction, or diagnostic category is clinically relevant, it must also match. Numerical proximity alone is insufficient for credit.
+  - CATEGORICAL / CLASSIFICATION findings (Angle or skeletal Class I/II/III, presence vs absence of a sign, left vs right laterality, crossbite yes/no): must match EXACTLY. A wrong class or wrong direction is incorrect / not covered — no tolerance here.
 
   Other rules:
-  - A selected evidence item is covered only if the model answer states the same clinical fact (per the
-    equivalence and tolerance rules above) without contradiction.
+  - A selected evidence item is covered only if the model answer states the same clinical fact (per the equivalence and tolerance rules above) without contradiction.
   - Missing a selected evidence item means it is not covered.
   - Extra unrelated but non-contradicting content does not by itself make the answer wrong.
-  - Set overall "correct" to true only if the answer captures the essential factual content
-    required by the question.
+  - Set overall "correct" to true only if the answer captures the essential factual content required by the question.
 
   QUESTION:
   $question

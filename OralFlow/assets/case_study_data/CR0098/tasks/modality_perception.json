@@ -1,0 +1,238 @@
+{
+  "patient_id": "report__CR0098",
+  "tasks": [
+    {
+      "task_id": "modality_perception_001",
+      "patient_id": "report__CR0098",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T0_perception_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_electric_pulp_test_response_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 had no response to electric pulp testing at the initial workup.",
+          "field": "electric_pulp_test_response",
+          "value": "no response",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_cold_test_response_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 had no response to cold testing at the initial workup.",
+          "field": "cold_test_response",
+          "value": "no response",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_pulp_diagnosis_02",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with necrotic pulp at the initial workup.",
+          "field": "pulp_diagnosis",
+          "value": "necrotic pulp",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_apical_diagnosis_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with acute apical abscess at the initial workup.",
+          "field": "apical_diagnosis",
+          "value": "acute apical abscess",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        }
+      ],
+      "gold_answer": "Tooth #31 had no response to electric pulp or cold testing and was diagnosed with necrotic pulp. Its apical diagnosis was acute apical abscess.",
+      "question": "At the initial dental workup, what were the pulp and apical diagnoses for tooth #31, based on the clinical testing findings?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, answerable at the initial workup stage, and aligned with the modality (TEXT_QA). The gold answer directly matches the selected evidence for both pulp and apical diagnoses, and the included clinical test responses are also supported by the evidence. No temporal or modality inconsistencies detected.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "modality_perception_002",
+      "patient_id": "report__CR0098",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T3_followup_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_5_cbct_timing_after_nsrct_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The postoperative CBCT scan was obtained 1 month after NSRCT on #31.",
+          "field": "cbct_timing_after_nsrct",
+          "value": "1 month after NSRCT",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_5_radiolucent_lesion_extent_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "CBCT cross sections showed an extensive radiolucent lesion.",
+          "field": "radiolucent_lesion_extent",
+          "value": "extensive",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_5_radiolucent_lesion_location_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The radiolucent lesion extended from the distal root of #30 to the distal root of #31.",
+          "field": "radiolucent_lesion_location",
+          "value": "from distal root of #30 to distal root of #31",
+          "unit": null,
+          "tooth": "#30; #31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_buccal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the buccal bone between #30 and #31.",
+          "field": "CBCT_buccal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_interproximal_bone_loss_between_30_31_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "CBCT revealed complete loss of the interproximal bone between #30 and #31.",
+          "field": "CBCT_interproximal_bone_loss_between_30_31",
+          "value": "complete loss",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_cbct_bony_defect_wall_count_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The CBCT findings led to a 1-wall defect.",
+          "field": "CBCT_bony_defect_wall_count",
+          "value": "1-wall defect",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        }
+      ],
+      "gold_answer": "One month after NSRCT on #31, CBCT showed an extensive radiolucent lesion extending from the distal root of #30 to the distal root of #31. There was complete loss of the buccal and interproximal bone between #30 and #31, producing a 1-wall defect.",
+      "question": "At the follow-up CBCT obtained one month after NSRCT on #31, what radiographic findings were described regarding the lesion extent and the condition of the bone between #30 and #31?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is well-posed for a modality_perception task at the specified follow-up and references CBCT appropriately. The gold answer is concise and fully supported by the selected evidence, accurately capturing lesion extent and the bone condition (buccal and interproximal loss leading to a 1-wall defect) without adding unsupported details.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "modality_perception_003",
+      "patient_id": "report__CR0098",
+      "task_type": "modality_perception",
+      "ask_after_stage": "T7_followup_05",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_23_postoperative_interval_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "The image was 1-year postoperative.",
+          "field": "postoperative_interval",
+          "value": "1 year",
+          "unit": "year",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_cbct_bone_fill_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, CBCT showed substantial bone fill at sites #30 and #31.",
+          "field": "CBCT bone fill",
+          "value": "substantial",
+          "unit": null,
+          "tooth": "#30 and #31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_cbct_graft_integration_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, CBCT showed graft integration at sites #30 and #31.",
+          "field": "CBCT graft integration",
+          "value": "present",
+          "unit": null,
+          "tooth": "#30 and #31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_24_periapical_lesion_status_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-year postoperative visit, the periapical lesion had resolved on CBCT.",
+          "field": "periapical lesion status",
+          "value": "resolved",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At the 1-year postoperative visit, CBCT showed substantial bone fill and graft integration at sites #30 and #31. The periapical lesion had resolved.",
+      "question": "What did follow-up CBCT imaging show regarding sites #30 and #31 and the periapical lesion?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, aligned with a modality perception task, and answerable at T7. All elements of the gold answer (1-year postoperative timing, substantial bone fill and graft integration at sites #30 and #31, and resolution of the periapical lesion) are directly supported by FIGURE_QA evidence. Modality and temporal consistency are appropriate.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    }
+  ]
+}

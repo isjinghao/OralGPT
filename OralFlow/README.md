@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/isjinghao/OralGPT/blob/main/assets/logo_OralFlow.png?raw=true" alt="OralFlow-Bench logo" width="200">
+  <img src="assets/oralflow_logo.png" alt="OralFlow-Bench logo" width="200">
 </p>
 
 <h1 align="center">OralFlow-Bench</h1>
@@ -86,7 +86,7 @@ GRAPHITI_NEO4J_PASSWORD=your_neo4j_password
 | OralFlow-Literature ingestion and timeline construction | MinerU + benchmark LLM + verifier LLM |
 | Model-perception trajectory | Multimodal answer model |
 | Perception and answer scoring | Verifier LLM |
-| `single_stage_memory`, `full_context_memory` | No additional memory service |
+| `full_context_memory` | No additional memory service |
 | `summary_memory` | Memo LLM |
 | `vector_memory` | Embedding model |
 | `mem0_memory` | Mem0 LLM + embedding model |
@@ -126,12 +126,12 @@ To compare multiple conditions and memory systems:
 ```bash
 bash scripts/run_step4_answers.sh --all --num-workers 1 \
   --trajectories standard_trajectory,short_noisy,no_ct \
-  --methods single_stage_memory,full_context_memory,summary_memory,vector_memory \
+  --methods full_context_memory,summary_memory,vector_memory \
   --answer-workers 2 --method-workers 1
 
 bash scripts/run_step4_scoring.sh --all --num-workers 1 \
   --trajectories standard_trajectory,short_noisy,no_ct \
-  --methods single_stage_memory,full_context_memory,summary_memory,vector_memory \
+  --methods full_context_memory,summary_memory,vector_memory \
   --score-workers 1 --method-workers 1
 ```
 
@@ -186,7 +186,7 @@ bash scripts/run_step4_report_scoring.sh --limit 1 --num-workers 1 \
 @inproceedings{anonymous2027oralflow,
   title     = {{OralFlow}: A Longitudinal Multimodal Benchmark across Clinical Workflows in Dentistry},
   author    = {Anonymous},
-  booktitle = {International Conference on Learning Representations},
+  booktitle = {IEEE Conference on Computer Vision and Pattern Recognition},
   year      = {2027},
   note      = {Under review}
 }

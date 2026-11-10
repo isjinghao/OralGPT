@@ -1,0 +1,275 @@
+{
+  "patient_id": "group1__CHENSISI",
+  "tasks": [
+    {
+      "task_id": "cross_modal_reasoning_001",
+      "patient_id": "group1__CHENSISI",
+      "task_type": "cross_modal_reasoning",
+      "ask_after_stage": "S4_CT",
+      "selected_evidence": [
+        {
+          "evidence_id": "group1_CHENSISI_s0_profile_2_chief_complaint_01",
+          "stage": "S0_PROFILE",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Patient's primary concern is mandibular protrusion.",
+          "field": "chief_complaint",
+          "value": "mandibular protrusion",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s1_fp_4_facial_profile_01",
+          "stage": "S1_FP",
+          "modality": [
+            "FP"
+          ],
+          "fact_text": "Facial profile is concave.",
+          "field": "facial_profile",
+          "value": "concave",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s2_dp_5_molar_relationship_01",
+          "stage": "S2_DP",
+          "modality": [
+            "DP"
+          ],
+          "fact_text": "Class III molar relationship bilaterally",
+          "field": "molar_relationship",
+          "value": "Class III",
+          "unit": null,
+          "tooth": null,
+          "side": "bilateral"
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s2_dp_5_reverse_overjet_01",
+          "stage": "S2_DP",
+          "modality": [
+            "DP"
+          ],
+          "fact_text": "Reverse overjet of 6 mm",
+          "field": "reverse_overjet",
+          "value": 6,
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s3_xr_xla_7_anb_01",
+          "stage": "S3_XR_XLA",
+          "modality": [
+            "XLData"
+          ],
+          "fact_text": "Severe skeletal Class III pattern with ANB approximately -7 degrees.",
+          "field": "ANB",
+          "value": "-7",
+          "unit": "degree",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s3_xr_xla_7_wits_01",
+          "stage": "S3_XR_XLA",
+          "modality": [
+            "XLData"
+          ],
+          "fact_text": "Wits appraisal approximately -14.8 mm, consistent with severe skeletal Class III.",
+          "field": "Wits",
+          "value": "-14.8",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s3_xr_xla_7_sna_01",
+          "stage": "S3_XR_XLA",
+          "modality": [
+            "XLData"
+          ],
+          "fact_text": "SNA approximately 82 degrees, maxilla positioned close to average relative to cranial base.",
+          "field": "SNA",
+          "value": "82",
+          "unit": "degree",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s3_xr_xla_7_snb_01",
+          "stage": "S3_XR_XLA",
+          "modality": [
+            "XLData"
+          ],
+          "fact_text": "SNB approximately 89 degrees, mandible markedly prognathic relative to cranial base.",
+          "field": "SNB",
+          "value": "89",
+          "unit": "degree",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s4_ct_8_skeletal_classification_01",
+          "stage": "S4_CT",
+          "modality": [
+            "CT"
+          ],
+          "fact_text": "Skeletal Class III pattern, dominated by mandibular prognathism with contributory maxillary retrusion",
+          "field": "skeletal_classification",
+          "value": "Class III, mandibular prognathism with maxillary retrusion",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s4_ct_8_maxillary_sagittal_position_01",
+          "stage": "S4_CT",
+          "modality": [
+            "CT"
+          ],
+          "fact_text": "Maxilla is retruded with reduced anterior projection of maxillary alveolus and zygomatico-maxillary complex relative to cranial base",
+          "field": "maxillary_sagittal_position",
+          "value": "retruded",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s4_ct_8_mandibular_sagittal_position_01",
+          "stage": "S4_CT",
+          "modality": [
+            "CT"
+          ],
+          "fact_text": "Mandible is protruded with prominent mandibular body and pogonion advanced anterior to maxilla",
+          "field": "mandibular_sagittal_position",
+          "value": "protruded",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "The chief complaint of mandibular protrusion and a concave facial profile are corroborated dentally by bilateral Class III molars with 6 mm reverse overjet, and skeletally by a severely negative ANB (~-7°) and Wits (~-14.8 mm). CT confirms an overall skeletal Class III pattern driven primarily by mandibular prognathism (protruded mandibular body/pogonion, SNB ~89°) with only a mild contributory maxillary retrusion (SNA near-average at ~82° but reduced anterior projection on CT). Together the findings indicate a mandible-dominant Class III skeletal discrepancy rather than a purely maxillary-deficiency pattern.",
+      "question": "Bringing together the patient's reported facial concerns, the intraoral bite findings, the earlier cephalometric measurements, and now the three-dimensional CT, how do these pieces together explain whether her Class III skeletal pattern is primarily driven by mandibular overgrowth, maxillary deficiency, or a combination of both?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question appropriately synthesizes FP, DP, XLData, and CT evidence across stages without leaking the answer or misnaming modalities as internal stage IDs. The gold answer's core claims (concave profile, Class III molars, reverse overjet, ANB/Wits values, SNA/SNB, CT-based mandibular prognathism with contributory maxillary retrusion, and the mandible-dominant conclusion) are all supported by the selected evidence. However, the descriptor 'long-standing' applied to the chief complaint of mandibular protrusion is not supported by the TEXT_QA evidence, which only states 'mandibular protrusion' with no duration qualifier. This unsupported detail is removed in the fixed answer.",
+        "issues": [
+          "Gold answer includes 'long-standing' for the chief complaint, which is not supported by the chief_complaint evidence (only 'mandibular protrusion' is stated, with no duration)."
+        ],
+        "fixed_question": null,
+        "fixed_answer": "The chief complaint of mandibular protrusion and a concave facial profile are corroborated dentally by bilateral Class III molars with 6 mm reverse overjet, and skeletally by a severely negative ANB (~-7°) and Wits (~-14.8 mm). CT confirms an overall skeletal Class III pattern driven primarily by mandibular prognathism (protruded mandibular body/pogonion, SNB ~89°) with only a mild contributory maxillary retrusion (SNA near-average at ~82° but reduced anterior projection on CT). Together the findings indicate a mandible-dominant Class III skeletal discrepancy rather than a purely maxillary-deficiency pattern."
+      }
+    },
+    {
+      "task_id": "cross_modal_reasoning_002",
+      "patient_id": "group1__CHENSISI",
+      "task_type": "cross_modal_reasoning",
+      "ask_after_stage": "S4_CT",
+      "selected_evidence": [
+        {
+          "evidence_id": "group1_CHENSISI_s1_fp_4_facial_symmetry_01",
+          "stage": "S1_FP",
+          "modality": [
+            "FP"
+          ],
+          "fact_text": "Facial structure is asymmetric.",
+          "field": "facial_symmetry",
+          "value": "asymmetric",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s1_fp_4_chin_deviation_01",
+          "stage": "S1_FP",
+          "modality": [
+            "FP"
+          ],
+          "fact_text": "Chin is deviated 2 mm to the right.",
+          "field": "chin_deviation",
+          "value": 2,
+          "unit": "mm",
+          "tooth": null,
+          "side": "right"
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s2_dp_5_lower_dental_midline_shift_01",
+          "stage": "S2_DP",
+          "modality": [
+            "DP"
+          ],
+          "fact_text": "Lower dental midline shifted 1 mm to the right",
+          "field": "lower_dental_midline_shift",
+          "value": 1,
+          "unit": "mm",
+          "tooth": null,
+          "side": "right"
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s3_xr_xla_7_menton_deviation_01",
+          "stage": "S3_XR_XLA",
+          "modality": [
+            "XR"
+          ],
+          "fact_text": "No gross skeletal cant on posteroanterior cephalogram; possible mild mandibular asymmetry with small menton deviation.",
+          "field": "menton_deviation",
+          "value": "mild",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s4_ct_8_chin_deviation_01",
+          "stage": "S4_CT",
+          "modality": [
+            "CT"
+          ],
+          "fact_text": "Mild-to-moderate lower facial asymmetry with mandibular midline and chin deviated to image-left (subject's right)",
+          "field": "chin_deviation",
+          "value": "image-left (subject's right)",
+          "unit": null,
+          "tooth": null,
+          "side": "right"
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s4_ct_8_gonial_asymmetry_01",
+          "stage": "S4_CT",
+          "modality": [
+            "CT"
+          ],
+          "fact_text": "Mandibular angles asymmetric; image-left gonial region more inferior and laterally flared than opposite side, suggesting ramus/body asymmetry",
+          "field": "gonial_asymmetry",
+          "value": "image-left more inferior and laterally flared",
+          "unit": null,
+          "tooth": null,
+          "side": "left"
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s4_ct_8_transverse_asymmetry_summary_01",
+          "stage": "S4_CT",
+          "modality": [
+            "CT"
+          ],
+          "fact_text": "Mandibular asymmetry with chin deviation to image-left and gonial/ramus asymmetry; maxilla largely centered with slight transverse/vertical cant coordinated to mandibular deviation",
+          "field": "transverse_asymmetry_summary",
+          "value": "mandibular asymmetry with chin deviation left, maxilla largely centered with coordinated cant",
+          "unit": null,
+          "tooth": null,
+          "side": "left"
+        }
+      ],
+      "gold_answer": "Facial photographs show an asymmetric face with the chin deviated about 2 mm to the right, consistent with a 1 mm right shift of the lower dental midline seen intraorally. Posteroanterior cephalometry found no gross skeletal cant but suggested a mild mandibular asymmetry with slight menton deviation, and CT confirms this as a true mandibular skeletal asymmetry: the mandibular midline/chin deviates to the patient's right with the right gonial/ramus region more inferior and laterally flared than the left, while the maxilla remains largely centered with only a slight coordinated cant. This pattern indicates the facial asymmetry is mandible-driven rather than maxilla-driven.",
+      "question": "Bringing together the facial photos, intraoral photos, panoramic/PA cephalometric findings, and the recent three-dimensional CT, how do these findings collectively support whether this patient's facial asymmetry originates from the mandible or the maxilla?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question appropriately names the actual modalities (facial photos, intraoral photos, panoramic/PA cephalometric findings, CT) rather than internal stage codes, and is answerable at S4_CT since all cited evidence is available by that stage. The gold answer's claims are all traceable to selected evidence: facial chin deviation (2mm right, FP), lower dental midline shift (1mm right, DP), PA cephalometric findings of no gross cant with mild mandibular asymmetry/menton deviation (XR), and CT findings of mandibular midline/chin deviation with gonial asymmetry and maxilla remaining largely centered with coordinated cant (CT). The 'image-left' terminology in the gonial asymmetry evidence is consistently mapped to 'subject's right' as explicitly clarified in the paired CT chin-deviation evidence, so translating gonial flaring to 'right' side is supported rather than fabricated. The final comparative conclusion (mandible-driven rather than maxilla-driven) is directly supported by the CT transverse_asymmetry_summary evidence, which explicitly states the maxilla is largely centered with only a coordinated cant while the mandible shows the primary asymmetry.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    }
+  ]
+}

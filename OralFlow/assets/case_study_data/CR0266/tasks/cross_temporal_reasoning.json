@@ -1,0 +1,286 @@
+{
+  "patient_id": "report__CR0266",
+  "tasks": [
+    {
+      "task_id": "cross_temporal_reasoning_001",
+      "patient_id": "report__CR0266",
+      "task_type": "cross_temporal_reasoning",
+      "ask_after_stage": "T3_followup_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_buccal_marginal_gingiva_white_streak_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white streak was present on the buccal marginal gingiva.",
+          "field": "buccal_marginal_gingiva_white_streak",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_size_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak measured 2 × 4 mm.",
+          "field": "white_streak_size",
+          "value": "2 × 4",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_wipeability_with_gauze_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak did not wipe off with gauze.",
+          "field": "white_streak_wipeability_with_gauze",
+          "value": "did not wipe off",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_24_gingival_lesion_histology_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+          "field": "gingival_lesion_histology",
+          "value": "consistent with hyperkeratosis",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At presentation, the buccal marginal gingiva had a 2 × 4 mm white streak that did not wipe off with gauze. Histology from the gingival lesion biopsy was consistent with hyperkeratosis.",
+      "question": "What were the size, wipeability, and later biopsy histology findings of the white streak on the buccal marginal gingiva?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question appropriately requires cross-temporal reasoning, referencing initial lesion characteristics and later biopsy findings. The gold answer is concise and fully supported by the selected evidence, with correct timing, site, and modality.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "cross_temporal_reasoning_002",
+      "patient_id": "report__CR0266",
+      "task_type": "cross_temporal_reasoning",
+      "ask_after_stage": "T7_followup_04",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_23_soft_tissue_covering_cover_screw_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The marginal soft tissue was slightly covering the lingual side of the cover screw.",
+          "field": "soft_tissue_covering_cover_screw",
+          "value": "slightly covering",
+          "unit": null,
+          "tooth": null,
+          "side": "lingual"
+        },
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_28_new_tissue_epithelial_layer_thickness_relative_to_surrounding_socket_tissue_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The new tissue had a thinner epithelial layer than the original tissue surrounding the socket.",
+          "field": "new_tissue_epithelial_layer_thickness_relative_to_surrounding_socket_tissue",
+          "value": "thinner",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_28_new_tissue_visible_red_streaks_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The new tissue had visible red streaks.",
+          "field": "new_tissue_visible_red_streaks",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_28_red_streaks_interpretation_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The visible red streaks were described as indicative of blood vessels.",
+          "field": "red_streaks_interpretation",
+          "value": "indicative of blood vessels",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t4_followup_01_28_new_tissue_complete_keratinization_01",
+          "stage": "T4_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The new tissue did not appear completely keratinized at this time.",
+          "field": "new_tissue_complete_keratinization",
+          "value": "not apparent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_thickness_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The soft tissue had thickened.",
+          "field": "soft_tissue_thickness",
+          "value": "thickened",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_keratinization_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The soft tissue appeared keratinized.",
+          "field": "soft_tissue_keratinization",
+          "value": "keratinized",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_32_visible_blood_vessels_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Blood vessels were no longer visible to the naked eye.",
+          "field": "visible_blood_vessels",
+          "value": "not_visible_to_naked_eye",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_continuity_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The newly formed soft tissue was more continuous with the surrounding tissue.",
+          "field": "soft_tissue_continuity",
+          "value": "more_continuous_with_surrounding_tissue",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_proliferation_direction_01",
+          "stage": "T5_followup_02",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The newly formed soft tissue had proliferated coronally.",
+          "field": "soft_tissue_proliferation_direction",
+          "value": "coronal",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_35_soft_tissue_appearance_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At 3 months, the soft tissue had completely submerged the implant cover screw.",
+          "field": "soft_tissue_appearance",
+          "value": "completely submerged implant cover screw",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_peri_implant_soft_tissue_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Peri-implant soft tissue appeared healthy.",
+          "field": "peri-implant_soft_tissue",
+          "value": "healthy",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_attached_keratinized_tissue_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Wide zone of attached keratinized tissue on the buccal and lingual surfaces.",
+          "field": "attached_keratinized_tissue",
+          "value": "wide zone",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_probing_depth_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Probing depths ranged from 2 to 3 mm.",
+          "field": "probing_depth",
+          "value": "2-3",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t7_followup_04_46_bleeding_on_probing_01",
+          "stage": "T7_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "No bleeding on probing.",
+          "field": "bleeding_on_probing",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "The peri-implant soft tissue matured progressively: it initially provided only partial cover-screw coverage, then appeared thin, incompletely keratinized, and vascular at 1 month. By 2 months it was thicker, keratinized, more continuous with the surrounding tissue, and had proliferated coronally; by 3 months it completely submerged the cover screw. At 2 years and 2 months, the peri-implant tissue appeared healthy, with a wide zone of attached keratinized tissue, 2- to 3-mm probing depths, and no bleeding on probing.",
+      "question": "How did the peri-implant soft tissue appearance and coverage of the cover screw change over the follow-up period?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, non-leaking, and answerable from the longitudinal evidence. The gold answer is supported overall: it correctly summarizes the progression from slight/partial cover-screw coverage to thin, incompletely keratinized, vascular tissue, then thicker and more continuous keratinized tissue, complete submergence of the cover screw, and finally healthy peri-implant tissue with attached keratinized tissue, 2- to 3-mm probing depths, and no bleeding on probing.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "patient_id": "report__CR0098",
+  "tasks": [
+    {
+      "task_id": "longitudinal_evidence_recall_001",
+      "patient_id": "report__CR0098",
+      "task_type": "longitudinal_evidence_recall",
+      "ask_after_stage": "T6_followup_04",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Clinical findings showed a persistent sinus tract present 1 month after NSRCT interproximally between #30 and #31.",
+          "field": "clinical_sinus_tract_location_1_month_after_NSRCT",
+          "value": "interproximal between #30 and #31",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t6_followup_04_22_sinus_tract_01",
+          "stage": "T6_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 6 weeks, a sinus tract was absent.",
+          "field": "sinus_tract",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Before the 6-week finding that a sinus tract was absent, the relevant earlier context was the 1-month post-NSRCT visit, when a persistent sinus tract was present interproximally between #30 and #31.",
+      "question": "Before the 6-week clinical examination documented that no sinus tract was present, what had the 1-month post-NSRCT clinical examination shown about the sinus tract and its location?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, timepoint-appropriate, and answerable from the selected evidence. The gold answer is supported by the 1-month post-NSRCT clinical findings showing a persistent sinus tract interproximally between #30 and #31, which contrasts correctly with the later 6-week absence finding.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "longitudinal_evidence_recall_002",
+      "patient_id": "report__CR0098",
+      "task_type": "longitudinal_evidence_recall",
+      "ask_after_stage": "T7_followup_05",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_interproximal_probing_depth_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Interproximal probing depths were 9–13 mm at the initial workup.",
+          "field": "interproximal_probing_depth",
+          "value": "9-13",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t7_followup_05_25_probing_depth_1_year_01",
+          "stage": "T7_followup_05",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 1 year, probing depths ranged 2–4 mm.",
+          "field": "probing_depth_1_year",
+          "value": "2–4",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Probing depths decreased, from 9–13 mm interproximally at the initial workup to 2–4 mm at 1 year.",
+      "question": "How did the periodontal probing depths at the 1-year follow-up compare with those documented during the initial workup?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is appropriate for longitudinal evidence recall and answerable at the 1-year follow-up. The gold answer is supported by the selected evidence but is indirect; a more explicit comparative statement improves clarity.",
+        "issues": [
+          "Answer is indirect and does not explicitly state the comparative change."
+        ],
+        "fixed_question": null,
+        "fixed_answer": "Probing depths decreased, from 9–13 mm interproximally at the initial workup to 2–4 mm at 1 year."
+      }
+    }
+  ]
+}

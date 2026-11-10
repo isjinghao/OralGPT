@@ -1,0 +1,130 @@
+{
+  "patient_id": "report__CR0266",
+  "tasks": [
+    {
+      "task_id": "longitudinal_evidence_recall_001",
+      "patient_id": "report__CR0266",
+      "task_type": "longitudinal_evidence_recall",
+      "ask_after_stage": "T3_followup_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_buccal_marginal_gingiva_white_streak_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white streak was present on the buccal marginal gingiva.",
+          "field": "buccal_marginal_gingiva_white_streak",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_size_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak measured 2 × 4 mm.",
+          "field": "white_streak_size",
+          "value": "2 × 4",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_wipeability_with_gauze_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak did not wipe off with gauze.",
+          "field": "white_streak_wipeability_with_gauze",
+          "value": "did not wipe off",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_24_gingival_lesion_histology_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+          "field": "gingival_lesion_histology",
+          "value": "consistent with hyperkeratosis",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At presentation, a 2 × 4 mm white streak was present on the buccal marginal gingiva and did not wipe off with gauze. At the 1-week postoperative follow-up, biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+      "question": "What were the initial clinical examination findings of the gingival lesion, and what did the biopsy histology show at the 1-week postoperative follow-up?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, answerable at the requested timepoint, and matches the longitudinal recall task type. The gold answer is supported by the evidence: the initial exam showed a 2 × 4 mm white streak on the buccal marginal gingiva that did not wipe off with gauze, and the follow-up biopsy histology was consistent with hyperkeratosis.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "longitudinal_evidence_recall_002",
+      "patient_id": "report__CR0266",
+      "task_type": "longitudinal_evidence_recall",
+      "ask_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_20_socket_gap_content_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At the 1-week postoperative visit, a fibrin clot occupied the gap distance.",
+          "field": "socket_gap_content",
+          "value": "fibrin clot occupied gap distance",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_22_implant_socket_gap_coverage_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white layer overlaid the gap between the implant and the mesial and distal socket walls.",
+          "field": "implant_socket_gap_coverage",
+          "value": "white layer overlying gap between implant and mesial/distal socket walls",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_37_bone_fill_around_implant_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Bone fill was present around the implant at implant uncovery.",
+          "field": "bone_fill_around_implant",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At the 1-week postoperative visit, a fibrin clot occupied the gap between the implant and the mesial and distal socket walls, with a white layer overlying the gap. At implant uncovery 3 months postoperatively, bone fill was present around the implant.",
+      "question": "What did follow-up show about the gap between the implant and the socket walls at 1 week, and what was observed around the implant at uncovery 3 months later?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, non-leaking, and answerable at the specified timepoint. The gold answer is supported by the selected evidence: the 1-week follow-up showed a fibrin clot in the implant-socket gap with a white layer overlying it, and at 3-month uncovery there was bone fill around the implant.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    }
+  ]
+}

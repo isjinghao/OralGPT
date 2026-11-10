@@ -8,4 +8,3 @@ __pycache__/
 .env
 reports/pdf/
 reports/figures/
-validation/

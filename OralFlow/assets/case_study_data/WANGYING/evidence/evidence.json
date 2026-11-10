@@ -1,0 +1,1139 @@
+{
+  "patient_id": "group1__WANGYING",
+  "evidence": [
+    {
+      "evidence_id": "group1_WANGYING_s0_profile_1_age_01",
+      "source_turn_id": 1,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Patient is 25 years old.",
+      "fact_type": "profile",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "age",
+        "value": "25",
+        "unit": "years",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s0_profile_1_gender_01",
+      "source_turn_id": 1,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Patient is female.",
+      "fact_type": "profile",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "gender",
+        "value": "female",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s0_profile_1_height_01",
+      "source_turn_id": 1,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Patient height is 167 cm.",
+      "fact_type": "profile",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "height",
+        "value": "167",
+        "unit": "cm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s0_profile_1_weight_01",
+      "source_turn_id": 1,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Patient weight is 53 kg.",
+      "fact_type": "profile",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "weight",
+        "value": "53",
+        "unit": "kg",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s0_profile_2_chief_complaint_01",
+      "source_turn_id": 2,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Patient's primary concern is protrusion of the upper incisors.",
+      "fact_type": "chief_complaint",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "chief_complaint",
+        "value": "protrusion of upper incisors",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s0_profile_2_chief_complaint_02",
+      "source_turn_id": 2,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Patient's primary concern includes a gummy smile.",
+      "fact_type": "chief_complaint",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "chief_complaint",
+        "value": "gummy smile",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s0_profile_2_duration_of_complaint_01",
+      "source_turn_id": 2,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The chief complaint has been present for 8 years.",
+      "fact_type": "history",
+      "clinical_dimension": "other",
+      "normalized": {
+        "field": "duration_of_complaint",
+        "value": "8",
+        "unit": "years",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s0_profile_3_dental_history_01",
+      "source_turn_id": 3,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "No relevant past dental history.",
+      "fact_type": "history",
+      "clinical_dimension": "other",
+      "normalized": {
+        "field": "dental_history",
+        "value": "none",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s0_profile_3_medical_history_01",
+      "source_turn_id": 3,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "No relevant past medical history.",
+      "fact_type": "history",
+      "clinical_dimension": "other",
+      "normalized": {
+        "field": "medical_history",
+        "value": "none",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s0_profile_3_surgical_history_01",
+      "source_turn_id": 3,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "No relevant past surgical history.",
+      "fact_type": "history",
+      "clinical_dimension": "other",
+      "normalized": {
+        "field": "surgical_history",
+        "value": "none",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s1_fp_4_facial_symmetry_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "Facial structure is symmetric",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "facial_symmetry",
+        "value": "symmetric",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s1_fp_4_incisor_display_at_rest_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "Maxillary incisor display at rest is 8 mm",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "incisor_display_at_rest",
+        "value": "8",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s1_fp_4_gummy_smile_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "Gummy smile of 4 mm is present",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "gummy_smile",
+        "value": "4",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s1_fp_4_upper_lip_length_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "Upper lip length is 20 mm",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "upper_lip_length",
+        "value": "20",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s1_fp_4_profile_type_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "Profile is convex",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "profile_type",
+        "value": "convex",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s1_fp_4_nasolabial_angle_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "Nasolabial angle is acute",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "nasolabial_angle",
+        "value": "acute",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s2_dp_5_molar_relationship_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Left molar relationship is Class I.",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "molar_relationship",
+        "value": "Class I",
+        "unit": null,
+        "side": "left",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s2_dp_5_molar_relationship_02",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Right molar relationship is Class II.",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "molar_relationship",
+        "value": "Class II",
+        "unit": null,
+        "side": "right",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s2_dp_5_overjet_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Overjet is 8 mm.",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "overjet",
+        "value": 8,
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s2_dp_5_overbite_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Overbite is 7 mm.",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "overbite",
+        "value": 7,
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s2_dp_5_upper_dental_midline_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Upper dental midline is central.",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "upper_dental_midline",
+        "value": "central",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s2_dp_5_lower_dental_midline_shift_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Lower dental midline is shifted 2 mm to the left.",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "lower_dental_midline_shift",
+        "value": 2,
+        "unit": "mm",
+        "side": "left",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s2_dp_5_canting_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "No canting was observed.",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "canting",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s2_dp_5_crowding_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Crowding is present from tooth 32 to tooth 42.",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "crowding",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": "32-42"
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_anb_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Skeletal Class II relationship: ANB 7.6°.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "ANB",
+        "value": "7.6",
+        "unit": "degree",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_wits_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Wits appraisal +7.9 mm, consistent with skeletal Class II.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "Wits",
+        "value": "7.9",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_sna_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Maxilla mildly protrusive: SNA 83.6° (slightly increased).",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "SNA",
+        "value": "83.6",
+        "unit": "degree",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_snb_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Mandible retrusive: SNB 76.0° (decreased).",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "SNB",
+        "value": "76.0",
+        "unit": "degree",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_co_go_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Mandibular ramus/body relatively short: Co-Go 66 mm (decreased).",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "Co-Go",
+        "value": "66",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_sn_mp_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Mild hyperdivergent/clockwise mandibular rotation: SN-MP 36°.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "SN-MP",
+        "value": "36",
+        "unit": "degree",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_impa_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Lower incisors significantly proclined: IMPA 100.5°.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "IMPA",
+        "value": "100.5",
+        "unit": "degree",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_l1_nb_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "L1-NB 9.0 mm, 37.1°, indicating proclined lower incisors.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "L1-NB",
+        "value": "9.0 mm / 37.1 degree",
+        "unit": null,
+        "side": null,
+        "tooth": "lower incisor"
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_overjet_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Overjet increased to 6.1 mm.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "overjet",
+        "value": "6.1",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_overbite_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Overbite increased to 4.5 mm, indicating deep bite tendency.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "overbite",
+        "value": "4.5",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_lip_position_to_e_plane_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Convex soft-tissue profile with retruded chin and protrusive lips relative to E-plane: UL-EP +5.5 mm, LL-EP +7.5 mm.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "lip position to E-plane",
+        "value": "UL +5.5 mm / LL +7.5 mm",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_7_pa_ceph_transverse_asymmetry_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No marked skeletal transverse asymmetry or cant evident on the posteroanterior cephalometric radiograph.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "PA ceph transverse asymmetry",
+        "value": "none",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_9_dentition_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Panoramic radiograph shows partial permanent dentition.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "dentition",
+        "value": "partial permanent dentition",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_9_impaction_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Tooth 38 (mandibular left third molar) is impacted.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "impaction",
+        "value": "impacted",
+        "unit": null,
+        "side": "left",
+        "tooth": "38"
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_9_impaction_02",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Tooth 48 (mandibular right third molar) is impacted.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "impaction",
+        "value": "impacted",
+        "unit": null,
+        "side": "right",
+        "tooth": "48"
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_9_periapical_lesion_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No periapical lesion detected on panoramic radiograph.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "periapical_lesion",
+        "value": "none detected",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_9_lesion_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No granuloma, cyst, or abscess identified on panoramic radiograph.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "lesion",
+        "value": "none identified",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_9_restorations_caries_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No definite caries, crowns, fillings, implants, root canal treatment, or root pieces detected on panoramic radiograph.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "restorations_caries",
+        "value": "none detected",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_9_bone_loss_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No definite generalized bone loss identified on panoramic radiograph.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "bone_loss",
+        "value": "none identified",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_9_maxillary_sinus_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Bilateral maxillary sinuses are visualized on panoramic radiograph.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "other",
+      "normalized": {
+        "field": "maxillary_sinus",
+        "value": "visualized",
+        "unit": null,
+        "side": "bilateral",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_9_mandibular_canal_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Bilateral mandibular canals are identified on panoramic radiograph.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "other",
+      "normalized": {
+        "field": "mandibular_canal",
+        "value": "identified",
+        "unit": null,
+        "side": "bilateral",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_9_impression_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Impression: bilateral impacted mandibular third molars (38 and 48).",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "impression",
+        "value": "bilateral impacted mandibular third molars",
+        "unit": null,
+        "side": "bilateral",
+        "tooth": "38,48"
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s3_xr_xla_9_periodontal_bone_loss_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No definite generalized periodontal bone loss identified on this panoramic image.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "periodontal_bone_loss",
+        "value": "none identified",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_menton_deviation_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "No menton deviation from midsagittal plane on 3D CT; craniofacial skeleton near-symmetric.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "menton_deviation",
+        "value": "none",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_maxillary_cant_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "No maxillary cant or vertical asymmetry of alveolar crest/piriform rims; maxillary midline centered.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "maxillary_cant",
+        "value": "none",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_ramus_symmetry_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Mandibular angles bilaterally similar in height and contour; no ramus height asymmetry.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "ramus_symmetry",
+        "value": "bilaterally similar",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_maxilla_sagittal_position_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Maxilla is approximately normal to mildly protrusive relative to the cranial base.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "maxilla_sagittal_position",
+        "value": "normal to mildly protrusive",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_mandible_sagittal_position_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Mandible is retruded/deficient with posteriorly positioned mandibular body and pogonion.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "mandible_sagittal_position",
+        "value": "retruded/deficient",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_gonial_angle_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Obtuse gonial angle with steep mandibular plane suggesting clockwise mandibular rotation.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "gonial_angle",
+        "value": "obtuse",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_skeletal_class_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Skeletal Class II pattern, dominated by mandibular retrognathia.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "skeletal_class",
+        "value": "Class II, mandibular retrognathia",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_overjet_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Overjet appears increased on CT, consistent with mandibular setback relative to maxilla.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "overjet",
+        "value": "increased",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_facial_height_pattern_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Long-face tendency with increased lower anterior facial height and steep mandibular plane.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "facial_height_pattern",
+        "value": "long-face, increased lower anterior facial height",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_chin_position_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Retruded chin with pogonion posterior to nasion vertical reference and subnasale-based facial line; small-to-moderate symphyseal projection.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "chin_position",
+        "value": "retruded",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_transverse_asymmetry_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "No significant transverse skeletal asymmetry detected; orbits, zygomas, mandibular rami and angles bilaterally similar.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "transverse_asymmetry",
+        "value": "none",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s4_ct_8_dominant_deformity_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Dominant deformity is mandibular retrognathia with clockwise vertical rotation pattern producing skeletal Class II relationship.",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "dominant_deformity",
+        "value": "mandibular retrognathia, clockwise rotation, skeletal Class II",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s5_tmj_6_mouth_opening_01",
+      "source_turn_id": 6,
+      "introduced_stage": "S5_TMJ",
+      "modality": [
+        "TMJ"
+      ],
+      "fact_text": "Maximum mouth opening is 4 cm.",
+      "fact_type": "tmj_finding",
+      "clinical_dimension": "tmj_status",
+      "normalized": {
+        "field": "mouth_opening",
+        "value": "4",
+        "unit": "cm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s5_tmj_6_mandibular_deviation_on_opening_01",
+      "source_turn_id": 6,
+      "introduced_stage": "S5_TMJ",
+      "modality": [
+        "TMJ"
+      ],
+      "fact_text": "Mandible shifts to the right on opening.",
+      "fact_type": "tmj_finding",
+      "clinical_dimension": "tmj_status",
+      "normalized": {
+        "field": "mandibular_deviation_on_opening",
+        "value": "shift to right",
+        "unit": null,
+        "side": "right",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s5_tmj_6_joint_sound_opening_01",
+      "source_turn_id": 6,
+      "introduced_stage": "S5_TMJ",
+      "modality": [
+        "TMJ"
+      ],
+      "fact_text": "Clicking sound present on opening, bilaterally.",
+      "fact_type": "tmj_finding",
+      "clinical_dimension": "tmj_status",
+      "normalized": {
+        "field": "joint_sound_opening",
+        "value": "clicking",
+        "unit": null,
+        "side": "bilateral",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_WANGYING_s5_tmj_6_joint_sound_closing_01",
+      "source_turn_id": 6,
+      "introduced_stage": "S5_TMJ",
+      "modality": [
+        "TMJ"
+      ],
+      "fact_text": "Clicking sound present on closing, bilaterally.",
+      "fact_type": "tmj_finding",
+      "clinical_dimension": "tmj_status",
+      "normalized": {
+        "field": "joint_sound_closing",
+        "value": "clicking",
+        "unit": null,
+        "side": "bilateral",
+        "tooth": null
+      }
+    }
+  ]
+}

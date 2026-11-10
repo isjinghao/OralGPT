@@ -1,0 +1,104 @@
+{
+  "patient_id": "report__CR0098",
+  "tasks": [
+    {
+      "task_id": "memory_update_conflict_correction_001",
+      "patient_id": "report__CR0098",
+      "task_type": "memory_update_conflict_correction",
+      "ask_after_stage": "T5_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_pulp_diagnosis_02",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with necrotic pulp at the initial workup.",
+          "field": "pulp_diagnosis",
+          "value": "necrotic pulp",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t0_perception_00_2_apical_diagnosis_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Tooth #31 was diagnosed with acute apical abscess at the initial workup.",
+          "field": "apical_diagnosis",
+          "value": "acute apical abscess",
+          "unit": null,
+          "tooth": "#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t5_followup_03_19_biopsy_diagnosis_01",
+          "stage": "T5_followup_03",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The biopsy report confirmed a definitive diagnosis of periapical cyst.",
+          "field": "biopsy_diagnosis",
+          "value": "periapical cyst",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Update the stored diagnostic state by adding the biopsy-confirmed definitive diagnosis of periapical cyst. Earlier, tooth #31 had been diagnosed with necrotic pulp and acute apical abscess at the initial workup, so the biopsy finding adds information beyond those initial diagnoses.",
+      "question": "What did the later pathology evidence add to the earlier diagnostic record for tooth #31?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural and answerable at the specified timepoint. The gold answer is supported by the evidence: earlier diagnoses for tooth #31 were necrotic pulp and acute apical abscess, and later biopsy evidence added a definitive diagnosis of periapical cyst.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "memory_update_conflict_correction_002",
+      "patient_id": "report__CR0098",
+      "task_type": "memory_update_conflict_correction",
+      "ask_after_stage": "T6_followup_04",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0098_t3_followup_01_6_clinical_sinus_tract_location_1_month_after_nsrct_01",
+          "stage": "T3_followup_01",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Clinical findings showed a persistent sinus tract present 1 month after NSRCT interproximally between #30 and #31.",
+          "field": "clinical_sinus_tract_location_1_month_after_NSRCT",
+          "value": "interproximal between #30 and #31",
+          "unit": null,
+          "tooth": "#30/#31",
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0098_t6_followup_04_22_sinus_tract_01",
+          "stage": "T6_followup_04",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "At 6 weeks, a sinus tract was absent.",
+          "field": "sinus_tract",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Revise the stored sinus-tract status from a persistent sinus tract interproximally between #30 and #31 at 1 month after NSRCT to absence of a sinus tract at 6 weeks.",
+      "question": "At the later follow-up, what was the sinus-tract status compared with the earlier 1-month post-NSRCT finding?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural and answerable at the requested later follow-up. The gold answer is supported by the evidence: the sinus tract was persistent and interproximal between #30 and #31 at 1 month after NSRCT, and absent at 6 weeks. No unsupported detail needs removal.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    }
+  ]
+}

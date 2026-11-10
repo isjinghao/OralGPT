@@ -1,0 +1,119 @@
+{
+  "patient_id": "report__CR0266",
+  "tasks": [
+    {
+      "task_id": "memory_update_conflict_correction_001",
+      "patient_id": "report__CR0266",
+      "task_type": "memory_update_conflict_correction",
+      "ask_after_stage": "T3_followup_00",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_buccal_marginal_gingiva_white_streak_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white streak was present on the buccal marginal gingiva.",
+          "field": "buccal_marginal_gingiva_white_streak",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_size_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak measured 2 × 4 mm.",
+          "field": "white_streak_size",
+          "value": "2 × 4",
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_wipeability_with_gauze_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak did not wipe off with gauze.",
+          "field": "white_streak_wipeability_with_gauze",
+          "value": "did not wipe off",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_24_gingival_lesion_histology_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+          "field": "gingival_lesion_histology",
+          "value": "consistent with hyperkeratosis",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+      "question": "What did the later biopsy and histologic examination show about the non-wipeable white streak on the buccal marginal gingiva?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural, non-leaking, and answerable at the requested follow-up stage. The later histology result is supported. The answer contains a little extra detail beyond the direct evidence, so it is best simplified.",
+        "issues": [
+          "The phrase \"was later biopsied\" is implied by the histology evidence but not stated as directly as the result itself."
+        ],
+        "fixed_question": null,
+        "fixed_answer": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis."
+      }
+    },
+    {
+      "task_id": "memory_update_conflict_correction_002",
+      "patient_id": "report__CR0266",
+      "task_type": "memory_update_conflict_correction",
+      "ask_after_stage": "T6_followup_03",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t3_followup_00_23_soft_tissue_covering_cover_screw_01",
+          "stage": "T3_followup_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The marginal soft tissue was slightly covering the lingual side of the cover screw.",
+          "field": "soft_tissue_covering_cover_screw",
+          "value": "slightly covering",
+          "unit": null,
+          "tooth": null,
+          "side": "lingual"
+        },
+        {
+          "evidence_id": "report_CR0266_t6_followup_03_35_soft_tissue_appearance_01",
+          "stage": "T6_followup_03",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "At 3 months, the soft tissue had completely submerged the implant cover screw.",
+          "field": "soft_tissue_appearance",
+          "value": "completely submerged implant cover screw",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "At 1 week, marginal soft tissue slightly covered the lingual side of the cover screw; by 3 months, the soft tissue had completely submerged the cover screw.",
+      "question": "How did the follow-up findings refine the description of soft-tissue coverage over the implant cover screw from 1 week to 3 months?",
+      "validation": {
+        "accepted": true,
+        "feedback": "The question is natural and answerable at the requested timepoint. The gold answer is supported by the selected evidence: earlier follow-up showed slight lingual coverage of the cover screw, and the 3-month follow-up showed the cover screw was completely submerged by soft tissue.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    }
+  ]
+}

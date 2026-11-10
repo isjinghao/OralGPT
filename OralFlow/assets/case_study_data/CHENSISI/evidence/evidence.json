@@ -1,0 +1,1049 @@
+{
+  "patient_id": "group1__CHENSISI",
+  "evidence": [
+    {
+      "evidence_id": "group1_CHENSISI_s0_profile_1_age_01",
+      "source_turn_id": 1,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Patient is 20 years old.",
+      "fact_type": "profile",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "age",
+        "value": "20",
+        "unit": "years",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s0_profile_1_gender_01",
+      "source_turn_id": 1,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Patient is female.",
+      "fact_type": "profile",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "gender",
+        "value": "female",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s0_profile_2_chief_complaint_01",
+      "source_turn_id": 2,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Patient's primary concern is mandibular protrusion.",
+      "fact_type": "chief_complaint",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "chief_complaint",
+        "value": "mandibular protrusion",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s0_profile_2_duration_01",
+      "source_turn_id": 2,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Mandibular protrusion has been present for 10 years.",
+      "fact_type": "history",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "duration",
+        "value": "10",
+        "unit": "years",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s0_profile_3_orthodontic_history_01",
+      "source_turn_id": 3,
+      "introduced_stage": "S0_PROFILE",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Patient has a history of orthodontic treatment from August 2023 to April 2024.",
+      "fact_type": "history",
+      "clinical_dimension": "other",
+      "normalized": {
+        "field": "orthodontic_history",
+        "value": "orthodontic treatment 2023-08 to 2024-04",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s1_fp_4_facial_symmetry_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "Facial structure is asymmetric.",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "facial_symmetry",
+        "value": "asymmetric",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s1_fp_4_chin_deviation_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "Chin is deviated 2 mm to the right.",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "chin_deviation",
+        "value": 2,
+        "unit": "mm",
+        "side": "right",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s1_fp_4_upper_incisor_display_at_rest_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "No upper incisor display at rest.",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "upper_incisor_display_at_rest",
+        "value": "none",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s1_fp_4_gummy_smile_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "No gummy smile.",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "gummy_smile",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s1_fp_4_upper_lip_length_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "Upper lip length is 20 mm.",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "upper_lip_length",
+        "value": 20,
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s1_fp_4_facial_profile_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "Facial profile is concave.",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "facial_profile",
+        "value": "concave",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s1_fp_4_nasolabial_angle_01",
+      "source_turn_id": 4,
+      "introduced_stage": "S1_FP",
+      "modality": [
+        "FP"
+      ],
+      "fact_text": "Nasolabial angle is obtuse.",
+      "fact_type": "facial_finding",
+      "clinical_dimension": "profile",
+      "normalized": {
+        "field": "nasolabial_angle",
+        "value": "obtuse",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s2_dp_5_molar_relationship_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Class III molar relationship bilaterally",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "molar_relationship",
+        "value": "Class III",
+        "unit": null,
+        "side": "bilateral",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s2_dp_5_reverse_overjet_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Reverse overjet of 6 mm",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "reverse_overjet",
+        "value": 6,
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s2_dp_5_anterior_open_bite_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Anterior open bite of 1 mm",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "anterior_open_bite",
+        "value": 1,
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s2_dp_5_upper_dental_midline_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Upper dental midline is central",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "upper_dental_midline",
+        "value": "central",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s2_dp_5_lower_dental_midline_shift_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Lower dental midline shifted 1 mm to the right",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "lower_dental_midline_shift",
+        "value": 1,
+        "unit": "mm",
+        "side": "right",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s2_dp_5_occlusal_cant_01",
+      "source_turn_id": 5,
+      "introduced_stage": "S2_DP",
+      "modality": [
+        "DP"
+      ],
+      "fact_text": "Occlusal canting present, with left side 2 mm higher",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "occlusal_cant",
+        "value": 2,
+        "unit": "mm",
+        "side": "left_higher",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_anb_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Severe skeletal Class III pattern with ANB approximately -7 degrees.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "ANB",
+        "value": "-7",
+        "unit": "degree",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_wits_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Wits appraisal approximately -14.8 mm, consistent with severe skeletal Class III.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "Wits",
+        "value": "-14.8",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_sna_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "SNA approximately 82 degrees, maxilla positioned close to average relative to cranial base.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "SNA",
+        "value": "82",
+        "unit": "degree",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_snb_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "SNB approximately 89 degrees, mandible markedly prognathic relative to cranial base.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "SNB",
+        "value": "89",
+        "unit": "degree",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_fh_npo_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "FH-NPo approximately 97 degrees with a very prominent chin; NA-APo markedly negative.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "FH-NPo",
+        "value": "97",
+        "unit": "degree",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_ans_me_n_me_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Hyperdivergent tendency with increased lower anterior facial height: ANS-Me/N-Me approximately 58%, increased.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "ANS-Me/N-Me",
+        "value": "58",
+        "unit": "%",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_mp_sn_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Mandibular plane angle steeper: MP-SN approximately 36.6 degrees, FMA approximately 28 degrees.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "MP-SN",
+        "value": "36.6",
+        "unit": "degree",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_s_go_n_me_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Reduced posterior facial height: S-Go/N-Me approximately 59%, decreased.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "S-Go/N-Me",
+        "value": "59",
+        "unit": "%",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_co_go_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XLData"
+      ],
+      "fact_text": "Short ramus: Co-Go approximately 52 mm, decreased.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "Co-Go",
+        "value": "52",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_dental_relationship_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Class III dental relationship with anterior crossbite and negative overjet.",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "dental_relationship",
+        "value": "Class III with anterior crossbite/negative overjet",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_incisor_inclination_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Dentoalveolar compensation present: maxillary incisors proclined and mandibular incisors retroclined/uprighted.",
+      "fact_type": "occlusal_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "incisor_inclination",
+        "value": "maxillary proclined, mandibular retroclined",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_7_menton_deviation_01",
+      "source_turn_id": 7,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No gross skeletal cant on posteroanterior cephalogram; possible mild mandibular asymmetry with small menton deviation.",
+      "fact_type": "cephalometric_measurement",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "menton_deviation",
+        "value": "mild",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_dentition_status_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Panoramic radiograph shows near-complete permanent dentition including third molars.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "dentition_status",
+        "value": "near-complete permanent dentition",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_impaction_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Upper right third molar (tooth 18) is impacted.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "impaction",
+        "value": "impacted",
+        "unit": null,
+        "side": "right",
+        "tooth": "18"
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_impaction_02",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Upper left third molar (tooth 28) is impacted.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "impaction",
+        "value": "impacted",
+        "unit": null,
+        "side": "left",
+        "tooth": "28"
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_impaction_03",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Lower right third molar (tooth 48) is impacted.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "impaction",
+        "value": "impacted",
+        "unit": null,
+        "side": "right",
+        "tooth": "48"
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_tooth_presence_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Lower left third molar (tooth 38) is present with posterior mandibular third molar region visualized.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "tooth_presence",
+        "value": "present",
+        "unit": null,
+        "side": "left",
+        "tooth": "38"
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_restoration_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Radiopaque restorations are visible in maxillary right posterior tooth region, maxillary left posterior tooth region, and mandibular left posterior tooth region.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "restoration",
+        "value": "radiopaque restoration present",
+        "unit": null,
+        "side": "bilateral",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_implant_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No implant detected on panoramic radiograph.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "implant",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_crown_rct_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No crown or root canal treatment detected on panoramic radiograph.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "crown_rct",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_periapical_pathology_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No periapical lesion, granuloma, cyst, or abscess detected on panoramic radiograph.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "periapical_pathology",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_caries_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No definite carious lesion detected on panoramic radiograph.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "caries",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_bone_loss_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "No clear generalized bone loss pattern identified; alveolar bone levels appear grossly preserved.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "dental_status",
+      "normalized": {
+        "field": "bone_loss",
+        "value": "absent/preserved",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s3_xr_xla_9_jaw_structures_01",
+      "source_turn_id": 9,
+      "introduced_stage": "S3_XR_XLA",
+      "modality": [
+        "XR"
+      ],
+      "fact_text": "Bilateral mandibular canals and maxillary sinuses are visualized without flagged abnormality.",
+      "fact_type": "panoramic_finding",
+      "clinical_dimension": "other",
+      "normalized": {
+        "field": "jaw_structures",
+        "value": "no abnormality flagged",
+        "unit": null,
+        "side": "bilateral",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_chin_deviation_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Mild-to-moderate lower facial asymmetry with mandibular midline and chin deviated to image-left (subject's right)",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "chin_deviation",
+        "value": "image-left (subject's right)",
+        "unit": null,
+        "side": "right",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_orbital_symmetry_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Orbits are level with no evident vertical dystopia; symmetric orbital rims",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "orbital_symmetry",
+        "value": "symmetric, no vertical dystopia",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_zygomatic_symmetry_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Zygomatic arches and malar buttresses show symmetric width and projection; no malar deficiency or asymmetry",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "zygomatic_symmetry",
+        "value": "symmetric, no deficiency",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_maxillary_cant_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Mild vertical cant of the maxillary dentoalveolar complex with image-left side appearing slightly lower",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "maxillary_cant",
+        "value": "mild, image-left lower",
+        "unit": null,
+        "side": "left",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_gonial_asymmetry_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Mandibular angles asymmetric; image-left gonial region more inferior and laterally flared than opposite side, suggesting ramus/body asymmetry",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "gonial_asymmetry",
+        "value": "image-left more inferior and laterally flared",
+        "unit": null,
+        "side": "left",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_maxillary_sagittal_position_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Maxilla is retruded with reduced anterior projection of maxillary alveolus and zygomatico-maxillary complex relative to cranial base",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "maxillary_sagittal_position",
+        "value": "retruded",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_mandibular_sagittal_position_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Mandible is protruded with prominent mandibular body and pogonion advanced anterior to maxilla",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "mandibular_sagittal_position",
+        "value": "protruded",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_skeletal_classification_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Skeletal Class III pattern, dominated by mandibular prognathism with contributory maxillary retrusion",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "skeletal_classification",
+        "value": "Class III, mandibular prognathism with maxillary retrusion",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_vertical_pattern_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Horizontal growth/short-face tendency with low mandibular plane angle and relatively strong posterior facial height; no vertical maxillary excess",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "vertical_pattern",
+        "value": "horizontal growth tendency, low mandibular plane angle, no vertical maxillary excess",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_chin_morphology_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Protruded symphysis/pogonion with robust/broad chin morphology",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "sagittal_relationship",
+      "normalized": {
+        "field": "chin_morphology",
+        "value": "protruded, robust/broad",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_lower_anterior_facial_height_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Overall normal-to-reduced lower anterior facial height with flat/low mandibular plane angle",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "vertical_pattern",
+      "normalized": {
+        "field": "lower_anterior_facial_height",
+        "value": "normal-to-reduced, flat/low mandibular plane angle",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s4_ct_8_transverse_asymmetry_summary_01",
+      "source_turn_id": 8,
+      "introduced_stage": "S4_CT",
+      "modality": [
+        "CT"
+      ],
+      "fact_text": "Mandibular asymmetry with chin deviation to image-left and gonial/ramus asymmetry; maxilla largely centered with slight transverse/vertical cant coordinated to mandibular deviation",
+      "fact_type": "ct_finding",
+      "clinical_dimension": "facial_asymmetry",
+      "normalized": {
+        "field": "transverse_asymmetry_summary",
+        "value": "mandibular asymmetry with chin deviation left, maxilla largely centered with coordinated cant",
+        "unit": null,
+        "side": "left",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s5_tmj_6_mouth_opening_01",
+      "source_turn_id": 6,
+      "introduced_stage": "S5_TMJ",
+      "modality": [
+        "TMJ"
+      ],
+      "fact_text": "Degree of mouth opening was 3.7 cm.",
+      "fact_type": "tmj_finding",
+      "clinical_dimension": "tmj_status",
+      "normalized": {
+        "field": "mouth_opening",
+        "value": "3.7",
+        "unit": "cm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s5_tmj_6_opening_path_01",
+      "source_turn_id": 6,
+      "introduced_stage": "S5_TMJ",
+      "modality": [
+        "TMJ"
+      ],
+      "fact_text": "The opening path was zigzag.",
+      "fact_type": "tmj_finding",
+      "clinical_dimension": "tmj_status",
+      "normalized": {
+        "field": "opening_path",
+        "value": "zigzag",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s5_tmj_6_clicking_sound_01",
+      "source_turn_id": 6,
+      "introduced_stage": "S5_TMJ",
+      "modality": [
+        "TMJ"
+      ],
+      "fact_text": "Clicking sound present on the left during opening.",
+      "fact_type": "tmj_finding",
+      "clinical_dimension": "tmj_status",
+      "normalized": {
+        "field": "clicking_sound",
+        "value": "present",
+        "unit": null,
+        "side": "left",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "group1_CHENSISI_s5_tmj_6_clicking_sound_02",
+      "source_turn_id": 6,
+      "introduced_stage": "S5_TMJ",
+      "modality": [
+        "TMJ"
+      ],
+      "fact_text": "Clicking sound present on the left during closing.",
+      "fact_type": "tmj_finding",
+      "clinical_dimension": "tmj_status",
+      "normalized": {
+        "field": "clicking_sound",
+        "value": "present",
+        "unit": null,
+        "side": "left",
+        "tooth": null
+      }
+    }
+  ]
+}

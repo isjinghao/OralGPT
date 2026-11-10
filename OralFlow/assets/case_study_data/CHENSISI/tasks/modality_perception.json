@@ -1,0 +1,277 @@
+{
+  "patient_id": "group1__CHENSISI",
+  "tasks": [
+    {
+      "task_id": "modality_perception_001",
+      "patient_id": "group1__CHENSISI",
+      "task_type": "modality_perception",
+      "ask_after_stage": "S1_FP",
+      "selected_evidence": [
+        {
+          "evidence_id": "group1_CHENSISI_s1_fp_4_facial_symmetry_01",
+          "stage": "S1_FP",
+          "modality": [
+            "FP"
+          ],
+          "fact_text": "Facial structure is asymmetric.",
+          "field": "facial_symmetry",
+          "value": "asymmetric",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s1_fp_4_chin_deviation_01",
+          "stage": "S1_FP",
+          "modality": [
+            "FP"
+          ],
+          "fact_text": "Chin is deviated 2 mm to the right.",
+          "field": "chin_deviation",
+          "value": 2,
+          "unit": "mm",
+          "tooth": null,
+          "side": "right"
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s1_fp_4_facial_profile_01",
+          "stage": "S1_FP",
+          "modality": [
+            "FP"
+          ],
+          "fact_text": "Facial profile is concave.",
+          "field": "facial_profile",
+          "value": "concave",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s1_fp_4_nasolabial_angle_01",
+          "stage": "S1_FP",
+          "modality": [
+            "FP"
+          ],
+          "fact_text": "Nasolabial angle is obtuse.",
+          "field": "nasolabial_angle",
+          "value": "obtuse",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s1_fp_4_upper_incisor_display_at_rest_01",
+          "stage": "S1_FP",
+          "modality": [
+            "FP"
+          ],
+          "fact_text": "No upper incisor display at rest.",
+          "field": "upper_incisor_display_at_rest",
+          "value": "none",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s1_fp_4_gummy_smile_01",
+          "stage": "S1_FP",
+          "modality": [
+            "FP"
+          ],
+          "fact_text": "No gummy smile.",
+          "field": "gummy_smile",
+          "value": "absent",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s1_fp_4_upper_lip_length_01",
+          "stage": "S1_FP",
+          "modality": [
+            "FP"
+          ],
+          "fact_text": "Upper lip length is 20 mm.",
+          "field": "upper_lip_length",
+          "value": 20,
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "gold_answer": "The facial photographs show an asymmetric face with the chin deviated about 2 mm to the right and a concave profile with an obtuse nasolabial angle. Upper lip length measures 20 mm, and there is no upper incisor display or gummy smile visible at rest.",
+      "question": "Based on the facial photographs, what did you observe about this patient's facial symmetry, profile, chin position, nasolabial angle, upper lip length, and lip posture at rest?",
+      "validation": {
+        "accepted": true,
+        "feedback": "All claims in the gold answer are directly supported by the selected facial photograph evidence: asymmetry, 2mm right chin deviation, concave profile, obtuse nasolabial angle, 20mm upper lip length, absent upper incisor display and gummy smile at rest. The question appropriately names 'facial photographs' as the modality, matches the S1_FP stage, and does not leak the answer. No unsupported details or comparative/causal claims are present.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "modality_perception_002",
+      "patient_id": "group1__CHENSISI",
+      "task_type": "modality_perception",
+      "ask_after_stage": "S2_DP",
+      "selected_evidence": [
+        {
+          "evidence_id": "group1_CHENSISI_s2_dp_5_molar_relationship_01",
+          "stage": "S2_DP",
+          "modality": [
+            "DP"
+          ],
+          "fact_text": "Class III molar relationship bilaterally",
+          "field": "molar_relationship",
+          "value": "Class III",
+          "unit": null,
+          "tooth": null,
+          "side": "bilateral"
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s2_dp_5_reverse_overjet_01",
+          "stage": "S2_DP",
+          "modality": [
+            "DP"
+          ],
+          "fact_text": "Reverse overjet of 6 mm",
+          "field": "reverse_overjet",
+          "value": 6,
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s2_dp_5_anterior_open_bite_01",
+          "stage": "S2_DP",
+          "modality": [
+            "DP"
+          ],
+          "fact_text": "Anterior open bite of 1 mm",
+          "field": "anterior_open_bite",
+          "value": 1,
+          "unit": "mm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s2_dp_5_upper_dental_midline_01",
+          "stage": "S2_DP",
+          "modality": [
+            "DP"
+          ],
+          "fact_text": "Upper dental midline is central",
+          "field": "upper_dental_midline",
+          "value": "central",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s2_dp_5_lower_dental_midline_shift_01",
+          "stage": "S2_DP",
+          "modality": [
+            "DP"
+          ],
+          "fact_text": "Lower dental midline shifted 1 mm to the right",
+          "field": "lower_dental_midline_shift",
+          "value": 1,
+          "unit": "mm",
+          "tooth": null,
+          "side": "right"
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s2_dp_5_occlusal_cant_01",
+          "stage": "S2_DP",
+          "modality": [
+            "DP"
+          ],
+          "fact_text": "Occlusal canting present, with left side 2 mm higher",
+          "field": "occlusal_cant",
+          "value": 2,
+          "unit": "mm",
+          "tooth": null,
+          "side": "left_higher"
+        }
+      ],
+      "gold_answer": "Intraoral photographs show a bilateral Class III molar relationship with a 6 mm reverse overjet and a 1 mm anterior open bite. The upper dental midline is centered while the lower midline is shifted 1 mm to the right, and an occlusal cant is present with the left side 2 mm higher than the right.",
+      "question": "Based on the intraoral dental photographs, what are the molar relationship, overjet, bite, and dental midline/occlusal plane findings for this patient?",
+      "validation": {
+        "accepted": true,
+        "feedback": "Question correctly names the intraoral dental photographs modality and asks about findings all directly supported by the selected S2_DP evidence: Class III molar relationship bilaterally, 6 mm reverse overjet, 1 mm anterior open bite, centered upper midline, 1 mm right lower midline shift, and 2 mm left-higher occlusal cant. All gold answer claims match evidence exactly with no unsupported additions.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    },
+    {
+      "task_id": "modality_perception_003",
+      "patient_id": "group1__CHENSISI",
+      "task_type": "modality_perception",
+      "ask_after_stage": "S5_TMJ",
+      "selected_evidence": [
+        {
+          "evidence_id": "group1_CHENSISI_s5_tmj_6_mouth_opening_01",
+          "stage": "S5_TMJ",
+          "modality": [
+            "TMJ"
+          ],
+          "fact_text": "Degree of mouth opening was 3.7 cm.",
+          "field": "mouth_opening",
+          "value": "3.7",
+          "unit": "cm",
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s5_tmj_6_opening_path_01",
+          "stage": "S5_TMJ",
+          "modality": [
+            "TMJ"
+          ],
+          "fact_text": "The opening path was zigzag.",
+          "field": "opening_path",
+          "value": "zigzag",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s5_tmj_6_clicking_sound_01",
+          "stage": "S5_TMJ",
+          "modality": [
+            "TMJ"
+          ],
+          "fact_text": "Clicking sound present on the left during opening.",
+          "field": "clicking_sound",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": "left"
+        },
+        {
+          "evidence_id": "group1_CHENSISI_s5_tmj_6_clicking_sound_02",
+          "stage": "S5_TMJ",
+          "modality": [
+            "TMJ"
+          ],
+          "fact_text": "Clicking sound present on the left during closing.",
+          "field": "clicking_sound",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": "left"
+        }
+      ],
+      "gold_answer": "On TMJ examination, maximal mouth opening was 3.7 cm with a zigzag opening path. Clicking sounds were noted on the left joint during both opening and closing.",
+      "question": "What were the findings on temporomandibular joint clinical examination regarding maximal mouth opening, the pattern of the opening path, and any clicking sounds and their location?",
+      "validation": {
+        "accepted": true,
+        "feedback": "Question is natural, correctly names TMJ clinical examination, and is answerable at S5_TMJ. Gold answer is fully supported by the four selected evidence items: mouth opening 3.7 cm, zigzag opening path, and clicking on left during both opening and closing.",
+        "issues": [],
+        "fixed_question": null,
+        "fixed_answer": null
+      }
+    }
+  ]
+}

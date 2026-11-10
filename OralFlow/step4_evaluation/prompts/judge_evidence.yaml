@@ -8,17 +8,11 @@ template: |
   the ids of the covered items, no explanations.
 
   Clinical semantic equivalence:
-  - Accept clinically equivalent or synonymous phrasing as covering the same fact; do not require
-    identical terminology. Examples of equivalent expressions:
-      * "mandibular excess" / "protruded chin" / "mandibular prognathism" ≈ "mandibular protrusion"
-      * "skeletal Class III" ≈ "bilateral Class III molar relationship" (when describing the same relationship)
-      * "concave facial profile" ≈ "prognathic mandibular profile"
-  - Judge on clinical meaning, not surface wording.
+  - Accept clinically equivalent paraphrases. Verify the anatomical structure and level (skeletal, dental, or soft tissue), and preserve key qualifiers, including laterality, direction, negation, severity, and diagnostic certainty. Consider examination modality and time point when relevant.Related findings cannot replace the target finding. Do not infer missing information. Apply numerical tolerances only to the same measurement and anatomical site.
 
   Numeric tolerance:
-  - Linear measurements (mm): direction/sign/laterality must match; magnitude acceptable within ±2 mm
-    OR ±20% of the reference (whichever is larger).
-  - Angles (degrees): within ±10° and matching qualitative descriptor (acute/obtuse/normal, high/low-angle).
+  - Linear measurements (mm): direction/sign/laterality must match; magnitude acceptable within ±2 mm OR ±20% of the reference (whichever is larger).
+  - Angles (degrees): within ±3° and matching qualitative descriptor (acute/obtuse/normal, high/low-angle). Apply numerical tolerances only when the answer refers to the same measurement and anatomical site. When the sign, direction, or diagnostic category is clinically relevant, it must also match. Numerical proximity alone is insufficient for credit.
   - Categorical / classification (Class I/II/III, left/right, presence/absence): must match EXACTLY.
 
   QUESTION:

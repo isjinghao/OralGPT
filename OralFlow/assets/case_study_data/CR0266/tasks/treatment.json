@@ -1,0 +1,454 @@
+{
+  "patient_id": "report__CR0266",
+  "tasks": [
+    {
+      "task_id": "report_CR0266_treatment_001",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What initial treatment was planned for the mandibular left first molar?",
+      "gold_answer": "The tooth was planned for extraction and immediate implant placement."
+    },
+    {
+      "task_id": "report_CR0266_treatment_002",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What medication was given before the procedure?",
+      "gold_answer": "The patient premedicated with 2 g amoxicillin prior to the procedure."
+    },
+    {
+      "task_id": "report_CR0266_treatment_003",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_2_radiographic_furcation_involvement_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Extensive furcation involvement was suggested radiographically at the initial presentation.",
+          "field": "radiographic_furcation_involvement",
+          "value": "extensive; suggested radiographically",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "How was the extraction performed and what precautions were taken?",
+      "gold_answer": "Following administration of local anesthesia, atraumatic extraction was performed by sectioning the tooth through the furcation and elevating both roots, taking care to avoid damage to the socket walls."
+    },
+    {
+      "task_id": "report_CR0266_treatment_004",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "How was the extraction socket prepared after extraction?",
+      "gold_answer": "The socket was carefully debrided with a surgical curette to remove all remnants of soft tissue, and the socket was irrigated with saline solution."
+    },
+    {
+      "task_id": "report_CR0266_treatment_005",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_buccal_marginal_gingiva_white_streak_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "A white streak was present on the buccal marginal gingiva.",
+          "field": "buccal_marginal_gingiva_white_streak",
+          "value": "present",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_wipeability_with_gauze_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The white streak did not wipe off with gauze.",
+          "field": "white_streak_wipeability_with_gauze",
+          "value": "did not wipe off",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What was done with the buccal gingival streak?",
+      "gold_answer": "The streak of leukoplakia on the buccal gingiva was excised and stored in formalin solution for histologic analysis."
+    },
+    {
+      "task_id": "report_CR0266_treatment_006",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_1_recession_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "5 mm buccal recession.",
+          "field": "recession",
+          "value": "5",
+          "unit": "mm",
+          "tooth": "mandibular left first molar",
+          "side": "buccal"
+        }
+      ],
+      "question": "What was determined by periodontal probing of the socket?",
+      "gold_answer": "All socket walls were intact with no fenestration or dehiscence present. There was a height discrepancy between the buccal and lingual bone crest; the lingual bone crest was more coronal than the buccal bone crest, consistent with the initial presentation of buccal recession. The socket was classified as Type B according to Smith and Tarnow."
+    },
+    {
+      "task_id": "report_CR0266_treatment_007",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What septal bone finding supported implant stabilization?",
+      "gold_answer": "Enough septal bone was observed to stabilize but not completely surround the implant, which would leave gaps between one or more of the surfaces of the implant and the socket walls."
+    },
+    {
+      "task_id": "report_CR0266_treatment_008",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What implant placement approach was selected?",
+      "gold_answer": "A flapless implant approach was employed."
+    },
+    {
+      "task_id": "report_CR0266_treatment_009",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "How was the implant osteotomy prepared?",
+      "gold_answer": "The implant osteotomy was initiated in the septal bone with a round bur, and twist drills were used to progressively enlarge the osteotomy as per the manufacturer’s recommendations."
+    },
+    {
+      "task_id": "report_CR0266_treatment_010",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_2_radiographic_furcation_involvement_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Extensive furcation involvement was suggested radiographically at the initial presentation.",
+          "field": "radiographic_furcation_involvement",
+          "value": "extensive; suggested radiographically",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What happened to the mesial and distal portions of the septum during osteotomy preparation?",
+      "gold_answer": "The coronal two-thirds of the mesial and distal aspect of the septum was obliterated."
+    },
+    {
+      "task_id": "report_CR0266_treatment_011",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_2_radiographic_furcation_involvement_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Extensive furcation involvement was suggested radiographically at the initial presentation.",
+          "field": "radiographic_furcation_involvement",
+          "value": "extensive; suggested radiographically",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What stability check was performed during progressive osteotomy preparation?",
+      "gold_answer": "Careful attention was paid to make sure that after each successive drill there was sufficient resistance to movement of the drill and guide pin within the osteotomy."
+    },
+    {
+      "task_id": "report_CR0266_treatment_012",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What implant was placed and with what insertion torque?",
+      "gold_answer": "A 4.5 × 9-mm TX Astra Tech implant fixture was placed with more than 35 Ncm of torque."
+    },
+    {
+      "task_id": "report_CR0266_treatment_013",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_1_tooth_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Mandibular left first molar.",
+          "field": "tooth",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": null,
+          "side": "left"
+        }
+      ],
+      "question": "How was the implant collar positioned relative to the buccal and lingual bone crests?",
+      "gold_answer": "The collar of the implant was placed at the level of septal bone that was coincident with the buccal bone crest and 2 mm apical to the lingual bone crest."
+    },
+    {
+      "task_id": "report_CR0266_treatment_014",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        },
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_2_radiographic_furcation_involvement_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "FIGURE_QA"
+          ],
+          "fact_text": "Extensive furcation involvement was suggested radiographically at the initial presentation.",
+          "field": "radiographic_furcation_involvement",
+          "value": "extensive; suggested radiographically",
+          "unit": null,
+          "tooth": null,
+          "side": null
+        }
+      ],
+      "question": "What was the initial bone-to-implant contact and where were the remaining implant surfaces exposed?",
+      "gold_answer": "The bone-to-implant contact was 360 degrees in the apical third of the implant and extended coronally on the buccal and lingual implant surfaces. The coronal two-thirds of the proximal surfaces of the implant were not in contact with bone and were exposed to the residual socket space."
+    },
+    {
+      "task_id": "report_CR0266_treatment_015",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What was the distance from the implant to the socket walls?",
+      "gold_answer": "The distance from the mesial and distal border of the implant to their respective socket walls was 4 to 5 mm."
+    },
+    {
+      "task_id": "report_CR0266_treatment_016",
+      "patient_id": "report__CR0266",
+      "task_type": "treatment",
+      "ask_after_stage": "T0_perception_00",
+      "release_after_stage": "T2_treatment_01",
+      "selected_evidence": [
+        {
+          "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+          "stage": "T0_perception_00",
+          "modality": [
+            "TEXT_QA"
+          ],
+          "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+          "field": "planned_tooth_extraction",
+          "value": "mandibular left first molar",
+          "unit": null,
+          "tooth": "mandibular left first molar",
+          "side": "left"
+        }
+      ],
+      "question": "What was done after implant placement, and what grafting or flap procedures were omitted?",
+      "gold_answer": "A cover screw was placed over the implant, and the implant was left to heal within the extraction socket without the use of a bone graft, barrier membrane, or coronal flap advancement."
+    }
+  ]
+}

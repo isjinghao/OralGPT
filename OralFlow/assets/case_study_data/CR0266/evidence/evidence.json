@@ -1,0 +1,1157 @@
+{
+  "patient_id": "report__CR0266",
+  "evidence": [
+    {
+      "evidence_id": "report_CR0266_t0_perception_00_1_tooth_01",
+      "source_turn_id": 1,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Mandibular left first molar.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "tooth",
+        "value": "mandibular left first molar",
+        "unit": null,
+        "side": "left",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t0_perception_00_1_recession_01",
+      "source_turn_id": 1,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "5 mm buccal recession.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "recession",
+        "value": "5",
+        "unit": "mm",
+        "side": "buccal",
+        "tooth": "mandibular left first molar"
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t0_perception_00_1_furcation_invasion_01",
+      "source_turn_id": 1,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Class II furcation invasion.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "furcation_invasion",
+        "value": "Class II",
+        "unit": null,
+        "side": null,
+        "tooth": "mandibular left first molar"
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t0_perception_00_1_vertical_component_01",
+      "source_turn_id": 1,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Class B vertical component.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "vertical_component",
+        "value": "Class B",
+        "unit": null,
+        "side": null,
+        "tooth": "mandibular left first molar"
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t0_perception_00_2_radiographic_furcation_involvement_01",
+      "source_turn_id": 2,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Extensive furcation involvement was suggested radiographically at the initial presentation.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "radiographic_furcation_involvement",
+        "value": "extensive; suggested radiographically",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t0_perception_00_3_age_at_presentation_01",
+      "source_turn_id": 3,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The patient was 55 years old at presentation.",
+      "fact_type": "demographic",
+      "clinical_dimension": "patient_context",
+      "normalized": {
+        "field": "age_at_presentation",
+        "value": "55",
+        "unit": "years",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t0_perception_00_3_sex_01",
+      "source_turn_id": 3,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The patient was male.",
+      "fact_type": "demographic",
+      "clinical_dimension": "patient_context",
+      "normalized": {
+        "field": "sex",
+        "value": "male",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t0_perception_00_3_planned_tooth_extraction_01",
+      "source_turn_id": 3,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The patient presented for extraction of the mandibular left first molar.",
+      "fact_type": "treatment",
+      "clinical_dimension": "treatment_course",
+      "normalized": {
+        "field": "planned_tooth_extraction",
+        "value": "mandibular left first molar",
+        "unit": null,
+        "side": "left",
+        "tooth": "mandibular left first molar"
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t0_perception_00_3_buccal_marginal_gingiva_white_streak_01",
+      "source_turn_id": 3,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "A white streak was present on the buccal marginal gingiva.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "buccal_marginal_gingiva_white_streak",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_size_01",
+      "source_turn_id": 3,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The white streak measured 2 × 4 mm.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "white_streak_size",
+        "value": "2 × 4",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t0_perception_00_3_white_streak_wipeability_with_gauze_01",
+      "source_turn_id": 3,
+      "introduced_stage": "T0_perception_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The white streak did not wipe off with gauze.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "white_streak_wipeability_with_gauze",
+        "value": "did not wipe off",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_20_postoperative_soft_tissue_position_01",
+      "source_turn_id": 20,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "At the 1-week postoperative visit, the surrounding soft tissue had collapsed toward the center of the socket.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "postoperative_soft_tissue_position",
+        "value": "collapsed toward center of socket",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_20_socket_gap_content_01",
+      "source_turn_id": 20,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "At the 1-week postoperative visit, a fibrin clot occupied the gap distance.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "socket_gap_content",
+        "value": "fibrin clot occupied gap distance",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_21_postoperative_wound_healing_01",
+      "source_turn_id": 21,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 1 week postoperatively, the site was healing within normal limits.",
+      "fact_type": "followup_outcome",
+      "clinical_dimension": "longitudinal_outcome",
+      "normalized": {
+        "field": "postoperative_wound_healing",
+        "value": "within normal limits",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_21_delayed_healing_01",
+      "source_turn_id": 21,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "No signs of delayed healing were present.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "delayed_healing",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_21_infection_01",
+      "source_turn_id": 21,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "No signs of infection were present.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "infection",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_22_implant_socket_gap_coverage_01",
+      "source_turn_id": 22,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "A white layer overlaid the gap between the implant and the mesial and distal socket walls.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "implant_socket_gap_coverage",
+        "value": "white layer overlying gap between implant and mesial/distal socket walls",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_22_fibrin_clot_01",
+      "source_turn_id": 22,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The white layer indicated the presence of a superficial fibrin clot.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "fibrin_clot",
+        "value": "present superficially",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_23_wound_edge_distance_to_socket_center_01",
+      "source_turn_id": 23,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The wound edge in the area of the excisional biopsy was further away from the center of the socket than the other wound edges.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "wound_edge_distance_to_socket_center",
+        "value": "further than other wound edges",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_23_wound_edge_healing_order_01",
+      "source_turn_id": 23,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The wound edge in the area of the excisional biopsy was expected to be the last area to reach the center of the socket during healing.",
+      "fact_type": "other",
+      "clinical_dimension": "longitudinal_outcome",
+      "normalized": {
+        "field": "wound_edge_healing_order",
+        "value": "expected last to reach socket center",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_23_marginal_soft_tissue_position_01",
+      "source_turn_id": 23,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The marginal soft tissue appeared to have collapsed toward the center of the socket.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "marginal_soft_tissue_position",
+        "value": "collapsed toward socket center",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_23_soft_tissue_covering_cover_screw_01",
+      "source_turn_id": 23,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The marginal soft tissue was slightly covering the lingual side of the cover screw.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "soft_tissue_covering_cover_screw",
+        "value": "slightly covering",
+        "unit": null,
+        "side": "lingual",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t3_followup_00_24_gingival_lesion_histology_01",
+      "source_turn_id": 24,
+      "introduced_stage": "T3_followup_00",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Biopsy histology of the gingival lesion was consistent with hyperkeratosis.",
+      "fact_type": "pathology_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "gingival_lesion_histology",
+        "value": "consistent with hyperkeratosis",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_26_postoperative_gap_tissue_appearance_01",
+      "source_turn_id": 26,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "At the 1-month postoperative visit, young migrating tissue occupied the previous gap distance.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "postoperative_gap_tissue_appearance",
+        "value": "young migrating tissue occupied previous gap distance",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_26_cover_screw_exposure_extent_01",
+      "source_turn_id": 26,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Most of the cover screw was still exposed at the 1-month postoperative visit.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "cover_screw_exposure_extent",
+        "value": "most still exposed",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_26_implant_exposure_extent_01",
+      "source_turn_id": 26,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "A portion of the implant was still exposed at the 1-month postoperative visit.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "implant_exposure_extent",
+        "value": "portion still exposed",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_27_marginal_soft_tissue_position_relative_to_wound_edges_01",
+      "source_turn_id": 27,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 1 month, the marginal soft tissue had migrated from the wound edges.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "marginal_soft_tissue_position_relative_to_wound_edges",
+        "value": "migrated from wound edges",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_27_marginal_soft_tissue_contact_with_implant_01",
+      "source_turn_id": 27,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 1 month, the marginal soft tissue was contacting the implant.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "marginal_soft_tissue_contact_with_implant",
+        "value": "contacting implant",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_27_marginal_soft_tissue_contact_with_cover_screw_01",
+      "source_turn_id": 27,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 1 month, the marginal soft tissue was contacting the cover screw.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "marginal_soft_tissue_contact_with_cover_screw",
+        "value": "contacting cover screw",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_28_new_tissue_epithelial_layer_thickness_relative_to_surrounding_socket_tissue_01",
+      "source_turn_id": 28,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The new tissue had a thinner epithelial layer than the original tissue surrounding the socket.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "new_tissue_epithelial_layer_thickness_relative_to_surrounding_socket_tissue",
+        "value": "thinner",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_28_new_tissue_visible_red_streaks_01",
+      "source_turn_id": 28,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The new tissue had visible red streaks.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "new_tissue_visible_red_streaks",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_28_red_streaks_interpretation_01",
+      "source_turn_id": 28,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The visible red streaks were described as indicative of blood vessels.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "red_streaks_interpretation",
+        "value": "indicative of blood vessels",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_28_new_tissue_complete_keratinization_01",
+      "source_turn_id": 28,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The new tissue did not appear completely keratinized at this time.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "new_tissue_complete_keratinization",
+        "value": "not apparent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_28_younger_tissue_location_relative_to_surrounding_older_tissue_01",
+      "source_turn_id": 28,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The younger tissue was located more apically in the socket than the surrounding older tissue.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "younger_tissue_location_relative_to_surrounding_older_tissue",
+        "value": "more apical in socket",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_29_cover_screw_soft_tissue_coverage_01",
+      "source_turn_id": 29,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 1 month, a portion of the cover screw was still not covered with soft tissue.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "cover_screw_soft_tissue_coverage",
+        "value": "portion still not covered",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t4_followup_01_29_site_plaque_buildup_01",
+      "source_turn_id": 29,
+      "introduced_stage": "T4_followup_01",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "At 1 month, moderate plaque buildup was noted at the site.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "site_plaque_buildup",
+        "value": "moderate",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t5_followup_02_31_socket_center_tissue_position_01",
+      "source_turn_id": 31,
+      "introduced_stage": "T5_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "At 2 months, the tissue in the center of the socket had migrated coronally.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "socket_center_tissue_position",
+        "value": "migrated coronally",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t5_followup_02_31_cover_screw_exposure_01",
+      "source_turn_id": 31,
+      "introduced_stage": "T5_followup_02",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "At 2 months, a portion of the cover screw was still exposed.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "cover_screw_exposure",
+        "value": "portion still exposed",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_thickness_01",
+      "source_turn_id": 32,
+      "introduced_stage": "T5_followup_02",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The soft tissue had thickened.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "soft_tissue_thickness",
+        "value": "thickened",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_keratinization_01",
+      "source_turn_id": 32,
+      "introduced_stage": "T5_followup_02",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The soft tissue appeared keratinized.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "soft_tissue_keratinization",
+        "value": "keratinized",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t5_followup_02_32_visible_blood_vessels_01",
+      "source_turn_id": 32,
+      "introduced_stage": "T5_followup_02",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Blood vessels were no longer visible to the naked eye.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "visible_blood_vessels",
+        "value": "not_visible_to_naked_eye",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_continuity_01",
+      "source_turn_id": 32,
+      "introduced_stage": "T5_followup_02",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The newly formed soft tissue was more continuous with the surrounding tissue.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "soft_tissue_continuity",
+        "value": "more_continuous_with_surrounding_tissue",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t5_followup_02_32_soft_tissue_proliferation_direction_01",
+      "source_turn_id": 32,
+      "introduced_stage": "T5_followup_02",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The newly formed soft tissue had proliferated coronally.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "soft_tissue_proliferation_direction",
+        "value": "coronal",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t5_followup_02_33_cover_screw_visibility_01",
+      "source_turn_id": 33,
+      "introduced_stage": "T5_followup_02",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "A small area on the distal aspect of the cover screw was still visible at 2 months.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "cover_screw_visibility",
+        "value": "small distal area still visible",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t5_followup_02_33_gingival_migration_01",
+      "source_turn_id": 33,
+      "introduced_stage": "T5_followup_02",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The gingiva had migrated onto the area of the cover screw that had previously been exposed.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "gingival_migration",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_35_soft_tissue_appearance_01",
+      "source_turn_id": 35,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "At 3 months, the soft tissue had completely submerged the implant cover screw.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "soft_tissue_appearance",
+        "value": "completely submerged implant cover screw",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_36_bone_fill_in_previous_socket_spaces_01",
+      "source_turn_id": 36,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "There was suggestion of bone fill in the previous socket spaces.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "bone_fill_in_previous_socket_spaces",
+        "value": "suggested",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_37_bone_fill_around_implant_01",
+      "source_turn_id": 37,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "Bone fill was present around the implant at implant uncovery.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "bone_fill_around_implant",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_38_expected_radiographic_timing_of_mineralized_bone_fill_01",
+      "source_turn_id": 38,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Radiographic evidence of mineralized bone fill was not expected until 6 months.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "expected_radiographic_timing_of_mineralized_bone_fill",
+        "value": "not expected until 6",
+        "unit": "months",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_39_buccal_crest_height_continuity_01",
+      "source_turn_id": 39,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The buccal crest height was precisely continuous with the buccal surface of the implant.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "buccal_crest_height_continuity",
+        "value": "continuous with implant buccal surface",
+        "unit": null,
+        "side": "buccal",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_39_buccal_crest_contour_continuity_01",
+      "source_turn_id": 39,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The buccal crest contour was precisely continuous with the buccal surface of the implant.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "buccal_crest_contour_continuity",
+        "value": "continuous with implant buccal surface",
+        "unit": null,
+        "side": "buccal",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_39_lingual_crest_thickness_01",
+      "source_turn_id": 39,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The lingual crest was thicker than the buccal crest.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "lingual_crest_thickness",
+        "value": "thicker than buccal crest",
+        "unit": null,
+        "side": "lingual",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_39_lingual_crest_position_01",
+      "source_turn_id": 39,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The lingual crest was above the implant platform.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "lingual_crest_position",
+        "value": "above implant platform",
+        "unit": null,
+        "side": "lingual",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_39_peri_implant_tissue_on_probing_01",
+      "source_turn_id": 39,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Sounding with a probe revealed hard tissue around the implant.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "peri_implant_tissue_on_probing",
+        "value": "hard tissue",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_39_soft_tissue_area_on_probing_01",
+      "source_turn_id": 39,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "A 1- to 2-mm area on the mesial side immediately adjacent to the first few implant threads felt softer on probing.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "soft_tissue_area_on_probing",
+        "value": "softer tissue adjacent to first few implant threads",
+        "unit": "mm",
+        "side": "mesial",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_39_soft_tissue_area_on_probing_02",
+      "source_turn_id": 39,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "A 1- to 2-mm area on the distal side immediately adjacent to the first few implant threads felt softer on probing.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "soft_tissue_area_on_probing",
+        "value": "softer tissue adjacent to first few implant threads",
+        "unit": "mm",
+        "side": "distal",
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t6_followup_03_39_implant_mobility_01",
+      "source_turn_id": 39,
+      "introduced_stage": "T6_followup_03",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "No mobility of the implant was detected.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "implant_mobility",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t7_followup_04_44_implant_restoration_presence_01",
+      "source_turn_id": 44,
+      "introduced_stage": "T7_followup_04",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "The implant restoration was clinically present at 2 years and 2 months postoperatively.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "implant_restoration_presence",
+        "value": "present",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t7_followup_04_45_crestal_bone_level_01",
+      "source_turn_id": 45,
+      "introduced_stage": "T7_followup_04",
+      "modality": [
+        "FIGURE_QA"
+      ],
+      "fact_text": "At 2 years and 2 months postoperatively, crestal bone levels were up to the implant platform.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "crestal bone level",
+        "value": "up to implant platform",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t7_followup_04_46_peri_implant_soft_tissue_01",
+      "source_turn_id": 46,
+      "introduced_stage": "T7_followup_04",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Peri-implant soft tissue appeared healthy.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "disease_status",
+      "normalized": {
+        "field": "peri-implant_soft_tissue",
+        "value": "healthy",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t7_followup_04_46_attached_keratinized_tissue_01",
+      "source_turn_id": 46,
+      "introduced_stage": "T7_followup_04",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Wide zone of attached keratinized tissue on the buccal and lingual surfaces.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "anatomy",
+      "normalized": {
+        "field": "attached_keratinized_tissue",
+        "value": "wide zone",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t7_followup_04_46_probing_depth_01",
+      "source_turn_id": 46,
+      "introduced_stage": "T7_followup_04",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "Probing depths ranged from 2 to 3 mm.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "probing_depth",
+        "value": "2-3",
+        "unit": "mm",
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t7_followup_04_46_bleeding_on_probing_01",
+      "source_turn_id": 46,
+      "introduced_stage": "T7_followup_04",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "No bleeding on probing.",
+      "fact_type": "clinical_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "bleeding_on_probing",
+        "value": "absent",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    },
+    {
+      "evidence_id": "report_CR0266_t7_followup_04_47_periapical_radiograph_crestal_bone_level_01",
+      "source_turn_id": 47,
+      "introduced_stage": "T7_followup_04",
+      "modality": [
+        "TEXT_QA"
+      ],
+      "fact_text": "The periapical radiograph demonstrated crestal bone levels up to the implant platform.",
+      "fact_type": "imaging_finding",
+      "clinical_dimension": "diagnostic_finding",
+      "normalized": {
+        "field": "periapical radiograph crestal bone level",
+        "value": "up to the implant platform",
+        "unit": null,
+        "side": null,
+        "tooth": null
+      }
+    }
+  ]
+}
