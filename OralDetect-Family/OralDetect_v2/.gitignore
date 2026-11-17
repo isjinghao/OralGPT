@@ -1,0 +1,8 @@
+# local absolute paths -- commit root_paths.example.yaml instead
+root_paths.yaml
+
+__pycache__/
+*.pyc
+.pytest_cache/
+runs/
+*.pt

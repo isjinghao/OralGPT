@@ -1,0 +1,18 @@
+# Dataset config: IOP-Compass (1,000 patients x 5 intraoral views, 88,601 teeth, FDI 11-48).
+# Read by scripts/01_prepare_data.py; every later step only needs `yolo_root`.
+# Paths are relative to `data_root` in ../../../root_paths.yaml.
+name: iop_compass
+
+raw_root:  raw_datas/IOP_Compass/IOP-Compass
+yolo_root: processed_datas/OralDetect_Family/v2/tooth_id/iop_compass_yolo
+
+# Patient-level: a patient's five views always land in the same split.
+split:
+  seed: 0
+  ratios: {train: 0.8, val: 0.1, test: 0.1}
+
+# Raw photos are 12-24 MP PNGs. They are stored once as JPEGs with the long side capped here,
+# which must stay >= the training `imgsz`.
+image:
+  max_side: 1280
+  jpeg_quality: 92

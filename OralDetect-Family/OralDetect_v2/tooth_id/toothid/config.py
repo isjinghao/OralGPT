@@ -1,0 +1,60 @@
+"""Config loading and path resolution.
+
+Configs hold RELATIVE paths only. The absolute roots live in one git-ignored file,
+`OralDetect_v2/root_paths.yaml`, and are joined on here -- nowhere else.
+
+    data config    raw_root, yolo_root   -> relative to `data_root`
+    model config   out_root, weights     -> relative to `exp_root`
+"""
+from __future__ import annotations
+
+import os
+from pathlib import Path
+
+import yaml
+
+MODULE_ROOT = Path(__file__).resolve().parents[1]          # .../OralDetect_v2/tooth_id
+V2_ROOT = MODULE_ROOT.parent                               # .../OralDetect_v2
+ROOT_PATHS_FILE = Path(os.environ.get("ORALDETECT_V2_ROOT_PATHS", V2_ROOT / "root_paths.yaml"))
+
+_DATA_KEYS = ("raw_root", "yolo_root")
+_MODEL_KEYS = ("out_root", "weights")
+
+
+def load_yaml(path: str | Path) -> dict:
+    path = Path(path)
+    if not path.is_absolute() and not path.exists():       # config paths are relative to the module
+        path = MODULE_ROOT / path
+    with open(path) as f:
+        cfg = yaml.safe_load(f)
+    if not isinstance(cfg, dict):
+        raise ValueError(f"{path}: expected a mapping at top level")
+    return cfg
+
+
+def load_roots() -> dict:
+    if not ROOT_PATHS_FILE.exists():
+        raise FileNotFoundError(f"{ROOT_PATHS_FILE} not found -- copy root_paths.example.yaml to it and fill in")
+    return load_yaml(ROOT_PATHS_FILE)
+
+
+def _resolve(cfg: dict, keys: tuple[str, ...], root_key: str, roots: dict | None) -> dict:
+    roots = roots if roots is not None else load_roots()
+    for k in keys:
+        if Path(cfg[k]).is_absolute():
+            raise ValueError(f"`{k}: {cfg[k]}` is absolute; configs take paths relative to `{root_key}`")
+        cfg[k] = str(Path(roots[root_key]) / cfg[k])
+    return cfg
+
+
+def load_data_cfg(path: str | Path, roots: dict | None = None) -> dict:
+    return _resolve(load_yaml(path), _DATA_KEYS, "data_root", roots)
+
+
+def load_model_cfg(path: str | Path, roots: dict | None = None) -> dict:
+    return _resolve(load_yaml(path), _MODEL_KEYS, "exp_root", roots)
+
+
+def run_dir(model_cfg: dict) -> Path:
+    """<exp_root>/<out_root>/<name> -- the one directory a run writes to."""
+    return Path(model_cfg["out_root"]) / model_cfg["name"]

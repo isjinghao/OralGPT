@@ -1,0 +1,9 @@
+# Copy to `root_paths.yaml` (git-ignored) and fill in. It is the ONLY file in OralDetect_v2 that
+# holds absolute paths; every config, script and launcher is relative to one of these roots.
+# Flat `key: value` only -- launch/env.sh reads it with awk.
+
+data_root:   /path/to/datasets            # raw + processed datasets   (configs/data/*.yaml)
+exp_root:    /path/to/experiments         # weights, runs, slurm logs  (configs/model/*.yaml)
+cache_root:  /path/to/cache               # ultralytics / torch / matplotlib caches
+python:      /path/to/env/bin/python      # interpreter with torch + ultralytics deps
+pythonpath:                               # optional: extra dir(s) put first on PYTHONPATH
