@@ -1,4 +1,4 @@
-# Model config: the baseline. YOLO11m-seg, 32-way FDI instance segmentation at 1024 px.
+# Model config: instance-segmentation variant. YOLO11m-seg, 32-way FDI box + mask at 1024 px.
 # Paths are relative to `exp_root` in ../../../root_paths.yaml.
 # A run writes to <exp_root>/<out_root>/<name>/ and nowhere else.
 name:     yolo11m_seg_1024

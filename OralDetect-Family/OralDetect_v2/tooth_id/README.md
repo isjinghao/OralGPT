@@ -3,7 +3,8 @@
 Input: one intraoral photograph. Output: every visible tooth as a box + mask, labelled with its
 FDI number (32 classes, permanent dentition 11–48).
 
-Baseline: YOLO11m-seg at 1024 px, trained on IOP-Compass.
+Baseline: YOLO11m box detection at 1024 px, trained on IOP-Compass (`configs/model/yolo11m_det.yaml`,
+the default). `yolo11m_seg.yaml` is the box + mask variant: `MODEL=configs/model/yolo11m_seg.yaml`.
 
 ## Layout
 
@@ -11,7 +12,7 @@ Baseline: YOLO11m-seg at 1024 px, trained on IOP-Compass.
 tooth_id/
 ├── configs/
 │   ├── data/iop_compass.yaml       raw + processed paths, patient-level split, image size
-│   └── model/yolo11m_seg.yaml      weights, train / predict / eval settings, output root
+│   └── model/yolo11m_{det,seg}.yaml  weights, train / predict / eval settings, output root
 ├── toothid/
 │   ├── fdi.py                      THE label space: 32 codes, mirror(), error taxonomy
 │   ├── config.py                   yaml loading, run_dir()
@@ -101,7 +102,6 @@ All four are also broken down per view and per FDI code. Wrong numbers are class
 ## Adding a model or a dataset
 
 - New model: add `configs/model/<name>.yaml`, pass it with `MODEL=configs/model/<name>.yaml bash launch/submit.sh 02_train`.
-  Any ultralytics seg/detect checkpoint works unchanged (`03_evaluate.py` reads `seg` metrics, so a
-  box-only model needs that block guarded).
+  Any ultralytics detect or seg checkpoint works unchanged (mask mAP is reported only for seg).
 - New dataset: add a reader next to `data/iop_compass.py` yielding `Record` / `Tooth`, a
   `configs/data/<name>.yaml`, and reuse `yolo_format.py` as is.

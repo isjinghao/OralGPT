@@ -1,0 +1,22 @@
+# Data-scaling test: fine-tune the whole encoder end to end on a fraction of IOP-Compass patients,
+# same task as the frozen probe (classify each ground-truth tooth box into its FDI code).
+# Paths are relative to roots in ../../../root_paths.yaml.
+name: tooth_fdi_finetune
+yolo_root: processed_datas/OralDetect_Family/v2/tooth_id/iop_compass_yolo     # under data_root
+out_root: exps_outputs_v2/encoder_probe                                       # under exp_root
+image_size: 1024                # the detector's input size, and the only size the SAM encoder runs at
+roi: {output_size: 3, sampling_ratio: 2}
+fractions: [0.01, 0.05, 0.25, 1.0]      # of the 800 training patients; nested subsets, fixed by subset_seed
+subset_seed: 0
+train:
+  steps: 6000                   # the same for every fraction, so every run costs the same
+  batch: 4
+  workers: 8
+  lr_backbone: 0.00003
+  lr_head: 0.001
+  weight_decay: 0.05
+  warmup_steps: 300
+  eval_every: 1000              # val + test are scored here; the test number at the best val step is reported
+  mlp_hidden: 1024
+  amp: true
+  seed: 0

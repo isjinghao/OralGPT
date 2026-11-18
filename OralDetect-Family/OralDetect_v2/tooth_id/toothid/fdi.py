@@ -55,3 +55,9 @@ def relation(gt: int, pred: int) -> str:
     if position(gt) == 1 and position(pred) == 1:
         return "adjacent"                      # 11 <-> 21, 31 <-> 41: neighbours across the midline
     return "mirror" if mirror(gt) == pred else "same_arch"
+
+
+# Tooth type <-> position digit, for datasets that label the type but not the quadrant.
+POSITION_NAMES = {1: "central incisor", 2: "lateral incisor", 3: "canine", 4: "first premolar",
+                  5: "second premolar", 6: "first molar", 7: "second molar", 8: "third molar"}
+NAME2POSITION = {n: p for p, n in POSITION_NAMES.items()}

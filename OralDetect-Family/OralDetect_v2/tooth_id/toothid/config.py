@@ -58,3 +58,11 @@ def load_model_cfg(path: str | Path, roots: dict | None = None) -> dict:
 def run_dir(model_cfg: dict) -> Path:
     """<exp_root>/<out_root>/<name> -- the one directory a run writes to."""
     return Path(model_cfg["out_root"]) / model_cfg["name"]
+
+
+def load_external_cfg(path: str | Path, roots: dict | None = None) -> dict:
+    """Config of an external (test-only) set: a list of `sources`, each with `images` and `annotations`."""
+    cfg, roots = load_yaml(path), roots if roots is not None else load_roots()
+    for src in cfg["sources"]:
+        _resolve(src, ("images", "annotations"), "data_root", roots)
+    return cfg

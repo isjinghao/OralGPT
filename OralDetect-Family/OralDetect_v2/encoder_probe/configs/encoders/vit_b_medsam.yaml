@@ -1,0 +1,8 @@
+# ViT-B/16 image encoder of MedSAM (SAM ViT-B fine-tuned on medical segmentation). Native input 1024;
+# features are taken before the 256-d neck. MedSAM feeds images scaled to [0, 1] without mean/std.
+name: vit_b_medsam
+backbone: vit_b16
+loader: hf_sam
+source: wanglab/medsam-vit-base
+pretrain: promptable segmentation, medical images (MedSAM)
+norm: {mean: [0.0, 0.0, 0.0], std: [1.0, 1.0, 1.0]}

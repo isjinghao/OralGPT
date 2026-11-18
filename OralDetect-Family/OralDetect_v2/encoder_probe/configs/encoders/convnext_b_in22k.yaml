@@ -1,0 +1,7 @@
+# ConvNeXt-B, official supervised ImageNet-22k weights (timm).
+name: convnext_b_in22k
+backbone: convnext_b
+loader: timm
+source: convnext_base.fb_in22k
+pretrain: supervised, ImageNet-22k labels
+norm: {mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225]}

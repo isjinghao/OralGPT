@@ -7,6 +7,7 @@ the layout, not by reading another module's code.
 | module | task | data | status |
 |---|---|---|---|
 | [`tooth_id/`](tooth_id) | intraoral photo -> every tooth, with its FDI number (box + mask) | IOP-Compass | baseline |
+| [`encoder_probe/`](encoder_probe) | frozen vision encoders compared by pretraining (ConvNeXt-B, ViT-B/16) on a tooth-numbering probe | IOP-Compass | first probe |
 
 ## Module skeleton
 

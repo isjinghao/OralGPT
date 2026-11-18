@@ -21,5 +21,5 @@ export MPLCONFIGDIR=$CACHE_ROOT/matplotlib
 mkdir -p "$YOLO_CONFIG_DIR" "$MPLCONFIGDIR" "$TOOTHID_LOGS"
 
 DATA=${DATA:-configs/data/iop_compass.yaml}          # relative to the module root
-MODEL=${MODEL:-configs/model/yolo11m_seg.yaml}
+MODEL=${MODEL:-configs/model/yolo11m_det.yaml}
 cd "$TOOTHID_ROOT"

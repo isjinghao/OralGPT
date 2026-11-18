@@ -1,0 +1,15 @@
+# Frozen-feature probe: classify each ground-truth tooth box of IOP-Compass into its FDI code.
+# Paths are relative to roots in ../../../root_paths.yaml.
+name: tooth_fdi
+yolo_root: processed_datas/OralDetect_Family/v2/tooth_id/iop_compass_yolo     # under data_root
+out_root: exps_outputs_v2/encoder_probe                                       # under exp_root
+image_sizes: [512, 1024]        # square letterbox side; one feature cache per (encoder, size)
+roi: {output_size: 3, sampling_ratio: 2}      # RoIAlign on the last feature map, then averaged
+extract: {batch: 8, workers: 8, amp: true}
+probe:
+  epochs: 100
+  batch: 4096
+  lr: 0.001
+  weight_decay: 0.0001
+  mlp_hidden: 1024
+  seed: 0

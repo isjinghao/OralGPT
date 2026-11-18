@@ -38,8 +38,9 @@ def main():
     from ultralytics import YOLO
     v = YOLO(str(weights)).val(data=str(root / "dataset.yaml"), split=args.split, imgsz=model["predict"]["imgsz"],
                                project=str(out), name="ultralytics_val", exist_ok=True, plots=True, verbose=False)
-    coco = dict(box_map50_95=round(float(v.box.map), 4), box_map50=round(float(v.box.map50), 4),
-                mask_map50_95=round(float(v.seg.map), 4), mask_map50=round(float(v.seg.map50), 4))
+    coco = dict(box_map50_95=round(float(v.box.map), 4), box_map50=round(float(v.box.map50), 4))
+    if hasattr(v, "seg"):                                   # segmentation checkpoints only
+        coco.update(mask_map50_95=round(float(v.seg.map), 4), mask_map50=round(float(v.seg.map50), 4))
 
     # (b) tooth-ID metrics on class-agnostic matches
     acc = IDAccumulator(model["eval"]["match_iou"])

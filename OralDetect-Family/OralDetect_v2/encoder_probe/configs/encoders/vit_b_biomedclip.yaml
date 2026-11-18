@@ -1,0 +1,8 @@
+# ViT-B/16 vision tower of BiomedCLIP (PMC-15M figure-caption pairs). Native input 224: the
+# position embedding is interpolated to the probe resolution.
+name: vit_b_biomedclip
+backbone: vit_b16
+loader: open_clip
+source: hf-hub:microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224
+pretrain: biomedical image-text contrastive (BiomedCLIP)
+norm: {mean: [0.48145466, 0.4578275, 0.40821073], std: [0.26862954, 0.26130258, 0.27577711]}

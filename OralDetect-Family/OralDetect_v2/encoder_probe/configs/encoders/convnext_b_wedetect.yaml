@@ -1,0 +1,7 @@
+# ConvNeXt-B from the WeDetect base detector: the weights OralCLIP started from.
+name: convnext_b_wedetect
+backbone: convnext_b
+loader: wedetect
+weights: ckpts/pretrained_models/wedetect_base.pth        # relative to exp_root
+pretrain: general open-vocabulary detection (WeDetect base)
+norm: {mean: [0.0, 0.0, 0.0], std: [1.0, 1.0, 1.0]}

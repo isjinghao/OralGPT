@@ -1,0 +1,16 @@
+# External test set: IO150K (intraoral photographs, mostly 512-733 px), as packaged for OralDetect v1.
+# Labels are tooth TYPES (central incisor ... second molar) with no quadrant, so it can only score
+# the position digit of an FDI prediction. Never trained on here: used by scripts/05_zero_shot_types.py.
+# Paths are relative to `data_root` in ../../../root_paths.yaml.
+name: io150k
+prefix: IO150K__          # keep only images whose file name starts with this
+sources:                  # all three v1 splits are unseen by tooth_id models, so all are test data
+  - split: v1_train
+    images:      processed_datas/OralDetect_Family/OralDetect_data_by_modality/intraoral
+    annotations: processed_datas/OralDetect_Family/OralDetect-Training/Detect-Training/instances_oraldetect_train.json
+  - split: v1_val
+    images:      processed_datas/OralDetect_Family/OralDetect_data_by_modality/intraoral
+    annotations: processed_datas/OralDetect_Family/OralDetect-Training/Detect-Training/instances_oraldetect_val.json
+  - split: v1_test
+    images:      processed_datas/OralDetect_Family/OralDetect-Bench/Detection/images/intraoral
+    annotations: processed_datas/OralDetect_Family/OralDetect-Bench/Detection/instances_oraldetect_test.json

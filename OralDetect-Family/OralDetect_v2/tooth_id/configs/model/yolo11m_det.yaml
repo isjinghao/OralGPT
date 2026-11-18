@@ -1,0 +1,43 @@
+# Model config: the baseline. YOLO11m, 32-way FDI box detection at 1024 px.
+# Labels on disk are polygons; ultralytics reduces them to boxes for a detect model.
+# Paths are relative to `exp_root` in ../../../root_paths.yaml.
+# A run writes to <exp_root>/<out_root>/<name>/ and nowhere else.
+name:     yolo11m_det_1024
+out_root: exps_outputs_v2/tooth_id
+weights:  ckpts/pretrained_models/ultralytics/yolo11m.pt
+
+# Passed verbatim to ultralytics `model.train(...)`.
+train:
+  imgsz: 1024
+  epochs: 100
+  patience: 30
+  batch: 16
+  workers: 8
+  seed: 0
+  amp: true
+  plots: true
+  # -- augmentation. The tooth number is decided by WHERE a tooth sits in the mouth, so anything
+  #    that moves teeth across the midline or between arches corrupts the label.
+  fliplr: 0.0       # REQUIRED 0: a mirror turns 16 into 26. engine/train.py refuses anything else.
+  flipud: 0.0       # REQUIRED 0: swaps upper and lower arch.
+  mosaic: 0.0       # stitching four mouths together destroys the arch context the ID depends on
+  mixup: 0.0
+  copy_paste: 0.0
+  degrees: 10.0
+  translate: 0.1
+  scale: 0.3
+  hsv_h: 0.015
+  hsv_s: 0.5
+  hsv_v: 0.3
+
+# Passed verbatim to ultralytics `model.predict(...)` for the tooth-ID evaluation.
+predict:
+  imgsz: 1024
+  conf: 0.25
+  iou: 0.6
+  agnostic_nms: true    # one tooth, one number
+  max_det: 64
+  batch: 16
+
+eval:
+  match_iou: 0.5        # GT <-> prediction box IoU for "the tooth was found"

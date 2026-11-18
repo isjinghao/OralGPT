@@ -1,0 +1,11 @@
+# Image-to-image retrieval on the Retrieval side of OralDetect-Bench (3,300 images, 5 modalities).
+# No training: each image queries the other images of its modality with the encoder's mean-pooled
+# last feature map; a hit is an image of the same `category`. Works for encoders without a text tower.
+# Paths are relative to roots in ../../../root_paths.yaml.
+name: bench_retrieval
+bench_root: processed_datas/OralDetect_Family/OralDetect-Bench/Retrieval      # under data_root
+out_root: exps_outputs_v2/encoder_probe                                       # under exp_root
+image_sizes: [224, 1024]        # images are resized to a square of this side
+batch: 16
+workers: 8
+amp: true

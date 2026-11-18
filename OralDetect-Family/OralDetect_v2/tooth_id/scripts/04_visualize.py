@@ -27,6 +27,7 @@ def main():
     ap.add_argument("--n", type=int, default=20)
     ap.add_argument("--worst", action="store_true")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--out", help="output folder (default: <run_dir>/eval_<split>/viz or viz_worst)")
     args = ap.parse_args()
 
     data, model = load_data_cfg(args.data), load_model_cfg(args.model)
@@ -39,21 +40,27 @@ def main():
     def gt(p):
         return read_label(root / "labels" / args.split / f"{p['stem']}.txt", *p["size"])
 
+    def errors(p):  # (wrong number, missed tooth, spurious box)
+        codes, boxes = gt(p)
+        pairs = greedy_match(boxes, p["boxes"], thr) if boxes and p["boxes"] else []
+        wrong = sum(codes[g] != p["codes"][q] for g, q, _ in pairs)
+        return wrong, len(boxes) - len(pairs), len(p["boxes"]) - len(pairs)
+
     if args.worst:
-        def n_wrong(p):
-            codes, boxes = gt(p)
-            pairs = greedy_match(boxes, p["boxes"], thr) if boxes and p["boxes"] else []
-            return sum(codes[g] != p["codes"][q] for g, q, _ in pairs)
-        preds.sort(key=n_wrong, reverse=True)
+        preds.sort(key=lambda p: sum(errors(p)), reverse=True)
     else:
         random.Random(args.seed).shuffle(preds)
 
-    (out / "viz").mkdir(exist_ok=True)
+    viz = Path(args.out) if args.out else out / ("viz_worst" if args.worst else "viz")
+    viz.mkdir(parents=True, exist_ok=True)
+    rows = ["stem\twrong_number\tmissed\tspurious"]
     for p in preds[: args.n]:
         codes, boxes = gt(p)
-        im = draw(root / "images" / args.split / f"{p['stem']}.jpg", codes, boxes, p["codes"], p["boxes"], thr)
-        im.save(out / "viz" / f"{p['stem']}.jpg", quality=90)
-    print("wrote", min(args.n, len(preds)), "images to", out / "viz")
+        im = draw(root / "images" / args.split / f"{p['stem']}.jpg", codes, boxes, p["codes"], p["boxes"], thr, p.get("scores"))
+        im.save(viz / f"{p['stem']}.jpg", quality=90)
+        rows.append("\t".join([p["stem"], *map(str, errors(p))]))
+    (viz / "index.tsv").write_text("\n".join(rows) + "\n")
+    print("wrote", min(args.n, len(preds)), "images to", viz)
 
 
 if __name__ == "__main__":

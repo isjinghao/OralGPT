@@ -1,0 +1,7 @@
+# ConvNeXt-B after OralCLIP v15: WeDetect init, then aligned on 710K dental image-text pairs.
+name: convnext_b_oralclip
+backbone: convnext_b
+loader: oralclip
+weights: ckpts/our_ckpts/oralclip/clip_checkpoints_v15/best.pt
+pretrain: dental image-text contrastive (OralCLIP v15), from the WeDetect init
+norm: {mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225]}

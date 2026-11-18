@@ -2,7 +2,7 @@
 # Step 3 + 4 alone, for a run that already has weights.
 #   SPLIT=val bash launch/submit.sh 03_evaluate
 #SBATCH --job-name=toothid_eval
-#SBATCH --cluster=gpu --partition=a100 --account=lzhan
+#SBATCH --cluster=gpu --partition=l40s --account=lzhan
 #SBATCH --nodes=1 --ntasks=1 --cpus-per-task=8 --gres=gpu:1 --mem=32g
 #SBATCH --time=01:00:00
 set -euo pipefail

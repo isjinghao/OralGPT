@@ -1,0 +1,7 @@
+# ViT-B/16, DINOv3 self-supervised on LVD-1689M (timm).
+name: vit_b_dinov3
+backbone: vit_b16
+loader: timm
+source: vit_base_patch16_dinov3.lvd1689m
+pretrain: self-supervised, general images (DINOv3)
+norm: {mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225]}
