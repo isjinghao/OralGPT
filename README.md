@@ -67,6 +67,7 @@
 
 ## News
 
+- **[2026-11-22]** 📝 The **OralGPT-Family Technical Report Template** (LaTeX, arXiv-ready, pdfLaTeX/Overleaf) has been released in [OralGPT-Family-Template](./OralGPT-Family-Template/). 👏 Welcome to use it for OralGPT-Family reports.
 - **[2026-10-11]** 🎉 **PlaqueSAM** has been published in **npj Digital Medicine**: [Photography-based dental plaque detection and report generation among preschool children using PlaqueSAM](https://www.nature.com/articles/s41746-026-03385-9). Code: [isjinghao/PlaqueSAM](https://github.com/isjinghao/PlaqueSAM).
 - **[2026-09-01]** 🔥 **OralFlow** is coming soon...
 - **[2026-08-29]** 🔥🔥 **OralDetect**, an open-vocabulary dental detector spanning 5 imaging modalities, has been released: weights on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralDetect-Family), with the [training set](https://huggingface.co/datasets/OralGPT/OralDetect-Training) and [benchmark](https://huggingface.co/datasets/OralGPT/OralDetect-Bench). 👏 Welcome to detect on your own dental images.
@@ -135,6 +136,7 @@ Evaluation steps for MMOral-OPG-Bench are in [MMOral-Bench-EvalKit](./MMOral-Ben
 | [OralGPT-V](./OralGPT-V/) | Oral world model |
 | [OralDetect](./OralDetect/) | Open-vocabulary detection training and evaluation |
 | [OralFlow](./OralFlow/) | OralFlow-Bench construction pipeline |
+| [OralGPT-Family-Template](./OralGPT-Family-Template/) | LaTeX template for OralGPT-Family technical reports (arXiv / Overleaf) |
 | [LLaMA-Factory](./LLaMA-Factory/) | Upstream training framework, vendored for convenience |
 | [PlaqueSAM](https://github.com/isjinghao/PlaqueSAM) | Separate repository |
 

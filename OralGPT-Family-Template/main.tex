@@ -1,0 +1,16 @@
+% =====================================================================
+%  OralGPT-Family Technical Report Template (arXiv)
+%  Compile:  pdflatex main ; bibtex main ; pdflatex main ; pdflatex main
+%  Edit only: frontmatter.tex (title/authors/abstract/links),
+%             content.tex (body + bibliography), appendix.tex, assets/.
+%  All styling lives in template_style.sty (see its CONFIGURATION AREA).
+%  Body size follows the 08 Piccolo template as delivered (11pt).
+% =====================================================================
+\documentclass[11pt]{article}
+\usepackage{template_style}
+
+\begin{document}
+\input{frontmatter}
+\input{content}   % main body, ends with the bibliography
+\input{appendix}  % optional: delete this line if no appendix is needed
+\end{document}

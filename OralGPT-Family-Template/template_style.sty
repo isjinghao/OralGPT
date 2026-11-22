@@ -1,0 +1,183 @@
+%% ====================================================================
+%%  template_style.sty  --  OralGPT D -- Team Final (Piccolo body + APRIL-style title box)
+%%  Team final OralGPT template. Official OralGPT logo used with the owner's permission.
+%%
+%%  Standalone style file. Common front-matter interface:
+%%    \ogsettitle \ogsetauthors \ogsetaffiliations \ogsetteam \ogsetemail
+%%    \ogsetlinkA/B/C \ogsetdate \ogsetreporttype \ogsetstatus \ogsetabstract
+%%    \ogmakefrontmatter
+%%  Body content is in content.tex; bibliography in refs.bib.
+%% ====================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{template_style}[2026/11/19 OralGPT template family]
+
+%% ---------------- required packages ---------------------------------
+\RequirePackage[T1]{fontenc}
+\RequirePackage{lmodern}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{geometry}
+\RequirePackage{fancyhdr}
+\RequirePackage{caption}
+\RequirePackage{booktabs}
+\RequirePackage{tabularx}
+\RequirePackage{titlesec}
+\RequirePackage{enumitem}
+\RequirePackage{microtype}
+\RequirePackage{url}
+\urlstyle{same}
+\RequirePackage{setspace}
+\RequirePackage[most]{tcolorbox}\RequirePackage{fontawesome5}\RequirePackage{twemojis}\RequirePackage{hyphenat}\RequirePackage{float}
+\RequirePackage{mathpazo}\RequirePackage[scaled=.94]{helvet}
+\RequirePackage[numbers,sort&compress]{natbib}
+
+%% ==================== CONFIGURATION AREA ============================
+%% 1) Brand palette (HTML)
+\definecolor{ogPrimary}{HTML}{0064E0}
+\definecolor{ogAccent}{HTML}{8996BA}
+\definecolor{ogInk}{HTML}{1C2B33}
+\definecolor{ogSurface}{HTML}{F4F8FC}
+\definecolor{ogMuted}{HTML}{6B7A8C}
+%% 2) Official logo: path, size and placement are all set here
+\newcommand{\ogLogoPath}{assets/oralgpt_logo.png}
+\newcommand{\ogLogoHeight}{1.2cm}
+\newcommand{\ogTopLogo}[1][\ogLogoHeight]{\includegraphics[height=#1]{\ogLogoPath}}
+%% 3) Typography knobs (title / author / abstract / headings / captions)
+\newcommand{\ogTitleFont}{\fontsize{17}{21}\selectfont\bfseries}
+\newcommand{\ogAuthorFont}{\normalsize}
+\newcommand{\ogAbstractFont}{\small}
+\newcommand{\ogSectionFont}{\normalfont\large\bfseries}
+\newcommand{\ogSubsectionFont}{\normalfont\normalsize\bfseries}
+\newcommand{\ogCaptionFont}{\small}
+%% --- title box ---
+\definecolor{ogBoxBg}{HTML}{E9FAFE}  % = 10% logo blue #23D0F6 + 90% white
+\newcommand{\ogHeaderLogoHeight}{0.55cm} % logo in the running header of pages 2..N
+\newcommand{\ogHeaderText}{OralGPT-Family} % text next to the header logo
+\definecolor{ogRule}{HTML}{C9CED6}      % header rule colour
+\newcommand{\ogHeaderRuleRaise}{5pt}   % lift the header rule towards the logo
+%% header-to-body distance = headsep in \geometry below (16pt)
+%% --- fonts and sizes (taken from the 08 Piccolo template) ---
+\renewcommand{\ogTitleFont}{\fontsize{19}{23}\selectfont\sffamily\bfseries}
+\renewcommand{\ogAuthorFont}{\normalsize\sffamily\bfseries}
+\renewcommand{\ogAbstractFont}{\normalsize}
+\renewcommand{\ogSectionFont}{\fontsize{13}{16}\selectfont\sffamily\bfseries\color{ogPrimary}}
+\renewcommand{\ogSubsectionFont}{\fontsize{11}{13}\selectfont\sffamily\bfseries\color{ogPrimary}}
+\renewcommand{\ogCaptionFont}{\small}
+%% caption label ("Figure 1", "Table 1") = subsection face and colour
+\newcommand{\ogCaptionLabelFont}{\sffamily\bfseries\color{ogPrimary}}
+%% --- metadata rows inside the title box ---
+\newcommand{\ogIconDate}{\raisebox{-0.12em}{\twemoji[height=1em]{spiral calendar}}}
+\newcommand{\ogIconGithub}{\faGithub}
+\newcommand{\ogIconHF}{\raisebox{-0.12em}{\twemoji[height=1em]{1f917}}}
+\newcommand{\ogMetaRow}[3]{{\small #1\ {\sffamily\bfseries #2:}\ #3}\par}
+%% 4) Paper, margins, body leading
+\geometry{a4paper,margin=2.5cm,headheight=25pt,headsep=16pt}
+\newcommand{\ogBodyLeading}{\linespread{1.05}\selectfont}
+%% 5) Brand mark used in headers (reference styles use neutral placeholders)
+\newcommand{\ogBrandMark}{\raisebox{-0.32\height}{\includegraphics[height=\ogHeaderLogoHeight]{\ogLogoPath}}\hspace{5pt}{\small\sffamily\bfseries\color{ogInk}\ogHeaderText}}
+%% 6) Footer note
+\newcommand{\ogFooterNote}{}
+%% ================= END OF CONFIGURATION AREA ========================
+
+\RequirePackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=ogPrimary,citecolor=ogPrimary,urlcolor=ogPrimary,
+            pdfborder={0 0 0},breaklinks=true}
+%% Robust line breaking for long technical terms and inline maths.
+\tolerance=1600
+\emergencystretch=1.5em
+\hyphenpenalty=50
+
+%% ---------------- shared front-matter data interface ----------------
+\newcommand{\ogsettitle}[1]{\def\ogTitle{#1}}        \ogsettitle{}
+\newcommand{\ogsetauthors}[1]{\def\ogAuthors{#1}}    \ogsetauthors{}
+\newcommand{\ogsetaffiliations}[1]{\def\ogAffils{#1}}\ogsetaffiliations{}
+\newcommand{\ogsetteam}[1]{\def\ogTeam{#1}}          \ogsetteam{}
+\newcommand{\ogsetemail}[1]{\def\ogEmail{#1}}        \ogsetemail{}
+\newcommand{\ogsetlinkA}[1]{\def\ogLinkA{#1}}        \ogsetlinkA{}
+\newcommand{\ogsetlinkB}[1]{\def\ogLinkB{#1}}        \ogsetlinkB{}
+\newcommand{\ogsetlinkC}[1]{\def\ogLinkC{#1}}        \ogsetlinkC{}
+\newcommand{\ogsetdate}[1]{\def\ogDate{#1}}          \ogsetdate{}
+\newcommand{\ogsetreporttype}[1]{\def\ogType{#1}}    \ogsetreporttype{}
+\newcommand{\ogsetstatus}[1]{\def\ogStatusLine{#1}}  \ogsetstatus{}
+\newcommand{\ogsetabstract}[1]{\long\def\ogAbstract{#1}} \ogsetabstract{}
+
+%% ---------------- front matter --------------------------------------
+
+% Title box: title, authors, affiliations, abstract and Date / Github /
+% Hugging Face rows in one rounded light box (no logo inside the box).
+\newcommand{\ogmakefrontmatter}{%
+  \begin{tcolorbox}[enhanced,breakable,frame hidden,colback=ogBoxBg,arc=10pt,
+      left=0.5cm,right=0.5cm,top=0.5cm,bottom=0.5cm,
+      grow to left by=1.5pt,grow to right by=1.5pt,before skip=0pt]
+    \raggedright\nohyphens
+    {\ogTitleFont\ogTitle\par}
+    \vspace{0.30cm}
+    {\ogAuthorFont\ogAuthors\par}
+    \vspace{0.15cm}
+    {\normalsize\ogAffils\par}
+    \vspace{0.45cm}
+    {\justifying\ogAbstractFont\color{ogInk}\ogAbstract\par}
+    \vspace{0.45cm}
+    \ogMetaRow{\ogIconDate}{Date}{\ogDate}
+    \ogMetaRow{\ogIconGithub}{Github}{\url{\ogLinkC}}
+    \ogMetaRow{\ogIconHF}{Hugging Face}{\url{\ogLinkB}}
+  \end{tcolorbox}
+  \vspace{0.55cm}
+}
+%% Appendix opener: call \ogbeginappendix once, after the bibliography.
+\newcommand{\ogbeginappendix}{%
+  \clearpage
+  \appendix
+  \counterwithin{figure}{section}%
+  \counterwithin{table}{section}%
+  \counterwithin{equation}{section}%
+  {\noindent\ogTitleFont Appendix\par}
+  \vspace{0.35cm}
+}
+
+
+%% ---------------- section / subsection hierarchy --------------------
+
+\providecommand{\justifying}{\rightskip=0pt \leftskip=0pt \parfillskip=0pt plus 1fil}
+\titleformat{\section}{\ogSectionFont}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\ogSubsectionFont}{\thesubsection}{0.7em}{}
+\titlespacing*{\section}{0pt}{14pt plus 2pt}{6pt}
+\titlespacing*{\subsection}{0pt}{10pt plus 2pt}{3pt}
+\setcitestyle{numbers,square,citesep={,}}
+\renewcommand{\arraystretch}{1.15}
+
+
+%% ---------------- figure & table captions ---------------------------
+
+%% "Figure 1 Caption text": label in the subsection face/colour, no colon,
+%% left aligned (no centring of short captions).
+\DeclareCaptionLabelSeparator{ogsp}{\ }
+\DeclareCaptionFormat{ogfinal}{{\ogCaptionLabelFont #1}#2#3}
+\DeclareCaptionFont{ogbody}{\ogCaptionFont}
+\captionsetup{format=ogfinal,labelsep=ogsp,font=ogbody,skip=5pt,
+              singlelinecheck=false,justification=justified}
+\captionsetup[table]{position=top}
+
+
+%% ---------------- headers, footers, bibliography --------------------
+
+\renewcommand{\footnoterule}{\kern-3pt\hrule width 12pc\kern 2.6pt}
+%% every page (incl. page 1): [logo] OralGPT-Family + thin rule
+\fancyhf{}
+\fancyhead[R]{\ogBrandMark}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\headrule}{\vskip-\ogHeaderRuleRaise\hbox to\headwidth{\color{ogRule}\leaders\hrule height \headrulewidth\hfill}\vskip\ogHeaderRuleRaise}
+\renewcommand{\footrulewidth}{0pt}
+
+
+\renewcommand{\refname}{References}
+\renewcommand{\bibfont}{\footnotesize}
+\setlength{\bibsep}{2pt}
+\pagestyle{fancy}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt plus 1pt}
+\AtBeginDocument{\ogBodyLeading}
