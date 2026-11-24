@@ -1,0 +1,21 @@
+# Intraoral photographs that carry detection labels but NO tooth numbers: every intraoral source of
+# OralDetect v1 plus the new candidate #3. scripts/07_pseudo_label.py numbers their teeth with a trained run.
+# Paths are relative to `data_root` in ../../../root_paths.yaml. An image listed by two sources is kept once.
+name: intraoral_detection
+v1_dirs: &v1
+  - processed_datas/OralDetect_Family/OralDetect_data_by_modality/intraoral
+  - processed_datas/OralDetect_Family/OralDetect-Bench/Detection/images/intraoral
+datasets:
+  - {name: OMNI,                 prefix: OMNI__,                 dirs: *v1}
+  - {name: AlphaDent_Caries,     prefix: AlphaDent_Caries__,     dirs: *v1}
+  - {name: Gingivitis,           prefix: Gingivitis__,           dirs: *v1}
+  - {name: IO150K,               prefix: IO150K__,               dirs: *v1}
+  - {name: FDTooth,              prefix: FDTooth__,              dirs: *v1}
+  - {name: rashid2022_colored,   prefix: rashid2022_colored__,   dirs: *v1}
+  - {name: plaque_identifyteeth, prefix: plaque_identifyteeth__, dirs: *v1}
+  - name: 03_intraoral_caries_pakistan       # candidate #3 (Zenodo 14827784), benchmark splits
+    prefix: ""
+    dirs:
+      - raw_datas/OralDetect/new_candidates_2026-11/03_intraoral_caries_pakistan/Benchmarking Dataset/Benchmarking Dataset/train/images
+      - raw_datas/OralDetect/new_candidates_2026-11/03_intraoral_caries_pakistan/Benchmarking Dataset/Benchmarking Dataset/valid/images
+      - raw_datas/OralDetect/new_candidates_2026-11/03_intraoral_caries_pakistan/Benchmarking Dataset/Benchmarking Dataset/test/images

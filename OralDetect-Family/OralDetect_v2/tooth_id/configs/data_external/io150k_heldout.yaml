@@ -1,0 +1,10 @@
+# IO150K images that no tooth_id run has trained on: the OralDetect v1 test split only.
+# Use this one to compare runs once IO150K train/val images are part of the training data
+# (configs/data/iop_plus_io150k.yaml). Same label caveat as io150k.yaml: tooth type, no quadrant.
+# Paths are relative to `data_root` in ../../../root_paths.yaml.
+name: io150k_heldout
+prefix: IO150K__
+sources:
+  - split: v1_test
+    images:      processed_datas/OralDetect_Family/OralDetect-Bench/Detection/images/intraoral
+    annotations: processed_datas/OralDetect_Family/OralDetect-Bench/Detection/instances_oraldetect_test.json

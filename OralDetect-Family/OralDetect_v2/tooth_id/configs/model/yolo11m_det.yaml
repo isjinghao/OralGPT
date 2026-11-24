@@ -2,7 +2,7 @@
 # Labels on disk are polygons; ultralytics reduces them to boxes for a detect model.
 # Paths are relative to `exp_root` in ../../../root_paths.yaml.
 # A run writes to <exp_root>/<out_root>/<name>/ and nowhere else.
-name:     yolo11m_det_1024
+name:     yolo11m_det_1024      # runs so far pass --name: ..._v1 = IOP-Compass, ..._v2 = IOP-Compass + IO150K
 out_root: exps_outputs_v2/tooth_id
 weights:  ckpts/pretrained_models/ultralytics/yolo11m.pt
 

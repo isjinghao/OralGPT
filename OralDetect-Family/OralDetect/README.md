@@ -82,7 +82,6 @@ What the weights repo contains:
 | file | size | what |
 |---|--:|---|
 | `OralDetect/oraldetect.pth` | 0.83 G | **the detector** — start here for inference or finetuning |
-| `OralDetect/oraldetect_init.pth` | 0.41 G | training init: towers loaded, neck/head still random |
 | `OralDetect/class_{names,texts}_oraldetect.json` | 6 K | the 87-class vocabulary and its prompts |
 | `OralCLIP/oralbert/` | 0.41 G | the dental BERT text tower, HF format — **required at run time** |
 | `OralCLIP/oralclip.pt` | 0.75 G | the full dental CLIP (`vision.*` + `text.*`) |
@@ -145,7 +144,7 @@ data:
   class_texts: your_data/class_texts.json
   evaluator:   coco            # required for any dataset that is not ours -- see below
 train:
-  lr: 5.0e-6                   # from the released detector; use 2.0e-5 from oraldetect_init.pth
+  lr: 5.0e-6                   # finetuning from the released detector
   epochs: 6
   gpus: 4
 ```

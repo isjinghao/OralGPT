@@ -4,7 +4,7 @@
     python scripts/04_finetune.py --encoder configs/encoders/vit_b_dinov3.yaml \
         --probe configs/probe/tooth_fdi_finetune.yaml [--fractions 0.01 1.0]
 
-Writes <out_root>/<probe>/runs/<encoder>_f<fraction>.json (skipped if present).
+Writes <out_root>/<probe>/runs/<encoder>_f<fraction>.{json,pt} (skipped if both are present).
 """
 import argparse
 import json
@@ -29,7 +29,8 @@ def main():
     runs.mkdir(parents=True, exist_ok=True)
     for frac in args.fractions or cfg["fractions"]:
         out = runs / f"{enc['name']}_f{frac}.json"
-        if out.exists():
+        ckpt = runs / f"{enc['name']}_f{frac}.pt"          # encoder weights at the best validation step
+        if out.exists() and ckpt.exists():
             print("exists, skipping:", out)
             continue
         print(f"== {enc['name']} fraction {frac}", flush=True)
@@ -37,7 +38,7 @@ def main():
         with torch.no_grad():
             dim = encoder(torch.zeros(1, 3, 64, 64) if enc["backbone"].startswith("convnext") else
                           torch.zeros(1, 3, cfg["image_size"], cfg["image_size"])).shape[1]
-        r = finetune(encoder, dim, cfg, frac)
+        r = finetune(encoder, dim, cfg, frac, save_path=ckpt)
         out.write_text(json.dumps(dict(encoder=enc["name"], backbone=enc["backbone"], pretrain=enc["pretrain"], **r), indent=1))
         print(f"   best val {r['val_fdi']} at step {r['step']}: test fdi {r['test']['fdi']} ({r['minutes']} min)", flush=True)
         del encoder

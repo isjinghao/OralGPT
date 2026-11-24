@@ -66,3 +66,24 @@ def load_external_cfg(path: str | Path, roots: dict | None = None) -> dict:
     for src in cfg["sources"]:
         _resolve(src, ("images", "annotations"), "data_root", roots)
     return cfg
+
+
+def load_unlabeled_cfg(path: str | Path, roots: dict | None = None) -> dict:
+    """Config of image sets to be numbered: `datasets`, each with a `prefix` and a list of `dirs`."""
+    cfg, roots = load_yaml(path), roots if roots is not None else load_roots()
+    for ds in cfg["datasets"]:
+        for d in ds["dirs"]:
+            if Path(d).is_absolute():
+                raise ValueError(f"`{d}` is absolute; configs take paths relative to `data_root`")
+        ds["dirs"] = [str(Path(roots["data_root"]) / d) for d in ds["dirs"]]
+    return cfg
+
+
+def load_union_cfg(path: str | Path, roots: dict | None = None) -> dict:
+    """Data config of a base FDI dataset plus `extras` (sets with human boxes but incomplete numbers,
+    completed with a run's predictions): adds `base_yolo_root` (data_root) and each `preds_from` (exp_root)."""
+    roots = roots if roots is not None else load_roots()
+    cfg = _resolve(load_data_cfg(path, roots), ("base_yolo_root",), "data_root", roots)
+    for ex in cfg["extras"]:
+        _resolve(ex, ("preds_from",), "exp_root", roots)
+    return cfg

@@ -48,7 +48,8 @@ def evaluate(model, loader, device, amp: bool) -> dict:
     return _score(torch.cat(logits), torch.cat(ys), torch.cat(views))
 
 
-def finetune(encoder, dim: int, cfg: dict, fraction: float, device="cuda") -> dict:
+def finetune(encoder, dim: int, cfg: dict, fraction: float, device="cuda", save_path=None) -> dict:
+    """`save_path`: where the encoder weights of the best validation step are written (optional)."""
     t, size = cfg["train"], cfg["image_size"]
     torch.manual_seed(t["seed"])
     train_ds = TeethDataset(cfg["yolo_root"], "train", size)
@@ -81,6 +82,8 @@ def finetune(encoder, dim: int, cfg: dict, fraction: float, device="cuda") -> di
                 print(f"  step {step} loss {float(loss):.3f} val {val['fdi']} test {test['fdi']} ({time.time() - t0:.0f}s)", flush=True)
                 if best is None or val["fdi"] > best["val_fdi"]:
                     best = dict(val_fdi=val["fdi"], step=step, test=test)
+                    if save_path is not None:
+                        torch.save({k: v.cpu() for k, v in model.encoder.body.state_dict().items()}, save_path)
             if step >= t["steps"]:
                 break
     return dict(fraction=fraction, n_patients=len({s.split("_")[0] for s in train_ds.stems}), n_images=len(train_ds),

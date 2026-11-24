@@ -1,0 +1,27 @@
+# Dataset config: IOP-Compass + IO150K + FDTooth (the "v3" training data of tooth_id).
+# Same as iop_plus_io150k.yaml with FDTooth added; built by scripts/08_build_typed_union.py.
+# Paths are relative to `data_root` in ../../../root_paths.yaml (`preds_from`: to `exp_root`).
+name: iop_plus_io150k_fdtooth
+
+raw_root:       raw_datas/IOP_Compass/IOP-Compass                                   # of the base set; not read here
+base_yolo_root: processed_datas/OralDetect_Family/v2/tooth_id/iop_compass_yolo     # made by step 1
+yolo_root:      processed_datas/OralDetect_Family/v2/tooth_id/iop_plus_io150k_fdtooth_yolo
+
+extras:
+  - name:         io150k                 # identical to iop_plus_io150k.yaml
+    kind:         tooth_type
+    config:       configs/data_external/io150k.yaml
+    train_splits: [v1_train, v1_val]
+    preds_from:   exps_outputs_v2/tooth_id/yolo11m_det_1024_v1/zeroshot_io150k/predictions.jsonl
+    match_iou:    0.5
+  # FDTooth boxes the 12 anterior teeth without numbers. They are numbered from the box layout; the
+  # other teeth in the photo come from the v2 run's predictions (step 7 output), so that they are
+  # not trained as background. An image is dropped when a prediction on a human box disagrees
+  # with the layout number.
+  - name:         fdtooth
+    kind:         anterior12
+    config:       configs/data_external/fdtooth.yaml
+    train_splits: [v1_train, v1_val]     # v1_test stays out: held-out FDTooth test
+    preds_from:   exps_outputs_v2/tooth_id/yolo11m_det_1024_v2/pseudo_intraoral_detection/FDTooth/predictions.jsonl
+    match_iou:    0.3                    # FDTooth boxes are drawn differently from IOP-Compass ones
+    min_score:    0.5                    # for the borrowed (non-anterior) teeth

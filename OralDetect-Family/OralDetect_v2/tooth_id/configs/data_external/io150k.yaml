@@ -1,6 +1,7 @@
 # External test set: IO150K (intraoral photographs, mostly 512-733 px), as packaged for OralDetect v1.
 # Labels are tooth TYPES (central incisor ... second molar) with no quadrant, so it can only score
-# the position digit of an FDI prediction. Never trained on here: used by scripts/05_zero_shot_types.py.
+# the position digit of an FDI prediction. Used by scripts/05_zero_shot_types.py. v1_train and v1_val
+# are training data of runs on configs/data/iop_plus_io150k.yaml: compare those on io150k_heldout.yaml.
 # Paths are relative to `data_root` in ../../../root_paths.yaml.
 name: io150k
 prefix: IO150K__          # keep only images whose file name starts with this

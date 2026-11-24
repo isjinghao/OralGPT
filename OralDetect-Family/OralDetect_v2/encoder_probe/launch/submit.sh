@@ -4,6 +4,6 @@
 # bash launch/submit.sh 03_probe
 set -euo pipefail
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/env.sh"
-step=${1:?usage: submit.sh <01_fetch_weights|02_extract|03_probe|04_finetune|06_bench_retrieval> [sbatch args]}; shift
+step=${1:?usage: submit.sh <01_fetch_weights|02_extract|03_probe|04_finetune|06_bench_retrieval|07_bench_retrieval_finetuned|08_condition_probe> [sbatch args]}; shift
 export PROBE ENCODER=${ENCODER:-} EXTRA=${EXTRA:-}
 sbatch --chdir="$ENCPROBE_ROOT" --output="$ENCPROBE_LOGS/%x.%j.log" "$@" "launch/$step.slurm"

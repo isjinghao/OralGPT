@@ -119,3 +119,16 @@ def build(cfg: dict, img_size: int) -> Encoder:
     if kind == "sam" and img_size != 1024:
         raise ValueError("the SAM encoder is run at its native 1024 only")
     return Encoder(body, kind, cfg["norm"]).eval().requires_grad_(False)
+
+
+def build_finetuned(cfg: dict, ckpt: str, trained_size: int, img_size: int) -> Encoder:
+    """An encoder with weights saved by finetune(): built at the size it was trained at (a learned
+    position embedding has that shape), then switched to `img_size`."""
+    model = build(cfg, trained_size)
+    model.body.load_state_dict(torch.load(ckpt, map_location="cpu"), strict=True)
+    if img_size != trained_size:
+        if model.kind == "sam":
+            raise ValueError("the SAM encoder is run at its native 1024 only")
+        if model.kind == "vit" and getattr(model.body, "pos_embed", None) is not None:
+            model.body.set_input_size(img_size=(img_size, img_size))
+    return model

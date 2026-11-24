@@ -38,6 +38,8 @@ def load_probe_cfg(path, roots: dict | None = None) -> dict:
     cfg, roots = load_yaml(path), roots or load_roots()
     _join(cfg, "yolo_root", roots["data_root"])
     _join(cfg, "bench_root", roots["data_root"])
+    for v in cfg.get("coco", {}).values():
+        _join(v, "images", roots["data_root"]), _join(v, "ann", roots["data_root"])
     _join(cfg, "out_root", roots["exp_root"])
     return cfg
 

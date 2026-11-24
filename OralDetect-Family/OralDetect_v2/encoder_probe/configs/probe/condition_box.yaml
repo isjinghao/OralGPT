@@ -1,0 +1,32 @@
+# Frozen-feature probe: classify each ground-truth condition box of the multimodal detection set
+# (lesions, restorations, cell types) within its modality.
+# Paths are relative to roots in ../../../root_paths.yaml.
+name: condition_box
+out_root: exps_outputs_v2/encoder_probe                                       # under exp_root
+coco:                                                                         # under data_root
+  train:
+    images: processed_datas/OralDetect_Family/OralDetect_data_by_modality
+    ann: processed_datas/OralDetect_Family/OralDetect-Training/Detect-Training/instances_oraldetect_train.json
+  val:
+    images: processed_datas/OralDetect_Family/OralDetect_data_by_modality
+    ann: processed_datas/OralDetect_Family/OralDetect-Training/Detect-Training/instances_oraldetect_val.json
+  test:
+    images: processed_datas/OralDetect_Family/OralDetect-Bench/Detection/images
+    ann: processed_datas/OralDetect_Family/OralDetect-Bench/Detection/instances_oraldetect_test.json
+# Classes that name a tooth or an anatomical structure are not conditions. A remaining class is kept
+# in a modality if it has boxes in both train and test there; a modality needs two kept classes.
+exclude:
+  - '^tooth \d\d '
+  - '^quadrant \d'
+  - '^(central incisor|lateral incisor|canine|first premolar|second premolar|first molar|second molar)$'
+  - '^(mandibular canal|maxillary sinus)$'
+image_sizes: [1024]
+roi: {output_size: 3, sampling_ratio: 2}
+extract: {batch: 8, workers: 8, amp: true}
+probe:
+  epochs: 100
+  batch: 4096
+  lr: 0.001
+  weight_decay: 0.0001
+  mlp_hidden: 1024
+  seed: 0

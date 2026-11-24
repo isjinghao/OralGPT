@@ -1,0 +1,7 @@
+# ConvNeXt-L, DINOv3 (distilled from the ViT-7B teacher on LVD-1689M) (timm).
+name: convnext_l_dinov3
+backbone: convnext_l
+loader: timm
+source: convnext_large.dinov3_lvd1689m
+pretrain: self-supervised, general images (DINOv3)
+norm: {mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225]}

@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-"""Step 2 -- cache one feature vector per ground-truth tooth, for one encoder at every probe resolution.
+"""Step 2 -- cache one feature vector per ground-truth box, for one encoder at every probe resolution.
 
     python scripts/02_extract.py --encoder configs/encoders/vit_b_dinov3.yaml --probe configs/probe/tooth_fdi.yaml
 
-Writes <out_root>/<probe>/features/<encoder>_<size>.pt = {train, val, test: {feat, geom, cls, view}}.
+Writes <out_root>/<probe>/features/<encoder>_<size>.pt = {train, val, test: {feat, geom, cls, view | mod}}
+(+ `classes` for a condition probe).
 """
 import argparse
 import time
@@ -13,7 +14,7 @@ import torch
 import _bootstrap  # noqa: F401
 from encprobe.config import feature_file, load_encoder_cfg, load_probe_cfg
 from encprobe.encoders import build
-from encprobe.extract import extract_split
+from encprobe.extract import extract_all
 
 
 def main():
@@ -33,12 +34,11 @@ def main():
         except ValueError as e:                      # e.g. SAM runs at its native size only
             print(f"skip {enc['name']} @ {size}: {e}")
             continue
-        t0, e = time.time(), probe["extract"]
-        data = {s: extract_split(model, probe["yolo_root"], s, size, probe["roi"], e["batch"], e["workers"], e["amp"], "cuda")
-                for s in ("train", "val", "test")}
+        t0 = time.time()
+        data = extract_all(model, probe, size)
         out.parent.mkdir(parents=True, exist_ok=True)
-        torch.save(dict(encoder=enc, size=size, **data), out)
-        print(f"{enc['name']} @ {size}: {tuple(data['train']['feat'].shape)} train teeth, {time.time() - t0:.0f}s -> {out}", flush=True)
+        torch.save(dict(encoder=enc, size=size, params_m=round(sum(p.numel() for p in model.parameters()) / 1e6, 1), **data), out)
+        print(f"{enc['name']} @ {size}: {tuple(data['train']['feat'].shape)} train boxes, {time.time() - t0:.0f}s -> {out}", flush=True)
         del model
 
 

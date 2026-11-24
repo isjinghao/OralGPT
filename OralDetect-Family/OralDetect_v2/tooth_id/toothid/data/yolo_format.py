@@ -35,11 +35,14 @@ def write_sample(rec: Record, split: str, root: str | Path, max_side: int, jpeg_
                 orig_size=[w0, h0], size=list(im.size), n_teeth=len(lines))
 
 
-def write_dataset_yaml(root: str | Path, splits: list[str]) -> Path:
+def write_dataset_yaml(root: str | Path, splits: list[str] | dict) -> Path:
+    """`splits`: split names (each at images/<split>), or {split: folder or list of folders}."""
     root = Path(root)
+    if not isinstance(splits, dict):
+        splits = {s: f"images/{s}" for s in splits}
     # No `path:` key -- ultralytics then resolves the splits against this file's own directory, so
     # the dataset can be moved or mounted elsewhere without a rewrite.
-    cfg = dict(**{s: f"images/{s}" for s in splits}, names=dict(enumerate(CLASS_NAMES)))
+    cfg = dict(**splits, names=dict(enumerate(CLASS_NAMES)))
     out = root / "dataset.yaml"
     out.write_text(yaml.safe_dump(cfg, sort_keys=False))
     return out

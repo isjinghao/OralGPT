@@ -167,7 +167,6 @@ hf download OralGPT/OralDetect-Family --local-dir "$WEIGHTS"
 | file | use |
 |---|---|
 | `$WEIGHTS/OralDetect/oraldetect.pth` | converged detector — the default start |
-| `$WEIGHTS/OralDetect/oraldetect_init.pth` | towers only, neck+head random — training from scratch |
 | `$WEIGHTS/OralCLIP/oralbert` | text tower, required at run time |
 
 > **Checkpoint 2** — both paths exist; `$WEIGHTS/OralCLIP/oralbert` holds `config.json`,
@@ -256,8 +255,7 @@ strict_load: true
 
 - `evaluator: coco` unless the images carry a `modality` key — `check_dataset.py` reports which.
   `per_modality` raises on datasets built elsewhere.
-- from `oraldetect.pth`: `lr 5.0e-6`, `epochs 6`. From `oraldetect_init.pth`: `lr 2.0e-5`,
-  `epochs 12`.
+- from `oraldetect.pth`: `lr 5.0e-6`, `epochs 6`.
 - `gpus` must equal `--nproc_per_node`; ask how many the user has. `batch_per_gpu: 4` is ~28 GB at
   1024², use 2 on 24 GB cards.
 
@@ -404,7 +402,7 @@ Add `--standalone --out "$REPORT/report_standalone.html"` for a copy to open or 
 prompt to `$DATAS/class_texts.json`. No retraining.
 
 **Change image size / text tower / drop calibration** — unsupported from the released checkpoint;
-the dry-run refuses. Requires starting from `$WEIGHTS/OralDetect/oraldetect_init.pth`.
+the dry-run refuses.
 
 **Never modify** `$REPO/WeDetect/config/oraldetect_finetune.py`.
 

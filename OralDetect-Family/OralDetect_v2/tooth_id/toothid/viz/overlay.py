@@ -57,3 +57,19 @@ def draw(image_path, gt_codes, gt_boxes, pred_codes, pred_boxes, iou_thr: float 
         dr.text(((box[0] + box[2]) / 2, (box[1] + box[3]) / 2), text, fill=color, font=font, anchor="mm", align="center",
                 stroke_width=2, stroke_fill="black")
     return im
+
+
+QUADRANT_COLOR = {1: "#ffd60a", 2: "#32d7ff", 3: "#30d158", 4: "#ff6482"}
+
+
+def draw_pred(image_path, codes, boxes, scores) -> Image.Image:
+    """Predictions only (no ground truth): box and number coloured by quadrant, confidence underneath."""
+    im = Image.open(image_path).convert("RGB")
+    dr, width = ImageDraw.Draw(im), max(2, im.width // 500)
+    font = _font(max(14, im.width // 60))
+    for code, box, score in zip(codes, boxes, scores):
+        color = QUADRANT_COLOR[code // 10]
+        dr.rectangle(box, outline=color, width=width)
+        dr.text(((box[0] + box[2]) / 2, (box[1] + box[3]) / 2), f"{code}\n" + f"{score:.2f}".replace("0.", ".", 1), fill=color, font=font,
+                anchor="mm", align="center", stroke_width=2, stroke_fill="black")
+    return im

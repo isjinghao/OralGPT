@@ -1,0 +1,20 @@
+# Dataset config: IOP-Compass + IO150K (the "v2" training data of tooth_id).
+# Built by scripts/08_build_typed_union.py from an existing IOP-Compass YOLO dataset; steps 2-4 read
+# it exactly like configs/data/iop_compass.yaml. val and test are the IOP-Compass val and test, so
+# numbers stay comparable with runs trained on IOP-Compass alone.
+# Paths are relative to `data_root` in ../../../root_paths.yaml (`preds_from`: to `exp_root`).
+name: iop_plus_io150k
+
+raw_root:       raw_datas/IOP_Compass/IOP-Compass                                   # of the base set; not read here
+base_yolo_root: processed_datas/OralDetect_Family/v2/tooth_id/iop_compass_yolo     # made by step 1
+yolo_root:      processed_datas/OralDetect_Family/v2/tooth_id/iop_plus_io150k_yolo
+
+extras:
+  # IO150K labels the tooth type but not the quadrant. The quadrant of each tooth is taken from the
+  # predictions of a model trained on IOP-Compass alone (step 5 output of that run).
+  - name:         io150k
+    kind:         tooth_type
+    config:       configs/data_external/io150k.yaml
+    train_splits: [v1_train, v1_val]     # v1_test stays out: it is the held-out IO150K test
+    preds_from:   exps_outputs_v2/tooth_id/yolo11m_det_1024_v1/zeroshot_io150k/predictions.jsonl
+    match_iou:    0.5

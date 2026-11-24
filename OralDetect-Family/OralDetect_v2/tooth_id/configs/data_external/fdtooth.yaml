@@ -1,0 +1,19 @@
+# FDTooth (frontal intraoral photographs), as packaged for OralDetect v1. Every image has 12 boxes:
+# the anterior teeth, canine to canine in both arches, labelled with / without fenestration or
+# dehiscence. No tooth number; toothid/data/typed_union.py derives it from the box layout.
+# Paths are relative to `data_root` in ../../../root_paths.yaml.
+name: fdtooth
+prefix: FDTooth__
+categories:
+  - anterior teeth with fenestration or dehiscence
+  - anterior teeth without fenestration or dehiscence
+sources:
+  - split: v1_train
+    images:      processed_datas/OralDetect_Family/OralDetect_data_by_modality/intraoral
+    annotations: processed_datas/OralDetect_Family/OralDetect-Training/Detect-Training/instances_oraldetect_train.json
+  - split: v1_val
+    images:      processed_datas/OralDetect_Family/OralDetect_data_by_modality/intraoral
+    annotations: processed_datas/OralDetect_Family/OralDetect-Training/Detect-Training/instances_oraldetect_val.json
+  - split: v1_test
+    images:      processed_datas/OralDetect_Family/OralDetect-Bench/Detection/images/intraoral
+    annotations: processed_datas/OralDetect_Family/OralDetect-Bench/Detection/instances_oraldetect_test.json
