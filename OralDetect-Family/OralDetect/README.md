@@ -4,6 +4,15 @@ Open-vocabulary dental object detection.
 
 The class name is the classifier, the model can detect the class that was never trained on, just add the name to the vocabulary file.
 
+> 🛠️ **Finetune on your own data with one prompt.** This repo ships an agent skill,
+> [`skills/oraldetect-finetune`](./skills/oraldetect-finetune/). Open the repo in a coding agent
+> that supports skills (for example Claude Code), point it at your dataset folder and say
+> *"finetune OralDetect on my data"*. The skill converts your labels to COCO, downloads the weights,
+> validates the data and vocabulary, writes the launch files, scores the released detector as a
+> baseline, finetunes, scores again, and hands back an HTML report comparing before and after.
+> Each step stops at a checkpoint, so a problem is reported instead of trained through.
+> Sections 3 to 5 below describe the same steps for running them by hand.
+
 ## Layout
 
 ```text

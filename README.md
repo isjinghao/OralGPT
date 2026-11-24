@@ -30,7 +30,7 @@
     <a href="https://huggingface.co/OralGPT"><b>[Coming]OralFlow-Bench</b></a>
   </p>
   <p>
-    🚧&ensp;<a href="./OralDetect/"><b>OralDetect</b></a>
+    🚧&ensp;<a href="./OralDetect-Family/OralDetect/"><b>OralDetect</b></a>
     &ensp;·&ensp;
     <b>OralClue</b>
     &ensp;·&ensp;
@@ -51,7 +51,7 @@
 - **Researchers**: papers, benchmarks, and an evaluation toolkit.
 - **Developers**: in-repo training and evaluation entry points, plus released weights on [Hugging Face](https://huggingface.co/OralGPT).
 - **Collaborators**:<br>
-  💻 **AI**: [Jing HAO](https://isjinghao.github.io/) · [Xinpeng LU](https://scholar.google.com/citations?user=b3N2f4kAAAAJ&hl=zh-CN) · Siyuan DAI · [Yuci LIANG](https://scholar.google.com/citations?user=tewbmFkAAAAJ&hl=en) · Yuxuan FAN<br>
+  💻 **AI**: [Jing HAO](https://isjinghao.github.io/) · [Xinpeng LU](https://scholar.google.com/citations?user=b3N2f4kAAAAJ&hl=zh-CN) · [Siyuan DAI](https://scholar.google.com/citations?hl=en&user=Dp_hXF4AAAAJ&view_op=list_works&sortby=pubdate) · [Yuci LIANG](https://scholar.google.com/citations?user=tewbmFkAAAAJ&hl=en) · Yuxuan FAN<br>
   🦷 **clinical**: [Jiahao BAO](https://scholar.google.com/citations?user=nvCj17EAAAAJ&hl=zh-CN) · Lizhuo LIN
 
 ## Table of Contents
@@ -70,7 +70,7 @@
 - **[2026-11-22]** 📝 The **OralGPT-Family Technical Report Template** (LaTeX, arXiv-ready, pdfLaTeX/Overleaf) has been released in [OralGPT-Family-Template](./OralGPT-Family-Template/). 👏 Welcome to use it for OralGPT-Family reports.
 - **[2026-10-11]** 🎉 **PlaqueSAM** has been published in **npj Digital Medicine**: [Photography-based dental plaque detection and report generation among preschool children using PlaqueSAM](https://www.nature.com/articles/s41746-026-03385-9). Code: [isjinghao/PlaqueSAM](https://github.com/isjinghao/PlaqueSAM).
 - **[2026-09-01]** 🔥 **OralFlow** is coming soon...
-- **[2026-08-29]** 🔥🔥 **OralDetect**, an open-vocabulary dental detector spanning 5 imaging modalities, has been released: weights on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralDetect-Family), with the [training set](https://huggingface.co/datasets/OralGPT/OralDetect-Training) and [benchmark](https://huggingface.co/datasets/OralGPT/OralDetect-Bench). 👏 Welcome to detect on your own dental images.
+- **[2026-08-29]** 🔥🔥 **OralDetect**, an open-vocabulary dental detector spanning 5 imaging modalities, has been released: [code](./OralDetect-Family/OralDetect/) for inference, evaluation and finetuning, weights on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralDetect-Family), with the [training set](https://huggingface.co/datasets/OralGPT/OralDetect-Training) and [benchmark](https://huggingface.co/datasets/OralGPT/OralDetect-Bench). 🛠️ An agent skill, [`oraldetect-finetune`](./OralDetect-Family/OralDetect/skills/oraldetect-finetune/), is provided: tell your coding agent *"finetune OralDetect on my data"* and one prompt runs the whole pipeline, from label conversion to training, evaluation and an HTML report. 👏 Welcome to detect on your own dental images.
 - **[2026-04-09]** 🔥 **OralAgent** has been released on [arXiv](https://arxiv.org/abs/2605.27378).
 - **[2026-03-27]** 🔥 **[NeurIPS 2025] MMOral‑OPG‑Bench** is now supported on [**VLMEvalKit**](https://github.com/open-compass/VLMEvalKit/blob/main/vlmeval/dataset/mmoral_opg_open.py) for evaluation.
 - **[2026-03-02]** 🚀 **OralGPT-Captioning-4B-Base** has been released on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralGPT-Captioning-4B-Base). 👏 Welcome to generate visual description of dental images.
@@ -96,7 +96,7 @@ Specialist and general models in the OralGPT family. PlaqueSAM lives in its own 
 | **OralGPT-Plus** | Learns to use visual tools via reinforcement learning for panoramic X-ray analysis | [CVPR 2026](https://arxiv.org/abs/2603.06366) | [OralGPT-Plus](./OralGPT-Plus/) |
 | **OralAgent** | Interactive dental image analysis with reasoning, tools, and knowledge | [arXiv 2026](https://arxiv.org/abs/2605.27378) | [Paper](https://arxiv.org/abs/2605.27378) |
 | **OralGPT-CMF** | Fine-tuned multimodal model for oral and maxillofacial cases | Ongoing | [HF](https://huggingface.co/OralGPT/OralGPT-CMF-v1) · [OralGPT-CMF](./OralGPT-CMF/) |
-| **OralDetect** | Open-vocabulary detector across five imaging modalities | Released | [HF](https://huggingface.co/OralGPT/OralDetect-Family) · [OralDetect](./OralDetect/) |
+| **OralDetect** | Open-vocabulary detector across five imaging modalities, with a one-prompt finetuning skill | Released | [HF](https://huggingface.co/OralGPT/OralDetect-Family) · [OralDetect](./OralDetect-Family/OralDetect/) · [Skill](./OralDetect-Family/OralDetect/skills/oraldetect-finetune/) |
 | **PlaqueSAM** | Plaque detection and visual report generation from smartphone photos of preschool children | [npj Digital Medicine 2026](https://doi.org/10.1038/s41746-026-03385-9) | [GitHub](https://github.com/isjinghao/PlaqueSAM) |
 | **OralGPT-X** | Oral image generation and translation for CBCT, MRI, and orthognathic imaging | Ongoing | [OralGPT-X](./OralGPT-X/) |
 | **OralGPT-V** | Oral world model | In progress | [OralGPT-V](./OralGPT-V/) |
@@ -134,7 +134,7 @@ Evaluation steps for MMOral-OPG-Bench are in [MMOral-Bench-EvalKit](./MMOral-Ben
 | [OralGPT-CMF](./OralGPT-CMF/) | OralGPT-CMF inference |
 | [OralGPT-X](./OralGPT-X/) | Generation data scripts and OralGPT-X-Bench |
 | [OralGPT-V](./OralGPT-V/) | Oral world model |
-| [OralDetect](./OralDetect/) | Open-vocabulary detection training and evaluation |
+| [OralDetect](./OralDetect-Family/OralDetect/) | Open-vocabulary detection: inference, evaluation, finetuning, and the `oraldetect-finetune` agent skill that runs a finetune end to end from one prompt |
 | [OralFlow](./OralFlow/) | OralFlow-Bench construction pipeline |
 | [OralGPT-Family-Template](./OralGPT-Family-Template/) | LaTeX template for OralGPT-Family technical reports (arXiv / Overleaf) |
 | [LLaMA-Factory](./LLaMA-Factory/) | Upstream training framework, vendored for convenience |
